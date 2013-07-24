@@ -1,0 +1,3 @@
+An implementation of MapCSS in Postgresql / plpgsql for use with Mapnik.
+Therefore you can reduce your Mapnik stylesheet to a minimum; all style
+calculation is done in the database.
