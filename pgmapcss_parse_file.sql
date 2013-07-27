@@ -10,6 +10,7 @@ declare
   selectors pgmapcss_selector_return[];
   properties pgmapcss_properties_return;
   content text;
+  ret text:=''::text;
 begin
   content:=$2;
 
@@ -28,8 +29,12 @@ begin
       content=substr(content, properties.text_length);
     end loop;
 
+    ret = ret || pgmapcss_build_statement(selectors, properties);
+
     raise notice 'content: %', content;
     if content is null or content ~ '^\s*$' then
+      raise notice E'\n%', ret;
+
       return true;
     end if;
   end loop;
@@ -38,4 +43,4 @@ begin
 end;
 $$ language 'plpgsql' immutable;
 
-select pgmapcss_parse_file('foo', E'way|z11-14[highway=primary][access=public]:closed::layer1,\nnode { foo: bar; test: text; } way[x=y]{ foo: bar; }');
+select pgmapcss_parse_file('foo', E'way|z11-14[highway=primary][access=public]:closed::layer1,\nnode { foo: bar; test: text; } way[x=y]{ foo: b''ar; }');
