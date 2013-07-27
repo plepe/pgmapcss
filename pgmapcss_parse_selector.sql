@@ -23,13 +23,13 @@ begin
   ret.pseudo_classes=Array[]::text[];
 
   -- parse object class (way, node, canvas, ...)
-  m := substring(selector from '^(\*|node|way|relation|area|meta|canvas)(\|.*|\[.*|:.*|\s)');
+  m := substring(selector from '^\s*(\*|node|way|relation|area|meta|canvas)(\|.*|\[.*|:.*|\s)');
   if m is not null then
     ret.conditions=array_append(ret.conditions, ''''||m||'''=ANY(type)');
   else
     raise notice 'can''t parse object class at "%..."', substring(selector, 0, 40);
   end if;
-  selector := substring(selector from '^(?:\*|node|way|relation|area|meta|canvas)(\|.*|\[.*|:.*|\s)');
+  selector := substring(selector from '^\s*(?:\*|node|way|relation|area|meta|canvas)(\|.*|\[.*|:.*|\s)');
 
   -- parse zoom level
   m := substring(selector from '^\|z([0-9\-]+)(\[.*|:.*|\s)');
