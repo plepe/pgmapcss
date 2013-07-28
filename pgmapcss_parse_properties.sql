@@ -1,6 +1,7 @@
 drop type if exists pgmapcss_properties_return cascade;
 create type pgmapcss_properties_return as (
   properties            hstore,
+  prop_list             hstore,
   text_length           int
 );
 
@@ -21,6 +22,7 @@ begin
   content:=$1;
 
   ret.properties:=''::hstore;
+  ret.prop_list:=''::hstore;
 
   m=substring(content from '^[^{]*{\s*(.*)');
   if m is null then
@@ -49,6 +51,8 @@ begin
     if content ~ '^([^;]*);' then
       value=substring(content from '^([^;]*);');
       ret.properties=ret.properties||hstore(key, value);
+      -- TODO: return type of value
+      ret.prop_list=ret.prop_list||hstore(key, 'text');
 
       content=substring(content from '^[^;]*;\s*(.*)$');
     else

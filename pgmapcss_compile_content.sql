@@ -1,6 +1,7 @@
 drop type pgmapcss_compile_content_return cascade;
 create type pgmapcss_compile_content_return as (
-  func          text
+  func          text,
+  prop_list     hstore
 );
 
 create or replace function pgmapcss_compile_content (
@@ -18,6 +19,7 @@ declare
 begin
   content:=$1;
   ret.func :=''::text;
+  ret.prop_list := ''::hstore;
 
   loop
     selectors:=Array[]::pgmapcss_selector_return[];
@@ -29,6 +31,7 @@ begin
 
     for properties in select * from pgmapcss_parse_properties(content) loop
       content=substr(content, properties.text_length);
+      ret.prop_list=ret.prop_list || properties.prop_list;
     end loop;
 
     ret.func = ret.func || pgmapcss_build_statement(selectors, properties);

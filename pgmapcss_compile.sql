@@ -14,7 +14,7 @@ begin
 
   ret = ret || r.func;
 
-  raise notice E'\n%', ret;
+  raise notice E'\n%\nproplist: %', ret, r.prop_list;
 
   return ret;
 end;
