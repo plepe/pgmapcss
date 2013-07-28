@@ -21,7 +21,7 @@ begin
   ret = ret || E')\nthen\n';
   ret = ret || '  style = style || ' || quote_nullable(cast(properties.properties as text)) || E';\n';
 
-  ret = ret || E'end if\n\n';
+  ret = ret || E'end if;\n\n';
 
   return ret;
 end;
