@@ -8,18 +8,18 @@ as $$
 declare
   content text;
   ret text:=''::text;
-  r pgmapcss_compile_content_return;
+  stat		pgmapcss_compile_stat;
   i record;
   a text[];
 begin
-  r := pgmapcss_compile_content($2);
+  stat := pgmapcss_compile_content($2);
 
   ret = ret || 'drop type if exists css_return_' || style_id || E' cascade;\n';
   ret = ret || 'create type css_return_' || style_id || E' as (\n';
 
   a = Array[]::text[];
   a = array_append(a, E'  _style\thstore');
-  for i in select * from each(r.prop_list) loop
+  for i in select * from each(stat.prop_list) loop
     a = array_append(a, E'  ' || quote_ident(i.key) || E'\t' || i.value);
   end loop;
   ret = ret || array_to_string(a, E',\n');
@@ -37,10 +37,10 @@ begin
   ret = ret || E'  ret css_return_' || style_id || E';\n';
   ret = ret || E'begin\n';
 
-  ret = ret || r.func;
+  ret = ret || stat.func;
 
   ret = ret || E'  ret._style=style;\n';
-  for i in select * from each(r.prop_list) loop
+  for i in select * from each(stat.prop_list) loop
     ret = ret || E'  ret.' || quote_ident(i.key) || ' = cast(style->' || quote_literal(i.key) || E' as ' || quote_ident(i.value) || E');\n';
   end loop;
 
@@ -48,7 +48,7 @@ begin
   ret = ret || E'  return;\n';
   ret = ret || E'end;\n$body$ language ''plpgsql'' immutable;\n';
 
-  raise notice E'\n%\nproplist: %', ret, r.prop_list;
+  raise notice E'\n%\nproplist: %', ret, stat.prop_list;
 
   return ret;
 end;

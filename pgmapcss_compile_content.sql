@@ -1,13 +1,7 @@
-drop type if exists pgmapcss_compile_content_return cascade;
-create type pgmapcss_compile_content_return as (
-  func          text,
-  prop_list     hstore
-);
-
 create or replace function pgmapcss_compile_content (
   /* content */ text
 )
-returns pgmapcss_compile_content_return
+returns pgmapcss_compile_stat
 as $$
 #variable_conflict use_variable
 declare
@@ -15,11 +9,11 @@ declare
   selectors pgmapcss_selector_return[];
   properties pgmapcss_properties_return;
   content text;
-  ret pgmapcss_compile_content_return;
+  stat pgmapcss_compile_stat;
 begin
   content:=$1;
-  ret.func :=''::text;
-  ret.prop_list := ''::hstore;
+  stat.func :=''::text;
+  stat.prop_list := ''::hstore;
 
   loop
     selectors:=Array[]::pgmapcss_selector_return[];
@@ -31,13 +25,13 @@ begin
 
     for properties in select * from pgmapcss_parse_properties(content) loop
       content=substr(content, properties.text_length);
-      ret.prop_list=ret.prop_list || properties.prop_list;
+      stat.prop_list=stat.prop_list || properties.prop_list;
     end loop;
 
-    ret.func = ret.func || pgmapcss_build_statement(selectors, properties);
+    stat := pgmapcss_build_statement(selectors, properties, stat);
 
     if content is null or content ~ '^\s*$' then
-      return ret;
+      return stat;
     end if;
   end loop;
 

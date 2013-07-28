@@ -1,15 +1,18 @@
 create or replace function pgmapcss_build_statement (
   selectors pgmapcss_selector_return[],
-  properties pgmapcss_properties_return
+  properties pgmapcss_properties_return,
+  pgmapcss_compile_stat
 )
-returns text
+returns pgmapcss_compile_stat
 as $$
 #variable_conflict use_variable
 declare
+  stat pgmapcss_compile_stat;
   ret text := ''::text;
   a text[];
   r pgmapcss_selector_return;
 begin
+  stat := $3;
   ret = ret || 'if   (';
 
   a = Array[]::text[];
@@ -23,6 +26,8 @@ begin
 
   ret = ret || E'end if;\n\n';
 
-  return ret;
+  stat.func = stat.func || ret;
+
+  return stat;
 end;
 $$ language 'plpgsql' immutable;

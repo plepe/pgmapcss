@@ -1,6 +1,7 @@
 #!/bin/bash
 
 for i in \
+  pgmapcss_types.sql \
   pgmapcss_condition.sql \
   pgmapcss_parse_selector.sql \
   pgmapcss_parse_selectors.sql \
