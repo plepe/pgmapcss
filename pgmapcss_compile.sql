@@ -38,17 +38,17 @@ begin
   ret = ret || E'  has_layer boolean[];\n';
   ret = ret || E'  ret css_return_' || style_id || E';\n';
   ret = ret || E'  layers text[] := ''' || cast(stat.layers as text) || E''';\n';
-  ret = ret || E'  i int;\n';
+  ret = ret || E'  r record;\n';
   ret = ret || E'begin\n';
   ret = ret || E'  styles := array_fill(''''::hstore, Array[' || array_upper(stat.layers, 1) || E']);\n';
   ret = ret || E'  has_layer := array_fill(false, Array[' || array_upper(stat.layers, 1) || E']);\n';
 
   ret = ret || stat.func;
 
-  ret = ret || E'  for i in 1..' || array_upper(stat.layers, 1) || E' loop\n';
-  ret = ret || E'    if has_layer[i] then\n';
-  ret = ret || E'      ret._style=styles[i];\n';
-  ret = ret || E'      ret._layer=layers[i];\n';
+  ret = ret || E'  for r in select * from (select generate_series(1, ' || array_upper(stat.layers, 1) || E') i, unnest(styles) style) t order by coalesce(cast(style->''object-z-index'' as float), 0) asc loop\n';
+  ret = ret || E'    if has_layer[r.i] then\n';
+  ret = ret || E'      ret._style=styles[r.i];\n';
+  ret = ret || E'      ret._layer=layers[r.i];\n';
   for i in select * from each(stat.prop_list) loop
     ret = ret || E'      ret.' || quote_ident(i.key) || ' = cast(ret._style->' || quote_literal(i.key) || E' as ' || quote_ident(i.value) || E');\n';
   end loop;

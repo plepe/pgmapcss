@@ -1,3 +1,7 @@
+way|z11-::casing
+{
+  object-z-index: -20;
+}
 way|z11-14[highway=primary]
 {
   width: 2;
