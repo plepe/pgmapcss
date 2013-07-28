@@ -14,7 +14,7 @@ declare
 begin
   r := pgmapcss_compile_content($2);
 
-  ret = ret || 'drop type css_return_' || style_id || E' cascade;\n';
+  ret = ret || 'drop type if exists css_return_' || style_id || E' cascade;\n';
   ret = ret || 'create type css_return_' || style_id || E' as (\n';
 
   a = Array[]::text[];

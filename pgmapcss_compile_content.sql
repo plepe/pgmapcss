@@ -1,4 +1,4 @@
-drop type pgmapcss_compile_content_return cascade;
+drop type if exists pgmapcss_compile_content_return cascade;
 create type pgmapcss_compile_content_return as (
   func          text,
   prop_list     hstore
