@@ -37,3 +37,6 @@ way[highway=unclassified] {
 way[foo=bar] {
   color: #00ff00;
 }
+way.minor_road {
+  width: 2;
+}

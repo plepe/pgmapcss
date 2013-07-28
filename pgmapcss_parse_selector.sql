@@ -1,5 +1,6 @@
 drop type if exists pgmapcss_selector_return cascade;
 create type pgmapcss_selector_return as (
+  classes		text[], /* .foo */
   conditions            text[], /* conditional expressions */
   pseudo_classes        text[], /* :closed, ... */
   layer                 text,
@@ -22,18 +23,29 @@ declare
   max_scale_denominator float := 3.93216e+08;
 begin
   selector:=$1;
+  ret.classes=Array[]::text[];
   ret.conditions=Array[]::text[];
   ret.pseudo_classes=Array[]::text[];
   ret.layer := 'default';
 
   -- parse object class (way, node, canvas, ...)
-  m := substring(selector from '^\s*(\*|node|way|relation|area|meta|canvas)(\|.*|\[.*|:.*|\s)');
+  m := substring(selector from '^\s*(\*|node|way|relation|area|meta|canvas)(\|.*|\[.*|:.*|\..*|\s)');
   if m is not null then
     ret.conditions=array_append(ret.conditions, ''''||m||'''=ANY(type)');
   else
     raise notice 'can''t parse object class at "%..."', substring(selector, 0, 40);
   end if;
-  selector := substring(selector from '^\s*(?:\*|node|way|relation|area|meta|canvas)(\|.*|\[.*|:.*|\s)');
+  selector := substring(selector from '^\s*(?:\*|node|way|relation|area|meta|canvas)(\|.*|\[.*|:.*|\..*|\s)');
+
+  -- parse classes
+  while selector ~ '^\.([a-zA-Z0-9_]+)' loop
+    m := substring(selector from '^\.([a-zA-Z0-9_]+)');
+    ret.classes=array_append(ret.classes, m);
+    ret.conditions=array_append(ret.conditions,
+      'tags ? ' || quote_literal('.' || m));
+
+    selector := substring(selector from '^\.[a-zA-Z0-9_]+(.*)$');
+  end loop;
 
   -- parse zoom level
   m := substring(selector from '^\|z([0-9\-]+)(\[.*|:.*|\s)');

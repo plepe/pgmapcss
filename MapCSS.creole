@@ -38,8 +38,6 @@ After the type selector, separated by '.'. Optional.
 
 See below under 'Assignments - Classes'.
 
-NOT SUPPORTED YET
-
 === Zoom selector ===
 After the class selector, separated by '|'. Optional.
 
@@ -151,5 +149,3 @@ You can then use .minor_road (as above) in the class selector:
 way.minor_road {
   color: #ffffff;
 }}}}
-
-NOT SUPPORTED YET.
