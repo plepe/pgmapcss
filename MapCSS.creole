@@ -113,11 +113,20 @@ E.g.
   background-color: rgb(1.0, 0.0, 0.0);
 }}}}
 
+=== Eval expressions ===
+You can compute values using an eval instrucion:
+{{{{
+  opacity: eval("tag(population)/100000");
+}}}}
+
+NOT SUPPORTED YET.
+
 === Assignments ===
 You may assign values to tags of the current object. This is independent from the current layer.
 
 |= Declaration |= Description
 | set highway_class=minor; | set tag 'highway_class' to value 'minor'.
+| set highway_class=eval(...); | use an eval expression to set tag 'highway_class'.
 | set highway_class; | set tag 'highway_class' to 'yes'.
 | unset highway_class; | remove the tag 'highway_class'.
 
