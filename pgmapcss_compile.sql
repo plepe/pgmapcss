@@ -8,7 +8,7 @@ as $$
 declare
   content text;
   ret text:=''::text;
-  r pgmapcss_compile_statements_return;
+  r pgmapcss_compile_content_return;
   i record;
   a text[];
 begin
