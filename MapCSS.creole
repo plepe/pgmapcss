@@ -1,0 +1,148 @@
+For more information about MapCSS see
+* http://wiki.openstreetmap.org/wiki/MapCSS
+* http://wiki.openstreetmap.org/wiki/MapCSS/0.2
+* http://josm.openstreetmap.de/wiki/Help/Styles/MapCSSImplementation
+
+== General Structure ==
+A MapCSS style sheet has rules of the form
+
+{{{
+selector {
+  prop: value;
+  ...
+  prop: value;
+}
+}}}
+
+For each rule, if the selector applies the properties from the { } block are set. If a property has already been set, it will be overridden.
+
+== Selectors ==
+Every selector may have several elements: type, class, zoom, condition, pseudo, layer, grouping and link.
+
+E.g.
+* way.public[highway=residential]
+* way|z11-14[amenity=parking][access=public]:closed:new::layer_1
+* relation[type=route][route=foot] > way::relation_underlay
+
+=== Type selector ===
+First part of a selector; required.
+
+|= Selector |= Description
+| * | Matches with any object
+| node, way, relation | Matches with objects of the given type
+| area | Matches polygons (closed ways, relations with type multipolygon)
+| canvas | The background
+
+=== Class selector ===
+After the type selector, separated by '.'. Optional.
+
+See below under 'Assignments - Classes'.
+
+NOT SUPPORTED YET
+
+=== Zoom selector ===
+After the class selector, separated by '|'. Optional.
+
+The zoom selector restricts the range of zoom levels at which a rule is applied. If the zoom selector is omitted, the condition is valid for all zoom levels.
+
+|= Selector |= Description
+| {{{|z5}}} | Only at zoom level 5.
+| {{{|z5-}}} | Zoom level 5 and above.
+| {{{|z-5}}} | Zoom level 5 and below.
+| {{{|z5-10}}} | Zoom level 5 to 10.
+
+=== Condition selector ===
+After the zoom selector, may be specified multiple times. Every condition is enclosed in [...]. Optional.
+
+You can combine several conditions, they will be combined by logical AND. E.g. {{{*[highway=primary][bridge]}}} matches all objects with tags highway=primary AND bridge=yes.
+
+==== Comparision expressions ===
+|= Operator |= Description
+| = | Exact match of the value. E.g. {{{[highway=residential]}}}. Matches are always case sensitive. Use quotes for special characters (NOT SUPPORTED YET).
+| != | Value not equal. Negation of =.
+| <, >, <=, >= | Comparision for numeric values (using floats).
+| ^= | Prefix match. Value starts with 'string', e.g. {{{[name^=Lon]}}} matches "London".
+| $= | Suffix match. Value ends with 'string', e.g. {{{[name$=dorf]}}} matches "Enzersdorf".
+| *= | Substring match. Value contains 'string', e.g. {{{[name*=ob]}}} matches "Foobar".
+| ~= | List membership. Tag value consits of a list of ;-separated values. E.g. {{{[amenity~=atm]}}} matches {{{amenity=atm;bank}}}.
+| =~ | Regular expression match. Value matches given regular expression, e.g. {{{[highway=~/.*ary/]}}} matches primary. Use {{{[highway=~/.*ary/i]}}} for case insensitive matches.
+
+* You can prepend any of the expressions with ! to negate match, e.g. {{{[amenity*=bank][!amenity*=atm]}}} matches amenity=bank, amenity=bank;post_office but not amenity=bank;atm.
+
+==== Test of tag presence/absense ===
+|= Condition |= Description
+| [key] | Tests whether object has tag 'key'.
+| [!key] | Tests whether no 'key' is present.
+
+=== Pseudo selectors ===
+After the condition selector(s), separated by ':'. Several pseudo selectors may be specified. Optional.
+
+NOT SUPPORTED YET.
+
+=== Layer identifier ===
+After the pseudo selector(s), separated by '::'. Optional.
+
+Layers can be used to create more than one style for a single object, e.g. '::casing' to draw a casing. A property {{{object-z-index}}} may be specified to order layers.
+
+If you omit the layer in the selector, this is the same as using ::default.
+
+=== Grouping ===
+You may use a list of properties with several selectors, separated by ','. E.g.
+{{{
+area[landuse=forest],
+area[natural=wood]
+{
+  color: green;
+  width: 2;
+}
+}}}
+
+=== Link selector ===
+Parent, Child or nearby relations.
+
+NOT SUPPORTED YET.
+
+== Properties ==
+You may specify BELIEBIG properties. They will be treated as text values. Declarations are written by enclosing a set of style specifiers in curly braces.o
+
+E.g.
+
+{{{{
+  opacity: 0.5;
+  color: #ff0000;
+  background-color: rgb(1.0, 0.0, 0.0);
+}}}}
+
+=== Assignments ===
+You may assign values to tags of the current object. This is independent from the current layer.
+
+|= Declaration |= Description
+| set highway_class=minor; | set tag 'highway_class' to value 'minor'.
+| set highway_class; | set tag 'highway_class' to 'yes'.
+| unset highway_class; | remove the tag 'highway_class'.
+
+Example:
+{{{
+way[highway=unclassified],
+way[highway=residential] {
+  set highway_class=minor;
+}
+way[highway_class=minor] {
+  color: #ffffff;
+  width: 2;
+}
+}}}
+
+NOT SUPPORTED YET.
+
+=== Assignments - Classes ===
+You can set tags beginning with a full-stop to simulate classes:
+{{{{ set .minor_road; }}}}
+
+You can then use .minor_road (as above) in the class selector:
+{{{
+way.minor_road {
+  color: #ffffff;
+}}}}
+
+NOT SUPPORTED YET.
