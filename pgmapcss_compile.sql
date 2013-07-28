@@ -18,8 +18,9 @@ begin
   ret = ret || 'create type css_return_' || style_id || E' as (\n';
 
   a = Array[]::text[];
+  a = array_append(a, E'  _style\thstore');
   for i in select * from each(r.prop_list) loop
-    a = array_append(a, E'  ' || i.key || E'\t' || i.value);
+    a = array_append(a, E'  ' || quote_ident(i.key) || E'\t' || i.value);
   end loop;
   ret = ret || array_to_string(a, E',\n');
   ret = ret || E'\n);\n\n';
@@ -33,10 +34,17 @@ begin
   ret = ret || E') returns setof css_return_' || style_id || E' as $body$\n';
   ret = ret || E'declare\n';
   ret = ret || E'  style hstore := ''''::hstore;\n';
+  ret = ret || E'  ret css_return_' || style_id || E';\n';
   ret = ret || E'begin\n';
 
   ret = ret || r.func;
 
+  ret = ret || E'  ret._style=style;\n';
+  for i in select * from each(r.prop_list) loop
+    ret = ret || E'  ret.' || quote_ident(i.key) || ' = cast(style->' || quote_literal(i.key) || E' as ' || quote_ident(i.value) || E');\n';
+  end loop;
+
+  ret = ret || E'  return next ret;\n';
   ret = ret || E'  return;\n';
   ret = ret || E'end;\n$body$ language ''plpgsql'' immutable;\n';
 
@@ -46,4 +54,4 @@ begin
 end;
 $$ language 'plpgsql' immutable;
 
-select pgmapcss_compile('foo', E'way|z11-14[highway=primary][access=public]:closed::layer1,\nnode { foo: bar; test: text; } way[x=y]{ foo: b''ar; }');
+select pgmapcss_compile('foo', E'way|z11-14[highway=primary][access=public]:closed::layer1,\nnode { foo: bar; test: text; } way[x=y]{ foo: b''ar; line-width: 3; }');
