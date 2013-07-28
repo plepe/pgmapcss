@@ -9,10 +9,36 @@ declare
   content text;
   ret text:=''::text;
   r pgmapcss_compile_statements_return;
+  i record;
+  a text[];
 begin
   r := pgmapcss_compile_content($2);
 
+  ret = ret || 'drop type css_return_' || style_id || E' cascade;\n';
+  ret = ret || 'create type css_return_' || style_id || E' as (\n';
+
+  a = Array[]::text[];
+  for i in select * from each(r.prop_list) loop
+    a = array_append(a, E'  ' || i.key || E'\t' || i.value);
+  end loop;
+  ret = ret || array_to_string(a, E',\n');
+  ret = ret || E'\n);\n\n';
+
+  ret = ret || 'create or replace function css_check_' || style_id || E'(\n';
+  ret = ret || E'  id\ttext,\n';
+  ret = ret || E'  tags\thstore,\n';
+  ret = ret || E'  way\tgeometry,\n';
+  ret = ret || E'  type\ttext[],\n';
+  ret = ret || E'  scale_denominator\tfloat\n';
+  ret = ret || E') returns setof css_return_' || style_id || E' as $body$\n';
+  ret = ret || E'declare\n';
+  ret = ret || E'  style hstore := ''''::hstore;\n';
+  ret = ret || E'begin\n';
+
   ret = ret || r.func;
+
+  ret = ret || E'  return;\n';
+  ret = ret || E'end;\n$body$ language ''plpgsql'' immutable;\n';
 
   raise notice E'\n%\nproplist: %', ret, r.prop_list;
 
