@@ -30,6 +30,16 @@ begin
       quote_nullable(cast(properties.properties as text)) || E';\n';
     ret = ret || '  has_layer[' || current_layer || E'] = true;\n';
 
+    if array_upper(akeys(properties.assignments), 1) is not null then
+      ret = ret || '  tags = tags || ' ||
+	quote_nullable(cast(properties.assignments as text)) || E';\n';
+    end if;
+
+    if array_upper(properties.unassignments, 1) is not null then
+      ret = ret || '  tags = tags - cast(' ||
+	quote_nullable(cast(properties.unassignments as text)) || E' as text[]);\n';
+    end if;
+
     ret = ret || E'end if;\n\n';
   end loop;
 

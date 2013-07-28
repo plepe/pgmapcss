@@ -27,3 +27,13 @@ way|z11-[bridge]::casing
 {
   color: #000000;
 }
+
+way[highway=residential],
+way[highway=unclassified] {
+  set .minor_road;
+  set foo=bar;
+  unset name;
+}
+way[foo=bar] {
+  color: #00ff00;
+}
