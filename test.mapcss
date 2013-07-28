@@ -1,0 +1,25 @@
+way|z11-14[highway=primary]
+{
+  width: 2;
+  color: #ff0000;
+}
+way|z11-14[highway=primary]::casing
+{
+  width: 4;
+  color: #404040;
+}
+
+way|z15-[highway=primary]
+{
+  width: 4;
+  color: #ff0000;
+}
+way|z15-[highway=primary]::casing
+{
+  width: 7;
+  color: #000000;
+}
+way|z11-[bridge]::casing
+{
+  color: #000000;
+}

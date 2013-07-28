@@ -12,3 +12,6 @@ do
   echo "* $i"
   psql $@ -f $i
 done
+
+FILE=`cat test.mapcss`
+psql $@ -c "select pgmapcss_compile('test', \$\$$FILE\$\$);"

@@ -53,5 +53,3 @@ begin
   return ret;
 end;
 $$ language 'plpgsql' immutable;
-
-select pgmapcss_compile('foo', E'way|z11-14[highway=primary][access=public]:closed::layer1,\nnode { foo: bar; test: text; } way[x=y]{ foo: b''ar; line-width: 3; }');
