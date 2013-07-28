@@ -19,6 +19,7 @@ begin
 
   a = Array[]::text[];
   a = array_append(a, E'  _style\thstore');
+  a = array_append(a, E'  _layer\ttext');
   for i in select * from each(stat.prop_list) loop
     a = array_append(a, E'  ' || quote_ident(i.key) || E'\t' || i.value);
   end loop;
@@ -33,18 +34,28 @@ begin
   ret = ret || E'  scale_denominator\tfloat\n';
   ret = ret || E') returns setof css_return_' || style_id || E' as $body$\n';
   ret = ret || E'declare\n';
-  ret = ret || E'  style hstore := ''''::hstore;\n';
+  ret = ret || E'  styles hstore[];\n';
+  ret = ret || E'  has_layer boolean[];\n';
   ret = ret || E'  ret css_return_' || style_id || E';\n';
+  ret = ret || E'  layers text[] := ''' || cast(stat.layers as text) || E''';\n';
+  ret = ret || E'  i int;\n';
   ret = ret || E'begin\n';
+  ret = ret || E'  styles := array_fill(''''::hstore, Array[' || array_upper(stat.layers, 1) || E']);\n';
+  ret = ret || E'  has_layer := array_fill(false, Array[' || array_upper(stat.layers, 1) || E']);\n';
 
   ret = ret || stat.func;
 
-  ret = ret || E'  ret._style=style;\n';
+  ret = ret || E'  for i in 1..' || array_upper(stat.layers, 1) || E' loop\n';
+  ret = ret || E'    if has_layer[i] then\n';
+  ret = ret || E'      ret._style=styles[i];\n';
+  ret = ret || E'      ret._layer=layers[i];\n';
   for i in select * from each(stat.prop_list) loop
-    ret = ret || E'  ret.' || quote_ident(i.key) || ' = cast(style->' || quote_literal(i.key) || E' as ' || quote_ident(i.value) || E');\n';
+    ret = ret || E'      ret.' || quote_ident(i.key) || ' = cast(ret._style->' || quote_literal(i.key) || E' as ' || quote_ident(i.value) || E');\n';
   end loop;
+  ret = ret || E'      return next ret;\n';
+  ret = ret || E'    end if;\n';
+  ret = ret || E'  end loop;\n';
 
-  ret = ret || E'  return next ret;\n';
   ret = ret || E'  return;\n';
   ret = ret || E'end;\n$body$ language ''plpgsql'' immutable;\n';
 

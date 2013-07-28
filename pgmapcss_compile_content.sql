@@ -14,6 +14,7 @@ begin
   content:=$1;
   stat.func :=''::text;
   stat.prop_list := ''::hstore;
+  stat.layers := Array['default']::text[];
 
   loop
     selectors:=Array[]::pgmapcss_selector_return[];

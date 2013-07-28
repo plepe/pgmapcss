@@ -24,6 +24,7 @@ begin
   selector:=$1;
   ret.conditions=Array[]::text[];
   ret.pseudo_classes=Array[]::text[];
+  ret.layer := 'default';
 
   -- parse object class (way, node, canvas, ...)
   m := substring(selector from '^\s*(\*|node|way|relation|area|meta|canvas)(\|.*|\[.*|:.*|\s)');
