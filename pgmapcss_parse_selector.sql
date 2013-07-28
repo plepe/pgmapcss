@@ -16,7 +16,10 @@ as $$
 declare
   ret pgmapcss_selector_return;
   m text;
+  m1 text;
+  t text;
   selector text;
+  max_scale_denominator float := 3.93216e+08;
 begin
   selector:=$1;
   ret.conditions=Array[]::text[];
@@ -34,7 +37,50 @@ begin
   -- parse zoom level
   m := substring(selector from '^\|z([0-9\-]+)(\[.*|:.*|\s)');
   if m is not null then
-    ret.conditions=array_append(ret.conditions, 'zoom = '||m);
+    -- zN
+    m1 := substring(m from '^([0-9]+)$');
+    if m1 is not null then
+      ret.conditions=array_append(ret.conditions,
+        'scale_denominator >= ' ||
+        cast((max_scale_denominator / 2 ^ cast(m as int)) as text) ||
+        ' and scale_denominator < ' ||
+        cast((max_scale_denominator / 2 ^ (cast(m as int) - 1)) as text)
+      );
+    end if;
+
+    -- zN-
+    m1 := substring(m from '^([0-9]+)\-$');
+    if m1 is not null then
+      ret.conditions=array_append(ret.conditions,
+        'scale_denominator < ' ||
+        cast((max_scale_denominator / 2 ^ (cast(m1 as int) - 1)) as text)
+      );
+    end if;
+
+    -- z-N
+    m1 := substring(m from '^\-([0-9]+)$');
+    if m1 is not null then
+      ret.conditions=array_append(ret.conditions,
+        'scale_denominator >= ' ||
+        cast((max_scale_denominator / 2 ^ cast(m1 as int)) as text)
+      );
+    end if;
+
+    -- zN-N
+    m1 := substring(m from '^(?:[0-9]+)\-([0-9]+)$');
+    if m1 is not null then
+      t=
+        'scale_denominator >= ' ||
+        cast((max_scale_denominator / 2 ^ cast(m1 as int)) as text);
+
+      m1 := substring(m from '^([0-9]+)\-(?:[0-9]+)$');
+      t=t||
+        ' and scale_denominator < ' ||
+        cast((max_scale_denominator / 2 ^ (cast(m1 as int) - 1)) as text);
+
+      ret.conditions=array_append(ret.conditions, t);
+    end if;
+
     selector := substring(selector from '^\|(?:z[0-9\-]+)(\[.*|:.*|\s)');
   end if;
 
