@@ -1,6 +1,7 @@
 way|z11-::casing
 {
-  object-z-index: -20;
+  z-index: -20;
+  object-z-index: -1;
 }
 way|z11-14[highway=primary]
 {
@@ -10,7 +11,7 @@ way|z11-14[highway=primary]
 way|z11-14[highway=primary]::casing
 {
   width: 4;
-  color: #404040;
+  color: #A0A0A0;
 }
 
 way|z15-[highway=primary]
@@ -21,7 +22,7 @@ way|z15-[highway=primary]
 way|z15-[highway=primary]::casing
 {
   width: 7;
-  color: #000000;
+  color: #A0A0A0;
 }
 way|z11-[bridge]::casing
 {
@@ -39,4 +40,5 @@ way[foo=bar] {
 }
 way.minor_road {
   width: 2;
+  z-index: -1;
 }

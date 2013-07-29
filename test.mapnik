@@ -1,0 +1,64 @@
+<?xml version="1.0"?>
+<!DOCTYPE Map>
+<Map srs="+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +no_defs +over">
+  <Style name="pgmapcss">
+<!--
+    <Rule>
+      <LineSymbolizer stroke="[color]" stroke-width="[width]" />
+    </Rule>
+
+This does not work yet, as Mapnik does not support reading the stroke-value from a database column. stroke-width is also not supported right now, but there's a tst branch, https://github.com/mapnik/mapnik/tree/stroke-width-expr - use this to try pgmapcss.
+
+You should follow https://github.com/mapnik/mapnik/issues/828 for updates.
+
+In the meantime, the following rules simulate this behaviour:
+     -->
+    <Rule>
+      <LineSymbolizer stroke="#ff0000" stroke-width="[width]" />
+      <Filter>[color] = '#ff0000'</Filter>
+    </Rule>
+    <Rule>
+      <LineSymbolizer stroke="#000000" stroke-width="[width]" />
+      <Filter>[color] = '#000000'</Filter>
+    </Rule>
+    <Rule>
+      <LineSymbolizer stroke="#00ff00" stroke-width="[width]" />
+      <Filter>[color] = '#00ff00'</Filter>
+    </Rule>
+    <Rule>
+      <LineSymbolizer stroke="#A0A0A0" stroke-width="[width]" />
+      <Filter>[color] = '#A0A0A0'</Filter>
+    </Rule>
+<!-- END -->
+  </Style>
+
+  <Layer name="layer" status="on" srs="+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +no_defs +over">
+    <Datasource>
+      <Parameter name="type">postgis</Parameter>
+      <Parameter name="dbname">DB</Parameter>
+      <Parameter name="user">USER</Parameter>
+      <Parameter name="password">PASSWORD</Parameter>
+      <Parameter name="host">localhost</Parameter>
+      <Parameter name="estimate_extent">false</Parameter>
+      <Parameter name="extent">-20037508,-19929239,20037508,19929239</Parameter>
+      <Parameter name="geometry_field">way</Parameter>
+      <Parameter name="srid">900913</Parameter>
+      <Parameter name="table">
+(select * from 
+  (select 
+    (css_check_test(
+      cast(osm_id as text),
+      tags,
+      way,
+      Array['way','line'],
+      !scale_denominator!
+    )
+  ).*, way from planet_osm_line
+  ) t
+  order by coalesce(cast("z-index" as float), 0) asc
+) t
+      </Parameter>
+    </Datasource>
+    <StyleName>pgmapcss</StyleName>
+  </Layer>
+</Map>
