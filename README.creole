@@ -1,3 +1,48 @@
 An implementation of MapCSS in Postgresql / plpgsql for use with Mapnik.
 Therefore you can reduce your Mapnik stylesheet to a minimum; all style
 calculation is done in the database.
+
+The postgresql function pgmapcss_install(style_id, file_content) converts the passed css file to a function. It will be available as postgresql function named 'css_check_{style_id}()'.
+
+== Function css_check_{style_id} ==
+
+Parameters:
+|= Parameter |= Type |= Description
+| id | text | Object ID, e.g. 'N1234'
+| tags | hstore | All tags of the object
+| way | geometry | The geometry of the object
+| types | text[] | An array of the types of the object, e.g. 'node', 'way', 'relation' or 'area', 'line', ...
+| scale_denominator | float | The current zoom level as scale_denominator
+
+Every call returns 0..n rows, depending on the matching css rules. There will be one returned row for every layer, ordered by 'object-z-index' (asc, default 0).
+
+Return values:
+|= Name |= Type |= Description
+| _style | hstore | All resulting properties
+| _layer | text | The current layer, default: 'default'.
+| _tags | hstore | The resulting tags, as modified by set and unset statements.
+| ... | text | A column for every property found in the CSS file.
+
+Example usage (for style_id 'test'):
+{{{
+(select * from
+  (select
+    (css_check_test(
+      cast(osm_id as text),
+      tags,
+      way,
+      Array['way','line'],
+      !scale_denominator!
+    )
+  ).*, way from planet_osm_line
+  ) t
+  order by coalesce(cast("z-index" as float), 0) asc
+) t
+}}}
+
+Example output:
+|= _style |= _layer |= _tags |= color |= width |= z-index |= object-z-index
+| "color"=>"#A0A0A0", "width"=>"7", "z-index"=>"-20", "object-z-index"=>"-1" | casing | "name"=>"Testroad", "highway"=>"primary" | #A0A0A0 | 7 | -20 | -1
+| "color"=>"#ff0000", "width"=>"4" | default | "name"=>"Testroad", "highway"=>"primary" | #ff0000 | 4 | |
+
+{{{!scale_denominator!}}} will be replaced by Mapnik by the current zoom level, see https://trac.openstreetmap.org/browser/subversion/applications/rendering/mapnik/zoom-to-scale.txt for valid values.
