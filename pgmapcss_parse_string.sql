@@ -45,7 +45,10 @@ begin
       i := i + 1;
 
       if i > length(content) then
-	return null;
+	ret.result = null;
+	ret.text_length = 0;
+
+	return ret;
       end if;
     end loop;
 
@@ -56,6 +59,8 @@ begin
     return ret;
   end if;
 
-  return null;
+  ret.result = null;
+  ret.text_length = 0;
+  return ret;
 end;
 $$ language 'plpgsql' immutable;
