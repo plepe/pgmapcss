@@ -31,7 +31,8 @@ begin
 
   -- parse object class (way, node, canvas, ...)
   m := substring(selector from '^\s*(\*|node|way|relation|area|meta|canvas)(\|.*|\[.*|:.*|\..*|\s)');
-  if m is not null then
+  if m = '*' then
+  elsif m is not null then
     ret.conditions=array_append(ret.conditions, ''''||m||'''=ANY(type)');
   else
     raise notice 'can''t parse object class at "%..."', substring(selector, 0, 40);
