@@ -16,7 +16,11 @@ begin
 
   foreach r in array selectors loop
     ret = ret || 'if   (';
-    ret = ret || array_to_string(r.conditions, ' and ');
+    if array_upper(r.conditions, 1) is null then
+      ret = ret || 'true';
+    else
+      ret = ret || array_to_string(r.conditions, ' and ');
+    end if;
     ret = ret || E')\nthen\n';
 
     current_layer = array_search(r.layer, stat.layers);
