@@ -54,9 +54,11 @@ After the zoom selector, may be specified multiple times. Every condition is enc
 
 You can combine several conditions, they will be combined by logical AND. E.g. {{{*[highway=primary][bridge]}}} matches all objects with tags highway=primary AND bridge=yes.
 
+Matches are always case sensitive (except regexp). Valid characters for keys are letters, digits, '-', '_' and ':'. Valid characters for values are all characters expect '"', ''' and ']'. You may quote keys and values with '"' or ''' to use special characters.
+
 ==== Comparision expressions ===
 |= Operator |= Description
-| = | Exact match of the value. E.g. {{{[highway=residential]}}}. Matches are always case sensitive. Use quotes for special characters (NOT SUPPORTED YET).
+| = | Exact match of the value. E.g. {{{[highway=residential]}}}.
 | != | Value not equal. Negation of =.
 | <, >, <=, >= | Comparision for numeric values (using floats).
 | ^= | Prefix match. Value starts with 'string', e.g. {{{[name^=Lon]}}} matches "London".

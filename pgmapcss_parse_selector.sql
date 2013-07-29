@@ -7,7 +7,7 @@ create type pgmapcss_selector_return as (
   text_length           int
 );
 
-drop function pgmapcss_parse_selector(text);
+drop function if exists pgmapcss_parse_selector(text);
 create or replace function pgmapcss_parse_selector (
   text
 )
@@ -21,6 +21,7 @@ declare
   t text;
   selector text;
   max_scale_denominator float := 3.93216e+08;
+  r record;
 begin
   selector:=$1;
   ret.classes=Array[]::text[];
@@ -98,10 +99,10 @@ begin
   end if;
 
   -- parse condition selector(s)
-  while selector ~ '^\[[^\]]+\]' loop
-    m := substring(selector from '^\[([^\]]+)\]');
-    ret.conditions=array_append(ret.conditions, pgmapcss_condition(m));
-    selector := substring(selector from '^\[[^\]]+\](.*)$');
+  while selector ~ '^\[' loop
+    r := pgmapcss_condition(substring(selector, 2));
+    ret.conditions=array_append(ret.conditions, r.result);
+    selector := substring(selector, r.text_length + 3);
   end loop;
 
   -- parse pseudo classes
