@@ -16,5 +16,8 @@ do
   psql $@ -f $i
 done
 
+echo "=== Resulting function ===" > test.output
 FILE=`cat test.mapcss`
-psql $@ -c "select pgmapcss_install('test', \$\$$FILE\$\$);"
+psql $@ -P format=unaligned -c "select pgmapcss_install('test', \$\$$FILE\$\$);" | tail -n+2 | head -n-2 >> test.output
+
+less test.output

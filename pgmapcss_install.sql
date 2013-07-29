@@ -1,8 +1,9 @@
+drop function pgmapcss_install(text, text);
 create or replace function pgmapcss_install (
   style_id      text,
   content	text
 )
-returns boolean
+returns text
 as $$
 #variable_conflict use_variable
 declare
@@ -11,6 +12,6 @@ begin
   func:=pgmapcss_compile(style_id, content);
   execute func;
 
-  return true;
+  return func;
 end;
 $$ language 'plpgsql' volatile;
