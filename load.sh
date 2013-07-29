@@ -10,6 +10,7 @@ for i in \
   pgmapcss_parse_properties.sql \
   pgmapcss_build_statement.sql \
   pgmapcss_compile_content.sql \
+  pgmapcss_parse_eval.sql \
   pgmapcss_compile.sql \
   pgmapcss_install.sql
 do

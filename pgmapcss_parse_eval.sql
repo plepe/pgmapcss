@@ -1,7 +1,8 @@
--- parse a string from the current content. Returns the parsed string and the length that was read from the content. This function is very similar to pgmapcss_parse_string, but - when eval content is not quoted - checks for correct parenthesis.
+-- parse a tree from an eval statement. Returns the tree and the length that was read from the content.
 create or replace function pgmapcss_parse_eval(
   			text,
-  "offset"		int default 1
+  "offset"		int default 1,
+  math_level		int default 0
 )
 returns pgmapcss_parse_string_return
 as $$
@@ -10,59 +11,104 @@ declare
   ret pgmapcss_parse_string_return;
   content text;
   esc boolean := false;
-  parenthesis_level int := 0;
   i int;
+  j int;
+  t text;
   r record;
+  a text[];
+  current text;
+  param text[];
 begin
   content := substring($1, "offset");
-  ret.result := '';
-
-  if content ~ '^("|'')' then
-    r := pgmapcss_parse_string(content);
-    return r;
-  end if;
+  ret.text_length := null;
 
   i := 1;
+  current := ''::text;
+  param := Array[]::text[];
+
   loop
-    raise notice 'X % (%): %...', i, parenthesis_level, substring(content, i, 40);
+    -- raise notice 'eval: % "%..."', math_level, substring(content, i, 20);
     if esc = true then
-      ret.result := ret.result || substring(content, i, 1);
+      current := current || substring(content, i, 1);
       esc := false;
 
     else
       if substring(content, i, 1) = E'\\' then
-	ret.result := ret.result || substring(content, i, 1);
 	esc := true;
 
       elsif substring(content, i, 1) in ('"', '''') then
-        r := pgmapcss_parse_string(content, null, i);
-	raise notice 'parse string %', r;
+        r := pgmapcss_parse_string(content, null, i + 1);
 
-	ret.result := ret.result || substring(content, i, r.text_length);
-	i := i + r.text_length - 1;
+	current := current || coalesce(r.result, '');
+	i := i + r.text_length;
+
+	-- TODO: check no text before / after current
 
       elsif substring(content, i, 1) = '(' then
 	ret.result := ret.result || substring(content, i, 1);
-        parenthesis_level := parenthesis_level + 1;
+
+	r := pgmapcss_parse_eval(content, i + 1);
+        i := i + r.text_length;
+
+	a := cast(r.result as text[]);
+	a := array_prepend('f:'||current, a);
+	param := array_append(param, cast(a as text));
+
+	current := '';
 
       elsif substring(content, i, 1) = ')' then
-	if parenthesis_level = 0 then
+	param := array_append(param, 'v:' || current);
+
+	ret.result := cast(param as text);
+	ret.text_length := i - 1;
+	return ret;
+      elsif substring(content, i, 1) = ',' then
+	param := array_append(param, 'v:' || current);
+	current := '';
+      elsif substring(content, i, 1) in ('+', '-', '*', '/') then
+        t := substring(content, i, 1);
+	j :=  (CASE WHEN t in ('+', '-') THEN 1
+	            WHEN t in ('*', '/') THEN 2
+	       END);
+
+	if (j < math_level) then
+	  if current != '' then
+	    param := array_append(param, 'v:' || current);
+	  end if;
+
+	  ret.result := cast(param as text);
 	  ret.text_length := i - 1;
 
 	  return ret;
+	else
+	  r := pgmapcss_parse_eval(content, i + 1, j);
+	  i := i + r.text_length;
+
+	  a := cast(r.result as text[]);
+	  if current = '' then
+	    a := array_cat(param, a);
+	    a := array_prepend('o:'||t, a);
+	    param := a;
+	  else
+	    a := array_prepend('v:'||current, a);
+	    a := array_prepend('o:'||t, a);
+	    param := array_append(param, cast(a as text));
+	  end if;
 	end if;
 
-        parenthesis_level := parenthesis_level - 1;
-	ret.result := ret.result || substring(content, i, 1);
+	current := '';
       else
-	ret.result := ret.result || substring(content, i, 1);
+	current := current || substring(content, i, 1);
       end if;
     end if;
 
     i := i + 1;
 
     if i > length(content) then
-      raise notice 'error parsing eval: %...', substring(content, i, 40);
+      if current != '' then
+	param := array_append(param, 'v:' || current);
+      end if;
+      ret.result := cast(param as text);
       ret.text_length := i;
 
       return ret;
