@@ -10,6 +10,7 @@ declare
   stat pgmapcss_compile_stat;
   ret text := ''::text;
   r pgmapcss_selector_return;
+  r1 record;
   current_layer text;
 begin
   stat := $3;
@@ -29,6 +30,7 @@ begin
       current_layer = array_upper(stat.layers, 1);
     end if;
 
+    ret = ret || '  current_style = styles[' || current_layer || E'];\n';
     ret = ret || '  styles[' || current_layer || '] = ' ||
       'styles[' || current_layer || '] || ' ||
       quote_nullable(cast(properties.properties as text)) || E';\n';
@@ -38,6 +40,17 @@ begin
       ret = ret || '  tags = tags || ' ||
 	quote_nullable(cast(properties.assignments as text)) || E';\n';
     end if;
+
+    for r1 in select * from each(properties.eval_assignments) loop
+      ret = ret || '  tags = tags || hstore(' ||
+        quote_literal(r1.key) || ', ' || r1.value || E');\n';
+    end loop;
+
+    for r1 in select * from each(properties.eval_properties) loop
+      ret = ret || '  styles[' || current_layer || '] = ' ||
+	'styles[' || current_layer || '] || hstore(' ||
+        quote_literal(r1.key) || ', ' || r1.value || E');\n';
+    end loop;
 
     if array_upper(properties.unassignments, 1) is not null then
       ret = ret || '  tags = tags - cast(' ||

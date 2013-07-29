@@ -11,6 +11,8 @@ for i in \
   pgmapcss_build_statement.sql \
   pgmapcss_compile_content.sql \
   pgmapcss_parse_eval.sql \
+  pgmapcss_compile_eval.sql \
+  eval.sql \
   pgmapcss_compile.sql \
   pgmapcss_install.sql
 do

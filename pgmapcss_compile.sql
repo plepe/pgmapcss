@@ -36,6 +36,7 @@ begin
   ret = ret || E') returns setof css_return_' || style_id || E' as $body$\n';
   ret = ret || E'declare\n';
   ret = ret || E'  tags hstore;\n';
+  ret = ret || E'  current_style hstore;\n';
   ret = ret || E'  styles hstore[];\n';
   ret = ret || E'  has_layer boolean[];\n';
   ret = ret || E'  ret css_return_' || style_id || E';\n';

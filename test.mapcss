@@ -38,6 +38,8 @@ way[highway=residential],
 way[highway=unclassified] {
   set .minor_road;
   set foo=bar;
+  set test=eval(tag(name));
+  foo: eval(2+3);
   unset name;
 }
 way[foo=bar] {
