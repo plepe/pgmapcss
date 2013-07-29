@@ -5,9 +5,11 @@ create type pgmapcss_parse_string_return as (
 );
 
 -- parse a string from the current content. Returns the parsed string and the length that was read from the content.
+-- no_quote_match: valid string definition if string is not quoted
 create or replace function pgmapcss_parse_string(
   			text,
-  no_quote_match	text default null -- valid string definition if string is not quoted
+  no_quote_match	text default null,
+  "offset"		int default 1
 )
 returns pgmapcss_parse_string_return
 as $$
@@ -19,7 +21,7 @@ declare
   esc boolean := false;
   i int;
 begin
-  content := $1;
+  content := substring($1, "offset");
   ret.result := '';
 
   if content ~ '^("|'')' then
