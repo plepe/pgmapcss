@@ -31,6 +31,8 @@ begin
   ret.prop_list:=''::hstore;
   ret.assignments:=''::hstore;
   ret.unassignments:=Array[]::text[];
+  ret.eval_assignments:=''::hstore;
+  ret.eval_properties:=''::hstore;
 
   m=substring(content from '^[^{]*{\s*(.*)');
   if m is null then
@@ -84,13 +86,13 @@ begin
       end if;
 
       if assignment_type = 1 then
-	ret.eval_properties := hstore(key, pgmapcss_compile_eval(r.result));
+	ret.eval_properties := ret.eval_properties || hstore(key, pgmapcss_compile_eval(r.result));
 	ret.prop_list := ret.prop_list||hstore(key, 'text');
       elsif assignment_type = 2 then
-	ret.eval_assignments := hstore(key, pgmapcss_compile_eval(r.result));
+	ret.eval_assignments := ret.eval_assignments || hstore(key, pgmapcss_compile_eval(r.result));
       end if;
 
-      content := substring(content, 6 + r.text_length + 1);
+      content := substring(content, 6 + r.text_length);
       content := substring(content from '^[^;]*;\s*(.*)$');
     elsif content ~ '^([^;]*);' then
       value=substring(content from '^([^;]*);');
