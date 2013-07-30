@@ -45,8 +45,6 @@ begin
 	-- TODO: check no text before / after current
 
       elsif substring(content, i, 1) = '(' then
-	ret.result := ret.result || substring(content, i, 1);
-
 	r := pgmapcss_parse_eval(content, i + 1);
         i := i + r.text_length;
 
@@ -57,10 +55,12 @@ begin
 	current := '';
 
       elsif substring(content, i, 1) = ')' then
-	param := array_append(param, 'v:' || current);
+	if current != '' then
+	  param := array_append(param, 'v:' || current);
+	end if;
 
 	ret.result := cast(param as text);
-	ret.text_length := i - 1;
+	ret.text_length := i;
 	return ret;
       elsif substring(content, i, 1) = ',' then
 	param := array_append(param, 'v:' || current);
@@ -94,6 +94,11 @@ begin
 	    a := array_prepend('o:'||t, a);
 	    param := array_append(param, cast(a as text));
 	  end if;
+
+	  if substring(content, i, 1) = ')' then
+	    i := i - 1;
+	  end if;
+
 	end if;
 
 	current := '';
