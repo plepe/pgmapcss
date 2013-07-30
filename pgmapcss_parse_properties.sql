@@ -24,6 +24,7 @@ declare
   value text;
   assignment_type int;
   r record;
+  r1 record;
 begin
   content:=$1;
 
@@ -78,7 +79,16 @@ begin
     end if;
 
     if content ~ '^eval\(' then
-      r := pgmapcss_parse_eval(content, 6);
+      r1 := pgmapcss_parse_string(content, null, 6);
+      if r1.result is not null then
+        if substring(content, 6 + r1.text_length) ~ '^\s*\)\s*;' then
+	  r := pgmapcss_parse_eval(r1.result);
+
+	  r.text_length := r1.text_length;
+	end if;
+      else
+	r := pgmapcss_parse_eval(content, 6);
+      end if;
 
       if r.result is null then
 	raise notice 'error parsing eval-statement at "%..."', substring(content, 1, 40);
