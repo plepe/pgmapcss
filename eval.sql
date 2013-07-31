@@ -292,3 +292,46 @@ begin
   return '';
 end;
 $$ language 'plpgsql' immutable;
+
+create or replace function eval_number(param text[],
+  id text, tags hstore, way geometry, type text[], scale_denominator float, style hstore)
+returns text
+as $$
+#variable_conflict use_variable
+declare
+  ret text := '';
+  unit text := 'px';
+  value float;
+begin
+  if array_upper(param, 1) >= 1 then
+    ret := trim(param[1]);
+
+    if ret = '' then
+      return '';
+    end if;
+
+    if ret ~ '(px|u)$' then
+      unit := substring(ret from '(px|u)$');
+      ret := trim(substring(ret, 1, length(ret) - length(unit)));
+    end if;
+
+    if ret !~ '^[0-9]+(\.[0-9]+)?' then
+      return '';
+    end if;
+
+    value := cast(ret as float);
+
+    if unit = 'px' then
+      -- no conversion necessary
+    elsif unit in ('u', 'm') then
+      value := value / (0.00028 * scale_denominator);
+    end if;
+
+    return cast(value as text);
+  end if;
+
+  return '';
+end;
+$$ language 'plpgsql' immutable;
+
+

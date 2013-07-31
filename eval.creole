@@ -5,8 +5,15 @@ In fact all values are internally stored as strings, but are converted to data t
 * /none/: An empty string or (postgresql) NULL value. The result of a calculation error (e.g. 2/0).
 * /string/: Any text; may be enclosed in quotes ("..." or '...'). (/none/ is an empty string).
 * /key/: A string which is used as key of tag or a property.
-* /number/: A chain of digits, may contain a '.' for a decimal point. (/none/ is treated as 0).
+* /number/: A chain of digits, may contain a '.' for a decimal point. (/none/ is treated as 0). May be suffixed by a unit name (see below).
 * /boolean/: true or false. If expression equals 0, "no", "false" or /none/ the value is considerd false, true otherwise. If a function returns a boolean value, "true" or "false" is returned.
+
+== Units ==
+If you read a number, unit conversion takes place. The following units are supported:
+|= Unit |= Description
+| px | Pixel on the screen (default)
+| u | Units in 900913 projection
+| m | Meters on the ground (TODO: currently equals 'u').
 
 == Operators ==
 != Operator != Description
@@ -25,3 +32,4 @@ In fact all values are internally stored as strings, but are converted to data t
 | any | value, [value, [value, ...]] | value | Returns first value that's not /none/.
 | boolean | value | boolean | Converts the input to "true" or "false" (see 'Data Types' for an explanation).
 | cond | boolean, value, [value] | value | if first input parameter is /boolean/ true returns the second parameter, otherwise the third parameter (or "").
+| number | value | number | Converts the input to a number (or "").
