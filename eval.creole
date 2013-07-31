@@ -1,0 +1,8 @@
+!= Operator != Description
+| +, -, *, / | arithmetic operations
+| , or ; | several statements separated by , or ; will always return the value of the last statement.
+
+!= Function != Parameters != Return value != Description
+| add, sub, mul, div | num, [num, [num, ...]] | num | arithmetic operations
+| prop | key, [key, [key, ...]] | value | current value of the computed property (in the current layer). If several keys are passed, the first found key is returned. E.g. prop("width")
+| tag | key, [key, [key, ...]] | value | value of the tag key (e.g. tag("name") ). If several keys are passed, the first set tag is returned, e.g. tag("name:en", "int_name", "name").
