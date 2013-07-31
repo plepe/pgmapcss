@@ -2,6 +2,17 @@
 {
   z-index: 0;
   adfasdf: adasdf;
+  fill-color: none;
+}
+point[place] {
+  text: eval(concat('== ', tag(name), ' =='));
+  z-index: 10;
+
+  font-family: "DejaVu Sans Book";
+  font-size: 12;
+  text-color: #000000;
+  text-halo-radius: 1;
+  text-halo-fill: #ffffff;
 }
 area {
   width: 1;
