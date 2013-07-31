@@ -19,6 +19,7 @@ declare
   a text[];
   b text[];
   current text;
+  current_length int;
   param text[];
   mode int := 0;
   -- 0 .. reading whitespace before token
@@ -32,12 +33,14 @@ begin
 
   i := 1;
   current := ''::text;
+  current_length := 0;
   param := Array[]::text[];
 
   loop
-    -- raise notice 'eval: % "%..."', math_level, substring(content, i, 20);
+    -- raise notice 'eval: (math%) (mode%) "%..."', math_level, mode, substring(content, i, 20);
     if esc = true then
       current := current || substring(content, i, 1);
+      current_length := current_length + 1;
       esc := false;
 
     else
@@ -55,10 +58,11 @@ begin
 	  raise warning 'Error parsing eval statement at "%..."', substring(content, i, 20);
 	end if;
 
-        r := pgmapcss_parse_string(content, null, i + 1);
+        r := pgmapcss_parse_string(content, null, i);
 
 	current := coalesce(r.result, '');
-	i := i + r.text_length;
+	current_length := current_length + r.text_length;
+	i := i + r.text_length - 1;
 
 	mode=2;
       elsif substring(content, i, 1) = '(' then
@@ -79,6 +83,7 @@ begin
 	param := array_append(param, cast(a as text));
 
 	current := '';
+	current_length := 0;
 	mode := 3;
 
       elsif substring(content, i, 1) = ')' then
@@ -104,9 +109,9 @@ begin
 	    mode := 0;
 	  end if;
 	elsif (j < math_level) then
-	  r := pgmapcss_parse_eval(content, i - length(current), j, t);
+	  r := pgmapcss_parse_eval(content, i - current_length, j, t);
 
-	  i := i + r.text_length - length(current) - 2;
+	  i := i + r.text_length - current_length - 2;
 	  a := cast(r.result as text[]);
 
 
@@ -136,9 +141,10 @@ begin
 	    end if;
 
 	  else
-	    r := pgmapcss_parse_eval(content, i - length(current), j, t);
-	    i := i - length(current) + r.text_length - 2;
+	    r := pgmapcss_parse_eval(content, i - current_length, j, t);
+	    i := i - current_length + r.text_length - 2;
 	    current := '';
+	    current_length := 0;
 
 	    a := cast(r.result as text[]);
 	    a := array_prepend('o:'||t, a);
@@ -156,11 +162,13 @@ begin
 	end if;
 
 	current := '';
+	current_length := 0;
       else
 	if mode > 1 then
 	  raise warning 'Error parsing eval statement at "%..."', substring(content, i, 20);
 	else
 	  current := current || substring(content, i, 1);
+	  current_length := current_length + 1;
 	  mode = 1;
 	end if;
       end if;
