@@ -39,7 +39,8 @@ way[highway=unclassified] {
   set .minor_road;
   set foo=bar;
   set test=eval(tag(name));
-  foo: eval(2+3);
+  set foo1=eval(2*5+1-3);
+  foo2: eval("2+-3");
   unset name;
 }
 way[foo=bar] {
