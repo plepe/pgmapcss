@@ -89,10 +89,12 @@ begin
 	ret.result := cast(param as text);
 	ret.text_length := i;
 	return ret;
-      elsif substring(content, i, 1) in ('+', '-', '*', '/', ',', ';') then
-        t := substring(content, i, 1);
+      elsif substring(content, i, 2) ~ '^(\+|\-|\*|\/|,|;|>|>=|<=|<)' then
+        t := substring(substring(content, i, 2) from '^(\+|\-|\*|\/|,|;|>|>=|<=|<)');
+	i := i + length(t) - 1;
 	j :=  (CASE WHEN t in ('+', '-') THEN 3
 	            WHEN t in ('*', '/') THEN 2
+	            WHEN t in ('>', '>=', '<=', '<') THEN 2
 	            WHEN t in (',', ';') THEN 99
 	       END);
 

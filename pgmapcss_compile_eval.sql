@@ -39,6 +39,14 @@ begin
     f:='mul';
   elsif param[1] = 'o:/' then
     f:='div';
+  elsif param[1] = 'o:>' then
+    f:='gt';
+  elsif param[1] = 'o:>=' then
+    f:='ge';
+  elsif param[1] = 'o:<=' then
+    f:='le';
+  elsif param[1] = 'o:<' then
+    f:='lt';
   elsif param[1] = 'o:,' then
     f:='all';
   elsif substr(param[1], 1, 2) = 'f:' then
