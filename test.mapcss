@@ -3,6 +3,10 @@
   z-index: 0;
   adfasdf: adasdf;
 }
+area {
+  width: 1;
+  color: #A0A0A0;
+}
 way|z11-::casing
 {
   z-index: -20;

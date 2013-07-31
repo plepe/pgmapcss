@@ -44,19 +44,25 @@ In the meantime, the following rules simulate this behaviour:
       <Parameter name="geometry_field">way</Parameter>
       <Parameter name="srid">900913</Parameter>
       <Parameter name="table">
-(select * from 
-  (select 
+(select * from
+  (select
     (css_check_test(
       cast(osm_id as text),
       tags,
       way,
-      Array['way','line'],
+      type,
       !scale_denominator!
     )
-  ).*, way from planet_osm_line
-  ) t
+  ).*, way from
+  (select osm_id, tags, way, Array['point', 'node'] as type from planet_osm_point
+  union
+    select osm_id, tags, way, Array['line', (CASE WHEN osm_id&lt;0 THEN 'relation' ELSE 'way' END)] from planet_osm_line
+  union
+    select osm_id, tags, way, Array['area', (CASE WHEN osm_id&lt;0 THEN 'relation' ELSE 'way' END)] from planet_osm_polygon
+  ) t) t
   order by coalesce(cast("z-index" as float), 0) asc
 ) t
+
       </Parameter>
     </Datasource>
     <StyleName>pgmapcss</StyleName>
