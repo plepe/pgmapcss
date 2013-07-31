@@ -106,8 +106,8 @@ begin
 	if t = current_op then
 	  if current != '' then
 	    param := array_append(param, 'v:' || current);
-	    mode := 0;
 	  end if;
+	  mode := 0;
 	elsif (j < math_level) then
 	  r := pgmapcss_parse_eval(content, i - current_length, j, t);
 
