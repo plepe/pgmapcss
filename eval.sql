@@ -98,6 +98,61 @@ begin
 end;
 $$ language 'plpgsql' immutable;
 
+create or replace function eval_concat(param text[],
+  id text, tags hstore, way geometry, type text[], scale_denominator float, style hstore)
+returns text
+as $$
+#variable_conflict use_variable
+declare
+  ret text := '';
+  i text;
+begin
+  foreach i in array param loop
+    ret := ret || i;
+  end loop;
+
+  return ret;
+end;
+$$ language 'plpgsql' immutable;
+
+create or replace function eval_sqrt(param text[],
+  id text, tags hstore, way geometry, type text[], scale_denominator float, style hstore)
+returns text
+as $$
+#variable_conflict use_variable
+declare
+  ret text := '';
+  i text;
+begin
+  if array_upper(param, 1) >= 1 then
+    return cast(sqrt(cast(param[1] as float)) as text);
+  end if;
+
+  return '';
+end;
+$$ language 'plpgsql' immutable;
+
+create or replace function eval_boolean(param text[],
+  id text, tags hstore, way geometry, type text[], scale_denominator float, style hstore)
+returns text
+as $$
+#variable_conflict use_variable
+declare
+  ret text := '';
+  i text;
+begin
+  if array_upper(param, 1) >= 1 then
+    if param[1] is null or trim(param[1]) in ('', 'no', 'false') or cast(param[1] as float)=0 then
+      return 'false';
+    else
+      return 'true';
+    end if;
+  end if;
+
+  return '';
+end;
+$$ language 'plpgsql' immutable;
+
 create or replace function eval_tag(param text[],
   id text, tags hstore, way geometry, type text[], scale_denominator float, style hstore)
 returns text
