@@ -45,22 +45,22 @@ begin
     content = substring(content, r.text_length + 1);
 
     if op='=' then
-      ret.result:=ret.result||'tags @> '''||quote_ident(key)||'=>'||quote_ident(value)||'''';
+      ret.result:=ret.result||'current.tags @> '''||quote_ident(key)||'=>'||quote_ident(value)||'''';
     elsif op='!=' then
-      ret.result:=ret.result||'not tags @> '''||quote_ident(key)||'=>'||quote_ident(value)||'''';
+      ret.result:=ret.result||'not current.tags @> '''||quote_ident(key)||'=>'||quote_ident(value)||'''';
     elsif op in ('<', '>', '<=', '>=') then
-      ret.result:=ret.result||'cast(tags->'||quote_literal(key)||' as numeric) '||op||' '||quote_literal(value);
+      ret.result:=ret.result||'cast(current.tags->'||quote_literal(key)||' as numeric) '||op||' '||quote_literal(value);
     elsif op='^=' then
       value:=value||'%';
-      ret.result:=ret.result||'tags->'||quote_literal(key)||' similar to '||quote_literal(value);
+      ret.result:=ret.result||'current.tags->'||quote_literal(key)||' similar to '||quote_literal(value);
     elsif op='$=' then
       value:='%'||value;
-      ret.result:=ret.result||'tags->'||quote_literal(key)||' similar to '||quote_literal(value);
+      ret.result:=ret.result||'current.tags->'||quote_literal(key)||' similar to '||quote_literal(value);
     elsif op='*=' then
       value:='%'||value||'%';
-      ret.result:=ret.result||'tags->'||quote_literal(key)||' similar to '||quote_literal(value);
+      ret.result:=ret.result||'current.tags->'||quote_literal(key)||' similar to '||quote_literal(value);
     elsif op='~=' then
-      ret.result:=ret.result||quote_literal(value)||'=any(string_to_array(tags->'||quote_literal(key)||', '';''))';
+      ret.result:=ret.result||quote_literal(value)||'=any(string_to_array(current.tags->'||quote_literal(key)||', '';''))';
     elsif op='=~' then
       op='~';
 
@@ -79,7 +79,7 @@ begin
         end if;
       end if;
 
-      ret.result:=ret.result||'tags->'||quote_literal(key)||' '||op||' '||quote_literal(value);
+      ret.result:=ret.result||'current.tags->'||quote_literal(key)||' '||op||' '||quote_literal(value);
     end if;
 
     return ret;
@@ -87,7 +87,7 @@ begin
 
   r := pgmapcss_parse_string(content, E'^([a-zA-Z_0-9\\-\\:]+)\\]');
   if r.result is not null then
-    ret.result := ret.result||'tags ? '||quote_literal(r.result);
+    ret.result := ret.result||'current.tags ? '||quote_literal(r.result);
     ret.text_length := r.text_length;
 
     return ret;

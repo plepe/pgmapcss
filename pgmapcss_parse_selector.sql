@@ -33,7 +33,7 @@ begin
   m := substring(selector from '^\s*(\*|node|way|relation|point|area|meta|canvas)(\|.*|\[.*|:.*|\..*|\s)');
   if m = '*' then
   elsif m is not null then
-    ret.conditions=array_append(ret.conditions, ''''||m||'''=ANY(type)');
+    ret.conditions=array_append(ret.conditions, ''''||m||'''=ANY(object.types)');
   else
     raise notice 'can''t parse object class at "%..."', substring(selector, 0, 40);
   end if;
@@ -44,7 +44,7 @@ begin
     m := substring(selector from '^\.([a-zA-Z0-9_]+)');
     ret.classes=array_append(ret.classes, m);
     ret.conditions=array_append(ret.conditions,
-      'tags ? ' || quote_literal('.' || m));
+      'current.tags ? ' || quote_literal('.' || m));
 
     selector := substring(selector from '^\.[a-zA-Z0-9_]+(.*)$');
   end loop;
@@ -56,9 +56,9 @@ begin
     m1 := substring(m from '^([0-9]+)$');
     if m1 is not null then
       ret.conditions=array_append(ret.conditions,
-        'scale_denominator >= ' ||
+        'render_context.scale_denominator >= ' ||
         cast((max_scale_denominator / 2 ^ cast(m as int)) as text) ||
-        ' and scale_denominator < ' ||
+        ' and render_context.scale_denominator < ' ||
         cast((max_scale_denominator / 2 ^ (cast(m as int) - 1)) as text)
       );
     end if;
@@ -67,7 +67,7 @@ begin
     m1 := substring(m from '^([0-9]+)\-$');
     if m1 is not null then
       ret.conditions=array_append(ret.conditions,
-        'scale_denominator < ' ||
+        'render_context.scale_denominator < ' ||
         cast((max_scale_denominator / 2 ^ (cast(m1 as int) - 1)) as text)
       );
     end if;
@@ -76,7 +76,7 @@ begin
     m1 := substring(m from '^\-([0-9]+)$');
     if m1 is not null then
       ret.conditions=array_append(ret.conditions,
-        'scale_denominator >= ' ||
+        'render_context.scale_denominator >= ' ||
         cast((max_scale_denominator / 2 ^ cast(m1 as int)) as text)
       );
     end if;
@@ -85,12 +85,12 @@ begin
     m1 := substring(m from '^(?:[0-9]+)\-([0-9]+)$');
     if m1 is not null then
       t=
-        'scale_denominator >= ' ||
+        'render_context.scale_denominator >= ' ||
         cast((max_scale_denominator / 2 ^ cast(m1 as int)) as text);
 
       m1 := substring(m from '^([0-9]+)\-(?:[0-9]+)$');
       t=t||
-        ' and scale_denominator < ' ||
+        ' and render_context.scale_denominator < ' ||
         cast((max_scale_denominator / 2 ^ (cast(m1 as int) - 1)) as text);
 
       ret.conditions=array_append(ret.conditions, t);

@@ -3,6 +3,8 @@
 for i in \
   array_search.sql \
   pgmapcss_types.sql \
+  pgmapcss_render_context.sql \
+  pgmapcss_object.sql \
   pgmapcss_parse_string.sql \
   pgmapcss_condition.sql \
   pgmapcss_parse_selector.sql \

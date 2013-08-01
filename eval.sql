@@ -1,5 +1,5 @@
 create or replace function eval_(param text[],
-  id text, tags hstore, way geometry, type text[], scale_denominator float, style hstore)
+  object pgmapcss_object, current pgmapcss_current, render_context pgmapcss_render_context)
 returns text
 as $$
 #variable_conflict use_variable
@@ -10,7 +10,7 @@ end;
 $$ language 'plpgsql' immutable;
 
 create or replace function eval_add(param text[],
-  id text, tags hstore, way geometry, type text[], scale_denominator float, style hstore)
+  object pgmapcss_object, current pgmapcss_current, render_context pgmapcss_render_context)
 returns text
 as $$
 #variable_conflict use_variable
@@ -27,7 +27,7 @@ end;
 $$ language 'plpgsql' immutable;
 
 create or replace function eval_sub(param text[],
-  id text, tags hstore, way geometry, type text[], scale_denominator float, style hstore)
+  object pgmapcss_object, current pgmapcss_current, render_context pgmapcss_render_context)
 returns text
 as $$
 #variable_conflict use_variable
@@ -48,7 +48,7 @@ end;
 $$ language 'plpgsql' immutable;
 
 create or replace function eval_mul(param text[],
-  id text, tags hstore, way geometry, type text[], scale_denominator float, style hstore)
+  object pgmapcss_object, current pgmapcss_current, render_context pgmapcss_render_context)
 returns text
 as $$
 #variable_conflict use_variable
@@ -65,7 +65,7 @@ end;
 $$ language 'plpgsql' immutable;
 
 create or replace function eval_div(param text[],
-  id text, tags hstore, way geometry, type text[], scale_denominator float, style hstore)
+  object pgmapcss_object, current pgmapcss_current, render_context pgmapcss_render_context)
 returns text
 as $$
 #variable_conflict use_variable
@@ -82,7 +82,7 @@ end;
 $$ language 'plpgsql' immutable;
 
 create or replace function eval_gt(param text[],
-  id text, tags hstore, way geometry, type text[], scale_denominator float, style hstore)
+  object pgmapcss_object, current pgmapcss_current, render_context pgmapcss_render_context)
 returns text
 as $$
 #variable_conflict use_variable
@@ -103,7 +103,7 @@ end;
 $$ language 'plpgsql' immutable;
 
 create or replace function eval_ge(param text[],
-  id text, tags hstore, way geometry, type text[], scale_denominator float, style hstore)
+  object pgmapcss_object, current pgmapcss_current, render_context pgmapcss_render_context)
 returns text
 as $$
 #variable_conflict use_variable
@@ -124,7 +124,7 @@ end;
 $$ language 'plpgsql' immutable;
 
 create or replace function eval_le(param text[],
-  id text, tags hstore, way geometry, type text[], scale_denominator float, style hstore)
+  object pgmapcss_object, current pgmapcss_current, render_context pgmapcss_render_context)
 returns text
 as $$
 #variable_conflict use_variable
@@ -145,7 +145,7 @@ end;
 $$ language 'plpgsql' immutable;
 
 create or replace function eval_lt(param text[],
-  id text, tags hstore, way geometry, type text[], scale_denominator float, style hstore)
+  object pgmapcss_object, current pgmapcss_current, render_context pgmapcss_render_context)
 returns text
 as $$
 #variable_conflict use_variable
@@ -166,7 +166,7 @@ end;
 $$ language 'plpgsql' immutable;
 
 create or replace function eval_prop(param text[],
-  id text, tags hstore, way geometry, type text[], scale_denominator float, style hstore)
+  object pgmapcss_object, current pgmapcss_current, render_context pgmapcss_render_context)
 returns text
 as $$
 #variable_conflict use_variable
@@ -174,8 +174,8 @@ declare
   i text;
 begin
   foreach i in array param loop
-    if style ? i then
-      return style->i;
+    if current.styles[current.current_layer_ind] ? i then
+      return current.styles[current.current_layer_ind]->i;
     end if;
   end loop;
 
@@ -184,7 +184,7 @@ end;
 $$ language 'plpgsql' immutable;
 
 create or replace function eval_concat(param text[],
-  id text, tags hstore, way geometry, type text[], scale_denominator float, style hstore)
+  object pgmapcss_object, current pgmapcss_current, render_context pgmapcss_render_context)
 returns text
 as $$
 #variable_conflict use_variable
@@ -201,7 +201,7 @@ end;
 $$ language 'plpgsql' immutable;
 
 create or replace function eval_sqrt(param text[],
-  id text, tags hstore, way geometry, type text[], scale_denominator float, style hstore)
+  object pgmapcss_object, current pgmapcss_current, render_context pgmapcss_render_context)
 returns text
 as $$
 #variable_conflict use_variable
@@ -218,7 +218,7 @@ end;
 $$ language 'plpgsql' immutable;
 
 create or replace function eval_boolean(param text[],
-  id text, tags hstore, way geometry, type text[], scale_denominator float, style hstore)
+  object pgmapcss_object, current pgmapcss_current, render_context pgmapcss_render_context)
 returns text
 as $$
 #variable_conflict use_variable
@@ -239,7 +239,7 @@ end;
 $$ language 'plpgsql' immutable;
 
 create or replace function eval_tag(param text[],
-  id text, tags hstore, way geometry, type text[], scale_denominator float, style hstore)
+  object pgmapcss_object, current pgmapcss_current, render_context pgmapcss_render_context)
 returns text
 as $$
 #variable_conflict use_variable
@@ -247,8 +247,8 @@ declare
   i text;
 begin
   foreach i in array param loop
-    if tags ? i then
-      return tags->i;
+    if current.tags ? i then
+      return current.tags->i;
     end if;
   end loop;
 
@@ -257,7 +257,7 @@ end;
 $$ language 'plpgsql' immutable;
 
 create or replace function eval_all(param text[],
-  id text, tags hstore, way geometry, type text[], scale_denominator float, style hstore)
+  object pgmapcss_object, current pgmapcss_current, render_context pgmapcss_render_context)
 returns text
 as $$
 #variable_conflict use_variable
@@ -268,7 +268,7 @@ end;
 $$ language 'plpgsql' immutable;
 
 create or replace function eval_cond(param text[],
-  id text, tags hstore, way geometry, type text[], scale_denominator float, style hstore)
+  object pgmapcss_object, current pgmapcss_current, render_context pgmapcss_render_context)
 returns text
 as $$
 #variable_conflict use_variable
@@ -294,7 +294,7 @@ end;
 $$ language 'plpgsql' immutable;
 
 create or replace function eval_number(param text[],
-  id text, tags hstore, way geometry, type text[], scale_denominator float, style hstore)
+  object pgmapcss_object, current pgmapcss_current, render_context pgmapcss_render_context)
 returns text
 as $$
 #variable_conflict use_variable
@@ -333,5 +333,3 @@ begin
   return '';
 end;
 $$ language 'plpgsql' immutable;
-
-

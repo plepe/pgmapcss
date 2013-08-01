@@ -51,23 +51,21 @@ In the meantime, the following rules simulate this behaviour:
       <Parameter name="host">localhost</Parameter>
       <Parameter name="estimate_extent">false</Parameter>
       <Parameter name="extent">-20037508,-19929239,20037508,19929239</Parameter>
-      <Parameter name="geometry_field">way</Parameter>
+      <Parameter name="geometry_field">_geo</Parameter>
       <Parameter name="srid">900913</Parameter>
       <Parameter name="table">
-(select (result).*, way from
+(select (result).* from
   (select
     css_check_test(
-      cast(osm_id as text),
-      tags,
-      way,
-      type,
-      !scale_denominator!
-    ) result, way from
-  (select osm_id, tags, way, Array['point', 'node'] as type from planet_osm_point
+      object,
+      pgmapcss_render_context(!bbox!, !scale_denominator!)
+    ) result
+  from
+  (select pgmapcss_object(cast(osm_id as text), tags, way, Array['point', 'node']) as object from planet_osm_point where way &amp;&amp; !bbox!
   union
-    select osm_id, tags, way, Array['line', (CASE WHEN osm_id&lt;0 THEN 'relation' ELSE 'way' END)] from planet_osm_line
+    select pgmapcss_object(cast(osm_id as text), tags, way, Array['line', (CASE WHEN osm_id&lt;0 THEN 'relation' ELSE 'way' END)]) as object from planet_osm_line where way &amp;&amp; !bbox!
   union
-    select osm_id, tags, way, Array['area', (CASE WHEN osm_id&lt;0 THEN 'relation' ELSE 'way' END)] from planet_osm_polygon
+    select pgmapcss_object(cast(osm_id as text), tags, way, Array['area', (CASE WHEN osm_id&lt;0 THEN 'relation' ELSE 'way' END)]) as object from planet_osm_polygon where way &amp;&amp; !bbox!
   ) t offset 0) t
   order by coalesce(cast((result)."z-index" as float), 0) asc
 ) t

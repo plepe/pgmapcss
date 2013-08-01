@@ -8,7 +8,7 @@ as $$
 declare
   ret text;
   param text[];
-  eval_param text := ', id, tags, way, type, scale_denominator, current_style';
+  eval_param text := ', object, current, render_context';
   p text[];
   t text;
   f text;
