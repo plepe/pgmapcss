@@ -1,5 +1,5 @@
 == PGMapCSS ==
-PGMapCSS is an implementation of [[http://www.mapcss.org/|MapCSS] in Postgresql
+PGMapCSS is an implementation of [[http://www.mapcss.org/|MapCSS]] in Postgresql
 / plpgsql for use with [[http://www.mapnik.org/|Mapnik]]. Therefore you can
 reduce your Mapnik stylesheet to a minimum; all style calculation is done in
 the database, providing more advanced functionality.
@@ -8,9 +8,9 @@ There were already several efforts to implement stylesheets based on Cascading S
 * [[https://github.com/mapnik/Cascadenik|Cascadenik]]
 * [[http://wiki.openstreetmap.org/wiki/Carto|CartoCSS]]
 
-All these tools are pre-processors, that convert a CSS stylesheet into a Mapnik stylesheet. PGMapCSS takes a different approach: The stylesheet is compiled into a PostgreSQL/plpgsql function which is evaluated at runtime. Therefore more advanced calculations are possible, even geometric alterations.
+All these tools are pre-processors, that convert a CSS stylesheet into a Mapnik stylesheet. PGMapCSS takes a different approach: The stylesheet is compiled into a PostgreSQL/plpgsql function which is evaluated at runtime. Therefore more advanced calculations are possible, even geometric alterations (though not supported yet).
 
-The Mapnik style just contains the database query/queries and the basic styles, referencing all options from the database queries. You can think of those styles as templates, which you can reference from you style sheet.
+The Mapnik style just contains the database query/queries and the basic styles, referencing all options from the database queries. You can think of those styles as templates, which you can reference from your style sheet.
 
 Read [[doc/MapCSS.creole]] to learn about the features of PGMapCSS's MapCSS implementation.
 

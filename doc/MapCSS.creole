@@ -20,9 +20,9 @@ For each rule, if the selector applies the properties from the { } block are set
 Every selector may have several elements: type, class, zoom, condition, pseudo, layer, grouping and link.
 
 E.g.
-* way.public[highway=residential]
-* way|z11-14[amenity=parking][access=public]:closed:new::layer_1
-* relation[type=route][route=foot] > way::relation_underlay
+* {{{way.public[highway=residential]}}}
+* {{{way|z11-14[amenity=parking][access=public]:closed:new::layer_1}}}
+* {{{relation[type=route][route=foot] > way::relation_underlay}}}
 
 === Type selector ===
 First part of a selector; required.
@@ -103,15 +103,17 @@ Parent, Child or nearby relations.
 NOT SUPPORTED YET.
 
 == Properties ==
-You may specify arbitrary properties. They will be treated as text values. Declarations are written by enclosing a set of style specifiers in curly braces.o
+You may specify arbitrary properties. They will be treated as text values. Declarations are written by enclosing a set of style specifiers in curly braces.
 
 E.g.
 
-{{{{
+{{{
+{
   opacity: 0.5;
   color: #ff0000;
   background-color: rgb(1.0, 0.0, 0.0);
-}}}}
+}
+}}}
 
 === Assignments ===
 You may assign values to tags of the current object. This is independent from the current layer.
@@ -136,10 +138,12 @@ way[highway_class=minor] {
 
 === Eval expressions ===
 You can compute values using an eval instrucion:
-{{{{
+{{{
+{
   opacity: eval("tag(population)/100000");
   set description=eval(cond(tag(population)>1000000,"large city","small city"));
-}}}}
+}}}
+}
 
 Either set a property for the current layer or set a tag for the current object.
 
@@ -147,10 +151,13 @@ See file [[eval.creole]] for details.
 
 === Assignments - Classes ===
 You can set tags beginning with a full-stop to simulate classes:
-{{{{ set .minor_road; }}}}
+{{{
+{ set .minor_road; }
+}}}
 
 You can then use .minor_road (as above) in the class selector:
 {{{
 way.minor_road {
   color: #ffffff;
-}}}}
+}
+}}}
