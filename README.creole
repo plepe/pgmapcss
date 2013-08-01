@@ -1,15 +1,25 @@
-An implementation of MapCSS in Postgresql / plpgsql for use with Mapnik.
-Therefore you can reduce your Mapnik stylesheet to a minimum; all style
-calculation is done in the database.
+== PGMapCSS ==
+PGMapCSS is an implementation of [[http://www.mapcss.org/|MapCSS] in Postgresql
+/ plpgsql for use with [[http://www.mapnik.org/|Mapnik]]. Therefore you can
+reduce your Mapnik stylesheet to a minimum; all style calculation is done in
+the database, providing more advanced functionality.
 
+There were already several efforts to implement stylesheets based on Cascading Stylesheets (CSS) for Mapnik:
+* [[https://github.com/mapnik/Cascadenik|Cascadenik]]
+* [[http://wiki.openstreetmap.org/wiki/Carto|CartoCSS]]
+
+All these tools are pre-processors, that convert a CSS stylesheet into a Mapnik stylesheet. PGMapCSS takes a different approach: The stylesheet is compiled into a PostgreSQL/plpgsql function which is evaluated at runtime. Therefore more advanced calculations are possible, even geometric alterations.
+
+The Mapnik style just contains the database query/queries and the basic styles, referencing all options from the database queries. You can think of those styles as templates, which you can reference from you style sheet.
+
+Read [[doc/MapCSS.creole]] to learn about the features of PGMapCSS's MapCSS implementation.
+
+WARNING: As of 2013, Mapnik does not support using expressions for all/most symbolizer parameters. Therefore usefulness of PGMapCSS is quite limited. See [[doc/compatibility.creole|Compatibility]] for more information.
+
+== Using PGMapCSS ==
 The postgresql function pgmapcss_install(style_id, file_content) converts the passed css file to a function. It will be available as postgresql function named 'css_check_{style_id}()'.
 
-== Compatibility ==
-The idea behind pgmapcss is to calculate all (or some) symbolizer parameters within database functions. This requires Mapnik (or other renderers) to be able to read those values. As of 2013-07 Mapnik does not support this yet, there are plans to convert all values to expressions as of version 3.0. See [https://github.com/mapnik/mapnik/issues/828|Mapnik issue "All values should become expressions"] for details.
-
-You may test the test.mapnik file using Mapnik branch [https://github.com/mapnik/mapnik/tree/stroke-width-expr|stroke-width-expr] and a default [http://wiki.openstreetmap.org/wiki/Osm2pgsql|osm2pgsql] import with option --hstore-all enabled.
-
-== Function css_check_{style_id} ==
+=== Function css_check_{style_id} ===
 
 Parameters:
 |= Parameter |= Type |= Description

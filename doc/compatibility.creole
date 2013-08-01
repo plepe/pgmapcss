@@ -1,0 +1,103 @@
+== Compatibility ==
+The idea behind pgmapcss is to calculate all (or some) symbolizer parameters with database functions. This requires Mapnik (or other renderers) to be able to read those values. As of 2013-07 Mapnik does not support this only for a limited amount of parameters.
+
+There are plans to convert all values to expressions for the next major Mapnik release, version 3.0. See [https://github.com/mapnik/mapnik/issues/828|Mapnik issue "All values should become expressions"] for details.
+
+You may test the test.mapnik file using Mapnik branch [https://github.com/mapnik/mapnik/tree/stroke-width-expr|stroke-width-expr] and a default [http://wiki.openstreetmap.org/wiki/Osm2pgsql|osm2pgsql] import with option --hstore-all enabled.
+
+=== Filter ===
+In Filters you may use expressions all right, e.g.
+{{{<Filter>[foo] = 'bar'</Filter>}}}
+
+=== PointSymbolizer ===
+|= CSS parameter |= Mapnik parameter |= support Mapnik 2.x |= support PGMapCSS
+| icon-image | file | yes | no support for url() syntax
+| | allow-overlap | no expr | yes
+| icon-opacity | opacity | no expr | yes
+| | transform | no expr | yes
+| | ignore-placement | no expr | yes
+| icon-width | | automatic | -
+| icon-height | | automatic | -
+
+Note: as you can modify the Symbolizer template in your Mapnik Stylesheet you can add missing CSS parameters yourself.
+
+=== LineSymbolizer ===
+|= CSS parameter |= Mapnik parameter |= support Mapnik 2.x |= support PGMapCSS
+| color | stroke | no expr | yes
+| width | stroke-width | no expr ; branch [[https://github.com/mapnik/mapnik/tree/stroke-width-expr|stroke-width-expr|stroke-width-expr]]] adds support | yes
+| opacity | stroke-opacity | no expr | yes
+| linejoin | stroke-linejoin | no expr | yes
+| linecap | stroke-linecap | no expr | yes
+| dashes | stroke-dasharray | no expr | yes
+
+Note: as you can modify the Symbolizer template in your Mapnik Stylesheet you can add missing CSS parameters yourself.
+
+=== PolygonSymbolizer ===
+|= CSS parameter |= Mapnik parameter |= support Mapnik 2.x |= support PGMapCSS
+| fill-color | fill | no expr | yes
+| fill-opacity | fill-opacity | no expr | yes
+| | gamma | no expr | yes
+
+Note: as you can modify the Symbolizer template in your Mapnik Stylesheet you can add missing CSS parameters yourself.
+
+=== TextSymbolizer ===
+|= CSS parameter |= Mapnik parameter |= support Mapnik 2.x |= support PGMapCSS
+| | text-ratio | no expr | yes
+| max-width | wrap-width | no expr | yes
+| | wrap-before | with ExpressionFormat | yes
+| | spacing | no expr | yes
+| | label-position-tolerance | no expr | yes
+| | force-odd-labels | no expr | yes
+| | max-char-angle-delta | no expr | yes
+| | dx | no expr | yes
+| text-offset | dy | no expr | yes
+| | avoid-edges | no expr | yes
+| | minimum-distance | no expr | yes
+| | allow-overlap | no expr | yes
+| text-position | placement | no expr | limited (MapCSS defines different options)
+| | vertical-alignment | no expr | yes
+| | justify-alignment | no expr | yes
+| | opacity | with ExpressionFormat | yes
+| | minimum-padding | no expr | yes
+| | minimum-path-length | no expr | yes
+| | orientation | no expr | yes
+| | rotate-displacement | no expr | yes
+| | placement-type | no expr | yes
+| | placements | no expr | yes
+| | upright | no expr | yes
+| | clip | no expr | yes
+| | largest_bbox_only | no expr | yes
+| font-family | face-name | with ExpressionFormat | yes; syntax differnet from MapCSS (face-name includes weight/style option)
+| | fontset-name | no expr | yes
+| font-size | size | with ExpressionFormat | yes
+| text-color | fill | with ExpressionFormat and branch harfbuzz | yes
+| text-halo-color | halo-fill | no expr | yes
+| text-halo-radius | halo-radius | with ExpressionFormat | yes
+| | character-spacing | with ExpressionFormat | yes
+| | line-spacing | with ExpressionFormat | yes
+| | wrap-character | with ExpressionFormat | yes
+| | text-transform | no expr | yes
+| font-weight | see face-name | no | no
+| font-style | see face-name | no | no
+| font-variant | | no | no
+| text-decoration | | no | no
+| text-transform | | no | possible with eval()
+| text | Symbolizer content | yes | syntax different from MapCSS (see Parameter 'text')
+
+==== Parameter 'text' ====
+In contrast to the definition of MapCSS you need to specify an eval-statement, e.g.:
+{{{
+CSS file:
+  point[place=city] {
+    text: eval(tag(name));
+  }
+
+Mapnik stylesheet:
+  <TextSymbolizer ...>[text]</TextSymbolizer>
+}}}
+
+==== "with ExpressionFormat" ====
+<TextSymbolizer> can't read parameters from expressions, but <ExpressionFormat> (which is an undocumented feature in Mapnik 2 as of 2013-07) can. <ExpressionFormat> (as well as <Format>) is a child of TextSymbolizer and can format a part of the symbol. Therefore you can do:
+{{{
+  <TextSymbolizer face-name="something"><ExpressionFormat size="[font-size]" halo-radius="[text-halo-radius]">[text]</ExpressionFormat></TextSymbolizer>
+}}}

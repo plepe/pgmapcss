@@ -103,7 +103,7 @@ Parent, Child or nearby relations.
 NOT SUPPORTED YET.
 
 == Properties ==
-You may specify BELIEBIG properties. They will be treated as text values. Declarations are written by enclosing a set of style specifiers in curly braces.o
+You may specify arbitrary properties. They will be treated as text values. Declarations are written by enclosing a set of style specifiers in curly braces.o
 
 E.g.
 
