@@ -1,12 +1,13 @@
 == Data Types ==
 In fact all values are internally stored as strings, but are converted to data types as needed. Therefore, when a data type is required below, this is just a reference.
 
-* //value//: An unspecified value.
-* //none//: An empty string or (postgresql) NULL value. The result of a calculation error (e.g. 2//0).
-* //string//: Any text; may be enclosed in quotes ("..." or '...'). (//none// is an empty string).
-* //key//: A string which is used as key of tag or a property.
-* //number//: A chain of digits, may contain a '.' for a decimal point. (//none// is treated as 0). May be suffixed by a unit name (see below).
-* //boolean//: true or false. If expression equals 0, "no", "false" or //none// the value is considerd false, true otherwise. If a function returns a boolean value, "true" or "false" is returned.
+|= Data Type |= Description |= Example
+| //value// | An unspecified value |
+| //none// | An empty string or (postgresql) NULL value. If a calculations fails (e.g. 2//0), the result is //none//. |
+| //string// | Any text; may be enclosed in quotes ("..." or '...'). (//none// is an empty string). | "foobar", 'foobar', foobar
+| //key// | A string which is used as key of tag or a property. | name:en
+| //number// | A chain of digits, may contain a '.' as decimal point. (//none// is treated as 0). May be suffixed by a unit name (see below). | 2.5, 5px, 30m
+| //boolean// | true or false. If expression equals 0, "no", "false" or //none// the value is considerd false, true otherwise. If a function returns a boolean value, "true" or "false" is returned.
 
 == Units ==
 If you read a number, unit conversion takes place. The following units are supported:
