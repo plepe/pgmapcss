@@ -20,6 +20,7 @@ declare
   b text[];
   current text;
   current_length int;
+  current_whitespace text;
   param text[];
   mode int := 0;
   -- 0 .. reading whitespace before token
@@ -34,12 +35,14 @@ begin
   i := 1;
   current := ''::text;
   current_length := 0;
+  current_whitespace := '';
   param := Array[]::text[];
 
   loop
     -- raise notice 'eval: (math%) (mode%) "%..."', math_level, mode, substring(content, i, 20);
     if esc = true then
-      current := current || substring(content, i, 1);
+      current := current || current_whitespace || substring(content, i, 1);
+      current_whitespace := '';
       current_length := current_length + 1;
       esc := false;
 
@@ -62,6 +65,7 @@ begin
 
 	current := coalesce(r.result, '');
 	current_length := current_length + r.text_length;
+	current_whitespace := '';
 	i := i + r.text_length - 1;
 
 	mode=2;
@@ -83,6 +87,7 @@ begin
 	param := array_append(param, cast(a as text));
 
 	current := '';
+	current_whitespace := '';
 	current_length := 0;
 	mode := 3;
 
@@ -144,6 +149,7 @@ begin
 	    r := pgmapcss_parse_eval(content, i - current_length, j, t);
 	    i := i - current_length + r.text_length - 2;
 	    current := '';
+	    current_whitespace := '';
 	    current_length := 0;
 
 	    a := cast(r.result as text[]);
@@ -162,12 +168,21 @@ begin
 	end if;
 
 	current := '';
+	current_whitespace := '';
 	current_length := 0;
       else
-	if mode > 1 then
+	-- maybe ignore whitespace
+	if substring(content, i) ~ '^\s' then
+	  -- ignore whitespace at beginning of token
+	  if mode != 0 then
+	    current_whitespace := current_whitespace || substring(content, i, 1);
+	    current_length := current_length + 1;
+	  end if;
+	elsif mode > 1 then
 	  raise warning 'Error parsing eval statement at "%..."', substring(content, i, 20);
 	else
-	  current := current || substring(content, i, 1);
+	  current := current || current_whitespace || substring(content, i, 1);
+	  current_whitespace := '';
 	  current_length := current_length + 1;
 	  mode = 1;
 	end if;
