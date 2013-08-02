@@ -53,3 +53,8 @@ Compile test.mapnik / test.mapcss style file
 Insert correct database parameters in test.mapnik (look for DB, USER, PASSWORD).
 
 Now you should have a working test.mapnik XML file, which you can use in renderd or other programs.
+
+=== Example ===
+{{doc/example.png}}
+
+Image created with the test.mapcss / test.mapnik style and Mapnik branch stroke-width-expr enabled.
