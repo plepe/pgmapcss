@@ -16,6 +16,8 @@ selector {
 
 For each rule, if the selector applies the properties from the { } block are set. If a property has already been set, it will be overridden.
 
+Additionally, comments can be made using "//" to comment the rest of the line out, or using "/*" and "*/" to comment out everything between these end points.
+
 == Selectors ==
 Every selector may have several elements: type, class, zoom, condition, pseudo, layer, grouping and link.
 

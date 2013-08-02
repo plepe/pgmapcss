@@ -29,6 +29,9 @@ begin
   ret.pseudo_classes=Array[]::text[];
   ret.layer := 'default';
 
+  -- check for comments
+  selector := pgmapcss_parse_comments(selector);
+
   -- parse object class (way, node, canvas, ...)
   m := substring(selector from '^\s*(\*|node|way|relation|point|area|meta|canvas)(\|.*|\[.*|:.*|\..*|\s)');
   if m = '*' then
@@ -120,6 +123,8 @@ begin
     selector := substring(selector from '^::[a-zA-Z0-9_]+(.*)$');
   end if;
 
+  -- check for comments
+  selector := pgmapcss_parse_comments(selector);
   ret.text_length=strpos($1, selector);
 
   return next ret;

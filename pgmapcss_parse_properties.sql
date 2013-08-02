@@ -35,6 +35,9 @@ begin
   ret.eval_assignments:=''::hstore;
   ret.eval_properties:=''::hstore;
 
+  -- check for comments
+  content := pgmapcss_parse_comments(content);
+
   m=substring(content from '^[^{]*{\s*(.*)');
   if m is null then
     raise notice 'Error parsing at "%..."', substring(content, 1, 40);
@@ -43,32 +46,35 @@ begin
     content=m;
   end if;
 
+  -- check for comments
+  content := pgmapcss_parse_comments(content);
+
   loop
-    if content ~ '^([a-zA-Z0-9_-]+)\s*:' then
-      key=substring(content from '^([a-zA-Z0-9_-]+)\s*:');
+    if content ~ '^\s*([a-zA-Z0-9_-]+)\s*:' then
+      key=substring(content from '^\s*([a-zA-Z0-9_-]+)\s*:');
       assignment_type=1;
 
-      content=substring(content from '^[a-zA-Z0-9_-]+\s*:\s*(.*)$');
+      content=substring(content from '^\s*[a-zA-Z0-9_-]+\s*:\s*(.*)$');
 
-    elsif content ~ '^set\s+([a-zA-Z0-9_\-\.]+)\s*=' then
-      key=substring(content from '^set\s+([a-zA-Z0-9_\-\.]+)\s*=');
+    elsif content ~ '^\s*set\s+([a-zA-Z0-9_\-\.]+)\s*=' then
+      key=substring(content from '^\s*set\s+([a-zA-Z0-9_\-\.]+)\s*=');
       assignment_type=2;
 
-      content=substring(content from '^set\s+[a-zA-Z0-9_\-\.]+\s*=\s*(.*)$');
+      content=substring(content from '^\s*set\s+[a-zA-Z0-9_\-\.]+\s*=\s*(.*)$');
 
-    elsif content ~ '^set\s+([a-zA-Z0-9_\-\.]+)\s*;' then
-      key=substring(content from '^set\s+([a-zA-Z0-9_\-\.]+)\s*;');
+    elsif content ~ '^\s*set\s+([a-zA-Z0-9_\-\.]+)\s*;' then
+      key=substring(content from '^\s*set\s+([a-zA-Z0-9_\-\.]+)\s*;');
       assignment_type=2;
 
-      content='yes;' || substring(content from '^set\s+[a-zA-Z0-9_\-\.]+\s*;(.*)$');
+      content='yes;' || substring(content from '^\s*set\s+[a-zA-Z0-9_\-\.]+\s*;(.*)$');
 
-    elsif content ~ '^unset\s+([a-zA-Z0-9_\-\.]+)\s*;' then
-      key=substring(content from '^unset\s+([a-zA-Z0-9_\-\.]+)\s*;');
+    elsif content ~ '^\s*unset\s+([a-zA-Z0-9_\-\.]+)\s*;' then
+      key=substring(content from '^\s*unset\s+([a-zA-Z0-9_\-\.]+)\s*;');
       assignment_type=3;
 
-      content='no;' || substring(content from '^unset\s+[a-zA-Z0-9_\-\.]+\s*;(.*)$');
+      content='no;' || substring(content from '^\s*unset\s+[a-zA-Z0-9_\-\.]+\s*;(.*)$');
 
-    elsif content ~ '^}' then
+    elsif content ~ '^\s*}' then
       ret.text_length=strpos($1, content)+1;
 
       return next ret;
@@ -77,6 +83,9 @@ begin
       raise notice 'Error parsing prop key at "%..."', substring(content, 1, 40);
       return;
     end if;
+
+    -- check for comments
+    content := pgmapcss_parse_comments(content);
 
     if content ~ '^eval\(' then
       r1 := pgmapcss_parse_string(content, null, 6);
@@ -121,6 +130,10 @@ begin
       end if;
 
       content=substring(content from '^[^;]*;\s*(.*)$');
+
+      -- check for comments
+      content := pgmapcss_parse_comments(content);
+
     else
       raise notice 'Error parsing prop value at "%..."', substring(content, 1, 40);
       return;

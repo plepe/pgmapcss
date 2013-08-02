@@ -7,6 +7,7 @@ for i in \
   pgmapcss_object.sql \
   pgmapcss_parse_string.sql \
   pgmapcss_condition.sql \
+  pgmapcss_parse_comments.sql \
   pgmapcss_parse_selector.sql \
   pgmapcss_parse_selectors.sql \
   pgmapcss_parse_properties.sql \
