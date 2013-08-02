@@ -20,10 +20,11 @@ for i in \
 do
   echo "* $i"
   psql $@ --set ON_ERROR_STOP=1 -f $i
+  ERR=$?
 
-  if [ $? -ne 0 ] ; then
+  if [ $ERR -ne 0 ] ; then
     echo
     echo "Aborting install.sh due to error!"
-    exit
+    exit $ERR
   fi
 done
