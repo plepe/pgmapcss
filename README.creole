@@ -17,7 +17,7 @@ Read [[doc/MapCSS.creole]] to learn about the features of PGMapCSS's MapCSS impl
 WARNING: As of 2013, Mapnik does not support using expressions for all/most symbolizer parameters. Therefore usefulness of PGMapCSS is quite limited. See [[doc/compatibility.creole|Compatibility]] for more information.
 
 Share this:
-[[https://flattr.com/submit/auto?user_id=plepe&url=https://github.com/plepe/pgmapcss&title=PGMapCSS&language=&tags=github&category=software|{{http://api.flattr.com/button/flattr-badge-large.png|Flattr PGMapCSS}}]]
+* [[https://flattr.com/submit/auto?user_id=plepe&url=https://github.com/plepe/pgmapcss&title=PGMapCSS&language=&tags=github&category=software|Flattr me!]]
 
 == Installation ==
 === Create a database ===
@@ -57,7 +57,7 @@ Insert correct database parameters in test.mapnik (look for DB, USER, PASSWORD).
 
 Now you should have a working test.mapnik XML file, which you can use in renderd or other programs.
 
-=== Example ===
+== Example ==
 {{doc/example.png}}
 
 Image created with the test.mapcss / test.mapnik style and Mapnik branch stroke-width-expr enabled.
