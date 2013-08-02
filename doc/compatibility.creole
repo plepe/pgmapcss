@@ -1,9 +1,9 @@
 == Compatibility ==
 The idea behind pgmapcss is to calculate all (or some) symbolizer parameters with database functions. This requires Mapnik (or other renderers) to be able to read those values. As of 2013-07 Mapnik does not support this only for a limited amount of parameters.
 
-There are plans to convert all values to expressions for the next major Mapnik release, version 3.0. See [https://github.com/mapnik/mapnik/issues/828|Mapnik issue "All values should become expressions"] for details.
+There are plans to convert all values to expressions for the next major Mapnik release, version 3.0. See [[https://github.com/mapnik/mapnik/issues/828|Mapnik issue "All values should become expressions"]] for details.
 
-You may test the test.mapnik file using Mapnik branch [https://github.com/mapnik/mapnik/tree/stroke-width-expr|stroke-width-expr] and a default [http://wiki.openstreetmap.org/wiki/Osm2pgsql|osm2pgsql] import with option --hstore-all enabled.
+You may test the test.mapnik file using Mapnik branch [[https://github.com/mapnik/mapnik/tree/stroke-width-expr|stroke-width-expr]] and a default [[http://wiki.openstreetmap.org/wiki/Osm2pgsql|osm2pgsql]] import with option --hstore-all enabled.
 
 === Filter ===
 In Filters you may use expressions all right, e.g.
@@ -24,7 +24,7 @@ Note: as you can modify the Symbolizer template in your Mapnik Stylesheet you ca
 === LineSymbolizer ===
 |= CSS parameter |= Mapnik parameter |= support Mapnik 2.x |= support PGMapCSS
 | color | stroke | no expr | yes
-| width | stroke-width | no expr ; branch [[https://github.com/mapnik/mapnik/tree/stroke-width-expr|stroke-width-expr|stroke-width-expr]]] adds support | yes
+| width | stroke-width | no expr ; branch [[https://github.com/mapnik/mapnik/tree/stroke-width-expr|stroke-width-expr]] adds support | yes
 | opacity | stroke-opacity | no expr | yes
 | linejoin | stroke-linejoin | no expr | yes
 | linecap | stroke-linecap | no expr | yes
@@ -70,7 +70,7 @@ Note: as you can modify the Symbolizer template in your Mapnik Stylesheet you ca
 | font-family | face-name | with ExpressionFormat | yes; syntax differnet from MapCSS (face-name includes weight/style option)
 | | fontset-name | no expr | yes
 | font-size | size | with ExpressionFormat | yes
-| text-color | fill | with ExpressionFormat and branch harfbuzz | yes
+| text-color | fill | with ExpressionFormat and branch [[https://github.com/mapnik/mapnik/tree/harfbuzz|harfbuzz]] | yes
 | text-halo-color | halo-fill | no expr | yes
 | text-halo-radius | halo-radius | with ExpressionFormat | yes
 | | character-spacing | with ExpressionFormat | yes
