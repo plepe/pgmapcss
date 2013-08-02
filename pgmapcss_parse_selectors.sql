@@ -1,4 +1,4 @@
-drop function pgmapcss_parse_selectors(text);
+drop function if exists pgmapcss_parse_selectors(text);
 create or replace function pgmapcss_parse_selectors (
   text
 )

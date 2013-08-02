@@ -9,7 +9,7 @@ create type pgmapcss_properties_return as (
   text_length           int
 );
 
-drop function pgmapcss_parse_properties(text);
+drop function if exists pgmapcss_parse_properties(text);
 create or replace function pgmapcss_parse_properties (
   text
 )
