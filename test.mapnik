@@ -56,7 +56,7 @@ In the meantime, the following rules simulate this behaviour:
       <Parameter name="table">
 (select (result).* from
   (select
-    css_check_test(
+    test_check(
       object,
       pgmapcss_render_context(!bbox!, !scale_denominator!)
     ) result

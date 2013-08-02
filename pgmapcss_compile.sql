@@ -14,8 +14,8 @@ declare
 begin
   stat := pgmapcss_compile_content($2);
 
-  ret = ret || 'drop type if exists css_return_' || style_id || E' cascade;\n';
-  ret = ret || 'create type css_return_' || style_id || E' as (\n';
+  ret = ret || 'drop type if exists ' || style_id || E'_result cascade;\n';
+  ret = ret || 'create type ' || style_id || E'_result as (\n';
 
   a = Array[]::text[];
   a = array_append(a, E'  _style\thstore');
@@ -28,13 +28,13 @@ begin
   ret = ret || array_to_string(a, E',\n');
   ret = ret || E'\n);\n\n';
 
-  ret = ret || 'create or replace function css_check_' || style_id || E'(\n';
+  ret = ret || 'create or replace function ' || style_id || E'_check(\n';
   ret = ret || E'  object\tpgmapcss_object,\n';
   ret = ret || E'  render_context\tpgmapcss_render_context\n';
-  ret = ret || E') returns setof css_return_' || style_id || E' as $body$\n';
+  ret = ret || E') returns setof ' || style_id || E'_result as $body$\n';
   ret = ret || E'declare\n';
   ret = ret || E'  current pgmapcss_current;\n';
-  ret = ret || E'  ret css_return_' || style_id || E';\n';
+  ret = ret || E'  ret ' || style_id || E'_result;\n';
   ret = ret || E'  layers text[] := ''' || cast(stat.layers as text) || E''';\n';
   ret = ret || E'  r record;\n';
   ret = ret || E'begin\n';
