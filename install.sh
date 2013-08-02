@@ -19,5 +19,11 @@ for i in \
   pgmapcss_install.sql
 do
   echo "* $i"
-  psql $@ -f $i
+  psql $@ --set ON_ERROR_STOP=1 -f $i
+
+  if [ $? -ne 0 ] ; then
+    echo
+    echo "Aborting install.sh due to error!"
+    exit
+  fi
 done
