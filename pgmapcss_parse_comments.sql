@@ -17,8 +17,6 @@ begin
     else
       return content;
     end if;
-
-    raise notice 'read comment; now: "%..."', substring(content, 1, 20);
   end loop;
 
 end;
