@@ -16,6 +16,9 @@ Read [[doc/MapCSS.creole]] to learn about the features of PGMapCSS's MapCSS impl
 
 WARNING: As of 2013, Mapnik does not support using expressions for all/most symbolizer parameters. Therefore usefulness of PGMapCSS is quite limited. See [[doc/compatibility.creole|Compatibility]] for more information.
 
+Share this:
+[[https://flattr.com/submit/auto?user_id=plepe&url=https://github.com/plepe/pgmapcss&title=PGMapCSS&language=&tags=github&category=software|{{http://api.flattr.com/button/flattr-badge-large.png|Flattr PGMapCSS}}]]
+
 == Installation ==
 === Create a database ===
 This installation has been done on Ubuntu 12.04 LTS with PostgreSQL 9.1 and PostGIS 1.5. If you use different versions on different systems the paths may vary.
