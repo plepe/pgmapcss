@@ -82,7 +82,7 @@ Note: as you can modify the Symbolizer template in your Mapnik Stylesheet you ca
 | font-variant | | no | no
 | text-decoration | | no | no
 | text-transform | | no | possible with eval()
-| text | Symbolizer content | yes | syntax different from MapCSS (see Parameter 'text')
+| text | Symbolizer content | yes | syntax different from MapCSS (see 'Parameter text' below)
 
 ==== Parameter 'text' ====
 In contrast to the definition of MapCSS you need to specify an eval-statement, e.g.:
