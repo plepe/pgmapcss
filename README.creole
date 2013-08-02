@@ -37,7 +37,7 @@ Import OSM-file with osm2pgsql
 ./osm2pgsql -d DB -s -S default.style --hstore-all --hstore-add-index -G data.osm
 }}}
 
-You may vary the parameters, but --hstore-all is really important.
+You may vary the parameters, but {{{--hstore-all}}} is really important.
 
 === Load PGMapCSS ===
 The following script loads all necessary functions to compile / run PGMapCSS
@@ -55,27 +55,9 @@ Insert correct database parameters in test.mapnik (look for DB, USER, PASSWORD).
 Now you should have a working test.mapnik XML file, which you can use in renderd or other programs.
 
 == Using PGMapCSS ==
-The postgresql function pgmapcss_install(style_id, file_content) converts the passed css file to a function. It will be available as postgresql function named 'css_check_{style_id}()'.
+The postgresql function {{{pgmapcss_install(style_id, file_content)}}} converts the passed css file to a function. It will be available as postgresql function named {{{ {style_id}_check() }}}.
 
 === Function {style_id}_check ===
-
-Parameters:
-|= Parameter |= Type |= Description
-| id | text | Object ID, e.g. 'N1234'
-| tags | hstore | All tags of the object
-| way | geometry | The geometry of the object
-| types | text[] | An array of the types of the object, e.g. 'node', 'way', 'relation' or 'area', 'line', ...
-| scale_denominator | float | The current zoom level as scale_denominator
-
-Every call returns 0..n rows, depending on the matching css rules. There will be one returned row for every layer, ordered by 'object-z-index' (asc, default 0).
-
-Return values:
-|= Name |= Type |= Description
-| _style | hstore | All resulting properties
-| _layer | text | The current layer, default: 'default'.
-| _tags | hstore | The resulting tags, as modified by set and unset statements.
-| _geo | geometry | Modified geometry
-| ... | text | A column for every property found in the CSS file.
 
 Example usage (for style_id 'test'):
 {{{
@@ -92,6 +74,16 @@ where object is of type {{{pgmapcss_object}}}:
 You may use the function {{{pgmapcss_object(id, tags, way, hstore)}}} to create an object for test_check.
 
 The {{{render_context}}} can be derived with the function {{{pgmapcss_render_context(bbox, scale_denominator)}}}.
+
+Every call returns 0..n rows, depending on the matching css rules. There will be one returned row for every layer, ordered by 'object-z-index' (asc, default 0).
+
+Return values:
+|= Name |= Type |= Description
+| _style | hstore | All resulting properties
+| _layer | text | The current layer, default: 'default'.
+| _tags | hstore | The resulting tags, as modified by set and unset statements.
+| _geo | geometry | Modified geometry
+| ... | text | A column for every property found in the CSS file.
 
 Full example usage:
 {{{
