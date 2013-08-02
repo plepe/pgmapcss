@@ -20,26 +20,35 @@ WARNING: As of 2013, Mapnik does not support using expressions for all/most symb
 === Create a database ===
 This installation has been done on Ubuntu 12.04 LTS with PostgreSQL 9.1 and PostGIS 1.5. If you use different versions on different systems the paths may vary.
 
-* psql "create database DB"
+{{{
+psql "create database DB"
+}}}
 
 Add hstore and postgis functionality
-* psql -d DB "create extension hstore"
-* psql -d DB -f /usr/share/postgresql/9.1/contrib/postgis-1.5/postgis.sql
-* psql -d DB -f /usr/share/postgresql/9.1/contrib/postgis-1.5/spatial_ref_sys.sql
+{{{
+psql -d DB "create extension hstore"
+psql -d DB -f /usr/share/postgresql/9.1/contrib/postgis-1.5/postgis.sql
+psql -d DB -f /usr/share/postgresql/9.1/contrib/postgis-1.5/spatial_ref_sys.sql
+}}}
 
 === Import OSM data ===
 Import OSM-file with osm2pgsql
-
-* ./osm2pgsql -d DB -s -S default.style --hstore-all --hstore-add-index -G data.osm
+{{{
+./osm2pgsql -d DB -s -S default.style --hstore-all --hstore-add-index -G data.osm
+}}}
 
 You may vary the parameters, but --hstore-all is really important.
 
 === Load PGMapCSS ===
 The following script loads all necessary functions to compile / run PGMapCSS
-** ./install.sh -d DB
+{{{
+./install.sh -d DB
+}}}
 
 Compile test.mapnik / test.mapcss style file
-** ./load.sh -d DB
+{{{
+./load.sh -d DB
+}}}
 
 Insert correct database parameters in test.mapnik (look for DB, USER, PASSWORD).
 
