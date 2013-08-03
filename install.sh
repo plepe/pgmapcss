@@ -20,7 +20,7 @@ for i in \
   pgmapcss_install.sql
 do
   echo "* $i"
-  psql $@ --set ON_ERROR_STOP=1 -f $i
+  psql $@ --set ON_ERROR_STOP=1 -f src/$i
   ERR=$?
 
   if [ $ERR -ne 0 ] ; then
