@@ -2,7 +2,7 @@ drop type if exists pgmapcss_compile_stat cascade;
 create type pgmapcss_compile_stat as (
   func          text,
   prop_list     hstore,
-  layers	text[]
+  pseudo_elements	text[]
 );
 
 drop type if exists pgmapcss_render_context cascade;
@@ -22,8 +22,8 @@ create type pgmapcss_object as (
 drop type if exists pgmapcss_current cascade;
 create type pgmapcss_current as (
   tags			hstore,
-  current_layer		text,
-  current_layer_ind	int,
+  pseudo_element	text,
+  pseudo_element_ind	int,
   styles		hstore[],
-  has_layer		boolean[]
+  has_pseudo_element	boolean[]
 );

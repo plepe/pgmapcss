@@ -19,12 +19,12 @@ You may use the function {{{pgmapcss_object(id, tags, way, hstore)}}} to create 
 
 The {{{render_context}}} can be derived with the function {{{pgmapcss_render_context(bbox, scale_denominator)}}}.
 
-Every call returns 0..n rows, depending on the matching css rules. There will be one returned row for every layer, ordered by 'object-z-index' (asc, default 0).
+Every call returns 0..n rows, depending on the matching css rules. There will be one returned row for every pseudo element, ordered by 'object-z-index' (asc, default 0).
 
 Return values:
 |= Name |= Type |= Description
 | _style | hstore | All resulting properties
-| _layer | text | The current layer, default: 'default'.
+| _pseudo_element | text | The current pseudo element, default: 'default'.
 | _tags | hstore | The resulting tags, as modified by set and unset statements.
 | _geo | geometry | Modified geometry
 | ... | text | A column for every property found in the CSS file.
@@ -45,6 +45,6 @@ Notes:
 * {{{offset 0}}}: the statement {{{(result).*}}} in the select statement will call test_check() for every resulting column; {{{offset 0}}} prevents this behaviour.
 
 Example output:
-|= _style |= _layer |= _tags |= _way |= color |= width |= z-index |= object-z-index
+|= _style |= _pseudo_element |= _tags |= _way |= color |= width |= z-index |= object-z-index
 | "color"=>"#A0A0A0", "width"=>"7", "z-index"=>"-20", "object-z-index"=>"-1" | casing | "name"=>"Testroad", "highway"=>"primary" | some geometry | #A0A0A0 | 7 | -20 | -1
 | "color"=>"#ff0000", "width"=>"4" | default | "name"=>"Testroad", "highway"=>"primary" | some geometry | #ff0000 | 4 | |

@@ -11,7 +11,7 @@ declare
   ret text := ''::text;
   r pgmapcss_selector_return;
   r1 record;
-  current_layer text;
+  current_pseudo_element text;
 begin
   stat := $3;
 
@@ -24,18 +24,18 @@ begin
     end if;
     ret = ret || E')\nthen\n';
 
-    current_layer = array_search(r.layer, stat.layers);
-    if current_layer is null then
-      stat.layers = array_append(stat.layers, r.layer);
-      current_layer = array_upper(stat.layers, 1);
+    current_pseudo_element = array_search(r.pseudo_element, stat.pseudo_elements);
+    if current_pseudo_element is null then
+      stat.pseudo_elements = array_append(stat.pseudo_elements, r.pseudo_element);
+      current_pseudo_element = array_upper(stat.pseudo_elements, 1);
     end if;
 
-    ret = ret || '  current.current_layer = layers[' || current_layer || E'];\n';
-    ret = ret || '  current.current_layer_ind = ' || current_layer || E';\n';
-    ret = ret || '  current.styles[' || current_layer || '] = ' ||
-      'current.styles[' || current_layer || '] || ' ||
+    ret = ret || '  current.pseudo_element = pseudo_elements[' || current_pseudo_element || E'];\n';
+    ret = ret || '  current.pseudo_element_ind = ' || current_pseudo_element || E';\n';
+    ret = ret || '  current.styles[' || current_pseudo_element || '] = ' ||
+      'current.styles[' || current_pseudo_element || '] || ' ||
       quote_nullable(cast(properties.properties as text)) || E';\n';
-    ret = ret || '  current.has_layer[' || current_layer || E'] = true;\n';
+    ret = ret || '  current.has_pseudo_element[' || current_pseudo_element || E'] = true;\n';
 
     if array_upper(akeys(properties.assignments), 1) is not null then
       ret = ret || '  current.tags = current.tags || ' ||
@@ -48,8 +48,8 @@ begin
     end loop;
 
     for r1 in select * from each(properties.eval_properties) loop
-      ret = ret || '  current.styles[' || current_layer || '] = ' ||
-	'current.styles[' || current_layer || '] || hstore(' ||
+      ret = ret || '  current.styles[' || current_pseudo_element || '] = ' ||
+	'current.styles[' || current_pseudo_element || '] || hstore(' ||
         quote_literal(r1.key) || ', ' || r1.value || E');\n';
     end loop;
 

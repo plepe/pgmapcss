@@ -19,11 +19,11 @@ For each rule, if the selector applies the properties from the { } block are set
 Additionally, comments can be made using "//" to comment the rest of the line out, or using "/*" and "*/" to comment out everything between these end points.
 
 == Selectors ==
-Every selector may have several elements: type, class, zoom, condition, pseudo, layer, grouping and link.
+Every selector may have several elements: type, class, zoom, condition, pseudo class, pseudo element, grouping and link.
 
 E.g.
 * {{{way.public[highway=residential]}}}
-* {{{way|z11-14[amenity=parking][access=public]:closed:new::layer_1}}}
+* {{{way|z11-14[amenity=parking][access=public]:closed:new::casing}}}
 * {{{relation[type=route][route=foot] > way::relation_underlay}}}
 
 === Type selector ===
@@ -80,17 +80,17 @@ Matches are always case sensitive (except regexp). Valid characters for keys are
 | [key] | Tests whether object has tag 'key'.
 | [!key] | Tests whether no 'key' is present.
 
-=== Pseudo selectors ===
-After the condition selector(s), separated by ':'. Several pseudo selectors may be specified. Optional.
+=== Pseudo classes ===
+After the condition selector(s), separated by ':'. Several pseudo classes may be specified. Optional.
 
 NOT SUPPORTED YET.
 
-=== Layer identifier ===
-After the pseudo selector(s), separated by '::'. Optional.
+=== Pseudo elements ===
+After the pseudo class(es), separated by '::'. Optional.
 
-Layers can be used to create more than one style for a single object, e.g. '::casing' to draw a casing. A property {{{object-z-index}}} may be specified to order layers.
+Pseudo elements can be used to create more than one style for a single object, e.g. '::casing' to draw a casing. A property {{{object-z-index}}} may be specified to order pseudo elements.
 
-If you omit the layer in the selector, this is the same as using ::default.
+If you omit the pseudo element descriptor in the selector, this is the same as using ::default.
 
 === Grouping ===
 You may use a list of properties with several selectors, separated by ','. E.g.
@@ -122,7 +122,7 @@ E.g.
 }}}
 
 === Assignments ===
-You may assign values to tags of the current object. This is independent from the current layer.
+You may assign values to tags of the current object. This is independent from the current pseudo element descriptor.
 
 |= Declaration |= Description
 | set highway_class=minor; | set tag 'highway_class' to value 'minor'.
@@ -151,7 +151,7 @@ You can compute values using an eval instrucion:
 }}}
 }
 
-Either set a property for the current layer or set a tag for the current object.
+Either set a property for the current pseudo element or set a tag for the current object.
 
 See file [[eval.creole]] for details.
 

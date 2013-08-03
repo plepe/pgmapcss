@@ -3,7 +3,7 @@ create type pgmapcss_selector_return as (
   classes		text[], /* .foo */
   conditions            text[], /* conditional expressions */
   pseudo_classes        text[], /* :closed, ... */
-  layer                 text,
+  pseudo_element        text,
   text_length           int
 );
 
@@ -27,7 +27,7 @@ begin
   ret.classes=Array[]::text[];
   ret.conditions=Array[]::text[];
   ret.pseudo_classes=Array[]::text[];
-  ret.layer := 'default';
+  ret.pseudo_element := 'default';
 
   -- check for comments
   selector := pgmapcss_parse_comments(selector);
@@ -116,10 +116,10 @@ begin
     selector := substring(selector from '^:[a-zA-Z0-9_]+(.*)$');
   end loop;
 
-  -- parse layer
+  -- parse pseudo element
   if selector ~ '^::([a-zA-Z0-9_]+)' then
     m := substring(selector from '^::([a-zA-Z0-9_]+)');
-    ret.layer=m;
+    ret.pseudo_element=m;
     selector := substring(selector from '^::[a-zA-Z0-9_]+(.*)$');
   end if;
 

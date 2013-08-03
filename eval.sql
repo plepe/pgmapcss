@@ -174,8 +174,8 @@ declare
   i text;
 begin
   foreach i in array param loop
-    if current.styles[current.current_layer_ind] ? i then
-      return current.styles[current.current_layer_ind]->i;
+    if current.styles[current.pseudo_element_ind] ? i then
+      return current.styles[current.pseudo_element_ind]->i;
     end if;
   end loop;
 
