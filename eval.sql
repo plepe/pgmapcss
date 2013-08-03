@@ -278,7 +278,7 @@ declare
   result boolean;
 begin
   if array_upper(param, 1) >= 2 then
-    result := eval_boolean(Array[param[1]], id, tags, way, type, scale_denominator, style);
+    result := eval_boolean(Array[param[1]], object, current, render_context);
 
     if result then
       return param[2];
@@ -324,7 +324,7 @@ begin
     if unit = 'px' then
       -- no conversion necessary
     elsif unit in ('u', 'm') then
-      value := value / (0.00028 * scale_denominator);
+      value := value / (0.00028 * render_context.scale_denominator);
     end if;
 
     return cast(value as text);
