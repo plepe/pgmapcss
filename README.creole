@@ -1,6 +1,6 @@
 == PGMapCSS ==
 PGMapCSS is an implementation of [[http://www.mapcss.org/|MapCSS]] in Postgresql
-/ plpgsql for use with [[http://www.mapnik.org/|Mapnik]]. Therefore you can
+/ plpgsql for use with [[http://www.mapnik.org/|Mapnik]] (but should work with other programs too). Therefore you can
 reduce your Mapnik stylesheet to a minimum; all style calculation is done in
 the database, providing more advanced functionality.
 
@@ -8,13 +8,13 @@ There were already several efforts to implement stylesheets based on Cascading S
 * [[https://github.com/mapnik/Cascadenik|Cascadenik]]
 * [[http://wiki.openstreetmap.org/wiki/Carto|CartoCSS]]
 
-All these tools are pre-processors, that convert a CSS stylesheet into a Mapnik stylesheet. PGMapCSS takes a different approach: The stylesheet is compiled into a PostgreSQL/plpgsql function which is evaluated at runtime. Therefore more advanced calculations are possible, even geometric alterations (though not supported yet).
+All these tools are pre-processors, that convert a CSS stylesheet into a Mapnik stylesheet. PGMapCSS takes a different approach: The stylesheet is compiled into a PostgreSQL/plpgsql function which is evaluated at runtime. Therefore more advanced calculations are possible, even geometric alterations (though not implemented yet).
 
 The Mapnik style just contains the database query/queries and the basic styles, referencing all options from the database queries. You can think of those styles as templates, which you can reference from your style sheet.
 
 Read [[doc/MapCSS.creole]] to learn about the features of PGMapCSS's MapCSS implementation.
 
-WARNING: As of 2013, Mapnik does not support using expressions for all/most symbolizer parameters. Therefore usefulness of PGMapCSS is quite limited. See [[doc/compatibility.creole|Compatibility]] for more information.
+WARNING: As of 2013, Mapnik does not support using expressions for most symbolizer parameters. Therefore usefulness of PGMapCSS is quite limited. See [[doc/compatibility.creole|Compatibility]] for more information.
 
 Share this:
 * [[https://flattr.com/submit/auto?user_id=plepe&url=https://github.com/plepe/pgmapcss&title=PGMapCSS&language=&tags=github&category=software|Flattr this!]]
@@ -61,4 +61,4 @@ Now you should have a working test.mapnik XML file, which you can use in renderd
 == Example ==
 {{doc/example.png}}
 
-Image created with the test.mapcss / test.mapnik style and Mapnik branch stroke-width-expr enabled.
+Image created with the test.mapcss / test.mapnik style and Mapnik branch stroke-width-expr enabled. Data: (c) [[http://www.openstreetmap.org|OpenStreetMap]] contributors.

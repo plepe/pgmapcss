@@ -21,7 +21,7 @@ The {{{render_context}}} can be derived with the function {{{pgmapcss_render_con
 
 Every call returns 0..n rows, depending on the matching css rules. There will be one returned row for every pseudo element, ordered by 'object-z-index' (asc, default 0).
 
-Return values:
+Return values (Data Type '{style_id}_result'):
 |= Name |= Type |= Description
 | _style | hstore | All resulting properties
 | _pseudo_element | text | The current pseudo element, default: 'default'.
@@ -40,8 +40,8 @@ select (result).* from (
 }}}
 
 Notes:
-* {{{!bbox!}}} and {{{!scale_denominator!}}} will be replaced by Mapnik by the current bounding box resp. scale denominator, see [[https://trac.openstreetmap.org/browser/subversion/applications/rendering/mapnik/zoom-to-scale.txt|zoom-to-scale.txt]] for valid values.
-* {{{where way && !bbox!}}}: as the geometry may be modified by PGMapCSS, PostgreSQL can't use indexes on the resulting column; therefore all objects in the database would be included on every request (expect very bad performance). Using this statement PostgreSQL can use indexes on the source geometry and only objects matching the bounding box will be included.
+* {{{!bbox!}}} and {{{!scale_denominator!}}} will be replaced by Mapnik by the current bounding box resp. scale denominator. See [[https://trac.openstreetmap.org/browser/subversion/applications/rendering/mapnik/zoom-to-scale.txt|zoom-to-scale.txt]] for valid values.
+* {{{where way && !bbox!}}}: as the geometry may be modified by PGMapCSS (though not implemented yet), PostgreSQL can't use indexes on the resulting column; therefore all objects in the database would be included on every request (expect very bad performance). Using this statement PostgreSQL can use indexes on the source geometry and only objects matching the bounding box will be included.
 * {{{offset 0}}}: the statement {{{(result).*}}} in the select statement will call test_check() for every resulting column; {{{offset 0}}} prevents this behaviour.
 
 Example output:
