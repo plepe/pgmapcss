@@ -310,8 +310,8 @@ begin
       return '';
     end if;
 
-    if ret ~ '(px|u)$' then
-      unit := substring(ret from '(px|u)$');
+    if ret ~ '(px|u|m)$' then
+      unit := substring(ret from '(px|u|m)$');
       ret := trim(substring(ret, 1, length(ret) - length(unit)));
     end if;
 
