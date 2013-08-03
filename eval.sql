@@ -19,7 +19,7 @@ declare
   i text;
 begin
   foreach i in array param loop
-    ret := ret + cast(i as float);
+    ret := ret + cast(eval_number(Array[i], object, current, render_context) as float);
   end loop;
 
   return ret;
@@ -39,7 +39,7 @@ begin
     if ret is null then
       ret := i;
     else
-      ret := ret - cast(i as float);
+      ret := ret - cast(eval_number(Array[i], object, current, render_context) as float);
     end if;
   end loop;
 
@@ -57,7 +57,7 @@ declare
   i text;
 begin
   foreach i in array param loop
-    ret := ret * cast(i as float);
+    ret := ret * cast(eval_number(Array[i], object, current, render_context) as float);
   end loop;
 
   return ret;
@@ -74,7 +74,7 @@ declare
   i text;
 begin
   foreach i in array param loop
-    ret := ret / cast(i as float);
+    ret := ret / cast(eval_number(Array[i], object, current, render_context) as float);
   end loop;
 
   return ret;
@@ -89,9 +89,13 @@ as $$
 declare
   ret text := '';
   i text;
+  p1 float;
+  p2 float;
 begin
   if array_upper(param, 1) >= 2 then
-    if cast(param[1] as float) > cast(param[2] as float) then
+    p1 := cast(eval_number(Array[param[1]], object, current, render_context) as float);
+    p2 := cast(eval_number(Array[param[2]], object, current, render_context) as float);
+    if p1 > p2 then
       return 'true';
     else
       return 'false';
@@ -110,9 +114,13 @@ as $$
 declare
   ret text := '';
   i text;
+  p1 float;
+  p2 float;
 begin
   if array_upper(param, 1) >= 2 then
-    if cast(param[1] as float) >= cast(param[2] as float) then
+    p1 := cast(eval_number(Array[param[1]], object, current, render_context) as float);
+    p2 := cast(eval_number(Array[param[2]], object, current, render_context) as float);
+    if p1 >= p2 then
       return 'true';
     else
       return 'false';
@@ -131,9 +139,13 @@ as $$
 declare
   ret text := '';
   i text;
+  p1 float;
+  p2 float;
 begin
   if array_upper(param, 1) >= 2 then
-    if cast(param[1] as float) <= cast(param[2] as float) then
+    p1 := cast(eval_number(Array[param[1]], object, current, render_context) as float);
+    p2 := cast(eval_number(Array[param[2]], object, current, render_context) as float);
+    if p1 <= p2 then
       return 'true';
     else
       return 'false';
@@ -152,9 +164,13 @@ as $$
 declare
   ret text := '';
   i text;
+  p1 float;
+  p2 float;
 begin
   if array_upper(param, 1) >= 2 then
-    if cast(param[1] as float) < cast(param[2] as float) then
+    p1 := cast(eval_number(Array[param[1]], object, current, render_context) as float);
+    p2 := cast(eval_number(Array[param[2]], object, current, render_context) as float);
+    if p1 < p2 then
       return 'true';
     else
       return 'false';
@@ -208,9 +224,11 @@ as $$
 declare
   ret text := '';
   i text;
+  p float;
 begin
   if array_upper(param, 1) >= 1 then
-    return cast(sqrt(cast(param[1] as float)) as text);
+    p := cast(eval_number(Array[1], object, current, render_context) as float);
+    return cast(sqrt(p) as text);
   end if;
 
   return '';
