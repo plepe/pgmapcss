@@ -32,8 +32,12 @@ First part of a selector; required.
 |= Selector |= Description
 | * | Matches with any object
 | node, way, relation | Matches with objects of the given type
-| area | Matches polygons (closed ways, relations with type multipolygon)
-| canvas | The background
+| area | Matches polygons (polygons as from osm2pgsql, incl. relations with type multipolygon)
+| point | Currently an alias for 'node'
+| line | Matches lines (way or relation)
+| canvas | The background (NOT SUPPORTED YET)
+
+The type of an object is retrieved from the 'types'-array in object-value (see [[API.creole]]). You can add/remove types from your database query.
 
 === Class selector ===
 After the type selector, separated by '.'. Optional.

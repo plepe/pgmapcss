@@ -33,7 +33,7 @@ begin
   selector := pgmapcss_parse_comments(selector);
 
   -- parse object class (way, node, canvas, ...)
-  m := substring(selector from '^\s*(\*|node|way|relation|point|area|meta|canvas)(\|.*|\[.*|:.*|\..*|\s)');
+  m := substring(selector from '^\s*(\*|[a-z_]+)(\|.*|\[.*|:.*|\..*|\s)');
   if m = '*' then
   elsif m is not null then
     ret.conditions=array_append(ret.conditions, ''''||m||'''=ANY(object.types)');
