@@ -14,7 +14,10 @@ declare
 begin
   stat := pgmapcss_compile_content($2);
 
+  -- Remove all old functions / data types
   ret = ret || 'drop type if exists ' || style_id || E'_result cascade;\n';
+
+  -- create result type for style
   ret = ret || 'create type ' || style_id || E'_result as (\n';
 
   a = Array[]::text[];
@@ -28,6 +31,7 @@ begin
   ret = ret || array_to_string(a, E',\n');
   ret = ret || E'\n);\n\n';
 
+  -- function to check a single object
   ret = ret || 'create or replace function ' || style_id || E'_check(\n';
   ret = ret || E'  object\tpgmapcss_object,\n';
   ret = ret || E'  render_context\tpgmapcss_render_context\n';
