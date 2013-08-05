@@ -3,6 +3,7 @@
 for i in \
   array_search.sql \
   pgmapcss_types.sql \
+  objects_osm2pgsql.sql \
   pgmapcss_render_context.sql \
   pgmapcss_object.sql \
   pgmapcss_parse_string.sql \
