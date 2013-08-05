@@ -43,7 +43,7 @@ begin
   else
     raise notice 'can''t parse object class at "%..."', substring(selector, 0, 40);
   end if;
-  selector := substring(selector from '^\s*(?:\*|node|way|relation|point|area|meta|canvas)(\|.*|\[.*|:.*|\..*|\s)');
+  selector := substring(selector, length(substring(selector from '^(\s*)(\*|[a-z_]+)')) + length(m) + 1);
 
   -- parse classes
   while selector ~ '^\.([a-zA-Z0-9_]+)' loop
