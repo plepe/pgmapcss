@@ -1,5 +1,6 @@
 drop type if exists pgmapcss_selector_return cascade;
 create type pgmapcss_selector_return as (
+  type			text,   /* node */
   classes		text[], /* .foo */
   min_scale		float,
   max_scale		float,
@@ -38,7 +39,7 @@ begin
   m := substring(selector from '^\s*(\*|[a-z_]+)(\|.*|\[.*|:.*|\..*|\s)');
   if m = '*' then
   elsif m is not null then
-    ret.conditions=array_append(ret.conditions, ''''||m||'''=ANY(object.types)');
+    ret.type = m;
   else
     raise notice 'can''t parse object class at "%..."', substring(selector, 0, 40);
   end if;

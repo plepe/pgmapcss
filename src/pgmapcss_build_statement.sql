@@ -23,6 +23,10 @@ begin
       ret = ret || array_to_string(r.conditions, ' and ');
     end if;
 
+    if r.type is not null then
+      ret := ret || ' and ''' || r.type || '''=ANY(object.types)';
+    end if;
+
     if r.min_scale is not null then
       ret := ret || ' and render_context.scale_denominator >= ' || r.min_scale;
     end if;
