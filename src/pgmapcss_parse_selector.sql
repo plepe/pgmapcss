@@ -1,6 +1,8 @@
 drop type if exists pgmapcss_selector_return cascade;
 create type pgmapcss_selector_return as (
   classes		text[], /* .foo */
+  min_scale		float,
+  max_scale		float,
   conditions            text[], /* conditional expressions */
   pseudo_classes        text[], /* :closed, ... */
   pseudo_element        text,
@@ -58,45 +60,29 @@ begin
     -- zN
     m1 := substring(m from '^([0-9]+)$');
     if m1 is not null then
-      ret.conditions=array_append(ret.conditions,
-        'render_context.scale_denominator >= ' ||
-        cast((max_scale_denominator / 2 ^ cast(m as int)) as text) ||
-        ' and render_context.scale_denominator < ' ||
-        cast((max_scale_denominator / 2 ^ (cast(m as int) - 1)) as text)
-      );
+      ret.max_scale := max_scale_denominator / 2 ^ (cast(m as int) - 1);
+      ret.min_scale := max_scale_denominator / 2 ^ cast(m as int);
     end if;
 
     -- zN-
     m1 := substring(m from '^([0-9]+)\-$');
     if m1 is not null then
-      ret.conditions=array_append(ret.conditions,
-        'render_context.scale_denominator < ' ||
-        cast((max_scale_denominator / 2 ^ (cast(m1 as int) - 1)) as text)
-      );
+      ret.max_scale := max_scale_denominator / 2 ^ (cast(m1 as int) - 1);
     end if;
 
     -- z-N
     m1 := substring(m from '^\-([0-9]+)$');
     if m1 is not null then
-      ret.conditions=array_append(ret.conditions,
-        'render_context.scale_denominator >= ' ||
-        cast((max_scale_denominator / 2 ^ cast(m1 as int)) as text)
-      );
+      ret.min_scale := max_scale_denominator / 2 ^ cast(m1 as int);
     end if;
 
     -- zN-N
     m1 := substring(m from '^(?:[0-9]+)\-([0-9]+)$');
     if m1 is not null then
-      t=
-        'render_context.scale_denominator >= ' ||
-        cast((max_scale_denominator / 2 ^ cast(m1 as int)) as text);
+      ret.min_scale := max_scale_denominator / 2 ^ cast(m1 as int);
 
       m1 := substring(m from '^([0-9]+)\-(?:[0-9]+)$');
-      t=t||
-        ' and render_context.scale_denominator < ' ||
-        cast((max_scale_denominator / 2 ^ (cast(m1 as int) - 1)) as text);
-
-      ret.conditions=array_append(ret.conditions, t);
+      ret.max_scale := max_scale_denominator / 2 ^ (cast(m1 as int) - 1);
     end if;
 
     selector := substring(selector from '^\|(?:z[0-9\-]+)(\[.*|:.*|\s)');

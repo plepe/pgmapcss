@@ -22,6 +22,14 @@ begin
     else
       ret = ret || array_to_string(r.conditions, ' and ');
     end if;
+
+    if r.min_scale is not null then
+      ret := ret || ' and render_context.scale_denominator >= ' || r.min_scale;
+    end if;
+    if r.max_scale is not null then
+      ret := ret || ' and render_context.scale_denominator < ' || r.max_scale;
+    end if;
+
     ret = ret || E')\nthen\n';
 
     current_pseudo_element = array_search(r.pseudo_element, stat.pseudo_elements);
