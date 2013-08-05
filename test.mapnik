@@ -49,17 +49,7 @@
       <Parameter name="geometry_field">_geo</Parameter>
       <Parameter name="srid">900913</Parameter>
       <Parameter name="table">
-(select (result).* from
-  (select
-    test_check(
-      object,
-      pgmapcss_render_context(!bbox!, !scale_denominator!)
-    ) result
-  from
-    objects(pgmapcss_render_context(!bbox!, !scale_denominator!)) object
-  offset 0) t
-  order by coalesce(cast((result)."z-index" as float), 0) asc
-) t
+test_match(pgmapcss_render_context(!bbox!, !scale_denominator!))
       </Parameter>
     </Datasource>
     <StyleName>pgmapcss</StyleName>

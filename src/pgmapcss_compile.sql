@@ -64,6 +64,27 @@ begin
   ret = ret || E'  return;\n';
   ret = ret || E'end;\n$body$ language ''plpgsql'' immutable;\n';
 
+  -- function to match objects in bbox
+  ret = ret || E';\n';
+  ret = ret || E'create or replace function ' || style_id || E'_match(\n';
+  ret = ret || E'  render_context\tpgmapcss_render_context\n';
+  ret = ret || E') returns setof ' || style_id || E'_result as $body$\n';
+  ret = ret || E'declare\n';
+  ret = ret || E'  ret ' || style_id || E'_result;\n';
+  ret = ret || E'begin\n';
+  ret = ret || E'  return query \n';
+  ret = ret || E'    select (result).* from\n';
+  ret = ret || E'      (select\n';
+  ret = ret || E'        ' || style_id || E'_check(\n';
+  ret = ret || E'          object, render_context\n';
+  ret = ret || E'        ) result\n';
+  ret = ret || E'      from\n';
+  ret = ret || E'        objects(render_context) object\n';
+  ret = ret || E'      offset 0) t\n';
+  ret = ret || E'      order by coalesce(cast((result)."z-index" as float), 0) asc;\n\n';
+  ret = ret || E'  return;\n';
+  ret = ret || E'end;\n$body$ language ''plpgsql'' immutable;\n';
+
   return ret;
 end;
 $$ language 'plpgsql' immutable;
