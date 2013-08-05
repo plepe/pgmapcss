@@ -1,5 +1,5 @@
-drop type if exists pgmapcss_selector_return cascade;
-create type pgmapcss_selector_return as (
+drop type if exists pgmapcss_selector_part cascade;
+create type pgmapcss_selector_part as (
   type			text,   /* node */
   classes		text[], /* .foo */
   min_scale		float,
@@ -10,15 +10,15 @@ create type pgmapcss_selector_return as (
   text_length           int
 );
 
-drop function if exists pgmapcss_parse_selector(text);
-create or replace function pgmapcss_parse_selector (
+drop function if exists pgmapcss_parse_selector_part(text);
+create or replace function pgmapcss_parse_selector_part (
   text
 )
-returns setof pgmapcss_selector_return
+returns setof pgmapcss_selector_part
 as $$
 #variable_conflict use_variable
 declare
-  ret pgmapcss_selector_return;
+  ret pgmapcss_selector_part;
   m text;
   m1 text;
   t text;
@@ -111,8 +111,7 @@ begin
   end if;
 
   -- check for comments
-  selector := pgmapcss_parse_comments(selector);
-  ret.text_length=strpos($1, selector);
+  ret.text_length=strpos($1, selector) - 1;
 
   return next ret;
   return;

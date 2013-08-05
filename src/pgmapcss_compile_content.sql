@@ -5,8 +5,8 @@ returns pgmapcss_compile_stat
 as $$
 #variable_conflict use_variable
 declare
-  r pgmapcss_selector_return;
-  selectors pgmapcss_selector_return[];
+  r pgmapcss_selector;
+  selectors pgmapcss_selector[];
   properties pgmapcss_properties_return;
   content text;
   stat pgmapcss_compile_stat;
@@ -17,7 +17,7 @@ begin
   stat.pseudo_elements := Array['default']::text[];
 
   loop
-    selectors:=Array[]::pgmapcss_selector_return[];
+    selectors:=Array[]::pgmapcss_selector[];
 
     for r in select * from pgmapcss_parse_selectors(content) loop
       selectors=array_append(selectors, r);
