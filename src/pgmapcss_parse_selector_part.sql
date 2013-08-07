@@ -13,6 +13,7 @@ declare
   selector text;
   max_scale_denominator float := 3.93216e+08;
   r record;
+  c pgmapcss_condition;
 begin
   selector:=$1;
   ret.classes=Array[]::text[];
@@ -37,8 +38,9 @@ begin
   while selector ~ '^\.([a-zA-Z0-9_]+)' loop
     m := substring(selector from '^\.([a-zA-Z0-9_]+)');
     ret.classes=array_append(ret.classes, m);
-    ret.conditions=array_append(ret.conditions,
-      'current.tags ? ' || quote_literal('.' || m));
+
+    c := ( 'has_tag', '.' || m, null);
+    ret.conditions=array_append(ret.conditions, c);
 
     selector := substring(selector from '^\.[a-zA-Z0-9_]+(.*)$');
   end loop;
@@ -79,8 +81,8 @@ begin
 
   -- parse condition selector(s)
   while selector ~ '^\[' loop
-    r := pgmapcss_condition(substring(selector, 2));
-    ret.conditions=array_append(ret.conditions, r.result);
+    r := pgmapcss_parse_condition(substring(selector, 2));
+    ret.conditions=array_append(ret.conditions, r);
     selector := substring(selector, r.text_length + 3);
   end loop;
 

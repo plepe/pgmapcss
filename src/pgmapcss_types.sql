@@ -28,13 +28,21 @@ create type pgmapcss_current as (
   has_pseudo_element	boolean[]
 );
 
+drop type if exists pgmapcss_condition cascade;
+create type pgmapcss_condition as (
+  op			text,
+  key			text,
+  value			text,
+  text_length		int
+);
+
 drop type if exists pgmapcss_selector_part cascade;
 create type pgmapcss_selector_part as (
   type			text,   /* node */
   classes		text[], /* .foo */
   min_scale		float,
   max_scale		float,
-  conditions            text[], /* conditional expressions */
+  conditions            pgmapcss_condition[], /* conditional expressions */
   pseudo_classes        text[], /* :closed, ... */
   pseudo_element        text,
   text_length           int

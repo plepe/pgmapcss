@@ -10,7 +10,7 @@ begin
   if array_upper(selector.conditions, 1) is null then
     ret = ret || 'true';
   else
-    ret = ret || array_to_string(selector.conditions, ' and ');
+    ret = ret || array_to_string((select array_agg(x) from (select pgmapcss_compile_condition(unnest(selector.conditions)) x) t), ' and ');
   end if;
 
   if selector.type is not null then

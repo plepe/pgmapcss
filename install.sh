@@ -7,10 +7,11 @@ for i in \
   pgmapcss_render_context.sql \
   pgmapcss_object.sql \
   pgmapcss_parse_string.sql \
-  pgmapcss_condition.sql \
+  pgmapcss_parse_condition.sql \
   pgmapcss_parse_comments.sql \
   pgmapcss_parse_selector_part.sql \
   pgmapcss_parse_selectors.sql \
+  pgmapcss_compile_condition.sql \
   pgmapcss_compile_selector_part.sql \
   pgmapcss_parse_properties.sql \
   pgmapcss_build_statement.sql \
