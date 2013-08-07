@@ -1,15 +1,3 @@
-drop type if exists pgmapcss_selector_part cascade;
-create type pgmapcss_selector_part as (
-  type			text,   /* node */
-  classes		text[], /* .foo */
-  min_scale		float,
-  max_scale		float,
-  conditions            text[], /* conditional expressions */
-  pseudo_classes        text[], /* :closed, ... */
-  pseudo_element        text,
-  text_length           int
-);
-
 drop function if exists pgmapcss_parse_selector_part(text);
 create or replace function pgmapcss_parse_selector_part (
   text

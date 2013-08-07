@@ -1,11 +1,3 @@
-drop type if exists pgmapcss_selector cascade;
-create type pgmapcss_selector as (
-  link_parent		pgmapcss_selector_part,
-  link_condition	pgmapcss_selector_part,
-  object		pgmapcss_selector_part,
-  text_length		int
-);
-
 drop function if exists pgmapcss_parse_selectors(text);
 create or replace function pgmapcss_parse_selectors (
   text

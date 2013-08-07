@@ -27,3 +27,23 @@ create type pgmapcss_current as (
   styles		hstore[],
   has_pseudo_element	boolean[]
 );
+
+drop type if exists pgmapcss_selector_part cascade;
+create type pgmapcss_selector_part as (
+  type			text,   /* node */
+  classes		text[], /* .foo */
+  min_scale		float,
+  max_scale		float,
+  conditions            text[], /* conditional expressions */
+  pseudo_classes        text[], /* :closed, ... */
+  pseudo_element        text,
+  text_length           int
+);
+
+drop type if exists pgmapcss_selector cascade;
+create type pgmapcss_selector as (
+  link_parent		pgmapcss_selector_part,
+  link_condition	pgmapcss_selector_part,
+  object		pgmapcss_selector_part,
+  text_length		int
+);
