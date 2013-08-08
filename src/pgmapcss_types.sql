@@ -60,7 +60,7 @@ drop type if exists pgmapcss_rule_properties cascade;
 create type pgmapcss_rule_properties as (
   properties            hstore,
   eval_properties	hstore,
-  prop_list             hstore,
+  prop_types		hstore,
   assignments		hstore,
   eval_assignments	hstore,
   unassignments		text[],
