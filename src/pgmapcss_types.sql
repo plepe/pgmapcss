@@ -55,3 +55,14 @@ create type pgmapcss_selector as (
   object		pgmapcss_selector_part,
   text_length		int
 );
+
+drop type if exists pgmapcss_rule_properties cascade;
+create type pgmapcss_rule_properties as (
+  properties            hstore,
+  eval_properties	hstore,
+  prop_list             hstore,
+  assignments		hstore,
+  eval_assignments	hstore,
+  unassignments		text[],
+  text_length           int
+);

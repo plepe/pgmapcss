@@ -1,6 +1,6 @@
 create or replace function pgmapcss_build_statement (
   selectors pgmapcss_selector[],
-  properties pgmapcss_properties_return,
+  properties pgmapcss_rule_properties,
   pgmapcss_compile_stat
 )
 returns pgmapcss_compile_stat

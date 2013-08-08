@@ -7,7 +7,7 @@ as $$
 declare
   r pgmapcss_selector;
   selectors pgmapcss_selector[];
-  properties pgmapcss_properties_return;
+  properties pgmapcss_rule_properties;
   content text;
   stat pgmapcss_compile_stat;
 begin

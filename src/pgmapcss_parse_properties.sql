@@ -1,23 +1,12 @@
-drop type if exists pgmapcss_properties_return cascade;
-create type pgmapcss_properties_return as (
-  properties            hstore,
-  eval_properties	hstore,
-  prop_list             hstore,
-  assignments		hstore,
-  eval_assignments	hstore,
-  unassignments		text[],
-  text_length           int
-);
-
 drop function if exists pgmapcss_parse_properties(text);
 create or replace function pgmapcss_parse_properties (
   text
 )
-returns setof pgmapcss_properties_return
+returns setof pgmapcss_rule_properties
 as $$
 #variable_conflict use_variable
 declare
-  ret pgmapcss_properties_return;
+  ret pgmapcss_rule_properties;
   content text;
   m text;
   key text;
