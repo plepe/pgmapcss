@@ -1,4 +1,4 @@
-drop function pgmapcss_compile_eval(text);
+drop function if exists pgmapcss_compile_eval(text);
 create or replace function pgmapcss_compile_eval(
   text
 )
