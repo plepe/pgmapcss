@@ -11,9 +11,14 @@ declare
   f float;
   c text;
   r record;
+  r1 record;
   sel pgmapcss_selector;
+  sel1 pgmapcss_selector;
   ob pgmapcss_selector_part;
+  ob1 pgmapcss_selector_part;
   where_selectors pgmapcss_selector[];
+  assignments hstore := ''::hstore;
+  k text;
 begin
   for r in select unnest(stat.selectors) selectors, unnest(stat.properties) properties loop
     -- TODO: make list of match-relevant tags configurable
@@ -22,8 +27,27 @@ begin
     end if;
   end loop;
 
+  -- map conditions which are based on a (possible) set-statement back to their
+  -- original selectors
+  for r in select
+    generate_series(1, array_upper(stat.selectors, 1)) i,
+    unnest(stat.selectors) selectors,
+    unnest(stat.properties) properties
+  loop
+    -- TODO: we could check for key/value, hence key=>*
+    for r1 in select * from each((r.properties).assignments) loop
+      -- k := quote_nullable(r1.key) || '=>' || r1.value;
+      k := quote_nullable(r1.key) || '=>*';
+      assignments := assignments || hstore(k, coalesce(assignments->k, '') || ';' || r.i );
+    end loop;
+    for r in select * from each((r.properties).eval_assignments) loop
+      k := quote_nullable(r1.key) || '=>*';
+      assignments := assignments || hstore(k, coalesce(assignments->k, '') || ';' || r.i );
+    end loop;
+  end loop;
+
   -- get all used scale_denominators
-  foreach sel in array where_selectors loop
+  foreach sel in array stat.selectors loop
     ob := sel.object;
 
     f := coalesce(ob.min_scale, 0);
@@ -59,6 +83,25 @@ begin
 	end if;
 
       end if;
+
+      -- include selectors which are referenced through set-statement
+      foreach r in array ob.conditions loop
+	if assignments ? (quote_nullable(r.key) || '=>*') then
+	  k := assignments->(quote_nullable(r.key) || '=>*');
+
+	  foreach c in array string_to_array(substring(k, 2), ';') loop
+	    sel1 := (stat.selectors)[cast(c as int)];
+	    ob1 := sel1.object;
+	    c := '(' || pgmapcss_compile_conditions(ob1.conditions) || ')';
+
+	    if h ? ob1.type then
+	      h := h || hstore(ob1.type, h->(ob1.type) || ' or ' || c);
+	    else
+	      h := h || hstore(ob1.type, c);
+	    end if;
+	  end loop;
+	end if;
+      end loop;
     end loop;
 
     ret := ret || E'  if render_context.scale_denominator >= ' || f || E' then\n';
