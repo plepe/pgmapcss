@@ -7,11 +7,7 @@ as $$
 declare
   ret text := '';
 begin
-  if array_upper(selector.conditions, 1) is null then
-    ret = ret || 'true';
-  else
-    ret = ret || array_to_string((select array_agg(x) from (select pgmapcss_compile_condition(unnest(selector.conditions), 'current.') x) t), ' and ');
-  end if;
+  ret = ret || pgmapcss_compile_conditions(selector.conditions, 'current.');
 
   if selector.type is not null then
     ret := ret || ' and ''' || selector.type || '''=ANY(object.types)';
