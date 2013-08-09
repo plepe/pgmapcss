@@ -1,3 +1,19 @@
+-- Create multicolumn way / tags indexes
+do $$
+begin
+if not exists (
+  select 1
+  from pg_class
+  where relname = 'planet_osm_point_way_tags'
+  ) then
+
+  raise notice E'\ncreating multicolumn indexes - please be patient ...';
+  create index planet_osm_point_way_tags on planet_osm_point using gist(way, tags);
+  create index planet_osm_line_way_tags on planet_osm_line using gist(way, tags);
+  create index planet_osm_polygon_way_tags on planet_osm_polygon using gist(way, tags);
+end if;
+end$$;
+
 -- Use this functions only with a database based on an import with osm2pgsql
 create or replace function objects(render_context pgmapcss_render_context, where_clauses hstore)
 returns setof pgmapcss_object
