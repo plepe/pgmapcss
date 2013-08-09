@@ -40,7 +40,7 @@ begin
       k := quote_nullable(r1.key) || '=>*';
       assignments := assignments || hstore(k, coalesce(assignments->k, '') || ';' || r.i );
     end loop;
-    for r in select * from each((r.properties).eval_assignments) loop
+    for r1 in select * from each((r.properties).eval_assignments) loop
       k := quote_nullable(r1.key) || '=>*';
       assignments := assignments || hstore(k, coalesce(assignments->k, '') || ';' || r.i );
     end loop;
