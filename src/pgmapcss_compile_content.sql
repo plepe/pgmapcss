@@ -29,6 +29,11 @@ begin
       stat.prop_list=stat.prop_list || properties.prop_types;
     end loop;
 
+    -- TODO: make list of match-relevant tags configurable
+    if properties.prop_has_value ?| Array['text', 'width', 'fill-color'] then
+      stat.where_selectors := array_cat(stat.where_selectors, selectors);
+    end if;
+
     stat := pgmapcss_build_statement(selectors, properties, stat);
 
     if content is null or content ~ '^\s*$' then

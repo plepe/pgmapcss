@@ -1,10 +1,3 @@
-drop type if exists pgmapcss_compile_stat cascade;
-create type pgmapcss_compile_stat as (
-  func          text,
-  prop_list     hstore,
-  pseudo_elements	text[]
-);
-
 drop type if exists pgmapcss_render_context cascade;
 create type pgmapcss_render_context as (
   bbox			geometry,
@@ -61,8 +54,18 @@ create type pgmapcss_rule_properties as (
   properties            hstore,
   eval_properties	hstore,
   prop_types		hstore,
+  prop_has_value	hstore,
   assignments		hstore,
   eval_assignments	hstore,
   unassignments		text[],
   text_length           int
+);
+
+drop type if exists pgmapcss_compile_stat cascade;
+create type pgmapcss_compile_stat as (
+  func          text,
+  prop_list     hstore,
+  -- where_selectors: all selectors which make an object show
+  where_selectors	pgmapcss_selector[],
+  pseudo_elements	text[]
 );

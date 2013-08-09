@@ -19,6 +19,7 @@ begin
 
   ret.properties:=''::hstore;
   ret.prop_types:=''::hstore;
+  ret.prop_has_value:=''::hstore;
   ret.assignments:=''::hstore;
   ret.unassignments:=Array[]::text[];
   ret.eval_assignments:=''::hstore;
@@ -96,6 +97,7 @@ begin
       if assignment_type = 1 then
 	ret.eval_properties := ret.eval_properties || hstore(key, pgmapcss_compile_eval(r.result));
 	ret.prop_types := ret.prop_types || hstore(key, 'text');
+	ret.prop_has_value := ret.prop_has_value || hstore(key, '1');
       elsif assignment_type = 2 then
 	ret.eval_assignments := ret.eval_assignments || hstore(key, pgmapcss_compile_eval(r.result));
       end if;
@@ -109,6 +111,9 @@ begin
 	ret.properties=ret.properties||hstore(key, value);
 	-- TODO: return type of value
 	ret.prop_types := ret.prop_types || hstore(key, 'text');
+	if (value != '') and (value is not null) then
+	  ret.prop_has_value := ret.prop_has_value || hstore(key, '1');
+	end if;
 
       elsif assignment_type=2 then
 	ret.assignments=ret.assignments||hstore(key, value);
