@@ -12,7 +12,8 @@ declare
   i record;
   a text[];
 begin
-  stat := pgmapcss_compile_content($2);
+  stat := pgmapcss_parse_content($2);
+  stat := pgmapcss_compile_content(stat);
 
   -- Remove all old functions / data types
   ret = ret || 'drop type if exists ' || style_id || E'_result cascade;\n';

@@ -1,5 +1,5 @@
 create or replace function pgmapcss_build_statement (
-  selectors pgmapcss_selector[],
+  selector pgmapcss_selector,
   properties pgmapcss_rule_properties,
   pgmapcss_compile_stat
 )
@@ -9,14 +9,12 @@ as $$
 declare
   stat pgmapcss_compile_stat;
   ret text := ''::text;
-  selector pgmapcss_selector;
   r pgmapcss_selector_part;
   r1 record;
   current_pseudo_element text;
 begin
   stat := $3;
 
-  foreach selector in array selectors loop
     r := selector.object;
 
     ret = ret || 'if   (';
@@ -58,7 +56,6 @@ begin
     end if;
 
     ret = ret || E'end if;\n\n';
-  end loop;
 
   stat.func = stat.func || ret;
 

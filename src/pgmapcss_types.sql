@@ -65,7 +65,8 @@ drop type if exists pgmapcss_compile_stat cascade;
 create type pgmapcss_compile_stat as (
   func          text,
   prop_list     hstore,
+  selectors	pgmapcss_selector[],
+  properties	pgmapcss_rule_properties[],
   -- where_selectors: all selectors which make an object show
-  where_selectors	pgmapcss_selector[],
   pseudo_elements	text[]
 );

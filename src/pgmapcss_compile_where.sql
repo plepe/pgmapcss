@@ -10,11 +10,20 @@ declare
   scale_denominators float[];
   f float;
   c text;
+  r record;
   sel pgmapcss_selector;
   ob pgmapcss_selector_part;
+  where_selectors pgmapcss_selector[];
 begin
+  for r in select unnest(stat.selectors) selectors, unnest(stat.properties) properties loop
+    -- TODO: make list of match-relevant tags configurable
+    if (r.properties).prop_has_value ?| Array['text', 'width', 'fill-color'] then
+      where_selectors := array_append(where_selectors, r.selectors);
+    end if;
+  end loop;
+
   -- get all used scale_denominators
-  foreach sel in array stat.where_selectors loop
+  foreach sel in array where_selectors loop
     ob := sel.object;
 
     f := coalesce(ob.min_scale, 0);
@@ -36,7 +45,7 @@ begin
     raise notice 'scale >%', f;
     h := ''::hstore;
 
-    foreach sel in array stat.where_selectors loop
+    foreach sel in array where_selectors loop
       ob := sel.object;
 
       if (coalesce(ob.min_scale, 0) <= f) and

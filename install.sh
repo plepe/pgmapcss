@@ -11,6 +11,7 @@ for i in \
   pgmapcss_parse_comments.sql \
   pgmapcss_parse_selector_part.sql \
   pgmapcss_parse_selectors.sql \
+  pgmapcss_parse_content.sql \
   pgmapcss_compile_condition.sql \
   pgmapcss_compile_conditions.sql \
   pgmapcss_compile_selector_part.sql \
