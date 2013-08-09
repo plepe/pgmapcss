@@ -27,8 +27,13 @@ begin
       current_pseudo_element = array_upper(stat.pseudo_elements, 1);
     end if;
 
-    ret = ret || '  current.pseudo_element = pseudo_elements[' || current_pseudo_element || E'];\n';
-    ret = ret || '  current.pseudo_element_ind = ' || current_pseudo_element || E';\n';
+    -- set values on 'current' for eval-statements
+    if array_upper(avals(properties.eval_assignments), 1) is not null or
+       array_upper(avals(properties.eval_properties), 1) is not null then
+      ret = ret || '  current.pseudo_element = pseudo_elements[' || current_pseudo_element || E'];\n';
+      ret = ret || '  current.pseudo_element_ind = ' || current_pseudo_element || E';\n';
+    end if;
+
     ret = ret || '  current.styles[' || current_pseudo_element || '] = ' ||
       'current.styles[' || current_pseudo_element || '] || ' ||
       quote_nullable(cast(properties.properties as text)) || E';\n';
