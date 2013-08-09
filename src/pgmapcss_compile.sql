@@ -64,6 +64,18 @@ begin
   ret = ret || E'  return;\n';
   ret = ret || E'end;\n$body$ language ''plpgsql'' immutable;\n';
 
+  -- function to get WHERE clause for efficient index usage for current
+  -- render context
+  ret = ret || E';\n';
+  ret = ret || E'create or replace function ' || style_id || E'_get_where(\n';
+  ret = ret || E'  render_context\tpgmapcss_render_context\n';
+  ret = ret || E') returns hstore as $body$\n';
+  ret = ret || E'declare\n';
+  ret = ret || E'  ret ' || style_id || E'_result;\n';
+  ret = ret || E'begin\n';
+  ret = ret || pgmapcss_compile_where(stat);
+  ret = ret || E'end;\n$body$ language ''plpgsql'' immutable;\n';
+
   -- function to match objects in bbox
   ret = ret || E';\n';
   ret = ret || E'create or replace function ' || style_id || E'_match(\n';

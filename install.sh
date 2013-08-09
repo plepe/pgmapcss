@@ -19,6 +19,7 @@ for i in \
   pgmapcss_compile_content.sql \
   pgmapcss_parse_eval.sql \
   pgmapcss_compile_eval.sql \
+  pgmapcss_compile_where.sql \
   eval.sql \
   pgmapcss_compile.sql \
   pgmapcss_install.sql
