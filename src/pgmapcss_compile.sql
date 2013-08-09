@@ -91,7 +91,7 @@ begin
   ret = ret || E'          object, render_context\n';
   ret = ret || E'        ) result\n';
   ret = ret || E'      from\n';
-  ret = ret || E'        objects(render_context) object\n';
+  ret = ret || E'        objects(render_context, ' || style_id || E'_get_where(render_context)) object\n';
   ret = ret || E'      offset 0) t\n';
   ret = ret || E'      order by coalesce(cast((result)."z-index" as float), 0) asc;\n\n';
   ret = ret || E'  return;\n';
