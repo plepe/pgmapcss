@@ -1,34 +1,45 @@
 <?xml version="1.0"?>
 <!DOCTYPE Map>
-<Map srs="+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +no_defs +over">
+<Map srs="+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +no_defs +over" background-color="#ffffff">
   <Style name="pgmapcss">
 <!-- POLYGONS -->
+# FOR COLORS COLOR
+    <Rule>
+      <Filter>[fill-color] = 'COLOR'</Filter>
+      <PolygonSymbolizer fill="COLOR" />
+    </Rule>
+# END
+
+<!--
+* Mapnik version >= 3: replace by
+
     <Rule>
       <Filter>[fill-color]</Filter>
-      <PolygonSymbolizer fill="#707070" />
-
-<!--
-* Mapnik version >= 3: replace by
-
       <PolygonSymbolizer fill="[fill-color]" fill-opacity="[fill-opacity]" />
+    </Rule>
 
 -->
-    </Rule>
 
 <!-- LINES -->
+# FOR COLORS COLOR
     <Rule>
-      <Filter>[width] and [color]</Filter>
-      <LineSymbolizer stroke="#000000" stroke-width="1" />
+      <Filter>[width] and [color] = 'COLOR'</Filter>
+      <LineSymbolizer stroke="COLOR" stroke-width="[width]" />
 <!--
 * Mapnik branch stroke-width-expr: replace by
-
-      <LineSymbolizer stroke="#000000" stroke-width="[width]" />
+      <LineSymbolizer stroke="COLOR" stroke-width="[width]" />
+-->
+    </Rule>
+# END
+<!--
 
 * Mapnik version >= 3: replace by
 
+    <Rule>
+      <Filter>[width] and [color]</Filter>
       <LineSymbolizer stroke="[color]" stroke-width="[width]" stroke-opacity="[opacity]" stroke-linejoin="[linejoin]" stroke-linecap="[linecap]" stroke-dasharray="[dashes]" />
--->
     </Rule>
+-->
 
 <!-- TEXTS -->
     <Rule>

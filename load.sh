@@ -11,3 +11,5 @@ else
   echo "An error occured when compiling CSS file"
   exit $ERR
 fi
+
+./preprocess_colors.pl
