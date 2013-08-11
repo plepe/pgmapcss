@@ -349,7 +349,7 @@ begin
       ret := trim(substring(ret, 1, length(ret) - length(unit)));
     end if;
 
-    if ret !~ '^[0-9]+(\.[0-9]+)?' then
+    if ret !~ '^-?[0-9]+(\.[0-9]+)?' then
       return '';
     end if;
 
