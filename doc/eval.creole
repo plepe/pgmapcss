@@ -19,13 +19,15 @@ If you read a number, unit conversion takes place. The following units are suppo
 == Operators ==
 |= Operator |= Description
 | +, -, *, / | arithmetic operations
+| ==, !=, <> | string comparison (equal, not equal, not equal)
 | >, >=, <=, < | number comparison
 | , or ; | several statements separated by , or ; will always return the value of the last statement.
 
 == Functions ==
 |= Function |= Parameters |= Return value |= Description
 | add, sub, mul, div | number, [number, [number, ...]] | number | arithmetic operations
-| gt, ge, le, lt | number, number | boolean | compares to numbers. >, >=, <= or <.
+| eq, neq | text, [text, [text, ...]] | boolean | eq: Returns true if all input parameters are equal; neq: Returns true if all of the input parameters are different.
+| gt, ge, le, lt | number, number | boolean | compares two numbers. >, >=, <= or <.
 | sqrt | number | number | Square root of input value
 | prop | key, [key, [key, ...]] | value | current value of the computed property (in the current layer). If several keys are passed, the first found key is returned. E.g. prop("width")
 | tag | key, [key, [key, ...]] | value | value of the tag key (e.g. tag("name") ). If several keys are passed, the first set tag is returned, e.g. tag("name:en", "int_name", "name").

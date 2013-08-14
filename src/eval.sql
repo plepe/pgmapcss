@@ -13,6 +13,9 @@ insert into eval_operators values ('>=', 'ge');
 insert into eval_operators values ('<=', 'le');
 insert into eval_operators values ('<', 'lt');
 insert into eval_operators values (',', 'all');
+insert into eval_operators values ('==', 'eq');
+insert into eval_operators values ('!=', 'neq');
+insert into eval_operators values ('<>', 'neq');
 
 create or replace function eval_(param text[],
   object pgmapcss_object, current pgmapcss_current, render_context pgmapcss_render_context)
@@ -212,6 +215,44 @@ begin
   end loop;
 
   return null;
+end;
+$$ language 'plpgsql' immutable;
+
+create or replace function eval_eq(param text[],
+  object pgmapcss_object, current pgmapcss_current, render_context pgmapcss_render_context)
+returns text
+as $$
+#variable_conflict use_variable
+declare
+  ret float := 0;
+  i int;
+begin
+  for i in 2..array_upper(param, 1) loop
+    if param[1] != param[i] then
+      return 'false';
+    end if;
+  end loop;
+
+  return 'true';
+end;
+$$ language 'plpgsql' immutable;
+
+create or replace function eval_neq(param text[],
+  object pgmapcss_object, current pgmapcss_current, render_context pgmapcss_render_context)
+returns text
+as $$
+#variable_conflict use_variable
+declare
+  ret float := 0;
+  i int;
+begin
+  select max(y) into i from (select count(x) y from (select unnest(param) x) t group by x) t;
+
+  if i > 1 then
+    return 'true';
+  end if;
+
+  return 'false';
 end;
 $$ language 'plpgsql' immutable;
 
