@@ -1,3 +1,19 @@
+drop table if exists eval_operators;
+create table eval_operators (
+  op		text		not null,
+  func		text		not null,
+  primary key(op)
+);
+insert into eval_operators values ('+', 'add');
+insert into eval_operators values ('-', 'sub');
+insert into eval_operators values ('*', 'mul');
+insert into eval_operators values ('/', 'div');
+insert into eval_operators values ('>', 'gt');
+insert into eval_operators values ('>=', 'ge');
+insert into eval_operators values ('<=', 'le');
+insert into eval_operators values ('<', 'lt');
+insert into eval_operators values (',', 'all');
+
 create or replace function eval_(param text[],
   object pgmapcss_object, current pgmapcss_current, render_context pgmapcss_render_context)
 returns text

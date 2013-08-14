@@ -1,4 +1,4 @@
-drop function pgmapcss_compile_eval(text);
+drop function if exists pgmapcss_compile_eval(text);
 create or replace function pgmapcss_compile_eval(
   text
 )
@@ -31,24 +31,9 @@ begin
 
   t := 'Array[' || array_to_string(p, ', ') || ']::text[]';
 
-  if    param[1] = 'o:+' then
-    f:='add';
-  elsif param[1] = 'o:-' then
-    f:='sub';
-  elsif param[1] = 'o:*' then
-    f:='mul';
-  elsif param[1] = 'o:/' then
-    f:='div';
-  elsif param[1] = 'o:>' then
-    f:='gt';
-  elsif param[1] = 'o:>=' then
-    f:='ge';
-  elsif param[1] = 'o:<=' then
-    f:='le';
-  elsif param[1] = 'o:<' then
-    f:='lt';
-  elsif param[1] = 'o:,' then
-    f:='all';
+  f := substring(param[1] from '^o:(.*)$');
+  if f is not null then
+    select func into f from eval_operators where eval_operators.op = f;
   elsif substr(param[1], 1, 2) = 'f:' then
     f:=trim(substr(param[1], 3));
   end if;
