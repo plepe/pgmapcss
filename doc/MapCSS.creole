@@ -37,7 +37,7 @@ First part of a selector; required.
 | line | Matches lines (way or relation)
 | canvas | The background (NOT SUPPORTED YET)
 
-The type of an object is retrieved from the 'types'-array in object-value (see [[API.creole]]). You can add/remove types from your database query.
+The type of an object is retrieved from the 'types'-array in object-value (see [[API.md]]). You can add/remove types from your database query.
 
 === Class selector ===
 After the type selector, separated by '.'. Optional.
