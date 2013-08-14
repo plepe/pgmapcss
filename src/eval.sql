@@ -424,3 +424,221 @@ begin
   return '';
 end;
 $$ language 'plpgsql' immutable;
+
+create or replace function eval_list(param text[],
+  object pgmapcss_object, current pgmapcss_current, render_context pgmapcss_render_context)
+returns text
+as $$
+#variable_conflict use_variable
+declare
+begin
+  return array_to_string(param, ';');
+end;
+$$ language 'plpgsql' immutable;
+
+create or replace function eval_get(param text[],
+  object pgmapcss_object, current pgmapcss_current, render_context pgmapcss_render_context)
+returns text
+as $$
+#variable_conflict use_variable
+declare
+  list text[];
+  t text;
+  i int;
+begin
+  if array_upper(param, 1) < 2 then
+    return '';
+  end if;
+
+  t := eval_number(Array[param[2]], object, current, render_context);
+
+  if t = '' then
+    return '';
+  end if;
+
+  i := cast(t as int);
+
+  list := string_to_array(param[1], ';');
+
+  if array_upper(list, 1) < i + 1 or i < 0 then
+    return '';
+  end if;
+
+  return list[i + 1];
+end;
+$$ language 'plpgsql' immutable;
+
+create or replace function eval_set(param text[],
+  object pgmapcss_object, current pgmapcss_current, render_context pgmapcss_render_context)
+returns text
+as $$
+#variable_conflict use_variable
+declare
+  list text[];
+  t text;
+  i int;
+begin
+  if array_upper(param, 1) < 3 then
+    return '';
+  end if;
+
+  t := eval_number(Array[param[2]], object, current, render_context);
+
+  if t = '' then
+    return '';
+  end if;
+
+  i := cast(t as int);
+
+  if i < 0 then
+    return '';
+  end if;
+
+  list := string_to_array(param[1], ';');
+
+  list[i] := param[3];
+
+  return array_to_string(list, ';', '');
+end;
+$$ language 'plpgsql' immutable;
+
+create or replace function eval_push(param text[],
+  object pgmapcss_object, current pgmapcss_current, render_context pgmapcss_render_context)
+returns text
+as $$
+#variable_conflict use_variable
+declare
+  list text[];
+  t text;
+  i int;
+begin
+  if array_upper(param, 1) < 2 then
+    return '';
+  end if;
+
+  list := string_to_array(param[1], ';');
+
+  list := array_append(list, param[2]);
+
+  return array_to_string(list, ';');
+end;
+$$ language 'plpgsql' immutable;
+
+create or replace function eval_split(param text[],
+  object pgmapcss_object, current pgmapcss_current, render_context pgmapcss_render_context)
+returns text
+as $$
+#variable_conflict use_variable
+declare
+  list text[];
+begin
+  if array_upper(param, 1) < 2 then
+    return '';
+  end if;
+
+  list := string_to_array(param[1], param[2]);
+
+  return array_to_string(list, ';');
+end;
+$$ language 'plpgsql' immutable;
+
+create or replace function eval_join(param text[],
+  object pgmapcss_object, current pgmapcss_current, render_context pgmapcss_render_context)
+returns text
+as $$
+#variable_conflict use_variable
+declare
+  list text[];
+begin
+  if array_upper(param, 1) < 2 then
+    return '';
+  end if;
+
+  list := string_to_array(param[1], ';');
+
+  return array_to_string(list, param[2]);
+end;
+$$ language 'plpgsql' immutable;
+
+create or replace function eval_count(param text[],
+  object pgmapcss_object, current pgmapcss_current, render_context pgmapcss_render_context)
+returns text
+as $$
+#variable_conflict use_variable
+declare
+  list text[];
+begin
+  if array_upper(param, 1) < 1 then
+    return '';
+  end if;
+
+  if param[1] = '' then
+    return '0';
+  end if;
+
+  list := string_to_array(param[1], ';');
+
+  return array_upper(list, 1);
+end;
+$$ language 'plpgsql' immutable;
+
+insert into eval_operators values ('~=', 'contains');
+create or replace function eval_contains(param text[],
+  object pgmapcss_object, current pgmapcss_current, render_context pgmapcss_render_context)
+returns text
+as $$
+#variable_conflict use_variable
+declare
+  list text[];
+  i int;
+begin
+  if array_upper(param, 1) < 2 then
+    return '';
+  end if;
+
+  list := string_to_array(param[1], ';');
+
+  select count(*) into i from (select unnest(list) x) t where x=param[2];
+
+  if i = 0 then
+    return 'false';
+  else
+    return 'true';
+  end if;
+end;
+$$ language 'plpgsql' immutable;
+
+create or replace function eval_search(param text[],
+  object pgmapcss_object, current pgmapcss_current, render_context pgmapcss_render_context)
+returns text
+as $$
+#variable_conflict use_variable
+declare
+  list text[];
+  i int;
+begin
+  if array_upper(param, 1) < 2 then
+    return '';
+  end if;
+
+  list := string_to_array(param[1], ';');
+
+  select n into i from (select generate_series(1, array_upper(list, 1)) n, unnest(list) x) t where x=param[2];
+
+  if i is null then
+    return 'false';
+  end if;
+
+  return i - 1;
+end;
+$$ language 'plpgsql' immutable;
+
+create or replace function eval_TEMPLATE(param text[],
+  object pgmapcss_object, current pgmapcss_current, render_context pgmapcss_render_context)
+returns text
+as $$
+#variable_conflict use_variable
+declare
+begin
+end;
+$$ language 'plpgsql' immutable;
