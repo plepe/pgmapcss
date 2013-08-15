@@ -412,16 +412,31 @@ begin
 
     value := cast(ret as float);
 
-    if unit = 'px' then
+    if unit = 'px' or unit is null then
       -- no conversion necessary
     elsif unit in ('u', 'm') then
-      value := value / (0.00028 * render_context.scale_denominator);
-    end if;
 
-    return cast(value as text);
+      value := value / (0.00028 * render_context.scale_denominator);
+    else
+
+      return '';
+    end if;
   end if;
 
-  return '';
+  if array_upper(param, 1) >= 2 then
+    if param[2] = 'px' then
+      -- no conversion necessary
+
+    elsif param[2] = 'u' or param[2] = 'm' then
+      value := value * (0.00028 * render_context.scale_denominator);
+
+    else
+      return '';
+
+    end if;
+  end if;
+
+  return cast(value as text);
 end;
 $$ language 'plpgsql' immutable;
 

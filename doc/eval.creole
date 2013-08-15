@@ -37,7 +37,7 @@ If you read a number, unit conversion takes place. The following units are suppo
 | any | value, [value, [value, ...]] | value | Returns first value that's not //none//.
 | boolean | value | boolean | Converts the input to "true" or "false" (see 'Data Types' for an explanation).
 | cond | boolean, value, [value] | value | if first input parameter is //boolean// true return the second parameter, otherwise the third parameter (or "").
-| number | value | number | Converts the input to a number (or "").
+| number | value, [string] | number | Converts the input to a number (or "") of the specified unit (parameter 2, default 'px'). E.g. number('2px') => '2' or number('100px', 'm') => '238.86' (at zoom level 16).
 
 === List functions ===
 |= Function |= Parameters |= Return value |= Description
