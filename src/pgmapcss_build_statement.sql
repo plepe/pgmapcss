@@ -30,7 +30,6 @@ begin
     -- set values on 'current' for eval-statements
     if array_upper(avals(properties.eval_assignments), 1) is not null or
        array_upper(avals(properties.eval_properties), 1) is not null then
-      ret = ret || '  current.pseudo_element = pseudo_elements[' || current_pseudo_element || E'];\n';
       ret = ret || '  current.pseudo_element_ind = ' || current_pseudo_element || E';\n';
     end if;
 

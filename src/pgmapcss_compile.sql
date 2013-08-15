@@ -40,9 +40,9 @@ begin
   ret = ret || E'declare\n';
   ret = ret || E'  current pgmapcss_current;\n';
   ret = ret || E'  ret ' || style_id || E'_result;\n';
-  ret = ret || E'  pseudo_elements text[] := ''' || cast(stat.pseudo_elements as text) || E''';\n';
   ret = ret || E'  r record;\n';
   ret = ret || E'begin\n';
+  ret = ret || E'  current.pseudo_elements := ''' || cast(stat.pseudo_elements as text) || E''';\n';
   ret = ret || E'  current.tags := object.tags;\n';
   -- initialize all styles with the 'geo' property
   ret = ret || E'  current.styles := array_fill(hstore(''geo'', object.geo), Array[' || array_upper(stat.pseudo_elements, 1) || E']);\n';
@@ -56,7 +56,7 @@ begin
   ret = ret || E'      ret._geo=current.styles[r.i]->''geo'';\n';
   ret = ret || E'      current.styles[r.i] := current.styles[r.i] - ''geo''::text;\n';
   ret = ret || E'      ret._style=current.styles[r.i];\n';
-  ret = ret || E'      ret._pseudo_element=pseudo_elements[r.i];\n';
+  ret = ret || E'      ret._pseudo_element=(current.pseudo_elements)[r.i];\n';
   for i in select * from each(stat.prop_list) loop
     ret = ret || E'      ret.' || quote_ident(i.key) || ' = cast(ret._style->' || quote_literal(i.key) || E' as ' || quote_ident(i.value) || E');\n';
   end loop;

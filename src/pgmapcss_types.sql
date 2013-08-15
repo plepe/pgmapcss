@@ -15,7 +15,7 @@ create type pgmapcss_object as (
 drop type if exists pgmapcss_current cascade;
 create type pgmapcss_current as (
   tags			hstore,
-  pseudo_element	text,
+  pseudo_elements	text[],
   pseudo_element_ind	int,
   styles		hstore[],
   has_pseudo_element	boolean[]
