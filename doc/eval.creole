@@ -31,7 +31,7 @@ If you read a number, unit conversion takes place. The following units are suppo
 | eq, neq | text, [text, [text, ...]] | boolean | eq: Returns true if all input parameters are equal; neq: Returns true if all of the input parameters are different.
 | gt, ge, le, lt | number, number | boolean | compares two numbers. >, >=, <= or <.
 | sqrt | number | number | Square root of input value
-| prop | key, [key, [key, ...]] | value | current value of the computed property (in the current layer). If several keys are passed, the first found key is returned. E.g. prop("width")
+| prop | key, [string] | value | current value of the computed property on pseudo element param2 (default: current pseudo element). Examples: prop(width), prop(width, casing)
 | tag | key, [key, [key, ...]] | value | value of the tag key (e.g. tag("name") ). If several keys are passed, the first set tag is returned, e.g. tag("name:en", "int_name", "name").
 | concat | string, [string, [string, ...]] | string | Concatenate all strings
 | any | value, [value, [value, ...]] | value | Returns first value that's not //none//.

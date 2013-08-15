@@ -206,15 +206,25 @@ returns text
 as $$
 #variable_conflict use_variable
 declare
-  i text;
+  i int;
 begin
-  foreach i in array param loop
-    if current.styles[current.pseudo_element_ind] ? i then
-      return current.styles[current.pseudo_element_ind]->i;
-    end if;
-  end loop;
+  if array_upper(param, 1) = 0 then
+    return '';
+  end if;
 
-  return null;
+  if array_upper(param, 1) >= 2 then
+    i := array_search(param[2], current.pseudo_elements);
+
+    if i is null then
+      return '';
+    end if;
+
+  else
+    i := current.pseudo_element_ind;
+
+  end if;
+
+  return current.styles[i]->param[1];
 end;
 $$ language 'plpgsql' immutable;
 
