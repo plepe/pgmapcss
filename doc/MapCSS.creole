@@ -179,3 +179,16 @@ way.minor_road {
   color: #ffffff;
 }
 }}}
+
+=== Geometry ===
+The special property "geo" will be predefined on every object. You may change it with eval statements.
+
+Example:
+{{{
+point[place=village] {
+  geo: eval(buffer(prop(geo), 10px));
+  fill-color: #00ff00;
+}
+}}}
+
+This will draw a 10px wide buffer around every node with 'place=village'.

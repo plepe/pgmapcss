@@ -8,7 +8,7 @@ There were already several efforts to implement stylesheets based on Cascading S
 * [[https://github.com/mapnik/Cascadenik|Cascadenik]]
 * [[http://wiki.openstreetmap.org/wiki/Carto|CartoCSS]]
 
-All these tools are pre-processors, that convert a CSS stylesheet into a Mapnik stylesheet. PGMapCSS takes a different approach: The stylesheet is compiled into PostgreSQL/plpgsql functions which are evaluated at runtime. Therefore more advanced calculations are possible, even geometric alterations (though not implemented yet). See [[doc/API.md]] for details.
+All these tools are pre-processors, that convert a CSS stylesheet into a Mapnik stylesheet. PGMapCSS takes a different approach: The stylesheet is compiled into PostgreSQL/plpgsql functions which are evaluated at runtime. Therefore more advanced calculations are possible, even geometric alterations. See [[doc/API.md]] for details.
 
 The Mapnik style just contains the database query/queries and the basic styles, referencing all options from the database queries. You can think of those styles as templates, which you can reference from your style sheet.
 
