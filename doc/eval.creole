@@ -27,7 +27,7 @@ If you read a number, unit conversion takes place. The following units are suppo
 
 == Functions ==
 |= Function |= Parameters |= Return value |= Description
-| add, sub, mul, div | number, [number, [number, ...]] | number | arithmetic operations
+| add, sub, mul, div | number, [number, [number, ...]] | number | arithmetic operations. If any of the input parameters is not a number, returns none.
 | eq, neq | text, [text, [text, ...]] | boolean | eq: Returns true if all input parameters are equal; neq: Returns true if all of the input parameters are different.
 | gt, ge, le, lt | number, number | boolean | compares two numbers. >, >=, <= or <.
 | sqrt | number | number | Square root of input value

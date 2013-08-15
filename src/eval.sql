@@ -36,9 +36,16 @@ as $$
 declare
   ret float := 0;
   i text;
+  t text;
 begin
   foreach i in array param loop
-    ret := ret + cast(eval_number(Array[i], object, current, render_context) as float);
+    t := eval_number(Array[i], object, current, render_context);
+
+    if t = '' then
+      return '';
+    end if;
+
+    ret := ret + cast(t as float);
   end loop;
 
   return ret;
@@ -53,12 +60,19 @@ as $$
 declare
   ret float := null;
   i text;
+  t text;
 begin
   foreach i in array param loop
+    t := eval_number(Array[i], object, current, render_context);
+
+    if t = '' then
+      return '';
+    end if;
+
     if ret is null then
-      ret := i;
+      ret := cast(t as float);
     else
-      ret := ret - cast(eval_number(Array[i], object, current, render_context) as float);
+      ret := ret - cast(t as float);
     end if;
   end loop;
 
@@ -74,9 +88,16 @@ as $$
 declare
   ret float := 1;
   i text;
+  t text;
 begin
   foreach i in array param loop
-    ret := ret * cast(eval_number(Array[i], object, current, render_context) as float);
+    t := eval_number(Array[i], object, current, render_context);
+
+    if t = '' then
+      return '';
+    end if;
+
+    ret := ret * cast(t as float);
   end loop;
 
   return ret;
@@ -91,9 +112,24 @@ as $$
 declare
   ret float := 1;
   i text;
+  t text;
 begin
   foreach i in array param loop
-    ret := ret / cast(eval_number(Array[i], object, current, render_context) as float);
+    t := eval_number(Array[i], object, current, render_context);
+
+    if t = '' then
+      return '';
+    end if;
+
+    if ret is null then
+      ret := cast(t as float);
+    else
+      if t = '0' then
+	return '';
+      end if;
+
+      ret := ret / cast(t as float);
+    end if;
   end loop;
 
   return ret;
