@@ -30,6 +30,12 @@ point[place] {
 
   z-index: 10;
 }
+point[place]::buffer {
+  geo: eval(buffer(prop(geo), 100m));
+  fill-color: #00ff00;
+  z-index: -2;
+}
+
 
 area[building] {
   fill-color: #707070;		// Mapnik >= version 3.0

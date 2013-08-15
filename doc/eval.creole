@@ -50,3 +50,7 @@ If you read a number, unit conversion takes place. The following units are suppo
 | count | list | number | Returns count of elements in the list
 | contains | list, value | boolean | Check if list contains value.
 | search | list, value | number/boolean | Returns (first) index of value in list or 'false' if not found.
+
+== Geometric functions ===
+|= Function |= Parameters |= Return value |= Description
+| buffer | geo, number | geo | Draws a buffer of the specified size (default: pixels) around the input geometry, e.g. buffer(prop(geo), 100m)
