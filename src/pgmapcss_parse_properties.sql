@@ -76,6 +76,7 @@ begin
 
     -- check for comments
     content := pgmapcss_parse_comments(content);
+    r := pgmapcss_parse_string(content);
 
     if content ~ '^eval\(' then
       r1 := pgmapcss_parse_string(content, null, 6);
@@ -104,8 +105,35 @@ begin
 
       content := substring(content, 6 + r.text_length);
       content := substring(content from '^[^;]*;\s*(.*)$');
+
+    elsif r is not null then
+    -- value is enclosed in quotes
+      value := r.result;
+
+      if assignment_type=1 then
+	ret.properties=ret.properties||hstore(key, value);
+	-- TODO: return type of value
+	ret.prop_types := ret.prop_types || hstore(key, 'text');
+	if (value != '') and (value is not null) then
+	  ret.prop_has_value := ret.prop_has_value || hstore(key, '1');
+	end if;
+
+      elsif assignment_type=2 then
+	ret.assignments=ret.assignments||hstore(key, value);
+
+      elsif assignment_type=3 then
+	ret.unassignments=array_append(ret.unassignments, key);
+
+      end if;
+
+      content := substring(content, r.text_length + 1);
+      content := substring(content from '^\s*;\s*(.*)$');
+
+      -- check for comments
+      content := pgmapcss_parse_comments(content);
+
     elsif content ~ '^([^;]*);' then
-      value=substring(content from '^([^;]*);');
+      value := rtrim(substring(content from '^([^;]*);'));
 
       if assignment_type=1 then
 	ret.properties=ret.properties||hstore(key, value);

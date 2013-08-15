@@ -125,8 +125,11 @@ E.g.
   opacity: 0.5;
   color: #ff0000;
   background-color: rgb(1.0, 0.0, 0.0);
+  text: "2px";
 }
 }}}
+
+* You may enclose strings by single or double quotes.
 
 === Assignments ===
 You may assign values to tags of the current object. This is independent from the current pseudo element descriptor.
