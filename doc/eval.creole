@@ -38,6 +38,7 @@ If you read a number, unit conversion takes place. The following units are suppo
 | boolean | value | boolean | Converts the input to "true" or "false" (see 'Data Types' for an explanation).
 | cond | boolean, value, [value] | value | if first input parameter is //boolean// true return the second parameter, otherwise the third parameter (or "").
 | number | value, [string] | number | Converts the input to a number (or "") of the specified unit (parameter 2, default 'px'). E.g. number('2px') => '2' or number('100px', 'm') => '238.86' (at zoom level 16).
+| debug | value | value | raise a postgresql notice with the value; returns value. E.g. width: eval(debug(5+4));
 
 === List functions ===
 |= Function |= Parameters |= Return value |= Description
