@@ -125,11 +125,13 @@ E.g.
   opacity: 0.5;
   color: #ff0000;
   background-color: rgb(1.0, 0.0, 0.0);
+  width: 2px;
   text: "2px";
 }
 }}}
 
 * You may enclose strings by single or double quotes.
+* You may specify values with a unit, default: 'px' (Pixels on screen). Other supported unites: 'u' (Units in 900913 projection on the map), 'm' (Meters on the map; NOT IMPLEMENTED YET: currently 'u' is used instead).
 
 === Assignments ===
 You may assign values to tags of the current object. This is independent from the current pseudo element descriptor.
