@@ -8,7 +8,8 @@ In fact all values are internally stored as strings, but are converted to data t
 | //key// | A string which is used as key of tag or a property. | name:en
 | //number// | A chain of digits, may contain a '.' as decimal point. (//none// is treated as 0). May be suffixed by a unit name (see below). | 2.5, 5px, 30m
 | //boolean// | true or false. If expression equals 0, "no", "false" or //none// the value is considerd false, true otherwise. If a function returns a boolean value, "true" or "false" is returned.
-| //list// | A list of values, separated by ';', e.g. 'atm;bank'.
+| //list// | A list of values, separated by ';' | 'atm;bank'.
+| //geometry// | A (e)WKB representation of a geometry as used by PostGIS
 
 == Units ==
 If you read a number, unit conversion takes place. The following units are supported:
@@ -54,4 +55,4 @@ If you read a number, unit conversion takes place. The following units are suppo
 
 == Geometric functions ===
 |= Function |= Parameters |= Return value |= Description
-| buffer | geo, number | geo | Draws a buffer of the specified size (default: pixels) around the input geometry, e.g. buffer(prop(geo), 100m)
+| buffer | geometry, number | geometry | Draws a buffer of the specified size (default: pixels) around the input geometry, e.g. buffer(prop(geo), 100m)
