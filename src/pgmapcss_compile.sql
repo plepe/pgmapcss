@@ -100,6 +100,18 @@ begin
   ret = ret || E'  return;\n';
   ret = ret || E'end;\n$body$ language ''plpgsql'' immutable;\n';
 
+  stat.func := '';
+  -- save stat as function
+  ret = ret || E';\n';
+  ret = ret || E'create or replace function ' || style_id || E'_stat(\n';
+  ret = ret || E') returns pgmapcss_compile_stat as $body$\n';
+  ret = ret || E'declare\n';
+  ret = ret || E'  ret pgmapcss_compile_stat;\n';
+  ret = ret || E'begin\n';
+  ret = ret || E'  ret := cast(' || quote_nullable(stat) || E' as pgmapcss_compile_stat);\n';
+  ret = ret || E'  return ret;\n';
+  ret = ret || E'end;\n$body$ language ''plpgsql'' immutable;\n';
+
   return ret;
 end;
 $$ language 'plpgsql' immutable;
