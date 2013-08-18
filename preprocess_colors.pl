@@ -1,5 +1,7 @@
 #!/usr/bin/perl
 
+%error_keys = ();
+
 # possible_values: return list of all possible values for a key
 sub possible_values {
   my $key = $_[0];
@@ -37,10 +39,15 @@ while (<$f>) {
       @res = ();
 
       foreach $value (possible_values($key)) {
-	foreach $row (@t) {
-	  my $r1 = $row;
-	  $r1 =~ s/\[$key\]/$value/;
-	  push @res, $r1;
+	if ($value eq '*') {
+	  $error_keys{$key} = 1;
+	}
+	else {
+	  foreach $row (@t) {
+	    my $r1 = $row;
+	    $r1 =~ s/\[$key\]/$value/;
+	    push @res, $r1;
+	  }
 	}
       }
 
@@ -55,3 +62,10 @@ while (<$f>) {
 }
 close($r);
 close($f);
+
+@error_keys = keys %error_keys;
+if (@error_keys != 0) {
+  print "WARNING! Some values for the following keys are calculated by an eval-statement. As pgmapcss can't guess the result of those statements some symbols might not get rendered.\n* ";
+  print join("\n* ", @error_keys);
+  print "\n";
+}
