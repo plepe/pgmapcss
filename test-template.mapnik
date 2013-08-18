@@ -3,14 +3,14 @@
 <Map srs="+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +no_defs +over" background-color="#ffffff">
   <Style name="pgmapcss">
 <!-- POLYGONS -->
-# FOR fill-color
+# FOR fill-color fill-opacity
     <Rule>
 <!--
 * Mapnik version >= 3: remove "# FOR" and "# END" and replace by
       <Filter>[fill-color]</Filter>
 -->
-      <Filter>'[fill-color]' = [fill-color]</Filter>
-      <PolygonSymbolizer fill="[fill-color]" />
+      <Filter>'[fill-color]' = [fill-color] and '[fill-opacity]' = [fill-opacity]</Filter>
+      <PolygonSymbolizer fill="[fill-color]" fill-opacity="[fill-opacity]" />
     </Rule>
 # END
 
@@ -25,32 +25,28 @@
 -->
 
 <!-- LINES -->
-# FOR color width
+# FOR color width opacity linejoin linecap dashes
     <Rule>
 <!--
-* Mapnik branch stroke-width-expr: replace by
-      <Filter>[width] and '[color]' = [color]</Filter>
+* Mapnik branch stroke-width-expr: remove "width" from FOR and replace
+      <Filter>[width] and '[color]' = [color] and '[opacity]' = [opacity] and '[linejoin]' = [linejoin] and '[linecap]' = [linecap] and '[dashes]' = [dashes]</Filter>
 * Mapnik version >= 3: remove "# FOR" and "# END" and replace by
       <Filter>[width]</Filter>
 -->
-      <Filter>'[width]' = [width] and '[color]' = [color]</Filter>
-      <LineSymbolizer stroke="[color]" stroke-width="[width]" />
-    </Rule>
-# END
-<!--
-
-* Mapnik version >= 3: replace by
-
-    <Rule>
-      <Filter>[width] and [color]</Filter>
+      <Filter>'[width]' = [width] and '[color]' = [color] and '[opacity]' = [opacity] and '[linejoin]' = [linejoin] and '[linecap]' = [linecap] and '[dashes]' = [dashes]</Filter>
       <LineSymbolizer stroke="[color]" stroke-width="[width]" stroke-opacity="[opacity]" stroke-linejoin="[linejoin]" stroke-linecap="[linecap]" stroke-dasharray="[dashes]" />
     </Rule>
--->
+# END
 
 <!-- TEXTS -->
+# FOR font-family text-color text-halo-color text-offset max-width
     <Rule>
+<!--
+* Mapnik version >= 3: remove "# FOR" and "# END" and replace by
       <Filter>[text]</Filter>
-      <TextSymbolizer face-name="DejaVu Sans Book"><ExpressionFormat size="[font-size]" halo-radius="[text-halo-radius]" character-spacing="[character-spacing]" opacity="[text-opacity]" wrap-character="[wrap-character]">[text]</ExpressionFormat></TextSymbolizer>
+-->
+      <Filter>[text] and '[font-family]' = [font-family] and '[text-color]' = [text-color] and '[text-halo-color]' = [text-halo-color] and '[text-offset]' = [text-offset] and '[max-width]' = [max-width]</Filter>
+      <TextSymbolizer face-name="[font-family]" fill="[text-color]" halo-fill="[text-halo-color]" dy="[text-offset]" wrap-width="[max-width]"><ExpressionFormat size="[font-size]" halo-radius="[text-halo-radius]" character-spacing="[character-spacing]" opacity="[text-opacity]" wrap-character="[wrap-character]">[text]</ExpressionFormat></TextSymbolizer>
     </Rule>
   </Style>
 
