@@ -3,10 +3,14 @@
 <Map srs="+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +no_defs +over" background-color="#ffffff">
   <Style name="pgmapcss">
 <!-- POLYGONS -->
-# FOR COLORS COLOR
+# FOR fill-color
     <Rule>
-      <Filter>[fill-color] = 'COLOR'</Filter>
-      <PolygonSymbolizer fill="COLOR" />
+<!--
+* Mapnik version >= 3: remove "# FOR" and "# END" and replace by
+      <Filter>[fill-color]</Filter>
+-->
+      <Filter>'[fill-color]' = [fill-color]</Filter>
+      <PolygonSymbolizer fill="[fill-color]" />
     </Rule>
 # END
 
@@ -21,14 +25,16 @@
 -->
 
 <!-- LINES -->
-# FOR COLORS COLOR
+# FOR color width
     <Rule>
-      <Filter>[width] and [color] = 'COLOR'</Filter>
-      <LineSymbolizer stroke="COLOR" stroke-width="[width]" />
 <!--
 * Mapnik branch stroke-width-expr: replace by
-      <LineSymbolizer stroke="COLOR" stroke-width="[width]" />
+      <Filter>[width] and '[color]' = [color]</Filter>
+* Mapnik version >= 3: remove "# FOR" and "# END" and replace by
+      <Filter>[width]</Filter>
 -->
+      <Filter>'[width]' = [width] and '[color]' = [color]</Filter>
+      <LineSymbolizer stroke="[color]" stroke-width="[width]" />
     </Rule>
 # END
 <!--

@@ -18,29 +18,36 @@ sub possible_values {
   return @ret;
 }
 
-@colors = possible_values("color");
-
 # now process test-template.mapnik and replace COLOR placeholders by colors
 open $f, "<test-template.mapnik";
 open $r, ">test.mapnik";
 while (<$f>) {
-  if (m/^# FOR COLORS (.*)$/) {
-    $repl_var = $1;
-    $t = "";
+  if (m/^# FOR (.*)$/) {
+    @keys = split " ", $1;
+    @t = ();
     while (<$f>) {
       if (m/^# END/) {
 	last;
       }
 
-      $t .= $_;
+      push @t, $_;
     }
 
-    foreach (@colors) {
-      my $u = $t;
-      $u =~ s/$repl_var/$_/g;
-      print $r $u;
+    foreach $key (@keys) {
+      @res = ();
+
+      foreach $value (possible_values($key)) {
+	foreach $row (@t) {
+	  my $r1 = $row;
+	  $r1 =~ s/\[$key\]/$value/;
+	  push @res, $r1;
+	}
+      }
+
+      @t = @res;
     }
 
+    print $r join "", @t;
   }
   else {
     print $r $_;
