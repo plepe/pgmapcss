@@ -1,15 +1,24 @@
 #!/usr/bin/perl
 
-# read list of colors from test.mapcss
-%colors = ();
-open $f, "<test.mapcss";
-while (<$f>) {
-  if (m/(#[0-9a-f]{6,8})/i) {
-    $colors{$1} = 1;
+# possible_values: return list of all possible values for a key
+sub possible_values {
+  my $key = $_[0];
+# TODO: escape characters
+  my @ret = ();
+
+  my $v;
+  my $r;
+# TODO: user/pass/host parameters for psql
+  open $v, "psql -t -A -c \"select value from (select key, unnest(cast(value as text[])) as value from each((test_stat()).properties_values)) t where key='$key';\"|";
+  while($r = <$v>) {
+    chop($r);
+    push @ret, $r;
   }
+
+  return @ret;
 }
-close($f);
-@colors = keys(%colors);
+
+@colors = possible_values("color");
 
 # now process test-template.mapnik and replace COLOR placeholders by colors
 open $f, "<test-template.mapnik";
