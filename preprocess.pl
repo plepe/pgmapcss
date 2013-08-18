@@ -39,7 +39,9 @@ while (<$f>) {
       @res = ();
 
       foreach $value (possible_values($key)) {
-	if ($value eq '*') {
+	if ($value eq '') {
+	}
+	elsif ($value eq '*') {
 	  $error_keys{$key} = 1;
 	}
 	else {
