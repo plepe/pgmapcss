@@ -11,6 +11,7 @@ begin
   stat := $1;
   stat.func :=''::text;
   stat.pseudo_elements := Array['default']::text[];
+  stat.properties_values := ''::hstore;
 
   for r in select unnest(stat.selectors) selectors, unnest(stat.properties) properties loop
     stat := pgmapcss_compile_statement(r.selectors, r.properties, stat);

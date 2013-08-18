@@ -67,6 +67,7 @@ create type pgmapcss_compile_stat as (
   prop_list     hstore,
   selectors	pgmapcss_selector[],
   properties	pgmapcss_rule_properties[],
+  properties_values	hstore,
   -- where_selectors: all selectors which make an object show
   pseudo_elements	text[]
 );

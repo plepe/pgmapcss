@@ -12,6 +12,8 @@ declare
   r pgmapcss_selector_part;
   r1 record;
   current_pseudo_element text;
+  t text;
+  a text[];
 begin
   stat := $3;
 
@@ -38,6 +40,21 @@ begin
       'current.styles[' || current_pseudo_element || '] || ' ||
       quote_nullable(cast(properties.properties as text)) || E';\n';
 
+    -- remember all possible property values
+    for r1 in select * from each(properties.properties) loop
+      t := stat.properties_values->(r1.key);
+      if t is null then
+	a := Array[]::text[];
+      else
+	a := cast(t as text[]);
+      end if;
+
+      if array_search(r1.value, a) is null then
+	stat.properties_values = stat.properties_values || hstore(r1.key, cast(
+	  array_append(a, r1.value) as text));
+      end if;
+    end loop;
+
     -- set all tag assignments which don't need eval
     if array_upper(akeys(properties.assignments), 1) is not null then
       ret = ret || '  current.tags = current.tags || ' ||
@@ -55,6 +72,19 @@ begin
       ret = ret || '  current.styles[' || current_pseudo_element || '] = ' ||
 	'current.styles[' || current_pseudo_element || '] || hstore(' ||
         quote_literal(r1.key) || ', ' || r1.value || E');\n';
+
+      -- remember all possible property values
+      t := stat.properties_values->(r1.key);
+      if t is null then
+	a := Array[]::text[];
+      else
+	a := cast(t as text[]);
+      end if;
+
+      if array_search('*', a) is null then
+	stat.properties_values = stat.properties_values || hstore(r1.key, cast(
+	  array_append(a, '*') as text));
+      end if;
     end loop;
 
     -- unset tags
