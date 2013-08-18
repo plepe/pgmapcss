@@ -137,7 +137,10 @@ begin
       value := rtrim(substring(content from '^([^;]*);'));
       unit := null;
 
-      if value ~ '^(.*)(px|m|u)$' then
+      if value = '' then
+	value := null;
+
+      elsif value ~ '^(.*)(px|m|u)$' then
 	unit := substring(value from '^(?:.*)(px|m|u)');
 
 	-- no need to calculate pixel values

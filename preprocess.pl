@@ -11,7 +11,7 @@ sub possible_values {
   my $v;
   my $r;
 # TODO: user/pass/host parameters for psql
-  open $v, "psql -t -A -c \"select value from (select key, unnest(cast(value as text[])) as value from each((test_stat()).properties_values)) t where key='$key';\"|";
+  open $v, "psql -t -A -c \"select (CASE WHEN value is null THEN 'NULL' ELSE value END) from (select key, unnest(cast(value as text[])) as value from each((test_stat()).properties_values)) t where key='$key';\"|";
   while($r = <$v>) {
     chop($r);
     push @ret, $r;
@@ -39,7 +39,7 @@ while (<$f>) {
       @res = ();
 
       foreach $value (possible_values($key)) {
-	if ($value eq '') {
+	if ($value eq 'NULL') {
 	}
 	elsif ($value eq '*') {
 	  $error_keys{$key} = 1;
