@@ -13,7 +13,7 @@ begin
   stat.pseudo_elements := Array['default']::text[];
 
   for r in select unnest(stat.selectors) selectors, unnest(stat.properties) properties loop
-    stat := pgmapcss_build_statement(r.selectors, r.properties, stat);
+    stat := pgmapcss_compile_statement(r.selectors, r.properties, stat);
   end loop;
 
   return stat;

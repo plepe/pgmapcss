@@ -16,7 +16,7 @@ for i in \
   pgmapcss_compile_conditions.sql \
   pgmapcss_compile_selector_part.sql \
   pgmapcss_parse_properties.sql \
-  pgmapcss_build_statement.sql \
+  pgmapcss_compile_statement.sql \
   pgmapcss_compile_content.sql \
   pgmapcss_parse_eval.sql \
   pgmapcss_compile_eval.sql \

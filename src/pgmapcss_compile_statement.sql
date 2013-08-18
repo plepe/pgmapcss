@@ -1,4 +1,4 @@
-create or replace function pgmapcss_build_statement (
+create or replace function pgmapcss_compile_statement (
   selector pgmapcss_selector,
   properties pgmapcss_rule_properties,
   pgmapcss_compile_stat
@@ -33,31 +33,38 @@ begin
       ret = ret || '  current.pseudo_element_ind = ' || current_pseudo_element || E';\n';
     end if;
 
+    -- set all properties which don't need eval
     ret = ret || '  current.styles[' || current_pseudo_element || '] = ' ||
       'current.styles[' || current_pseudo_element || '] || ' ||
       quote_nullable(cast(properties.properties as text)) || E';\n';
-    ret = ret || '  current.has_pseudo_element[' || current_pseudo_element || E'] = true;\n';
 
+    -- set all tag assignments which don't need eval
     if array_upper(akeys(properties.assignments), 1) is not null then
       ret = ret || '  current.tags = current.tags || ' ||
 	quote_nullable(cast(properties.assignments as text)) || E';\n';
     end if;
 
+    -- set all eval-assignments on tags
     for r1 in select * from each(properties.eval_assignments) loop
       ret = ret || '  current.tags = current.tags || hstore(' ||
         quote_literal(r1.key) || ', ' || r1.value || E');\n';
     end loop;
 
+    -- set all eval-assignments on properties
     for r1 in select * from each(properties.eval_properties) loop
       ret = ret || '  current.styles[' || current_pseudo_element || '] = ' ||
 	'current.styles[' || current_pseudo_element || '] || hstore(' ||
         quote_literal(r1.key) || ', ' || r1.value || E');\n';
     end loop;
 
+    -- unset tags
     if array_upper(properties.unassignments, 1) is not null then
       ret = ret || '  current.tags = current.tags - cast(' ||
 	quote_nullable(cast(properties.unassignments as text)) || E' as text[]);\n';
     end if;
+
+    -- set has_pseudo_element to true
+    ret = ret || '  current.has_pseudo_element[' || current_pseudo_element || E'] = true;\n';
 
     ret = ret || E'end if;\n\n';
 
