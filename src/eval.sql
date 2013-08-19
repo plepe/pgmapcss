@@ -326,12 +326,16 @@ as $$
 #variable_conflict use_variable
 declare
   ret text := '';
-  i text;
-  p float;
+  t text;
 begin
   if array_upper(param, 1) >= 1 then
-    p := cast(eval_number(Array[1], object, current, render_context) as float);
-    return cast(sqrt(p) as text);
+    t := eval_number(Array[param[1]], object, current, render_context);
+
+    if t = '' then
+      return '';
+    end if;
+
+    return cast(sqrt(cast(t as float)) as text);
   end if;
 
   return '';
