@@ -37,8 +37,13 @@ point[place] {
   z-index: 10;
 }
 point[place]::buffer {
-  geo: eval(buffer(prop(geo), 100m));
+  set radius=eval(sqrt(tag(population)));
+}
+point[place][radius>0]::buffer {
+  geo: eval(buffer(prop(geo), tag(radius)));
   fill-color: #00ff00;
+  width: 1;
+  color: #007f00;
   z-index: -2;
 }
 
