@@ -28,12 +28,13 @@ fi
 
 eval set -- "$ARGS";
 
-DB=$USER
-DBUSER=$USER
-DBPASS="PASSWORD"
-DBHOST="localhost"
-FILE=""
-BASE="$(dirname $0)/default"
+export DB=$USER
+export DBUSER=$USER
+export DBPASS="PASSWORD"
+export DBHOST="localhost"
+export FILE=""
+export BASE="$(dirname $0)/default"
+export STYLE_ID=""
 
 while true ; do
   case "$1" in
@@ -92,7 +93,7 @@ CONTENT=`cat $BASE.mapcss $FILE`
 psql -d "dbname=$DB user=$DBUSER host=$DBHOST password=$DBPASS" --set ON_ERROR_STOP=1 -P format=unaligned -c "select pgmapcss_install('$STYLE_ID', \$\$$CONTENT\$\$);" 2> $STYLE_ID.stderr | tail -n+2 | head -n-2 >> $STYLE_ID.stdout
 
 echo "* Pre-processing mapnik file"
-./preprocess.pl >> $STYLE_ID.stderr
+$(dirname $0)/preprocess.pl >> $STYLE_ID.stderr
 
 if [ -s $STYLE_ID.stderr ] ; then
   echo "--=== Warnings and Errors ===--" >> $STYLE_ID.output

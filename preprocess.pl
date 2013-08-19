@@ -1,5 +1,12 @@
 #!/usr/bin/perl
 
+$DB=$ENV{DB};
+$DBUSER=$ENV{DBUSER};
+$DBPASS=$ENV{DBPASS};
+$DBHOST=$ENV{DBHOST};
+$BASE=$ENV{BASE};
+$STYLE_ID=$ENV{STYLE_ID};
+
 %error_keys = ();
 
 # possible_values: return list of all possible values for a key
@@ -11,7 +18,7 @@ sub possible_values {
   my $v;
   my $r;
 # TODO: user/pass/host parameters for psql
-  open $v, "psql -t -A -c \"select (CASE WHEN value is null THEN 'NULL' ELSE value END) from (select key, unnest(cast(value as text[])) as value from each((test_stat()).properties_values)) t where key='$key';\"|";
+  open $v, "psql -t -A -c \"select (CASE WHEN value is null THEN 'NULL' ELSE value END) from (select key, unnest(cast(value as text[])) as value from each((${STYLE_ID}_stat()).properties_values)) t where key='$key';\"|";
   while($r = <$v>) {
     chop($r);
     push @ret, $r;
@@ -21,8 +28,8 @@ sub possible_values {
 }
 
 # now process test-template.mapnik and replace COLOR placeholders by colors
-open $f, "<default-template.mapnik";
-open $r, ">test.mapnik";
+open $f, "<${BASE}-template.mapnik";
+open $r, ">${STYLE_ID}.mapnik";
 while (<$f>) {
   if (m/^# FOR (.*)$/) {
     @keys = split " ", $1;
@@ -59,6 +66,12 @@ while (<$f>) {
     print $r join "", @t;
   }
   else {
+    $_ =~ s/DBUSER/$DBUSER/ge;
+    $_ =~ s/DBPASS/$DBPASS/ge;
+    $_ =~ s/DBHOST/$DBHOST/ge;
+    $_ =~ s/DB/${DB}/ge;
+    $_ =~ s/STYLE_ID/$STYLE_ID/ge;
+
     print $r $_;
   }
 }
