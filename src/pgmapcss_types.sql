@@ -38,6 +38,7 @@ create type pgmapcss_selector_part as (
   conditions            pgmapcss_condition[], /* conditional expressions */
   pseudo_classes        text[], /* :closed, ... */
   pseudo_element        text,
+  create_pseudo_element	boolean,
   text_length           int
 );
 

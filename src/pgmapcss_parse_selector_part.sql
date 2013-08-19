@@ -20,6 +20,7 @@ begin
   ret.conditions=Array[]::text[];
   ret.pseudo_classes=Array[]::text[];
   ret.pseudo_element := 'default';
+  ret.create_pseudo_element := true;
 
   -- check for comments
   selector := pgmapcss_parse_comments(selector);
@@ -94,10 +95,18 @@ begin
   end loop;
 
   -- parse pseudo element
-  if selector ~ '^::([a-zA-Z0-9_]+)' then
-    m := substring(selector from '^::([a-zA-Z0-9_]+)');
-    ret.pseudo_element=m;
-    selector := substring(selector from '^::[a-zA-Z0-9_]+(.*)$');
+  if selector ~ '^::([a-zA-Z0-9_\(\)]+)' then
+    m := substring(selector from '^::([a-zA-Z0-9_\(\)]+)');
+    m1 := substring(m from '^\((.*)\)$');
+
+    if m1 is not null then
+      ret.pseudo_element := m1;
+      ret.create_pseudo_element := false;
+    else
+      ret.pseudo_element := m;
+    end if;
+
+    selector := substring(selector from '^::[a-zA-Z0-9_\(\)]+(.*)$');
   end if;
 
   -- check for comments

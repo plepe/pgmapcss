@@ -94,7 +94,9 @@ begin
     end if;
 
     -- set has_pseudo_element to true
-    ret = ret || '  current.has_pseudo_element[' || current_pseudo_element || E'] = true;\n';
+    if r.create_pseudo_element then
+      ret = ret || '  current.has_pseudo_element[' || current_pseudo_element || E'] = true;\n';
+    end if;
 
     ret = ret || E'end if;\n\n';
 

@@ -1,5 +1,5 @@
 /* DEFAULT VALUES (and make sure that result columns are available) */
-* {
+*::(default) {
 // General
   z-index: 0;
 // PolygonSymbolizer

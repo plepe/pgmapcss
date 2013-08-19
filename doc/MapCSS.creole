@@ -99,6 +99,8 @@ Pseudo elements can be used to create more than one style for a single object, e
 
 If you omit the pseudo element descriptor in the selector, this is the same as using ::default.
 
+You may enclose the pseudo element in brackets (e.g. "::(default)") to suppress creating a pseudo element from this statement. This is used internally to set default values.
+
 === Grouping ===
 You may use a list of properties with several selectors, separated by ','. E.g.
 {{{
