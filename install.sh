@@ -1,5 +1,62 @@
 #!/bin/bash
 
+function show_usage {
+  echo
+  echo "Usage:"
+  echo "  install.sh [option...]"
+  echo
+  echo "Options:"
+  echo "  -d, --database    Name of database (default: username)"
+  echo "  -u, --user        User for database (default: username)"
+  echo "  -p, --password    Password for database (default: PASSWORD)"
+  echo "  -h, --host        Host for database (default: localhost)"
+}
+
+ARGS=$(getopt -o d:u:p:h:f:b: -l "database:,user:,password:,host:" -n "install.sh" -- "$@");
+
+if [ $? -ne 0 ] ; then
+  show_usage
+  exit 1
+fi
+
+eval set -- "$ARGS";
+
+DB=$USER
+DBUSER=$USER
+DBPASS="PASSWORD"
+DBHOST="localhost"
+BASEPATH=$(dirname $0)
+
+while true ; do
+  case "$1" in
+    -d|--database)
+      shift;
+      DB=$1
+      shift;
+      ;;
+    -u|--user)
+      shift;
+      DBUSER=$1
+      shift;
+      ;;
+    -p|--password)
+      shift;
+      DBPASS=$1
+      shift;
+      ;;
+    -h|--host)
+      shift;
+      DBHOST=$1
+      shift;
+      ;;
+    --)
+      shift;
+      break;
+      ;;
+  esac
+done
+
+
 for i in \
   array_search.sql \
   pgmapcss_types.sql \
@@ -26,7 +83,7 @@ for i in \
   pgmapcss_install.sql
 do
   echo "* $i"
-  psql $@ --set ON_ERROR_STOP=1 -f src/$i
+  psql -d "dbname=$DB user=$DBUSER host=$DBHOST password=$DBPASS" --set ON_ERROR_STOP=1 -f "$BASEPATH/src/$i"
   ERR=$?
 
   if [ $ERR -ne 0 ] ; then
