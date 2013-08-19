@@ -49,14 +49,16 @@ The following script loads all necessary functions to compile / run PGMapCSS
 ./install.sh -d DB
 }}}
 
+Run {{{./install.sh -h}}} for additional options.
+
 Compile test.mapnik / test.mapcss style file
 {{{
 ./load.sh -d DB test
 }}}
 
-Insert correct database parameters in test.mapnik (look for DB, USER, PASSWORD).
+Run {{{./load.sh -h}}} for additional options.
 
-Now you should have a working test.mapnik XML file, which you can use in renderd or other programs.
+Now you should have a working 'test.mapnik' XML file, which you can use in renderd or other programs.
 
 == Example ==
 {{doc/example.png}}

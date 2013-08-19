@@ -9,6 +9,7 @@ function show_usage {
   echo "  by 'style_id', e.g. 'style_id_match()'."
   echo
   echo "Options:"
+  echo "  -h, --help        Help (this page)"
   echo "  -d, --database    Name of database (default: username)"
   echo "  -u, --user        User for database (default: username)"
   echo "  -p, --password    Password for database (default: PASSWORD)"
@@ -19,7 +20,7 @@ function show_usage {
   echo "                    may specify an absolute path)"
 }
 
-ARGS=$(getopt -o d:u:p:h:f:b: -l "database:,user:,password:,host:,file:,base:" -n "load.sh" -- "$@");
+ARGS=$(getopt -o hd:u:p:H:f:b: -l "help,database:,user:,password:,host:,file:,base:" -n "load.sh" -- "$@");
 
 if [ $? -ne 0 ] ; then
   show_usage
@@ -38,6 +39,11 @@ export STYLE_ID=""
 
 while true ; do
   case "$1" in
+    -h|--help)
+      shift;
+      show_usage
+      exit
+      ;;
     -d|--database)
       shift;
       DB=$1
@@ -53,7 +59,7 @@ while true ; do
       DBPASS=$1
       shift;
       ;;
-    -h|--host)
+    -H|--host)
       shift;
       DBHOST=$1
       shift;

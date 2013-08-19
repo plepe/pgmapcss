@@ -6,13 +6,14 @@ function show_usage {
   echo "  install.sh [option...]"
   echo
   echo "Options:"
+  echo "  -h, --help        Help (this page)"
   echo "  -d, --database    Name of database (default: username)"
   echo "  -u, --user        User for database (default: username)"
   echo "  -p, --password    Password for database (default: PASSWORD)"
-  echo "  -h, --host        Host for database (default: localhost)"
+  echo "  -H, --host        Host for database (default: localhost)"
 }
 
-ARGS=$(getopt -o d:u:p:h:f:b: -l "database:,user:,password:,host:" -n "install.sh" -- "$@");
+ARGS=$(getopt -o hd:u:p:H:f:b: -l "help,database:,user:,password:,host:" -n "install.sh" -- "$@");
 
 if [ $? -ne 0 ] ; then
   show_usage
@@ -29,6 +30,11 @@ BASEPATH=$(dirname $0)
 
 while true ; do
   case "$1" in
+    -h|--help)
+      shift;
+      show_usage
+      exit
+      ;;
     -d|--database)
       shift;
       DB=$1
@@ -44,7 +50,7 @@ while true ; do
       DBPASS=$1
       shift;
       ;;
-    -h|--host)
+    -H|--host)
       shift;
       DBHOST=$1
       shift;
