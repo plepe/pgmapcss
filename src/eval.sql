@@ -405,6 +405,8 @@ begin
       return r;
     end if;
   end loop;
+
+  return '';
 end;
 $$ language 'plpgsql' immutable;
 
