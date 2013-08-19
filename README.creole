@@ -8,13 +8,15 @@ There were already several efforts to implement stylesheets based on Cascading S
 * [[https://github.com/mapnik/Cascadenik|Cascadenik]]
 * [[http://wiki.openstreetmap.org/wiki/Carto|CartoCSS]]
 
-All these tools are pre-processors, that convert a CSS stylesheet into a Mapnik stylesheet. PGMapCSS takes a different approach: The stylesheet is compiled into PostgreSQL/plpgsql functions which are evaluated at runtime. Therefore more advanced calculations are possible, even geometric alterations. See [[doc/API.md]] for details.
+All these tools are pre-processors, that convert a CSS stylesheet into a Mapnik stylesheet. PGMapCSS takes a different approach: The stylesheet is compiled into PostgreSQL/plpgsql functions which are evaluated at runtime. Therefore more advanced calculations are possible, even geometric modifications. Read [[doc/MapCSS.creole]] to learn about the features of PGMapCSS's MapCSS implementation.
 
-The Mapnik style just contains the database query/queries and the basic styles, referencing all options from the database queries. You can think of those styles as templates, which you can reference from your style sheet.
+The Mapnik style just contains a single database query and the basic styles, referencing all options from the database queries. You can think of those styles as templates, which you can reference from your style sheet.
 
-Read [[doc/MapCSS.creole]] to learn about the features of PGMapCSS's MapCSS implementation.
+As Mapnik 2.2 does not support using expressions for most symbolizer parameters, some pre-processing on the Mapnik Stylefile has to take place. The Mapnik XML file is generated from a template.
 
-WARNING: As of 2013, Mapnik does not support using expressions for most symbolizer parameters. Therefore usefulness of PGMapCSS is quite limited. See [[doc/compatibility.creole|Compatibility]] for more information.
+PGMapCSS is designed for Mapnik but might work with other renderers too. See file [[doc/compatibility.creole|Compatibility]] for more information.
+
+Developers: Every compiled style consists of a couple of PostgreSQL functions. See [[doc/API.md]] for details.
 
 Share this:
 * [[https://flattr.com/submit/auto?user_id=plepe&url=https://github.com/plepe/pgmapcss&title=PGMapCSS&language=&tags=github&category=software|Flattr this!]]
