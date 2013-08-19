@@ -2,9 +2,11 @@
 
 rm -f test.output
 
-FILE=`cat test.mapcss`
+echo "* Compiling mapcss file"
+FILE=`cat default.mapcss test.mapcss`
 psql $@ --set ON_ERROR_STOP=1 -P format=unaligned -c "select pgmapcss_install('test', \$\$$FILE\$\$);" 2> test.stderr | tail -n+2 | head -n-2 >> test.stdout
 
+echo "* Pre-processing mapnik file"
 ./preprocess.pl >> test.stderr
 
 if [ -s test.stderr ] ; then

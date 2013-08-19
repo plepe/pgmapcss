@@ -21,7 +21,7 @@ sub possible_values {
 }
 
 # now process test-template.mapnik and replace COLOR placeholders by colors
-open $f, "<test-template.mapnik";
+open $f, "<default-template.mapnik";
 open $r, ">test.mapnik";
 while (<$f>) {
   if (m/^# FOR (.*)$/) {
