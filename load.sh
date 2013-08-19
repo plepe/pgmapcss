@@ -1,16 +1,21 @@
 #!/bin/bash
 
-echo "=== Resulting function ===" > test.output
+rm -f test.output
+
 FILE=`cat test.mapcss`
-psql $@ --set ON_ERROR_STOP=1 -P format=unaligned -c "select pgmapcss_install('test', \$\$$FILE\$\$);" | tail -n+2 | head -n-2 >> test.output
-ERR=$?
+psql $@ --set ON_ERROR_STOP=1 -P format=unaligned -c "select pgmapcss_install('test', \$\$$FILE\$\$);" 2> test.stderr | tail -n+2 | head -n-2 >> test.stdout
 
-./preprocess.pl
+./preprocess.pl >> test.stderr
 
-if [ $ERR -eq 0 ] ; then
-  less test.output
-else
-  echo "An error occured when compiling CSS file"
-  exit $ERR
+if [ -s test.stderr ] ; then
+  echo "--=== Warnings and Errors ===--" >> test.output
+  cat test.stderr >> test.output
 fi
 
+echo "--=== Resulting functions ===--" >> test.output
+cat test.stdout >> test.output
+
+rm test.stderr
+rm test.stdout
+
+less test.output
