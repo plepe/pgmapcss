@@ -41,6 +41,7 @@ begin
   ret = ret || E'  current pgmapcss_current;\n';
   ret = ret || E'  ret ' || style_id || E'_result;\n';
   ret = ret || E'  r record;\n';
+  ret = ret || E'  i int;\n';
   ret = ret || E'begin\n';
   ret = ret || E'  current.pseudo_elements := ''' || cast(stat.pseudo_elements as text) || E''';\n';
   ret = ret || E'  current.tags := object.tags;\n';

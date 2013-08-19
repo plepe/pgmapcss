@@ -101,6 +101,8 @@ If you omit the pseudo element descriptor in the selector, this is the same as u
 
 You may enclose the pseudo element in brackets (e.g. "::(default)") to suppress creating a pseudo element from this statement. This is used internally to set default values.
 
+To set properties for all possible pseudo elements, you may use '::*' or '::(*)'. This is used internally to set default values.
+
 === Grouping ===
 You may use a list of properties with several selectors, separated by ','. E.g.
 {{{

@@ -17,17 +17,26 @@ declare
 begin
   stat := $3;
 
-    r := selector.object;
+  r := selector.object;
 
-    ret = ret || 'if   (';
-    ret = ret || pgmapcss_compile_selector_part(selector.object);
-    ret = ret || E')\nthen\n';
+  ret = ret || 'if   (';
+  ret = ret || pgmapcss_compile_selector_part(selector.object);
+  ret = ret || E')\nthen\n';
 
+  -- if we find a pseudo element '*' then iterate over all possible
+  -- pseudo elements
+  if r.pseudo_element = '*' then
+    current_pseudo_element = 'i';
+    ret = ret || E'for i in 1..array_upper(current.pseudo_elements, 1) loop\n';
+
+  -- otherwise we just search the index of the current pseudo element
+  else
     current_pseudo_element = array_search(r.pseudo_element, stat.pseudo_elements);
     if current_pseudo_element is null then
       stat.pseudo_elements = array_append(stat.pseudo_elements, r.pseudo_element);
       current_pseudo_element = array_upper(stat.pseudo_elements, 1);
     end if;
+  end if;
 
     -- set values on 'current' for eval-statements
     if array_upper(avals(properties.eval_assignments), 1) is not null or
@@ -98,7 +107,11 @@ begin
       ret = ret || '  current.has_pseudo_element[' || current_pseudo_element || E'] = true;\n';
     end if;
 
-    ret = ret || E'end if;\n\n';
+  if r.pseudo_element = '*' then
+    ret = ret || E'end loop;\n';
+  end if;
+
+  ret = ret || E'end if;\n\n';
 
   stat.func = stat.func || ret;
 

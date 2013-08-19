@@ -95,8 +95,8 @@ begin
   end loop;
 
   -- parse pseudo element
-  if selector ~ '^::([a-zA-Z0-9_\(\)]+)' then
-    m := substring(selector from '^::([a-zA-Z0-9_\(\)]+)');
+  if selector ~ '^::([a-zA-Z0-9_\(\)\*]+)' then
+    m := substring(selector from '^::([a-zA-Z0-9_\(\)\*]+)');
     m1 := substring(m from '^\((.*)\)$');
 
     if m1 is not null then
@@ -106,7 +106,7 @@ begin
       ret.pseudo_element := m;
     end if;
 
-    selector := substring(selector from '^::[a-zA-Z0-9_\(\)]+(.*)$');
+    selector := substring(selector from '^::[a-zA-Z0-9_\(\)\*]+(.*)$');
   end if;
 
   -- check for comments
