@@ -1,8 +1,8 @@
 PGMapCSS is being developed as interface between a PostgreSQL/PostGIS database and the Mapnik renderer. This does not mean, that PGMapCSS can't work with other renderers too. This page list compatibility with other renderers.
 
-The crucial thing is, that the renderer can use the following database query as
-data source, where BBOX is replaced by the current bounding box and
-SCALE_DENOMINATOR by the current scale denominator:
+The crucial thing is, that the renderer can use a single database query of the
+follwing form as data source, where BBOX is replaced by the current bounding
+box and SCALE_DENOMINATOR by the current scale denominator:
 {{{
 select * from test_match(pgmapcss_render_context(BBOX, SCALE_DENOMINATOR))
 }}}
@@ -12,13 +12,13 @@ The less crucial thing is, that the returned values can be read as symbolizer va
 <Line width='[width]' color='[color]' />
 }}}
 
-
 == Mapnik v2.2 ==
 * URL: http://mapnik.org/
+* Overall PGMapCSS support: OK
 
 Support database query: YES
 * use !bbox! as BBOX
-* use !scale_denominator! as scale denominator
+* use !scale_denominator! as SCALE_DENOMINATOR
 
 Support reading returned values: LIMITED
 * PGMapCSS uses preprocessing to (mostly) work around the limitation.
@@ -26,3 +26,25 @@ Support reading returned values: LIMITED
 Notes:
 * There are plans to convert all values to expressions for the next major Mapnik release, version 3.0. See [[https://github.com/mapnik/mapnik/issues/828|Mapnik issue "All values should become expressions"]] for details.
 * There are some development versions which support more input options, noteably [[https://github.com/mapnik/mapnik/tree/stroke-width-expr|stroke-width-expr]].
+
+== MapServer 6.2 ==
+* URL: http://mapserver.org/
+* Overall PGMapCSS support: NO (though untested)
+
+Support database query: PARTLY
+* use !BOX! as BBOX
+* no support for scale denominator (according to http://mapserver.org/input/vector/postgis.html)
+
+Support reading returned values: PARTLY
+* The most importantant values (widths, colors, ...) seem to be supported; other values could be solved by preprocessing.
+* Apparently only one style definition per layer/query can be defined.
+
+== GeoServer 2.3 ==
+* URL: http://geoserver.org/display/GEOS/Welcome
+* Overall PGMapCSS support: NO (though untested)
+
+Support database query: NO
+* only a database table or view can be used as input
+
+Support reading returned values: PROBABLE
+* According to http://docs.geoserver.org/stable/en/user/styling/sld-reference/pointsymbolizer.html#using-expressions-in-parameter-values many parameter values can be read from a filter expression.
