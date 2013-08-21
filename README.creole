@@ -32,7 +32,7 @@ psql "create database DB"
 
 Add hstore and postgis functionality
 {{{
-psql -d DB "create extension hstore"
+psql -d DB -c "create extension hstore"
 psql -d DB -f /usr/share/postgresql/9.1/contrib/postgis-1.5/postgis.sql
 psql -d DB -f /usr/share/postgresql/9.1/contrib/postgis-1.5/spatial_ref_sys.sql
 }}}
@@ -40,7 +40,7 @@ psql -d DB -f /usr/share/postgresql/9.1/contrib/postgis-1.5/spatial_ref_sys.sql
 === Import OSM data ===
 Import OSM-file with osm2pgsql
 {{{
-./osm2pgsql -d DB -s -S default.style --hstore-all --hstore-add-index -G data.osm
+./osm2pgsql -d DB -s -S default.style --hstore-all -G data.osm
 }}}
 
 You may vary the parameters, but {{{--hstore-all}}} is really important.
