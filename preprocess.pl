@@ -18,7 +18,7 @@ sub possible_values {
   my $v;
   my $r;
 # TODO: user/pass/host parameters for psql
-  open $v, "psql -t -A -c \"select (CASE WHEN value is null THEN 'NULL' ELSE value END) from (select key, unnest(cast(value as text[])) as value from each((${STYLE_ID}_stat()).properties_values)) t where key='$key';\"|";
+  open $v, "psql -d \"dbname=$DB user=$DBUSER host=$DBHOST password=$DBPASS\" -t -A -c \"select (CASE WHEN value is null THEN 'NULL' ELSE value END) from (select key, unnest(cast(value as text[])) as value from each((${STYLE_ID}_stat()).properties_values)) t where key='$key';\"|";
   while($r = <$v>) {
     chop($r);
     push @ret, $r;
