@@ -16,7 +16,7 @@ declare
   sel1 pgmapcss_selector;
   ob pgmapcss_selector_part;
   ob1 pgmapcss_selector_part;
-  where_selectors pgmapcss_selector[];
+  where_selectors pgmapcss_selector[] := Array[]::pgmapcss_selector[];
   assignments hstore := ''::hstore;
   k text;
 begin
@@ -66,7 +66,6 @@ begin
 
   -- now iterate through used scale_denominators and collect where_selectors
   foreach f in array scale_denominators loop
-    raise notice 'scale >%', f;
     h := ''::hstore;
 
     foreach sel in array where_selectors loop
