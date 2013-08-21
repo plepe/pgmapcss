@@ -2,7 +2,8 @@ Example 1: Major roads and parks
 ================================
 For starters a simple example will be shown: Major roads and parks.
 
-<div style='float: right;'>![Example 1](example1.png)</div>
+
+![Example 1](example1.png)
 ```css
 /* draw a green polygon for all parks */
 area[leisure=park] {
