@@ -26,7 +26,7 @@ begin
   selector := pgmapcss_parse_comments(selector);
 
   -- parse object class (way, node, canvas, ...)
-  m := substring(selector from '^\s*(\*|[a-z_]+)(\|.*|\[.*|:.*|\..*|\s)');
+  m := substring(selector from '^\s*(\*|[a-z_]+)(\|.*|\[.*|:.*|\..*|\s|\{)');
   if m = '*' then
   elsif m is not null then
     ret.type = m;
