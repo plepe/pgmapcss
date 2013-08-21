@@ -24,4 +24,8 @@
   // not in MapCSS 0.2 standard:
   character-spacing: 0;
   wrap-character: " ";
+  text-position: center;
+}
+line::(*) {
+  text-position: line;
 }
