@@ -88,8 +88,20 @@ if [ "$STYLE_ID" == "" ] ; then
   exit;
 fi
 
+# if file name is accidentially given, cut '.mapcss'
+if [ "$(echo $STYLE_ID | cut -d. -f2)" == "mapcss" ] ; then
+  STYLE_ID=$(echo $STYLE_ID | cut -d. -f1)
+fi
+
+# if no file parameter was given use $STYLE_ID.mapcss
 if [ "$FILE" == "" ] ; then
   FILE="$STYLE_ID.mapcss"
+fi
+
+# check if file exists
+if [ ! -f $FILE ] ; then
+  echo "No such file: $FILE"
+  exit
 fi
 
 rm -f $STYLE_ID.output
