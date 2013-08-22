@@ -16,7 +16,7 @@ selector {
 
 For each rule, if the selector applies the properties from the { } block are set. If a property has already been set, it will be overridden.
 
-Additionally, comments can be made using "//" to comment the rest of the line out, or using "/*" and "*/" to comment out everything between these end points.
+Additionally, comments can be made using {{{//}}} to comment the rest of the line out, or using {{{/*}}} and {{{*/}}} to comment out everything between these end points.
 
 == Selectors ==
 Every selector may have several elements: type, class, zoom, condition, pseudo class, pseudo element, grouping and link.
@@ -83,12 +83,12 @@ Matches are always case sensitive (except regexp). Valid characters for keys are
 | ^= | Prefix match. Value starts with 'string', e.g. {{{[name^=Lon]}}} matches "London". | no standard
 | $= | Suffix match. Value ends with 'string', e.g. {{{[name$=dorf]}}} matches "Enzersdorf". | no standard
 | *= | Substring match. Value contains 'string', e.g. {{{[name*=ob]}}} matches "Foobar". | no standard
-| ~= | List membership. Tag value consits of a list of ;-separated values. E.g. {{{[amenity~=atm]}}} matches {{{amenity=atm;bank}}}. | no standard
+| ~~= | List membership. Tag value consits of a list of ;-separated values. E.g. {{{[amenity~=atm]}}} matches {{{amenity=atm;bank}}}. | no standard
 | =~ | Regular expression match. Value matches given regular expression, e.g. {{{[highway=~/.*ary/]}}} matches primary. Use {{{[highway=~/.*ary/i]}}} for case insensitive matches. | MapCSS 0.2¹
 
 * You can prepend any of the expressions with ! to negate match, e.g. {{{[amenity*=bank][!amenity*=atm]}}} matches amenity=bank, amenity=bank;post_office but not amenity=bank;atm.
 
-¹ MapCSS 0.2 does not define insensitive matches.
+¹ MapCSS 0.2 does not define case insensitive matches.
 
 ==== Test of tag presence/absense ===
 |= Condition |= Description
@@ -153,7 +153,7 @@ E.g.
 
 * Compatibility MapCSS 0.2: MOSTLY
 ** no definition about quoting in MapCSS
-** color definition "rgb(1, 0.5, 0)" not supported yet
+** color definition "rgb(1, 0.5, 0)" and url locator "url(img/foo.png)" not supported yet
 
 See file [[default.creole]] for properties of styles based on the 'default' style definition.
 
