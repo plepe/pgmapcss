@@ -155,6 +155,8 @@ E.g.
 ** no definition about quoting in MapCSS
 ** color definition "rgb(1, 0.5, 0)" not supported yet
 
+See file [[default.creole]] for properties of styles based on the 'default' style definition.
+
 === Assignments ===
 You may assign values to tags of the current object. This is independent from the current pseudo element descriptor.
 

@@ -35,6 +35,7 @@ line|z12-[highway=tertiary]::label {
   text-color: #000000;
   text-halo-color: #ffffff7f;
   text-halo-radius: 1;
+  line-position: line;
   z-index: 2;
 }
 ```

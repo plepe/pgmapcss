@@ -9,7 +9,7 @@
   width: ;
   color: ;
   opacity: 1;
-  linejoin: miter;
+  linejoin: round;
   linecap: butt;
   dashes: none;
 // TextSymbolizer
@@ -26,7 +26,4 @@
   character-spacing: 0;
   wrap-character: " ";
   text-position: center;
-}
-line::(*) {
-  text-position: line;
 }
