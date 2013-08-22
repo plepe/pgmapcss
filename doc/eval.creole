@@ -19,31 +19,40 @@ If you read a number, unit conversion takes place. The following units are suppo
 | m | Meters on the ground (TODO: currently equals 'u').
 
 == Operators ==
-|= Operator |= Description
-| +, -, *, / | arithmetic operations
-| ==, !=, <> | string comparison (equal, not equal, not equal)
-| >, >=, <=, < | number comparison
+|= Operator |= Description |= Compatibility
+| +, -, *, / | arithmetic operations | MapCSS 0.2
+| ==, !=, <> | string comparison (equal, not equal, not equal) | TODO: MapCSS 0.2: number comparison
+| >, >=, <=, < | number comparison | MapCSS 0.2
 | , or ; | several statements separated by , or ; will always return the value of the last statement.
-| ~= | list membership; whether list contains an element.
+| ~= | list membership; whether list contains an element. | no standard
 
 == Functions ==
-|= Function |= Parameters |= Return value |= Description
-| add, sub, mul, div | number, [number, [number, ...]] | number | arithmetic operations. If any of the input parameters is not a number, returns none.
-| eq, neq | text, [text, [text, ...]] | boolean | eq: Returns true if all input parameters are equal; neq: Returns true if all of the input parameters are different.
-| gt, ge, le, lt | number, number | boolean | compares two numbers. >, >=, <= or <.
-| sqrt | number | number | Square root of input value
-| prop | key, [string] | value | current value of the computed property on pseudo element param2 (default: current pseudo element). Examples: prop(width), prop(width, casing)
-| tag | key, [key, [key, ...]] | value | value of the tag key (e.g. tag("name") ). If several keys are passed, the first set tag is returned, e.g. tag("name:en", "int_name", "name").
-| concat | string, [string, [string, ...]] | string | Concatenate all strings
-| any | value, [value, [value, ...]] | value | Returns first value that's not //none//.
-| min | number, [number, [number, ...]] | number | Returns lowest of the input values.
-| max | number, [number, [number, ...]] | number | Returns highest of the input values.
-| boolean | value | boolean | Converts the input to "true" or "false" (see 'Data Types' for an explanation).
-| cond | boolean, value, [value] | value | if first input parameter is //boolean// true return the second parameter, otherwise the third parameter (or "").
-| number | value, [string] | number | Converts the input to a number (or "") of the specified unit (parameter 2, default 'px'). E.g. number('2px') => '2' or number('100px', 'm') => '238.86' (at zoom level 16).
-| debug | value | value | raise a postgresql notice with the value; returns value. E.g. width: eval(debug(5+4));
+|= Function |= Parameters |= Return value |= Description | Compatibility
+| add, sub, mul, div | number, [number, [number, ...]] | number | arithmetic operations. If any of the input parameters is not a number, returns none. | no standard
+| eq, neq | text, [text, [text, ...]] | boolean | eq: Returns true if all input parameters are equal; neq: Returns true if all of the input parameters are different. | no standard
+| gt, ge, le, lt | number, number | boolean | compares two numbers. >, >=, <= or <. | no standard
+| sqrt | number | number | Square root of input value | MapCSS 0.2
+| prop | key, [string] | value | current value of the computed property on pseudo element param2 (default: current pseudo element). Examples: prop(width), prop(width, casing) | MapCSS 0.2 (no standard: pseudo element)
+| tag | key, [key, [key, ...]] | value | value of the tag key (e.g. tag("name") ). If several keys are passed, the first set tag is returned, e.g. tag("name:en", "int_name", "name"). | MapCSS 0.2 (only one key)
+| concat | string, [string, [string, ...]] | string | Concatenate all strings | no standard
+| any | value, [value, [value, ...]] | value | Returns first value that's not //none//. | MapCSS 0.2
+| min | number, [number, [number, ...]] | number | Returns lowest of the input values. | MapCSS 0.2
+| max | number, [number, [number, ...]] | number | Returns highest of the input values. | MapCSS 0.2
+| boolean | value | boolean | Converts the input to "true" or "false" (see 'Data Types' for an explanation). | MapCSS 0.2
+| cond | boolean, value, [value] | value | if first input parameter is //boolean// true return the second parameter, otherwise the third parameter (or ""). | MapCSS 0.2
+| number | value, [string] | number | Converts the input to a number (or "") of the specified unit (parameter 2, default 'px'). E.g. number('2px') => '2' or number('100px', 'm') => '238.86' (at zoom level 16). | no standard
+| debug | value | value | raise a postgresql notice with the value; returns value. E.g. width: eval(debug(5+4)); | no standard
+
+Missing functions (as of MapCSS 0.2):
+* str
+* int
+* num
+* metric
+* zmetric
 
 === List functions ===
+* List functions are not part of the MapCSS 0.2 standard
+
 |= Function |= Parameters |= Return value |= Description
 | list | value, [value, [value, ...]] | list | Returns a list from all input values. E.g. list("Alice", "Bob") -> "Alice;Bob"
 | get | list, number | value | Returns the n-th element of the list (counting starts at 0)
@@ -56,5 +65,7 @@ If you read a number, unit conversion takes place. The following units are suppo
 | search | list, value | number/boolean | Returns (first) index of value in list or 'false' if not found.
 
 == Geometric functions ===
+* Geometric functions are not part of the MapCSS 0.2 standard
+
 |= Function |= Parameters |= Return value |= Description
 | buffer | geometry, number | geometry | Draws a buffer of the specified size (default: pixels) around the input geometry, e.g. buffer(prop(geo), 100m)

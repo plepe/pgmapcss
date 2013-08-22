@@ -39,6 +39,8 @@ First part of a selector; required.
 
 The type of an object is retrieved from the 'types'-array in object-value (see [[API.md]]). You can add/remove types from your database query.
 
+* Compatibility MapCSS 0.2: YES (with the exception of 'canvas')
+
 === Class selector ===
 After the type selector, separated by '.'. Optional.
 
@@ -51,6 +53,8 @@ way.minor_road {
 
 See below under 'Assignments - Classes'.
 
+* Compatibility MapCSS 0.2: YES
+
 === Zoom selector ===
 After the class selector, separated by '|'. Optional.
 
@@ -62,6 +66,8 @@ The zoom selector restricts the range of zoom levels at which a rule is applied.
 | {{{|z-5}}} | Zoom level 5 and below.
 | {{{|z5-10}}} | Zoom level 5 to 10.
 
+* Compatibility MapCSS 0.2: YES
+
 === Condition selector ===
 After the zoom selector, may be specified multiple times. Every condition is enclosed in [...]. Optional.
 
@@ -70,22 +76,26 @@ You can combine several conditions, they will be combined by logical AND. E.g. {
 Matches are always case sensitive (except regexp). Valid characters for keys are letters, digits, '-', '_' and ':'. Valid characters for values are all characters expect '"', ''' and ']'. You may quote keys and values with '"' or ''' to use special characters.
 
 ==== Comparision expressions ===
-|= Operator |= Description
-| = | Exact match of the value. E.g. {{{[highway=residential]}}}.
-| != | Value not equal. Negation of =.
-| <, >, <=, >= | Comparision for numeric values (using floats).
-| ^= | Prefix match. Value starts with 'string', e.g. {{{[name^=Lon]}}} matches "London".
-| $= | Suffix match. Value ends with 'string', e.g. {{{[name$=dorf]}}} matches "Enzersdorf".
-| *= | Substring match. Value contains 'string', e.g. {{{[name*=ob]}}} matches "Foobar".
-| ~= | List membership. Tag value consits of a list of ;-separated values. E.g. {{{[amenity~=atm]}}} matches {{{amenity=atm;bank}}}.
-| =~ | Regular expression match. Value matches given regular expression, e.g. {{{[highway=~/.*ary/]}}} matches primary. Use {{{[highway=~/.*ary/i]}}} for case insensitive matches.
+|= Operator |= Description |= Compatibility
+| = | Exact match of the value. E.g. {{{[highway=residential]}}}. | MapCSS 0.2
+| != | Value not equal. Negation of =. | MapCSS 0.2
+| <, >, <=, >= | Comparision for numeric values (using floats). | MapCSS 0.2
+| ^= | Prefix match. Value starts with 'string', e.g. {{{[name^=Lon]}}} matches "London". | no standard
+| $= | Suffix match. Value ends with 'string', e.g. {{{[name$=dorf]}}} matches "Enzersdorf". | no standard
+| *= | Substring match. Value contains 'string', e.g. {{{[name*=ob]}}} matches "Foobar". | no standard
+| ~= | List membership. Tag value consits of a list of ;-separated values. E.g. {{{[amenity~=atm]}}} matches {{{amenity=atm;bank}}}. | no standard
+| =~ | Regular expression match. Value matches given regular expression, e.g. {{{[highway=~/.*ary/]}}} matches primary. Use {{{[highway=~/.*ary/i]}}} for case insensitive matches. | MapCSS 0.2¹
 
 * You can prepend any of the expressions with ! to negate match, e.g. {{{[amenity*=bank][!amenity*=atm]}}} matches amenity=bank, amenity=bank;post_office but not amenity=bank;atm.
+
+¹ MapCSS 0.2 does not define insensitive matches.
 
 ==== Test of tag presence/absense ===
 |= Condition |= Description
 | [key] | Tests whether object has tag 'key'.
 | [!key] | Tests whether no 'key' is present.
+
+* Compatibility MapCSS 0.2: PARTLY, no check for 'no/false' yet
 
 === Pseudo classes ===
 After the condition selector(s), separated by ':'. Several pseudo classes may be specified. Optional.
@@ -103,6 +113,8 @@ You may enclose the pseudo element in brackets (e.g. "::(default)") to suppress 
 
 To set properties for all possible pseudo elements, you may use '::*' or '::(*)'. This is used internally to set default values.
 
+* Compatibility MapCSS 0.2: not defined in standard
+
 === Grouping ===
 You may use a list of properties with several selectors, separated by ','. E.g.
 {{{
@@ -113,6 +125,8 @@ area[natural=wood]
   width: 2;
 }
 }}}
+
+* Compatibility MapCSS 0.2: YES
 
 === Link selector ===
 Parent, Child or nearby relations.
@@ -128,7 +142,7 @@ E.g.
 {
   opacity: 0.5;
   color: #ff0000;
-  background-color: rgb(1.0, 0.0, 0.0);
+  background-color: #00FF00;
   width: 2px;
   text: "2px";
 }
@@ -136,6 +150,10 @@ E.g.
 
 * You may enclose strings by single or double quotes.
 * You may specify values with a unit, default: 'px' (Pixels on screen). Other supported unites: 'u' (Units in 900913 projection on the map), 'm' (Meters on the map; NOT IMPLEMENTED YET: currently 'u' is used instead).
+
+* Compatibility MapCSS 0.2: MOSTLY
+** no definition about quoting in MapCSS
+** color definition "rgb(1, 0.5, 0)" not supported yet
 
 === Assignments ===
 You may assign values to tags of the current object. This is independent from the current pseudo element descriptor.
@@ -158,6 +176,8 @@ way[highway_class=minor] {
 }
 }}}
 
+* Compatibility MapCSS 0.2: YES (though 'unset' is not defined in MapCSS)
+
 === Eval expressions ===
 You can compute values using an eval instrucion:
 {{{
@@ -170,6 +190,8 @@ You can compute values using an eval instrucion:
 Either set a property for the current pseudo element or set a tag for the current object.
 
 See file [[eval.creole]] for details.
+
+* Compatibility MapCSS 0.2: YES
 
 === Assignments - Classes ===
 You can set tags beginning with a full-stop to simulate classes:
@@ -184,6 +206,8 @@ way.minor_road {
 }
 }}}
 
+* Compatibility MapCSS 0.2: YES
+
 === Geometry ===
 The special property "geo" will be predefined on every object. You may change it with eval statements.
 
@@ -196,3 +220,5 @@ point[place=village] {
 }}}
 
 This will draw a 10px wide buffer around every node with 'place=village'.
+
+* Compatibility MapCSS 0.2: not defined in standard
