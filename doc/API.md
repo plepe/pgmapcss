@@ -5,6 +5,7 @@ The postgresql function `pgmapcss_install(style_id, file_content)` converts the 
 A data type `{style_id}_result` will be created which returns some fixed columns and a column for each property.
 
 Return values (Data Type '{style_id}_result'):
+
 | Name   | Type     | Description        |
 | ------ | -------- | ------------------ |
 | _style | hstore   | All resulting properties |
@@ -24,6 +25,7 @@ select * from test_check(object, render_context);
 ```
 
 where object is of type `pgmapcss_object`:
+
 | Column | Type     | Description |
 | ------ | -------- | ----------- |
 | id     | text     | the id of the object (recommended: N1234 for nodes, W1234 for ways, R1234 for relations) |
@@ -46,11 +48,12 @@ select (result).* from (
 ```
 
 Notes:
-* `!bbox!` and `!scale_denominator!` will be replaced by Mapnik by the current bounding box resp. scale denominator. See [[https://trac.openstreetmap.org/browser/subversion/applications/rendering/mapnik/zoom-to-scale.txt|zoom-to-scale.txt]] for valid values.
-* `where way && !bbox!`: as the geometry may be modified by PGMapCSS (though not implemented yet), PostgreSQL can't use indexes on the resulting column; therefore all objects in the database would be included on every request (expect very bad performance). Using this statement PostgreSQL can use indexes on the source geometry and only objects matching the bounding box will be included.
+* `!bbox!` and `!scale_denominator!` will be replaced by Mapnik by the current bounding box resp. scale denominator. See [zoom-to-scale.txt](https://trac.openstreetmap.org/browser/subversion/applications/rendering/mapnik/zoom-to-scale.txt) for valid values.
+* `where way && !bbox!`: as the geometry may be modified by PGMapCSS, PostgreSQL can't use indexes on the resulting column; therefore all objects in the database would be included on every request (expect very bad performance). Using this statement PostgreSQL can use indexes on the source geometry and only objects matching the bounding box will be included.
 * `offset 0`: the statement `(result).*` in the select statement will call `test_check()` for every resulting column; `offset 0` prevents this behaviour.
 
 Example output:
+
 | _style | _pseudo_element | _tags | _way | color | width | z-index | object-z-index |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | "color"=>"#A0A0A0", "width"=>"7", "z-index"=>"-20", "object-z-index"=>"-1" | casing | "name"=>"Testroad", "highway"=>"primary" | some geometry | #A0A0A0 | 7 | -20 | -1 |
@@ -65,7 +68,7 @@ select * from test_match(pgmapcss_render_context(!bbox!, !scale_denominator!));
 ```
 
 Notes:
-* `!bbox!` and `!scale_denominator!` will be replaced by Mapnik by the current bounding box resp. scale denominator. See [[https://trac.openstreetmap.org/browser/subversion/applications/rendering/mapnik/zoom-to-scale.txt|zoom-to-scale.txt]] for valid values.
+* `!bbox!` and `!scale_denominator!` will be replaced by Mapnik by the current bounding box resp. scale denominator. See [zoom-to-scale.txt](https://trac.openstreetmap.org/browser/subversion/applications/rendering/mapnik/zoom-to-scale.txt) for valid values.
 
 pgmapcss optimizes database queries for each zoom level, so that only objects that might be displayed will be returned. A selector has to include one (or more) of the properties `text`, `width`, `fill-color` (TODO: make list configurable) to be included in the query.
 
@@ -83,11 +86,16 @@ line|z12-[highway=secondary] {
 
 will generate a query like
 ```sql
-select * from planet_osm_line where ((tags @> 'highway=>primary')) and way && !bbox!;
+select * from planet_osm_line where (
+  (tags @> 'highway=>primary')
+) and way && !bbox!;
 ```
 in zoom level 10 and 11, but for zoom level 12 and higher:
 ```sql
-select * from planet_osm_line where ((tags @> 'highway=>primary') or (tags @> 'highway=>secondary')) and way && !bbox!;
+select * from planet_osm_line where (
+  (tags @> 'highway=>primary') or
+  (tags @> 'highway=>secondary')
+) and way && !bbox!;
 ```
 
 It even reconstructs classes, like:
@@ -105,5 +113,10 @@ line.minor_road|z14- {
 
 Generated SQL for zoom level 14 and higher (including the CSS rules from the previous example):
 ```sql
-select * from planet_osm_line where ((tags @> 'highway=>primary') or (tags @> 'highway=>secondary') or (tags @> 'highway=>residential') or (tags @> 'highway=>unclassified')) and way && !bbox!;
+select * from planet_osm_line where (
+  (tags @> 'highway=>primary') or
+  (tags @> 'highway=>secondary') or
+  (tags @> 'highway=>residential') or
+  (tags @> 'highway=>unclassified')
+) and way && !bbox!;
 ```
