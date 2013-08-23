@@ -1,0 +1,31 @@
+/* DEFAULT VALUES (and make sure that result columns are available) */
+*::(*) {
+// General
+  z-index: 0;
+// PolygonSymbolizer
+  fill-color: ;
+  fill-opacity: 1;
+// LineSymbolizer
+  width: ;
+  color: ;
+  opacity: 1;
+  linejoin: miter;
+  linecap: butt;
+  dashes: none;
+// TextSymbolizer
+  font-family: "DejaVu Sans Book";
+  font-size: 12;
+  text-color: #000000;
+  text-halo-color: #ffffff;
+  text-opacity: 1;
+  text-halo-radius: 0;
+  text-offset: 0;
+  max-width: 0;
+  // not in MapCSS 0.2 standard:
+  character-spacing: 0;
+  wrap-character: " ";
+  text-position: center;
+}
+line::(*) {
+  text-position: line;
+}

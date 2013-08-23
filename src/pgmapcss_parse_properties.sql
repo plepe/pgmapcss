@@ -1,23 +1,12 @@
-drop type if exists pgmapcss_properties_return cascade;
-create type pgmapcss_properties_return as (
-  properties            hstore,
-  eval_properties	hstore,
-  prop_list             hstore,
-  assignments		hstore,
-  eval_assignments	hstore,
-  unassignments		text[],
-  text_length           int
-);
-
 drop function if exists pgmapcss_parse_properties(text);
 create or replace function pgmapcss_parse_properties (
   text
 )
-returns setof pgmapcss_properties_return
+returns setof pgmapcss_rule_properties
 as $$
 #variable_conflict use_variable
 declare
-  ret pgmapcss_properties_return;
+  ret pgmapcss_rule_properties;
   content text;
   m text;
   key text;
@@ -25,11 +14,13 @@ declare
   assignment_type int;
   r record;
   r1 record;
+  unit text;
 begin
   content:=$1;
 
   ret.properties:=''::hstore;
-  ret.prop_list:=''::hstore;
+  ret.prop_types:=''::hstore;
+  ret.prop_has_value:=''::hstore;
   ret.assignments:=''::hstore;
   ret.unassignments:=Array[]::text[];
   ret.eval_assignments:=''::hstore;
@@ -86,6 +77,7 @@ begin
 
     -- check for comments
     content := pgmapcss_parse_comments(content);
+    r := pgmapcss_parse_string(content);
 
     if content ~ '^eval\(' then
       r1 := pgmapcss_parse_string(content, null, 6);
@@ -106,23 +98,80 @@ begin
 
       if assignment_type = 1 then
 	ret.eval_properties := ret.eval_properties || hstore(key, pgmapcss_compile_eval(r.result));
-	ret.prop_list := ret.prop_list||hstore(key, 'text');
+	ret.prop_types := ret.prop_types || hstore(key, 'text');
+	ret.prop_has_value := ret.prop_has_value || hstore(key, '1');
       elsif assignment_type = 2 then
 	ret.eval_assignments := ret.eval_assignments || hstore(key, pgmapcss_compile_eval(r.result));
       end if;
 
       content := substring(content, 6 + r.text_length);
       content := substring(content from '^[^;]*;\s*(.*)$');
-    elsif content ~ '^([^;]*);' then
-      value=substring(content from '^([^;]*);');
+
+    elsif r is not null then
+    -- value is enclosed in quotes
+      value := r.result;
 
       if assignment_type=1 then
 	ret.properties=ret.properties||hstore(key, value);
 	-- TODO: return type of value
-	ret.prop_list=ret.prop_list||hstore(key, 'text');
+	ret.prop_types := ret.prop_types || hstore(key, 'text');
+	if (value != '') and (value is not null) then
+	  ret.prop_has_value := ret.prop_has_value || hstore(key, '1');
+	end if;
 
       elsif assignment_type=2 then
 	ret.assignments=ret.assignments||hstore(key, value);
+
+      elsif assignment_type=3 then
+	ret.unassignments=array_append(ret.unassignments, key);
+
+      end if;
+
+      content := substring(content, r.text_length + 1);
+      content := substring(content from '^\s*;\s*(.*)$');
+
+      -- check for comments
+      content := pgmapcss_parse_comments(content);
+
+    elsif content ~ '^([^;]*);' then
+      value := rtrim(substring(content from '^([^;]*);'));
+      unit := null;
+
+      if value = '' then
+	value := null;
+
+      elsif value ~ '^(.*)(px|m|u)$' then
+	unit := substring(value from '^(?:.*)(px|m|u)');
+
+	-- no need to calculate pixel values
+	if unit = 'px' then
+	  value := substring(value from '^(.*)px');
+
+	-- prepare an eval function to convert unit to pixel values
+	else
+	  r1 := pgmapcss_parse_eval('number("' || value || '")');
+	end if;
+      end if;
+
+      if assignment_type=1 then
+	if unit is null or unit = 'px' then
+	  ret.properties=ret.properties||hstore(key, value);
+	else
+	  ret.eval_properties := ret.eval_properties || hstore(key, pgmapcss_compile_eval(r1.result));
+	end if;
+
+	-- TODO: return type of value
+	ret.prop_types := ret.prop_types || hstore(key, 'text');
+	if (value != '') and (value is not null) then
+	  ret.prop_has_value := ret.prop_has_value || hstore(key, '1');
+	end if;
+
+      elsif assignment_type=2 then
+	if unit is null or unit = 'px' then
+	  ret.assignments=ret.assignments||hstore(key, value);
+	else
+	  ret.eval_assignments := ret.eval_assignments || hstore(key, pgmapcss_compile_eval(r1.result));
+	end if;
 
       elsif assignment_type=3 then
 	ret.unassignments=array_append(ret.unassignments, key);

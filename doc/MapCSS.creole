@@ -37,7 +37,7 @@ First part of a selector; required.
 | line | Matches lines (way or relation)
 | canvas | The background (NOT SUPPORTED YET)
 
-The type of an object is retrieved from the 'types'-array in object-value (see [[API.creole]]). You can add/remove types from your database query.
+The type of an object is retrieved from the 'types'-array in object-value (see [[API.md]]). You can add/remove types from your database query.
 
 === Class selector ===
 After the type selector, separated by '.'. Optional.
@@ -99,6 +99,10 @@ Pseudo elements can be used to create more than one style for a single object, e
 
 If you omit the pseudo element descriptor in the selector, this is the same as using ::default.
 
+You may enclose the pseudo element in brackets (e.g. "::(default)") to suppress creating a pseudo element from this statement. This is used internally to set default values.
+
+To set properties for all possible pseudo elements, you may use '::*' or '::(*)'. This is used internally to set default values.
+
 === Grouping ===
 You may use a list of properties with several selectors, separated by ','. E.g.
 {{{
@@ -125,8 +129,13 @@ E.g.
   opacity: 0.5;
   color: #ff0000;
   background-color: rgb(1.0, 0.0, 0.0);
+  width: 2px;
+  text: "2px";
 }
 }}}
+
+* You may enclose strings by single or double quotes.
+* You may specify values with a unit, default: 'px' (Pixels on screen). Other supported unites: 'u' (Units in 900913 projection on the map), 'm' (Meters on the map; NOT IMPLEMENTED YET: currently 'u' is used instead).
 
 === Assignments ===
 You may assign values to tags of the current object. This is independent from the current pseudo element descriptor.
@@ -174,3 +183,16 @@ way.minor_road {
   color: #ffffff;
 }
 }}}
+
+=== Geometry ===
+The special property "geo" will be predefined on every object. You may change it with eval statements.
+
+Example:
+{{{
+point[place=village] {
+  geo: eval(buffer(prop(geo), 10px));
+  fill-color: #00ff00;
+}
+}}}
+
+This will draw a 10px wide buffer around every node with 'place=village'.
