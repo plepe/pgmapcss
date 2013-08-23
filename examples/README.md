@@ -80,3 +80,34 @@ line.major_road[tunnel]::casing {
 }
 ```
 
+Example 3: Place nodes and their population
+===========================================
+In the 3rd example we see the places names of some villages and a simple
+diagram with the population size. Also the administrative boundaries are shown.
+![example3](example3.png)
+```css
+/* Print the name of all places */
+point[place] {
+  text: eval(tag(name));
+  z-index: 2;
+}
+
+/* For each place show a diagram: a red circle depending on the
+  population of the place. We are using the square root of population
+  as pixel radius to not grow too fast. */
+point[place]::diagram {
+  geo: eval(buffer(prop(geo), sqrt(tag(population))));
+  fill-color: #ff7f7f;
+  color: #ff0000;
+  width: 1;
+}
+
+/* Also, show administrative boundaries as purple lines */
+line[boundary=administrative][admin_level<=8],
+relation[boundary=administrative][admin_level<=8] {
+  color: #7f00ff;
+  width: 1;
+  z-index: 1;
+}
+```
+
