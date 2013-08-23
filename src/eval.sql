@@ -709,13 +709,13 @@ declare
   t text;
 begin
   if array_upper(param, 1) < 2 then
-    return '';
+    return param[1];
   end if;
 
   t := eval_number(Array[param[2], 'u'], object, current, render_context);
 
-  if t is null then
-    return '';
+  if t is null or t = '' then
+    return param[1];
   end if;
 
   return ST_Buffer(param[1], cast(t as float));

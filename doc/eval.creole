@@ -68,4 +68,4 @@ Missing functions (as of MapCSS 0.2):
 * Geometric functions are not part of the MapCSS 0.2 standard
 
 |= Function |= Parameters |= Return value |= Description
-| buffer | geometry, number | geometry | Draws a buffer of the specified size (default: pixels) around the input geometry, e.g. buffer(prop(geo), 100m)
+| buffer | geometry, number | geometry | Draws a buffer of the specified size (default: pixels) around the input geometry, e.g. buffer(prop(geo), 100m); if no or invalid number is specified the input geometry is returned.
