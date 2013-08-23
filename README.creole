@@ -10,6 +10,8 @@ There were already several efforts to implement stylesheets based on Cascading S
 
 All these tools are pre-processors, that convert a CSS stylesheet into a Mapnik stylesheet. PGMapCSS takes a different approach: The stylesheet is compiled into PostgreSQL/plpgsql functions which are evaluated at runtime. Therefore more advanced calculations are possible, even geometric modifications. Read [[doc/MapCSS.creole]] to learn about the features of PGMapCSS's MapCSS implementation.
 
+**[[examples/README.md|Show me some examples!]]**
+
 The Mapnik style just contains a single database query and the basic styles, referencing all options from the database queries. You can think of those styles as templates, which you can reference from your style sheet.
 
 As Mapnik 2.2 does not support using expressions for most symbolizer parameters, some pre-processing on the Mapnik Stylefile has to take place. The Mapnik XML file is generated from a template.
@@ -17,8 +19,6 @@ As Mapnik 2.2 does not support using expressions for most symbolizer parameters,
 PGMapCSS is designed for Mapnik but might work with other renderers too. See file [[doc/compatibility.creole|Compatibility]] for more information.
 
 Developers: Every compiled style consists of a couple of PostgreSQL functions. See [[doc/API.md]] for details.
-
-_[[examples/README.md|Show me some examples!]]._
 
 Share this:
 * [[https://flattr.com/submit/auto?user_id=plepe&url=https://github.com/plepe/pgmapcss&title=PGMapCSS&language=&tags=github&category=software|Flattr this!]]
