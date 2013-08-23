@@ -1,81 +1,46 @@
-=== Filter ===
-In Filters you may use expressions all right, e.g.
-{{{<Filter>[foo] = 'bar'</Filter>}}}
+* properties marked in the "support Mapnik 2.x" with "no eval" can't be evaluated by an eval statement. A warning will be issued when compiling.
 
-=== PointSymbolizer ===
-|= CSS parameter |= Mapnik parameter |= support Mapnik 2.x |= support PGMapCSS
-| icon-image | file | yes | no support for url() syntax
-| | allow-overlap | no expr | yes
-| icon-opacity | opacity | no expr | yes
-| | transform | no expr | yes
-| | ignore-placement | no expr | yes
-| icon-width | | automatic | -
-| icon-height | | automatic | -
+=== Canvas properties ===
+* Not supported yet
 
-Note: as you can modify the Symbolizer template in your Mapnik Stylesheet you can add missing CSS parameters yourself.
+=== Point properties ===
+|= CSS parameter |= Description |= Mapnik parameter |= support Mapnik 2.x |= Compatibility MapCSS 0.2
+| icon-image | URL (absolute or relative) of an image to use as an icon. Do not enclose filename in url() | file | yes | NOT SUPPORTED YET (also: no support for url() syntax yet)
+| icon-opacity | Opacity of the icon image | opacity | no eval | YES
+| icon-width | Width of image. | - | automatic | IGNORED. scaling should be applied.
+| icon-height | Height of image. | - | automatic | IGNORED. scaling should be applied.
 
-=== LineSymbolizer ===
-|= CSS parameter |= Mapnik parameter |= support Mapnik 2.x |= support PGMapCSS
-| color | stroke | no expr | yes
-| width | stroke-width | no expr ; branch [[https://github.com/mapnik/mapnik/tree/stroke-width-expr|stroke-width-expr]] adds support | yes
-| opacity | stroke-opacity | no expr | yes
-| linejoin | stroke-linejoin | no expr | yes
-| linecap | stroke-linecap | no expr | yes
-| dashes | stroke-dasharray | no expr | yes
+=== Line properties ===
+|= CSS parameter |= Description |= Mapnik parameter |= support Mapnik 2.x |= Compatibility MapCSS 0.2
+| color | Colour of the line. | stroke | no eval | MOSTLY: rgb(..) not supported yet
+| width | The line width in pixels. | stroke-width | no eval ; branch [[https://github.com/mapnik/mapnik/tree/stroke-width-expr|stroke-width-expr]] adds support | YES
+| opacity | How transparent the line is, from 0 (transparent) to 1 (opaque). | stroke-opacity | no eval | YES
+| linejoin | The style for line corners: 'round' (default), 'miter' or 'bevel'. | stroke-linejoin | no eval | YES
+| linecap | The style for the end of the line: 'butt' (default), 'round' or 'square' | stroke-linecap | no eval | MOSTLY: 'butt' should be 'none'
+| dashes | An array of alternating on/off lengths | stroke-dasharray | no eval | YES
 
-Note: as you can modify the Symbolizer template in your Mapnik Stylesheet you can add missing CSS parameters yourself.
+* MapCSS 0.2 properties not (yet) supported: image, casing-* (you can use a pseudo element instead), extrude, extrude-*
 
-=== PolygonSymbolizer ===
-|= CSS parameter |= Mapnik parameter |= support Mapnik 2.x |= support PGMapCSS
-| fill-color | fill | no expr | yes
-| fill-opacity | fill-opacity | no expr | yes
-| | gamma | no expr | yes
+=== Area properties ===
+|= CSS parameter |= Description |= Mapnik parameter |= support Mapnik 2.x |= Compatibility MapCSS 0.2
+| fill-color | Colour in which to fill the area. | fill | no eval | MOSTLY: rgb(..) not suported
+| fill-opacity | How transparent the fill is, from 0 (transparent) to 1 (opaque) | fill-opacity | no eval | YES
 
-Note: as you can modify the Symbolizer template in your Mapnik Stylesheet you can add missing CSS parameters yourself.
+* MapCSS 0.2 properties not (yet) supported: fill-image
 
-=== TextSymbolizer ===
-|= CSS parameter |= Mapnik parameter |= support Mapnik 2.x |= support PGMapCSS
-| | text-ratio | no expr | yes
-| max-width | wrap-width | no expr | yes
-| | wrap-before | with ExpressionFormat | yes
-| | spacing | no expr | yes
-| | label-position-tolerance | no expr | yes
-| | force-odd-labels | no expr | yes
-| | max-char-angle-delta | no expr | yes
-| | dx | no expr | yes
-| text-offset | dy | no expr | yes
-| | avoid-edges | no expr | yes
-| | minimum-distance | no expr | yes
-| | allow-overlap | no expr | yes
-| text-position | placement | no expr | limited (MapCSS defines different options)
-| | vertical-alignment | no expr | yes
-| | justify-alignment | no expr | yes
-| | opacity | with ExpressionFormat | yes
-| | minimum-padding | no expr | yes
-| | minimum-path-length | no expr | yes
-| | orientation | no expr | yes
-| | rotate-displacement | no expr | yes
-| | placement-type | no expr | yes
-| | placements | no expr | yes
-| | upright | no expr | yes
-| | clip | no expr | yes
-| | largest_bbox_only | no expr | yes
-| font-family | face-name | with ExpressionFormat | yes; syntax differnet from MapCSS (face-name includes weight/style option)
-| | fontset-name | no expr | yes
-| font-size | size | with ExpressionFormat | yes
-| text-color | fill | with ExpressionFormat and branch [[https://github.com/mapnik/mapnik/tree/harfbuzz|harfbuzz]] | yes
-| text-halo-color | halo-fill | no expr | yes
-| text-halo-radius | halo-radius | with ExpressionFormat | yes
-| | character-spacing | with ExpressionFormat | yes
-| | line-spacing | with ExpressionFormat | yes
-| | wrap-character | with ExpressionFormat | yes
-| | text-transform | no expr | yes
-| font-weight | see face-name | no | no
-| font-style | see face-name | no | no
-| font-variant | | no | no
-| text-decoration | | no | no
-| text-transform | | no | possible with eval()
-| text | Symbolizer content | yes | syntax different from MapCSS (see 'Parameter text' below)
+=== Label properties ===
+|= CSS parameter |= Description |= Mapnik parameter |= support Mapnik 2.x |= Compatibility MapCSS 0.2
+| max-width | The maximum width of a text label for a point, after which it should wrap onto the next line. | wrap-width | no eval | YES
+| text-offset | The vertical offset from the centre of the way or point. | dy | no eval | YES
+| text-position | Whether the text follows the path of the way ('line') or is centred on the area ('center') | placement | | YES
+| font-family | Name of the font to use | face-name | eval() with ExpressionFormat | syntax differnet (face-name includes weight/style option)
+| font-size | Size of the text | size | eval() with ExpressionFormat | YES
+| text-color | Colour of text | fill | eval() with ExpressionFormat and branch [[https://github.com/mapnik/mapnik/tree/harfbuzz|harfbuzz]] | MOSTLY: rgb(..) not suported
+| text-halo-color | The colour (hex or CSS) of the 'halo' or 'pull-out' used to make the text stand out from features underneath it. | halo-fill | no eval | MOSTLY: rgb(..) not suported
+| text-halo-radius |  The radius of the halo | halo-radius | eval() with ExpressionFormat | YES
+| text | The text for the label | | yes | NO: syntax different from MapCSS (see 'Parameter text' below)
+
+* MapCSS 0.2 properties not (yet) supported: font-weight, font-style, font-variant, text-decoration, text-transform
 
 ==== Parameter 'text' ====
 In contrast to the definition of MapCSS you need to specify an eval-statement, e.g.:

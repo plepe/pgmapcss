@@ -9,10 +9,11 @@
   width: ;
   color: ;
   opacity: 1;
-  linejoin: miter;
+  linejoin: round;
   linecap: butt;
   dashes: none;
 // TextSymbolizer
+  text: ;
   font-family: "DejaVu Sans Book";
   font-size: 12;
   text-color: #000000;
@@ -25,7 +26,4 @@
   character-spacing: 0;
   wrap-character: " ";
   text-position: center;
-}
-line::(*) {
-  text-position: line;
 }

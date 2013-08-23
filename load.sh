@@ -110,18 +110,24 @@ echo "* Compiling mapcss file"
 CONTENT=`cat $BASE.mapcss $FILE`
 psql -d "dbname=$DB user=$DBUSER host=$DBHOST password=$DBPASS" --set ON_ERROR_STOP=1 -P format=unaligned -c "select pgmapcss_install('$STYLE_ID', \$\$$CONTENT\$\$);" 2> $STYLE_ID.stderr | tail -n+2 | head -n-2 >> $STYLE_ID.stdout
 
-echo "* Pre-processing mapnik file"
-$(dirname $0)/preprocess.pl >> $STYLE_ID.stderr
+if [ -s $STYLE_ID.stdout ] ; then
+  echo "* Pre-processing mapnik file"
+  $(dirname $0)/preprocess.pl >> $STYLE_ID.stderr
+fi
 
 if [ -s $STYLE_ID.stderr ] ; then
   echo "--=== Warnings and Errors ===--" >> $STYLE_ID.output
   cat $STYLE_ID.stderr >> $STYLE_ID.output
+
+  cat $STYLE_ID.stderr
 fi
 
-echo "--=== Resulting functions ===--" >> $STYLE_ID.output
-cat $STYLE_ID.stdout >> $STYLE_ID.output
+if [ -s $STYLE_ID.stdout ] ; then
+  echo "--=== Resulting functions ===--" >> $STYLE_ID.output
+  cat $STYLE_ID.stdout >> $STYLE_ID.output
+else
+  echo "Compiling failed. See $STYLE_ID.output for details."
+fi
 
 rm $STYLE_ID.stderr
 rm $STYLE_ID.stdout
-
-less $STYLE_ID.output

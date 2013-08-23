@@ -1,1 +1,14 @@
+0.2.0 release 2013-08-23
+* simpler database query in .mapnik stylesheet using {style_id}_match(),
+  optimizing queries for every zoom level for index usage
+* pre-process mapnik-stylesheet; create rules for every calculateable
+  combination of options; default values in default.mapcss
+* accept values with units (e.g. 2px, 30m)
+* introduce properties for most MapCSS 0.2 options
+* a lot of improvements to parser and compiler
+* more eval-functions; list-functions; geometry-functions
+* add 'examples' folder
+* check compatibility with MapServer, GeoServer
+* load.sh, install.sh: accept parameters; see --help
+
 0.1.0 first public release 2013-08-03
