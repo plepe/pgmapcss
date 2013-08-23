@@ -45,6 +45,7 @@ Example 2: Layering roads
 This example shows how eval-statements for z-index can be used to layer roads correctly.
 
 Warning: This example needs Mapnik branch 'stroke-width-expr' or version 3.0 and accompaning modifications in file default-template.mapnik (search for 'stroke-width-expr' for details). If you run this example with Mapnik 2.2 the casing might be missing.
+
 ![example2](example2.png)
 ```css
 line[highway=motorway],
@@ -84,6 +85,7 @@ Example 3: Place nodes and their population
 ===========================================
 In the 3rd example we see the places names of some villages and a simple
 diagram with the population size. Also the administrative boundaries are shown.
+
 ![example3](example3.png)
 ```css
 /* Print the name of all places */
