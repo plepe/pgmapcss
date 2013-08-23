@@ -1,25 +1,3 @@
-/* DEFAULT VALUES (and make sure that result columns are available) */
-* {
-// General
-  z-index: 0;
-// PolygonSymbolizer
-  fill-color: ;
-  fill-opacity: 1;
-// LineSymbolizer
-  width: ;
-  color: ;
-// TextSymbolizer
-  font-family: "DejaVu Sans Book"; // not working?
-  font-size: 12;
-  text-color: #000000;		// Mapnik >= version 3.0 or branch harfbuzz
-  text-halo-color: #ffffff;	// Mapnik >= version 3.0 or branch harfbuzz
-  text-opacity: 1;
-  text-halo-radius: 0;
-  // not in MapCSS 0.2 standard:
-  character-spacing: 0;
-  wrap-character: " ";
-}
-
 point[place] {
   text: eval(concat('== ', tag(name), ' =='));
   text-halo-radius: 2;
@@ -30,6 +8,17 @@ point[place] {
 
   z-index: 10;
 }
+point[place]::buffer {
+  set radius=eval(sqrt(tag(population)));
+}
+point[place][radius>0]::buffer {
+  geo: eval(buffer(prop(geo), tag(radius)));
+  fill-color: #00ff00;
+  width: 1;
+  color: #007f00;
+  z-index: -2;
+}
+
 
 area[building] {
   fill-color: #707070;		// Mapnik >= version 3.0

@@ -27,10 +27,14 @@ declare
   -- 1 .. reading token
   -- 2 .. token finished, read quoted string
   -- 3 .. token finished (e.g. after brackets)
+  op_regexp text;
 begin
   content := substring($1, "offset");
   ret.text_length := null;
   -- raise notice 'parse_eval(''%'', %, ''%'')', content, math_level, current_op;
+  
+  -- compile eval operator regexp
+  select '^(' || array_to_string(array_agg(x), '|') || ')' into op_regexp from (select replace(regexp_replace(op, '(\+|\*)', E'\\ \\1', 'g'), ' ', '') x from eval_operators) t;
 
   i := 1;
   current := ''::text;
@@ -99,8 +103,8 @@ begin
 	ret.result := cast(param as text);
 	ret.text_length := i;
 	return ret;
-      elsif substring(content, i, 2) ~ '^(\+|\-|\*|\/|,|;|>|>=|<=|<)' then
-        t := substring(substring(content, i, 2) from '^(\+|\-|\*|\/|,|;|>|>=|<=|<)');
+      elsif substring(content, i, 2) ~ op_regexp then
+        t := substring(substring(content, i, 2) from op_regexp);
 	i := i + length(t) - 1;
 	j :=  (CASE WHEN t in ('+', '-') THEN 3
 	            WHEN t in ('*', '/') THEN 2

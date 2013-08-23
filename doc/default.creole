@@ -1,0 +1,61 @@
+* properties marked in the "support Mapnik 2.x" with "no eval" can't be evaluated by an eval statement. A warning will be issued when compiling.
+
+=== Canvas properties ===
+* Not supported yet
+
+=== Point properties ===
+|= CSS parameter |= Description |= Mapnik parameter |= support Mapnik 2.x |= Compatibility MapCSS 0.2
+| icon-image | URL (absolute or relative) of an image to use as an icon. Do not enclose filename in url() | file | yes | NOT SUPPORTED YET (also: no support for url() syntax yet)
+| icon-opacity | Opacity of the icon image | opacity | no eval | YES
+| icon-width | Width of image. | - | automatic | IGNORED. scaling should be applied.
+| icon-height | Height of image. | - | automatic | IGNORED. scaling should be applied.
+
+=== Line properties ===
+|= CSS parameter |= Description |= Mapnik parameter |= support Mapnik 2.x |= Compatibility MapCSS 0.2
+| color | Colour of the line. | stroke | no eval | MOSTLY: rgb(..) not supported yet
+| width | The line width in pixels. | stroke-width | no eval ; branch [[https://github.com/mapnik/mapnik/tree/stroke-width-expr|stroke-width-expr]] adds support | YES
+| opacity | How transparent the line is, from 0 (transparent) to 1 (opaque). | stroke-opacity | no eval | YES
+| linejoin | The style for line corners: 'round' (default), 'miter' or 'bevel'. | stroke-linejoin | no eval | YES
+| linecap | The style for the end of the line: 'butt' (default), 'round' or 'square' | stroke-linecap | no eval | MOSTLY: 'butt' should be 'none'
+| dashes | An array of alternating on/off lengths | stroke-dasharray | no eval | YES
+
+* MapCSS 0.2 properties not (yet) supported: image, casing-* (you can use a pseudo element instead), extrude, extrude-*
+
+=== Area properties ===
+|= CSS parameter |= Description |= Mapnik parameter |= support Mapnik 2.x |= Compatibility MapCSS 0.2
+| fill-color | Colour in which to fill the area. | fill | no eval | MOSTLY: rgb(..) not suported
+| fill-opacity | How transparent the fill is, from 0 (transparent) to 1 (opaque) | fill-opacity | no eval | YES
+
+* MapCSS 0.2 properties not (yet) supported: fill-image
+
+=== Label properties ===
+|= CSS parameter |= Description |= Mapnik parameter |= support Mapnik 2.x |= Compatibility MapCSS 0.2
+| max-width | The maximum width of a text label for a point, after which it should wrap onto the next line. | wrap-width | no eval | YES
+| text-offset | The vertical offset from the centre of the way or point. | dy | no eval | YES
+| text-position | Whether the text follows the path of the way ('line') or is centred on the area ('center') | placement | | YES
+| font-family | Name of the font to use | face-name | eval() with ExpressionFormat | syntax differnet (face-name includes weight/style option)
+| font-size | Size of the text | size | eval() with ExpressionFormat | YES
+| text-color | Colour of text | fill | eval() with ExpressionFormat and branch [[https://github.com/mapnik/mapnik/tree/harfbuzz|harfbuzz]] | MOSTLY: rgb(..) not suported
+| text-halo-color | The colour (hex or CSS) of the 'halo' or 'pull-out' used to make the text stand out from features underneath it. | halo-fill | no eval | MOSTLY: rgb(..) not suported
+| text-halo-radius |  The radius of the halo | halo-radius | eval() with ExpressionFormat | YES
+| text | The text for the label | | yes | NO: syntax different from MapCSS (see 'Parameter text' below)
+
+* MapCSS 0.2 properties not (yet) supported: font-weight, font-style, font-variant, text-decoration, text-transform
+
+==== Parameter 'text' ====
+In contrast to the definition of MapCSS you need to specify an eval-statement, e.g.:
+{{{
+CSS file:
+  point[place=city] {
+    text: eval(tag(name));
+  }
+
+Mapnik stylesheet:
+  <TextSymbolizer ...>[text]</TextSymbolizer>
+}}}
+
+==== "with ExpressionFormat" ====
+<TextSymbolizer> can't read parameters from expressions, but <ExpressionFormat> (which is an undocumented feature in Mapnik 2 as of 2013-07) can. <ExpressionFormat> (as well as <Format>) is a child of TextSymbolizer and can format a part of the symbol. Therefore you can do:
+{{{
+  <TextSymbolizer face-name="something"><ExpressionFormat size="[font-size]" halo-radius="[text-halo-radius]">[text]</ExpressionFormat></TextSymbolizer>
+}}}
