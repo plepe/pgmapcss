@@ -11,3 +11,5 @@ for i in `ls *mapcss` ; do
   echo "\`\`\`"
   echo
 done
+
+echo "Data: (c) [[http://www.openstreetmap.org|OpenStreetMap]] contributors."
