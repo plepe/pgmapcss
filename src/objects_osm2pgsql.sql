@@ -152,16 +152,15 @@ begin
 end;
 $$ language 'plpgsql' immutable;
 
--- returns all relations the supplied feature is member of, with the
--- additional column link_tags, e.g. "role"=>"stop", "index"=>"492", "member_id"=>"n1231934421"
-create or replace function objects_relation_member_of(member_id text)
+create or replace function objects_relation(text)
 returns setof pgmapcss_parent_object
 as $$
 #variable_conflict use_variable
 declare
-  w text[];
-  bbox text;
+  relation_id bigint;
 begin
+  relation_id := cast(substring($1, 2) as bigint);
+
   return query select
     'r' || id,
     t.tags,
@@ -188,7 +187,7 @@ begin
       from
 	planet_osm_rels
       where
-	members @> Array[member_id]
+	id = relation_id
       ) t
     group by
       id,
@@ -209,6 +208,33 @@ begin
     t.member_id=member_id
   group by
     t.id, t."index", t.tags, t.member_id, t.member_role
+  ;
+end;
+$$ language 'plpgsql' immutable;
+
+-- returns all relations the supplied feature is member of, with the
+-- additional column link_tags, e.g. "role"=>"stop", "index"=>"492", "member_id"=>"n1231934421"
+create or replace function objects_relation_member_of(member_id text)
+returns setof pgmapcss_parent_object
+as $$
+#variable_conflict use_variable
+declare
+  w text[];
+  bbox text;
+begin
+  return query select
+    (ob).*
+  from
+    (select
+      objects_relation('r' || id) ob
+    from
+      planet_osm_rels
+    where
+      members @> Array[member_id]
+    offset 0
+    ) t
+  where
+    (ob).link_tags->'member_id' = member_id
   ;
 end;
 $$ language 'plpgsql' immutable;
