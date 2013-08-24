@@ -12,6 +12,15 @@ create type pgmapcss_object as (
   types			text[]
 );
 
+drop type if exists pgmapcss_parent_object cascade;
+create type pgmapcss_parent_object as (
+  id			text,
+  tags			hstore,
+  geo			geometry,
+  types			text[],
+  link_tags		hstore
+);
+
 drop type if exists pgmapcss_current cascade;
 create type pgmapcss_current as (
   tags			hstore,
