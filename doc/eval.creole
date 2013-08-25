@@ -64,6 +64,8 @@ Missing functions (as of MapCSS 0.2):
 | count | list | number | Returns count of elements in the list
 | contains | list, value | boolean | Check if list contains value.
 | search | list, value | number/boolean | Returns (first) index of value in list or 'false' if not found.
+| unique | list | list | Removes duplicate values from a list.
+| sort | list | list | Orders list alphabetically ascending.
 
 == Geometric functions ===
 * Geometric functions are not part of the MapCSS 0.2 standard
