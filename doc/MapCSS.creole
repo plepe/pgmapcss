@@ -129,9 +129,28 @@ area[natural=wood]
 * Compatibility MapCSS 0.2: YES
 
 === Link selector ===
-Parent, Child or nearby relations.
+You can combine several selectors to formulate conditions on relations between objects. The selector always consists of three parts: parent (or relating object) selector, link condition, object selector. E.g. {{{relation[route=bus] in[role=platform] way[highway]}}} matches any way with a highway tag which is member of a relation with route bus where the member role is platform. If the way is member of several relations the statement is processed multiple times.
 
-NOT SUPPORTED YET.
+You can access the tags of the parent with parent_tag(), though changes via set/unset are not available. The link condition will be set a couple of tags (depending on the type of condition), which can be accessed with link_tag(). These tags are also available as link condition (e.g. in[index=2]).
+
+The following link conditions are available:
+
+==== 'in' ====
+The object is member of a parent relation.
+
+The following link tags will be set:
+* index: an arbitrary counter for each matching parent (starting with 1).
+* role: the member role of the object.
+* sequence_id: The index of the object in the relation.
+* member_id: The ID of the member.
+
+TODO: http://josm.openstreetmap.de/wiki/Help/Styles/MapCSSImplementation#Linkselector defines 'index' as the nth matching object in the relation.
+==== 'near' ====
+Objects which are "near" another object, e.g. {{{way[highway] near[index=1][distance<50] node[addr:housenumber]}}} matches any housenumber which is near a highway (max. 50 pixels). The {{{index=1}}} selects only the closest highway.
+
+The following link tags will be set:
+* index: the nth parent object near the current feature (starting with 1, the closest parent object).
+* distance: distance between the objects in pixels.
 
 == Properties ==
 You may specify arbitrary properties. They will be treated as text values. Declarations are written by enclosing a set of style specifiers in curly braces.
