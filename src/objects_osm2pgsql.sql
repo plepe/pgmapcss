@@ -239,3 +239,39 @@ begin
   ;
 end;
 $$ language 'plpgsql' immutable;
+
+create or replace function objects_near(max_distance text, object pgmapcss_object, current pgmapcss_current, render_context pgmapcss_render_context, where_clauses hstore)
+returns setof pgmapcss_parent_object
+as $$
+#variable_conflict use_variable
+declare
+  bbox geometry;
+  r pgmapcss_render_context;
+  t text;
+  f float;
+begin
+  t := eval_number(Array[max_distance], object, current, render_context);
+  if t = '' then
+    f := 0;
+  else
+    f := cast(t as float);
+  end if;
+
+  bbox := ST_Buffer(ST_Envelope(object.geo), f);
+
+  r := render_context;
+  r.bbox := bbox;
+
+  return query select
+    *,
+    hstore(Array[
+      'distance', eval_number(Array[ST_Distance(object.geo, geo) || 'u', 'px'], object, current, render_context)
+    ]) link_tags
+  from
+    objects(r, where_clauses)
+  where
+    id != object.id
+  order by
+    ST_Distance(object.geo, geo) asc;
+end;
+$$ language 'plpgsql' immutable;
