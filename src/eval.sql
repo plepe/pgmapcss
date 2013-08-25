@@ -445,11 +445,12 @@ declare
   ret text := '';
   unit text := 'px';
   value float;
+  m text;
 begin
   if array_upper(param, 1) >= 1 then
     ret := trim(param[1]);
 
-    if ret = '' then
+    if ret = '' or ret is null then
       return '';
     end if;
 
@@ -458,11 +459,12 @@ begin
       ret := trim(substring(ret, 1, length(ret) - length(unit)));
     end if;
 
-    if ret !~ '^-?[0-9]+(\.[0-9]+)?' then
+    m := substring(ret from '^(-?[0-9]+(\.[0-9]+)?)');
+    if m is null then
       return '';
     end if;
 
-    value := cast(ret as float);
+    value := cast(m as float);
 
     if unit = 'px' or unit is null then
       -- no conversion necessary
