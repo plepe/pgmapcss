@@ -82,6 +82,7 @@ for i in \
   pgmapcss_parse_properties.sql \
   pgmapcss_compile_statement.sql \
   pgmapcss_compile_content.sql \
+  pgmapcss_compile_link_selector.sql \
   pgmapcss_parse_eval.sql \
   pgmapcss_compile_eval.sql \
   pgmapcss_compile_where.sql \
