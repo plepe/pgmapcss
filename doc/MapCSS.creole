@@ -129,13 +129,13 @@ area[natural=wood]
 * Compatibility MapCSS 0.2: YES
 
 === Link selector ===
-You can combine several selectors to formulate conditions on relations between objects. The selector always consists of three parts: parent (or relating object) selector, link condition, object selector. E.g. {{{relation[route=bus] in[role=platform] way[highway]}}} matches any way with a highway tag which is member of a relation with route bus where the member role is platform. If the way is member of several relations the statement is processed multiple times.
+You can combine several selectors to formulate conditions on relations between objects. The selector always consists of three parts: parent (or relating object) selector, link condition, object selector. E.g. {{{relation[route=bus] >[role=platform] way[highway]}}} matches any way with a highway tag which is member of a relation with route bus where the member role is platform. If the way is member of several relations the statement is processed multiple times.
 
-You can access the tags of the parent with parent_tag(), though changes via set/unset are not available. The link condition will be set a couple of tags (depending on the type of condition), which can be accessed with link_tag(). These tags are also available as link condition (e.g. in[index=2]).
+You can access the tags of the parent with parent_tag(), though changes via set/unset are not available. The link condition will be set a couple of tags (depending on the type of condition), which can be accessed with link_tag(). These tags are also available as link condition (e.g. >[index=2]).
 
 The following link conditions are available:
 
-==== 'in' ====
+==== '>' ====
 The object is member of a parent relation.
 
 The following link tags will be set:
