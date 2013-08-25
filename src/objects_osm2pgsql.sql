@@ -168,7 +168,7 @@ begin
     -- ST_Collect(coalesce(planet_osm_line.way, planet_osm_polygon.way)),
     Array['relation'],
     hstore(Array[
-      'index', cast("index" as text),
+      'sequence_id', cast("sequence_id" as text),
       'member_id', t.member_id,
       'role', member_role
     ])
@@ -176,14 +176,14 @@ begin
     (select
       id,
       t.tags,
-      "index",
+      "sequence_id",
       (array_agg(members))[1] member_id,
       (array_agg(members))[2] member_role
     from
       (select
 	id,
 	hstore(tags) tags,
-	(generate_series(0, array_upper(members, 1) - 1)) / 2 "index",
+	(generate_series(0, array_upper(members, 1) - 1)) / 2 "sequence_id",
 	unnest(members) members
       from
 	planet_osm_rels
@@ -193,9 +193,9 @@ begin
     group by
       id,
       tags,
-      "index"
+      "sequence_id"
     order by
-      "index"
+      "sequence_id"
     ) t
 --  left join
 --      planet_osm_line
@@ -208,7 +208,7 @@ begin
   where
     t.member_id=member_id
   group by
-    t.id, t."index", t.tags, t.member_id, t.member_role
+    t.id, t."sequence_id", t.tags, t.member_id, t.member_role
   ;
 end;
 $$ language 'plpgsql' immutable;
