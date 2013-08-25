@@ -25,8 +25,13 @@ begin
 
   -- if selector.link_parent then
   if (selector.link_condition).type = 'in' then
-    ret = ret || E'for r in select parent_object.* from objects_relation_member_of(object.id) parent_object where (' || pgmapcss_compile_selector_part(selector.link_parent, 'parent_object.') || E') loop\n';
-    ret = ret || E'current.parent_object = r;\n';
+    ret = ret || E'parent_index := 0;\n';
+    ret = ret || E'for parent_object in select t_parent_object.* from objects_relation_member_of(object.id) t_parent_object where (' || pgmapcss_compile_selector_part(selector.link_parent, 't_parent_object.') || E') loop\n';
+    ret = ret || E'parent_index := parent_index + 1;\n';
+    ret = ret || E'o.tags := parent_object.link_tags || hstore(''index'', cast(parent_index as text));\n';
+    ret = ret || E'if (' || pgmapcss_compile_conditions((selector.link_condition).conditions, 'o.') || E') then\n';
+    ret = ret || E'current.parent_object = parent_object;\n';
+    ret = ret || E'current.link_object = o;\n';
   end if;
 
   -- if we find a pseudo element '*' then iterate over all possible
@@ -118,6 +123,7 @@ begin
   end if;
 
   if (selector.link_condition).type = 'in' then
+    ret = ret || E'end if;\n';
     ret = ret || E'end loop;\n';
     ret = ret || E'current.parent_object = null;\n';
   end if;
