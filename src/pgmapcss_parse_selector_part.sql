@@ -1,6 +1,7 @@
 drop function if exists pgmapcss_parse_selector_part(text);
 create or replace function pgmapcss_parse_selector_part (
-  text
+  text,
+  object_class_selector text default '\*|[a-z_]+'
 )
 returns setof pgmapcss_selector_part
 as $$
@@ -26,14 +27,14 @@ begin
   selector := pgmapcss_parse_comments(selector);
 
   -- parse object class (way, node, canvas, ...)
-  m := substring(selector from '^\s*(\*|[a-z_]+)(\|.*|\[.*|:.*|\..*|\s|\{)');
+  m := substring(selector from '^\s*(' || object_class_selector || ')(\|.*|\[.*|:.*|\..*|\s|\{)');
   if m = '*' then
   elsif m is not null then
     ret.type = m;
   else
     raise notice 'can''t parse object class at "%..."', substring(selector, 0, 40);
   end if;
-  selector := substring(selector, length(substring(selector from '^(\s*)(\*|[a-z_]+)')) + length(m) + 1);
+  selector := substring(selector, length(substring(selector from '^(\s*)(' || object_class_selector || ')')) + length(m) + 1);
 
   -- parse classes
   while selector ~ '^\.([a-zA-Z0-9_]+)' loop

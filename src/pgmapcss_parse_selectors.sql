@@ -21,7 +21,7 @@ begin
       ret.link_parent := r;
       ret.text_length := r.text_length;
 
-      r := pgmapcss_parse_selector_part(content);
+      r := pgmapcss_parse_selector_part(content, 'in|near');
       ret.link_condition := r;
       ret.text_length := ret.text_length + r.text_length;
       content:=substr(content, r.text_length + 1);
