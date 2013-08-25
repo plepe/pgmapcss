@@ -164,7 +164,8 @@ begin
   return query select
     'r' || id,
     t.tags,
-    ST_Collect(coalesce(planet_osm_line.way, planet_osm_polygon.way)),
+    null::geometry,
+    -- ST_Collect(coalesce(planet_osm_line.way, planet_osm_polygon.way)),
     Array['relation'],
     hstore(Array[
       'index', cast("index" as text),
@@ -196,14 +197,14 @@ begin
     order by
       "index"
     ) t
-  left join
-      planet_osm_line
-    on
-      (-id) = planet_osm_line.osm_id
-  left join
-      planet_osm_polygon
-    on
-      (-id) = planet_osm_polygon.osm_id
+--  left join
+--      planet_osm_line
+--    on
+--      (-id) = planet_osm_line.osm_id
+--  left join
+--      planet_osm_polygon
+--    on
+--      (-id) = planet_osm_polygon.osm_id
   where
     t.member_id=member_id
   group by
