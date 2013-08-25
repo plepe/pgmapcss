@@ -65,6 +65,7 @@ done
 
 for i in \
   array_search.sql \
+  natcasesort.sql \
   pgmapcss_types.sql \
   objects_osm2pgsql.sql \
   pgmapcss_render_context.sql \
