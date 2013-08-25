@@ -23,6 +23,12 @@ begin
   ret = ret || pgmapcss_compile_selector_part(selector.object);
   ret = ret || E')\nthen\n';
 
+  -- if selector.link_parent then
+  if (selector.link_condition).type = 'in' then
+    ret = ret || E'for r in select parent_object.* from objects_relation_member_of(object.id) parent_object where (' || pgmapcss_compile_selector_part(selector.link_parent, 'parent_object.') || E') loop\n';
+    ret = ret || E'current.parent_object = r;\n';
+  end if;
+
   -- if we find a pseudo element '*' then iterate over all possible
   -- pseudo elements
   if r.pseudo_element = '*' then
@@ -109,6 +115,11 @@ begin
 
   if r.pseudo_element = '*' then
     ret = ret || E'end loop;\n';
+  end if;
+
+  if (selector.link_condition).type = 'in' then
+    ret = ret || E'end loop;\n';
+    ret = ret || E'current.parent_object = null;\n';
   end if;
 
   ret = ret || E'end if;\n\n';

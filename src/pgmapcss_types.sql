@@ -24,6 +24,8 @@ create type pgmapcss_parent_object as (
 drop type if exists pgmapcss_current cascade;
 create type pgmapcss_current as (
   tags			hstore,
+  parent_object		pgmapcss_parent_object,
+  types			text[],
   pseudo_elements	text[],
   pseudo_element_ind	int,
   styles		hstore[],

@@ -1,5 +1,6 @@
 create or replace function pgmapcss_compile_selector_part (
-  selector pgmapcss_selector_part
+  selector pgmapcss_selector_part,
+  prefix text default 'current.'
 )
 returns text
 as $$
@@ -7,10 +8,10 @@ as $$
 declare
   ret text := '';
 begin
-  ret = ret || pgmapcss_compile_conditions(selector.conditions, 'current.');
+  ret = ret || pgmapcss_compile_conditions(selector.conditions, prefix);
 
   if selector.type is not null then
-    ret := ret || ' and ''' || selector.type || '''=ANY(object.types)';
+    ret := ret || ' and ''' || selector.type || '''=ANY(' || prefix || 'types)';
   end if;
 
   if selector.min_scale is not null then
