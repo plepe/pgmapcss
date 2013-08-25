@@ -66,3 +66,16 @@ way.minor_road {
   color: #ff0000;
   z-index: -1;
 }
+
+relation[route=tram] in line|z15-[railway] {
+  set ref_list = eval(push(tag(ref_list), parent_tag(ref)));
+}
+line[railway] {
+  text: eval(join(sort(unique(tag(ref_list))), ", "));
+  width: 2;
+  color: #000000;
+  text-color: #ff0000;
+  text-position: line;
+  text-halo-color: #000000;
+  text-halo-radius: 1;
+}
