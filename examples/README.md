@@ -113,4 +113,4 @@ relation[boundary=administrative][admin_level<=8] {
 }
 ```
 
-Data: (c) [[http://www.openstreetmap.org|OpenStreetMap]] contributors.
+Data: (c) [OpenStreetMap](http://www.openstreetmap.org) contributors.

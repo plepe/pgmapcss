@@ -12,4 +12,4 @@ for i in `ls *mapcss` ; do
   echo
 done
 
-echo "Data: (c) [[http://www.openstreetmap.org|OpenStreetMap]] contributors."
+echo "Data: (c) [OpenStreetMap](http://www.openstreetmap.org) contributors."
