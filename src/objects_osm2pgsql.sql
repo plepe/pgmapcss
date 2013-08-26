@@ -240,6 +240,57 @@ begin
 end;
 $$ language 'plpgsql' immutable;
 
+-- returns all members of the relation
+-- additional column link_tags, e.g. "role"=>"stop", "index"=>"492", "member_id"=>"n1231934421"
+create or replace function objects_relation_members(relation_id text)
+returns setof pgmapcss_parent_object
+as $$
+#variable_conflict use_variable
+declare
+begin
+  return query
+  select * from
+  (select
+    (CASE
+      WHEN t1.osm_id is not null then 'n' || t1.osm_id
+      WHEN t2.osm_id is not null then 'w' || t2.osm_id
+      WHEN t3.osm_id is not null then 'w' || t3.osm_id
+      WHEN t4.osm_id is not null then 'r' || t4.osm_id
+      WHEN t5.osm_id is not null then 'r' || t5.osm_id
+    END) id,
+    coalesce(t1.tags, t2.tags, t3.tags, t4.tags, t5.tags) tags,
+    coalesce(t1.way, t2.way, t3.way, t4.way, t5.way) geo,
+    (CASE
+      WHEN t1.osm_id is not null then Array['node', 'point']
+      WHEN t2.osm_id is not null then Array['line', 'way']
+      WHEN t3.osm_id is not null then Array['area', 'way']
+      WHEN t4.osm_id is not null then Array['line', 'relation']
+      WHEN t5.osm_id is not null then Array['area', 'relation']
+    END) types,
+    link_tags
+  from objects_relation(relation_id) r
+    left join planet_osm_point t1
+      on substring(r.link_tags->'member_id', 1, 1) = 'n' and
+	cast(substring(r.link_tags->'member_id', 2) as bigint) = t1.osm_id
+    left join planet_osm_line t2
+      on substring(r.link_tags->'member_id', 1, 1) = 'w' and
+	cast(substring(r.link_tags->'member_id', 2) as bigint) = t2.osm_id
+    left join planet_osm_polygon t3
+      on substring(r.link_tags->'member_id', 1, 1) = 'w' and
+	cast(substring(r.link_tags->'member_id', 2) as bigint) = t3.osm_id
+    left join planet_osm_line t4
+      on substring(r.link_tags->'member_id', 1, 1) = 'r' and
+	- cast(substring(r.link_tags->'member_id', 2) as bigint) = t4.osm_id
+    left join planet_osm_polygon t5
+      on substring(r.link_tags->'member_id', 1, 1) = 'r' and
+	- cast(substring(r.link_tags->'member_id', 2) as bigint) = t5.osm_id
+  order by
+    cast(r.link_tags->'sequence_id' as int) asc
+  ) t
+  where t.id is not null;
+end;
+$$ language 'plpgsql' immutable;
+
 create or replace function objects_near(max_distance text, object pgmapcss_object, current pgmapcss_current, render_context pgmapcss_render_context, where_clauses hstore)
 returns setof pgmapcss_parent_object
 as $$

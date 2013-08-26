@@ -145,6 +145,16 @@ The following link tags will be set:
 * member_id: The ID of the member.
 
 TODO: http://josm.openstreetmap.de/wiki/Help/Styles/MapCSSImplementation#Linkselector defines 'index' as the nth matching object in the relation.
+
+==== '<' ====
+The object is a relation. The statement will be processed for all members (which is the 'parent object' in that case. E.g. {{{node <[role=stop] relation[route=bus]}}}.
+
+The following link tags will be set:
+* index: an arbitrary counter for each matching parent (starting with 1).
+* role: the member role of the object.
+* sequence_id: The index of the object in the relation.
+* member_id: The ID of the member.
+
 ==== 'near' ====
 Objects which are "near" another object, e.g. {{{way[highway] near[index=1][distance<50] node[addr:housenumber]}}} matches any housenumber which is near a highway (max. 50 pixels). The {{{index=1}}} selects only the closest highway.
 
