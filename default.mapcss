@@ -2,9 +2,14 @@
 *::(*) {
 // General
   z-index: 0;
+// PointSymbolizer
+  icon-image: ;
+  icon-opacity: 1;
 // PolygonSymbolizer
   fill-color: ;
   fill-opacity: 1;
+// PolygonPatternSymbolizer
+  fill-image: ;
 // LineSymbolizer
   width: ;
   color: ;
@@ -12,6 +17,8 @@
   linejoin: round;
   linecap: butt;
   dashes: none;
+// LinePatternSymbolizer
+  image: ;
 // TextSymbolizer
   text: ;
   font-family: "DejaVu Sans Book";
