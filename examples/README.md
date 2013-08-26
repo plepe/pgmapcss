@@ -113,4 +113,35 @@ relation[boundary=administrative][admin_level<=8] {
 }
 ```
 
+Example 4: Tramway network
+==========================
+A route map of all tramway routes (and other means of transportation, but this should just be a simple example) should show all routes on their ways nicely sorted. This is something that usually needs quite some database magic, but can be achieved with some simple statements in pgmapcss.
+
+![example4](example4.png)
+```css
+/* Draw all tram routes in red */
+line[route=tram] {
+  color: #ff0000;
+  width: 2;
+}
+
+/* For every route iterate over all members to save their 'ref' tag
+   to the child tag 'ref_list' */
+relation[route=tram] > line|z14-[railway] {
+  set ref_list = eval(push(tag(ref_list), parent_tag(ref)));
+}
+
+/* Remove duplicate refs from list, sort the list 'naturally' and join
+   the elements by ', '. Print the ref tags in red with a white halo. */
+line|z14-[railway]::label {
+  text: eval(join(natsort(unique(tag(ref_list))), ", "));
+  text-color: #ff0000;
+  text-halo-color: #ffffff;
+  text-halo-radius: 1;
+  text-position: line;
+  z-index: 1;
+}
+
+```
+
 Data: (c) [[http://www.openstreetmap.org|OpenStreetMap]] contributors.
