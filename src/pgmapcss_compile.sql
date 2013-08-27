@@ -22,10 +22,12 @@ begin
   ret = ret || 'create type ' || style_id || E'_result as (\n';
 
   a = Array[]::text[];
-  a = array_append(a, E'  _style\thstore');
-  a = array_append(a, E'  _pseudo_element\ttext');
-  a = array_append(a, E'  _geo\ttext');
+  a = array_append(a, E'  _id\ttext');
   a = array_append(a, E'  _tags\thstore');
+  a = array_append(a, E'  _geo\ttext');
+  a = array_append(a, E'  _types\ttext[]');
+  a = array_append(a, E'  _pseudo_element\ttext');
+  a = array_append(a, E'  _properties\thstore');
   for i in select * from each(stat.prop_list) loop
     a = array_append(a, E'  ' || quote_ident(i.key) || E'\t' || i.value);
   end loop;
@@ -55,13 +57,15 @@ begin
 
   ret = ret || stat.func;
 
-  ret = ret || E'  ret._tags=current.tags;\n';
+  ret = ret || E'  ret.id=object.id;\n';
+  ret = ret || E'  ret.types=object.types;\n';
+  ret = ret || E'  ret.tags=current.tags;\n';
   ret = ret || E'  for r in select * from (select generate_series(1, ' || array_upper(stat.pseudo_elements, 1) || E') i, unnest(current.styles) style) t order by coalesce(cast(style->''object-z-index'' as float), 0) asc loop\n';
   ret = ret || E'    if current.has_pseudo_element[r.i] then\n';
-  ret = ret || E'      ret._geo=current.styles[r.i]->''geo'';\n';
+  ret = ret || E'      ret.geo=current.styles[r.i]->''geo'';\n';
   ret = ret || E'      current.styles[r.i] := current.styles[r.i] - ''geo''::text;\n';
-  ret = ret || E'      ret._style=current.styles[r.i];\n';
-  ret = ret || E'      ret._pseudo_element=(current.pseudo_elements)[r.i];\n';
+  ret = ret || E'      ret.properties=current.styles[r.i];\n';
+  ret = ret || E'      ret.pseudo_element=(current.pseudo_elements)[r.i];\n';
   ret = ret || E'      return next ret;\n';
   ret = ret || E'    end if;\n';
   ret = ret || E'  end loop;\n';
@@ -91,9 +95,9 @@ begin
   ret = ret || E'begin\n';
   ret = ret || E'  return query \n';
   ret = ret || E'    select \n';
-  ret = ret || E'      _style, _pseudo_element, _geo, _tags';
+  ret = ret || E'      id, tags, geo, types, pseudo_element, properties';
   for i in select * from each(stat.prop_list) loop
-    ret = ret || E',\n      cast(_style->' || quote_literal(i.key) || E' as ' || quote_ident(i.value) || E')';
+    ret = ret || E',\n      cast(properties->' || quote_literal(i.key) || E' as ' || quote_ident(i.value) || E')';
   end loop;
   ret = ret || E'    from\n';
   ret = ret || E'    (select (result).* from\n';
@@ -104,7 +108,7 @@ begin
   ret = ret || E'      from\n';
   ret = ret || E'        objects(render_context, ' || style_id || E'_get_where(render_context)) object\n';
   ret = ret || E'      offset 0) t) t\n';
-  ret = ret || E'      order by coalesce(cast(_style->''z-index'' as float), 0) asc;\n\n';
+  ret = ret || E'      order by coalesce(cast(properties->''z-index'' as float), 0) asc;\n\n';
   ret = ret || E'  return;\n';
   ret = ret || E'end;\n$body$ language ''plpgsql'' immutable;\n';
 

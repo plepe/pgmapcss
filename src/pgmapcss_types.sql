@@ -87,8 +87,10 @@ create type pgmapcss_compile_stat as (
 
 drop type if exists pgmapcss_result cascade;
 create type pgmapcss_result as (
-  _style		hstore,
-  _pseudo_element	text,
-  _geo			text,
-  _tags			hstore
+  id			text,
+  tags			hstore,
+  geo			text,
+  types			text[],
+  pseudo_element	text,
+  properties		hstore
 );
