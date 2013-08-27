@@ -36,10 +36,10 @@ begin
   ret = ret || 'create or replace function ' || style_id || E'_check(\n';
   ret = ret || E'  object\tpgmapcss_object,\n';
   ret = ret || E'  render_context\tpgmapcss_render_context\n';
-  ret = ret || E') returns setof ' || style_id || E'_result as $body$\n';
+  ret = ret || E') returns setof pgmapcss_result as $body$\n';
   ret = ret || E'declare\n';
   ret = ret || E'  current pgmapcss_current;\n';
-  ret = ret || E'  ret ' || style_id || E'_result;\n';
+  ret = ret || E'  ret pgmapcss_result;\n';
   ret = ret || E'  r record;\n';
   ret = ret || E'  parent_object record;\n';
   ret = ret || E'  parent_index int;\n';
@@ -62,9 +62,6 @@ begin
   ret = ret || E'      current.styles[r.i] := current.styles[r.i] - ''geo''::text;\n';
   ret = ret || E'      ret._style=current.styles[r.i];\n';
   ret = ret || E'      ret._pseudo_element=(current.pseudo_elements)[r.i];\n';
-  for i in select * from each(stat.prop_list) loop
-    ret = ret || E'      ret.' || quote_ident(i.key) || ' = cast(ret._style->' || quote_literal(i.key) || E' as ' || quote_ident(i.value) || E');\n';
-  end loop;
   ret = ret || E'      return next ret;\n';
   ret = ret || E'    end if;\n';
   ret = ret || E'  end loop;\n';
@@ -93,15 +90,21 @@ begin
   ret = ret || E'  ret ' || style_id || E'_result;\n';
   ret = ret || E'begin\n';
   ret = ret || E'  return query \n';
-  ret = ret || E'    select (result).* from\n';
+  ret = ret || E'    select \n';
+  ret = ret || E'      _style, _pseudo_element, _geo, _tags';
+  for i in select * from each(stat.prop_list) loop
+    ret = ret || E',\n      cast(_style->' || quote_literal(i.key) || E' as ' || quote_ident(i.value) || E')';
+  end loop;
+  ret = ret || E'    from\n';
+  ret = ret || E'    (select (result).* from\n';
   ret = ret || E'      (select\n';
   ret = ret || E'        ' || style_id || E'_check(\n';
   ret = ret || E'          object, render_context\n';
   ret = ret || E'        ) result\n';
   ret = ret || E'      from\n';
   ret = ret || E'        objects(render_context, ' || style_id || E'_get_where(render_context)) object\n';
-  ret = ret || E'      offset 0) t\n';
-  ret = ret || E'      order by coalesce(cast((result)."z-index" as float), 0) asc;\n\n';
+  ret = ret || E'      offset 0) t) t\n';
+  ret = ret || E'      order by coalesce(cast(_style->''z-index'' as float), 0) asc;\n\n';
   ret = ret || E'  return;\n';
   ret = ret || E'end;\n$body$ language ''plpgsql'' immutable;\n';
 

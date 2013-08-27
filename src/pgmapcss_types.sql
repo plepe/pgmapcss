@@ -84,3 +84,11 @@ create type pgmapcss_compile_stat as (
   -- where_selectors: all selectors which make an object show
   pseudo_elements	text[]
 );
+
+drop type if exists pgmapcss_result cascade;
+create type pgmapcss_result as (
+  _style		hstore,
+  _pseudo_element	text,
+  _geo			text,
+  _tags			hstore
+);
