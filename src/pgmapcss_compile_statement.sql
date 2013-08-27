@@ -121,7 +121,6 @@ begin
 
     -- if we combine this feature with other features, return
     for r1 in select * from each(properties.combine) loop
-      ret = ret || E'  raise notice ''COMBINE'';\n';
       ret = ret || '  return query select object.id, current.tags, current.styles[' || current_pseudo_element || ']->''geo'', object.types, null::text, null::hstore, ' || quote_nullable(r1.key) || E'::text, ' || r1.value || E';\n';
     end loop;
 

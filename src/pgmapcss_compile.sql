@@ -48,7 +48,6 @@ begin
   ret = ret || E'  o pgmapcss_object;\n';
   ret = ret || E'  i int;\n';
   ret = ret || E'begin\n';
-  ret = ret || E'  raise notice ''% % %'', object.types, object.id, object.tags;\n';
   ret = ret || E'  current.pseudo_elements := ''' || cast(stat.pseudo_elements as text) || E''';\n';
   ret = ret || E'  current.tags := object.tags;\n';
   ret = ret || E'  current.types := object.types;\n';

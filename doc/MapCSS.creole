@@ -255,3 +255,24 @@ point[place=village] {
 This will draw a 10px wide buffer around every node with 'place=village'.
 
 * Compatibility MapCSS 0.2: not defined in standard
+
+== Combining features ==
+In pgmapcss 0.3 a new feature has been introduced: 'combine'. It allows combining several similar features into one, e.g. all streets with the same name. This may improve text rendering (Streets in OpenStreetMap are usually split into short junks, as type of street changes: oneway, bus routes, lanes, ...).
+
+You need a selector which matches the features you want to combine, there you add an instruction {{{combine TYPE ID}}}, where ID is usually an eval-statement on the tags you want to group the features on. The TYPE can be used as object type in a selector. Note that there is no ':' after "combine".
+
+The tags of the input features will be merged, e.g. the tags of the following input features "amenity=bar kitchen=pizza;kebap" and "amenity=bar kitchen=pizza;noodles opening_hours=never" will be merged to "amenity=bar kitchen=pizza;noodles;kebap opening_hours=never". Modifications of tags via set/unset-statements BEFORE the combine-statement will be available in the combined feature.
+
+The geometry of all input features will collected. Therefore it might be useful to merge the lines (line_merge).
+
+Example:
+{{{
+line[highway] {
+  combine street eval(tag(name));
+}
+
+street {
+  geo: eval(line_merge(prop(geo)));
+  text: eval(tag(name));
+}
+}}}
