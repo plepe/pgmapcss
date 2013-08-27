@@ -39,6 +39,7 @@
 | text-halo-color | The colour (hex or CSS) of the 'halo' or 'pull-out' used to make the text stand out from features underneath it. | halo-fill | no eval | MOSTLY: rgb(..) not suported
 | text-halo-radius |  The radius of the halo | halo-radius | eval() with ExpressionFormat | YES
 | text | The text for the label | | yes | NO: syntax different from MapCSS (see 'Parameter text' below)
+| text-spacing | Space between repeated labels. If spacing is 0 only one label is placed (default). | spacing | yes | no standard
 
 * MapCSS 0.2 properties not (yet) supported: font-weight, font-style, font-variant, text-decoration, text-transform
 

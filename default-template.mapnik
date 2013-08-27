@@ -58,7 +58,7 @@
       <Filter>[text] and [text-position] = 'line'</Filter>
 -->
       <Filter>[text] and [text-position] = 'line' and '[font-family]' = [font-family] and '[text-color]' = [text-color] and '[text-halo-color]' = [text-halo-color] and '[text-offset]' = [text-offset] and '[max-width]' = [max-width]</Filter>
-      <TextSymbolizer placement="line" face-name="[font-family]" fill="[text-color]" halo-fill="[text-halo-color]" dy="[text-offset]" wrap-width="[max-width]"><ExpressionFormat size="[font-size]" halo-radius="[text-halo-radius]" character-spacing="[character-spacing]" opacity="[text-opacity]" wrap-character="[wrap-character]">[text]</ExpressionFormat></TextSymbolizer>
+      <TextSymbolizer placement="line" face-name="[font-family]" fill="[text-color]" halo-fill="[text-halo-color]" dy="[text-offset]" wrap-width="[max-width]"><ExpressionFormat size="[font-size]" halo-radius="[text-halo-radius]" character-spacing="[character-spacing]" opacity="[text-opacity]" wrap-character="[wrap-character]" spacing="[text-spacing]">[text]</ExpressionFormat></TextSymbolizer>
     </Rule>
 # END
   </Style>

@@ -26,4 +26,5 @@
   character-spacing: 0;
   wrap-character: " ";
   text-position: center;
+  text-spacing: 0;
 }
