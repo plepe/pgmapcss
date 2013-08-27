@@ -1,0 +1,42 @@
+line[highway=primary],
+line[highway=secondary],
+line[highway=tertiary] {
+  set street_type = major;
+}
+line[highway=unclassified],
+line[highway=residential] {
+  set street_type = minor;
+}
+
+line[street_type] {
+  combine street eval(concat(tag(street_type), '-', tag(name)));
+}
+
+street[street_type]::casing {
+  color: #a0a0a0;
+  z-index: -1;
+}
+street[street_type=major]::casing {
+  width: 10;
+}
+street[street_type=minor]::casing {
+  width: 8;
+}
+
+street[street_type=major] {
+  width: 8;
+  color: #ffff00;
+  z-index: 0.1;
+}
+street[street_type=minor] {
+  width: 6;
+  color: #ffffff;
+}
+
+street::label {
+  geo: eval(line_merge(prop(geo)));
+  text: eval(tag(name));
+  text-position: line;
+  text-spacing: 100;
+  z-index: 1;
+}

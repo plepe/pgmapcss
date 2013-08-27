@@ -144,4 +144,55 @@ line|z14-[railway]::label {
 
 ```
 
+Example 5: Combining features
+=============================
+Streets in OpenStreetMap are usually split into short junks to reflect changes in street layout: one way streets, bus routes, lanes, bicycles lanes, ... This raises a problem when rendering roads, as labels are missing (because they don't fit in a zoom level on the road) or are repeated at random intervals (when they just fit onto roads). pgmapcss 0.3 introduces 'combine', where features can be merged by statements.
+
+In this example features are merged by either major/minor road type and their name. In the left image features are not merged. The change in the right image is clearly visible, much more roads can be labeled.
+
+![example5](example5.png)
+```css
+line[highway=primary],
+line[highway=secondary],
+line[highway=tertiary] {
+  set street_type = major;
+}
+line[highway=unclassified],
+line[highway=residential] {
+  set street_type = minor;
+}
+
+line[street_type] {
+  combine street eval(concat(tag(street_type), '-', tag(name)));
+}
+
+street[street_type]::casing {
+  color: #a0a0a0;
+  z-index: -1;
+}
+street[street_type=major]::casing {
+  width: 10;
+}
+street[street_type=minor]::casing {
+  width: 8;
+}
+
+street[street_type=major] {
+  width: 8;
+  color: #ffff00;
+  z-index: 0.1;
+}
+street[street_type=minor] {
+  width: 6;
+  color: #ffffff;
+}
+
+street::label {
+  geo: eval(line_merge(prop(geo)));
+  text: eval(tag(name));
+  text-position: line;
+  z-index: 1;
+}
+```
+
 Data: (c) [[http://www.openstreetmap.org|OpenStreetMap]] contributors.
