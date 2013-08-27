@@ -25,6 +25,7 @@ begin
   ret.unassignments:=Array[]::text[];
   ret.eval_assignments:=''::hstore;
   ret.eval_properties:=''::hstore;
+  ret.combine:=''::hstore;
 
   -- check for comments
   content := pgmapcss_parse_comments(content);
@@ -65,6 +66,12 @@ begin
 
       content='no;' || substring(content from '^\s*unset\s+[a-zA-Z0-9_\-\.]+\s*;(.*)$');
 
+    elsif content ~ '^\s*combine\s+([a-zA-Z0-9_\-\.]+)\s+' then
+      key=substring(content from '^\s*combine\s+([a-zA-Z0-9_\-\.]+)\s+');
+      assignment_type=4;
+
+      content=substring(content from '^\s*combine\s+[a-zA-Z0-9_\-\.]+\s+(.*)$');
+
     elsif content ~ '^\s*}' then
       ret.text_length=strpos($1, content)+1;
 
@@ -102,6 +109,8 @@ begin
 	ret.prop_has_value := ret.prop_has_value || hstore(key, '1');
       elsif assignment_type = 2 then
 	ret.eval_assignments := ret.eval_assignments || hstore(key, pgmapcss_compile_eval(r.result));
+      elsif assignment_type = 4 then
+        ret.combine := ret.combine || hstore(key, pgmapcss_compile_eval(r.result));
       end if;
 
       content := substring(content, 6 + r.text_length);
@@ -124,6 +133,9 @@ begin
 
       elsif assignment_type=3 then
 	ret.unassignments=array_append(ret.unassignments, key);
+
+      elsif assignment_type = 4 then
+        ret.combine := ret.combine || hstore(key, value);
 
       end if;
 

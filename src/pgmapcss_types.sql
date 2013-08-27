@@ -71,6 +71,7 @@ create type pgmapcss_rule_properties as (
   assignments		hstore,
   eval_assignments	hstore,
   unassignments		text[],
+  combine		hstore,
   text_length           int
 );
 
@@ -92,5 +93,7 @@ create type pgmapcss_result as (
   geo			text,
   types			text[],
   pseudo_element	text,
-  properties		hstore
+  properties		hstore,
+  combine_type		text,
+  combine_id		text
 );

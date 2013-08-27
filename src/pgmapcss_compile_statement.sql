@@ -11,6 +11,7 @@ declare
   ret text := ''::text;
   r pgmapcss_selector_part;
   r1 record;
+  r2 record;
   current_pseudo_element text;
   t text;
   a text[];
@@ -117,6 +118,12 @@ begin
     if r.create_pseudo_element then
       ret = ret || '  current.has_pseudo_element[' || current_pseudo_element || E'] = true;\n';
     end if;
+
+    -- if we combine this feature with other features, return
+    for r1 in select * from each(properties.combine) loop
+      ret = ret || E'  raise notice ''COMBINE'';\n';
+      ret = ret || '  return query select object.id, current.tags, current.styles[' || current_pseudo_element || ']->''geo'', object.types, null::text, null::hstore, ' || quote_nullable(r1.key) || E'::text, ' || r1.value || E';\n';
+    end loop;
 
   if r.pseudo_element = '*' then
     ret = ret || E'end loop;\n';

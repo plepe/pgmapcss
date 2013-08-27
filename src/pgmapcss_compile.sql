@@ -48,6 +48,7 @@ begin
   ret = ret || E'  o pgmapcss_object;\n';
   ret = ret || E'  i int;\n';
   ret = ret || E'begin\n';
+  ret = ret || E'  raise notice ''% % %'', object.types, object.id, object.tags;\n';
   ret = ret || E'  current.pseudo_elements := ''' || cast(stat.pseudo_elements as text) || E''';\n';
   ret = ret || E'  current.tags := object.tags;\n';
   ret = ret || E'  current.types := object.types;\n';
@@ -102,12 +103,18 @@ begin
   ret = ret || E'    from\n';
   ret = ret || E'    (select (result).* from\n';
   ret = ret || E'      (select\n';
+  ret = ret || E'        (CASE WHEN (result).combine_type is null THEN (array_agg(result))[1]\n';
+  ret = ret || E'        ELSE ' || style_id || E'_check(\n';
+  ret = ret || E'          pgmapcss_object(string_agg((result).id, '';''), hstore_merge(array_agg((result).tags)), ST_Collect((result).geo), Array[(result).combine_type]), render_context)\n';
+  ret = ret || E'        END) result from\n';
+  ret = ret || E'      (select\n';
   ret = ret || E'        ' || style_id || E'_check(\n';
   ret = ret || E'          object, render_context\n';
   ret = ret || E'        ) result\n';
   ret = ret || E'      from\n';
   ret = ret || E'        objects(render_context, ' || style_id || E'_get_where(render_context)) object\n';
-  ret = ret || E'      offset 0) t) t\n';
+  ret = ret || E'      offset 0) t\n';
+  ret = ret || E'      group by (result).combine_type, coalesce((result).combine_id, (result).id || (result).pseudo_element) offset 0) t) t\n';
   ret = ret || E'      order by coalesce(cast(properties->''z-index'' as float), 0) asc;\n\n';
   ret = ret || E'  return;\n';
   ret = ret || E'end;\n$body$ language ''plpgsql'' immutable;\n';
