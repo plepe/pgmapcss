@@ -90,7 +90,8 @@ for i in \
   pgmapcss_compile_where.sql \
   eval.sql \
   pgmapcss_compile.sql \
-  pgmapcss_install.sql
+  pgmapcss_install.sql \
+  $(ls "$BASEPATH/src/" | grep -e "^eval_")
 do
   echo "* $i"
   psql -d "dbname=$DB user=$DBUSER host=$DBHOST password=$DBPASS" --set ON_ERROR_STOP=1 -f "$BASEPATH/src/$i"
