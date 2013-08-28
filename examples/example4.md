@@ -1,3 +1,7 @@
 Example 4: Tramway network
 ==========================
-A route map of all tramway routes (and other means of transportation, but this should just be a simple example) should show all routes on their ways nicely sorted. This is something that usually needs quite some database magic, but can be achieved with some simple statements in pgmapcss.
+A route map of all tramway routes (and other means of transportation, but this should just be a simple example) should show all route references on their ways nicely sorted.
+
+Also most stations consist of many individual stops for all the busses and trams going in different directions, but on the map we want to print the name only once.
+
+This is something that usually needs quite some database magic, but can be achieved with some pgmapcss magic.

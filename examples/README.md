@@ -115,7 +115,11 @@ relation[boundary=administrative][admin_level<=8] {
 
 Example 4: Tramway network
 ==========================
-A route map of all tramway routes (and other means of transportation, but this should just be a simple example) should show all routes on their ways nicely sorted. This is something that usually needs quite some database magic, but can be achieved with some simple statements in pgmapcss.
+A route map of all tramway routes (and other means of transportation, but this should just be a simple example) should show all route references on their ways nicely sorted.
+
+Also most stations consist of many individual stops for all the busses and trams going in different directions, but on the map we want to print the name only once.
+
+This is something that usually needs quite some database magic, but can be achieved with some pgmapcss magic.
 
 ![example4](example4.png)
 ```css
@@ -131,17 +135,52 @@ relation[route=tram] > line|z14-[railway] {
   set ref_list = eval(push(tag(ref_list), parent_tag(ref)));
 }
 
-/* Remove duplicate refs from list, sort the list 'naturally' and join
-   the elements by ', '. Print the ref tags in red with a white halo. */
-line|z14-[railway]::label {
-  text: eval(join(natsort(unique(tag(ref_list))), ", "));
+/* Remove duplicate refs from list, sort the list. Combine all lines
+   with the same combination of routes into a new type 'tram_routes'. */
+line|z14-[railway] {
+  set ref_list = eval(sort(unique(tag(ref_list))));
+}
+line|z14-[railway] {
+  combine tram_routes eval(tag(ref_list));
+}
+
+/* Render the tram_routes from the statement before. "Line Merge" the
+   geometry for nicer label placement. Sort the refs "naturally" and
+   merge with a colon. Repeat labels every ~128px. */
+tram_routes::label {
+  geo: eval(line_merge(prop(geo)));
+  text: eval(join(natsort(tag(ref_list)), ', '));
   text-color: #ff0000;
   text-halo-color: #ffffff;
   text-halo-radius: 1;
   text-position: line;
+  text-spacing: 128px;
+  z-index: 3;
+}
+
+/* Find all tram stops on the map and combine them (with the same name)
+   to the new type 'tram_stop'. */
+node|z14-[railway=tram_stop] {
+  combine tram_stop eval(tag(name));
+}
+
+/* Build a polygon (a "convex hull") from all the tram stop nodes and
+   draw a buffer of 7px around them. */
+tram_stop {
+  geo: eval(buffer(convex_hull(prop(geo)), 7px));
+  fill-color: #a0a0a07f;
+  width: 1;
+  color: #a0a0a0af;
   z-index: 1;
 }
 
+/* Print the stop name on the polygon from the geometry of the "default"
+   pseudo element (the statement above) */
+tram_stop::label {
+  geo: eval(prop(geo, default));
+  text: eval(tag(name));
+  z-index: 2;
+}
 ```
 
 Example 5: Combining features
@@ -162,6 +201,9 @@ line[highway=residential] {
   set street_type = minor;
 }
 
+/* This is where the magic happens: At type 'street' is introduced
+   which combines all lines with an equal 'street_type' tag (which
+   is set in the statements above) and the same name. */
 line[street_type] {
   combine street eval(concat(tag(street_type), '-', tag(name)));
 }
@@ -170,12 +212,8 @@ street[street_type]::casing {
   color: #a0a0a0;
   z-index: -1;
 }
-street[street_type=major]::casing {
-  width: 10;
-}
-street[street_type=minor]::casing {
-  width: 8;
-}
+street[street_type=major]::casing { width: 10; }
+street[street_type=minor]::casing { width: 8; }
 
 street[street_type=major] {
   width: 8;
@@ -187,10 +225,12 @@ street[street_type=minor] {
   color: #ffffff;
 }
 
+/* merge lines if possible; print name */
 street::label {
   geo: eval(line_merge(prop(geo)));
   text: eval(tag(name));
   text-position: line;
+  text-spacing: 256;
   z-index: 1;
 }
 ```
