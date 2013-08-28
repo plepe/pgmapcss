@@ -24,6 +24,10 @@ begin
     -- TODO: make list of match-relevant tags configurable
     if (r.properties).prop_has_value ?| Array['text', 'width', 'fill-color'] then
       where_selectors := array_append(where_selectors, r.selectors);
+
+    elsif array_upper(akeys((r.properties).combine), 1) is not null then
+      where_selectors := array_append(where_selectors, r.selectors);
+
     end if;
   end loop;
 
