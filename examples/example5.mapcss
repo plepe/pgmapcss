@@ -37,6 +37,6 @@ street::label {
   geo: eval(line_merge(prop(geo)));
   text: eval(tag(name));
   text-position: line;
-  text-spacing: 100;
+  text-spacing: 256;
   z-index: 1;
 }
