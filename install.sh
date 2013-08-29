@@ -68,6 +68,7 @@ for i in \
   natcasesort.sql \
   array_unique.sql \
   hstore_merge.sql \
+  hstore_array.sql \
   pgmapcss_types.sql \
   objects_osm2pgsql.sql \
   pgmapcss_render_context.sql \
