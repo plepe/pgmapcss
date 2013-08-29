@@ -25,7 +25,7 @@ begin
     if (r.properties).prop_has_value ?| Array['text', 'width', 'fill-color'] then
       where_selectors := array_append(where_selectors, r.selectors);
 
-    elsif array_upper(akeys((r.properties).combine), 1) is not null then
+    elsif (r.properties).has_combine then
       where_selectors := array_append(where_selectors, r.selectors);
 
     end if;
@@ -39,14 +39,12 @@ begin
     unnest(stat.properties) properties
   loop
     -- TODO: we could check for key/value, hence key=>*
-    for r1 in select * from each((r.properties).assignments) loop
-      -- k := quote_nullable(r1.key) || '=>' || r1.value;
-      k := quote_nullable(r1.key) || '=>*';
-      assignments := assignments || hstore(k, coalesce(assignments->k, '') || ';' || r.i );
-    end loop;
-    for r1 in select * from each((r.properties).eval_assignments) loop
-      k := quote_nullable(r1.key) || '=>*';
-      assignments := assignments || hstore(k, coalesce(assignments->k, '') || ';' || r.i );
+    for r1 in select * from unnest((r.properties).properties) loop
+      if r1.assignment_type = 'T' then
+	k := quote_nullable(r1.key) || '=>*';
+	assignments := assignments || hstore(k,
+	  coalesce(assignments->k, '') || ';' || r.i);
+      end if;
     end loop;
   end loop;
 

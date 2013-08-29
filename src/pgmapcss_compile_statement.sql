@@ -1,6 +1,6 @@
 create or replace function pgmapcss_compile_statement (
   selector pgmapcss_selector,
-  properties pgmapcss_rule_properties,
+  properties pgmapcss_properties,
   pgmapcss_compile_stat
 )
 returns pgmapcss_compile_stat
@@ -10,11 +10,13 @@ declare
   stat pgmapcss_compile_stat;
   ret text := ''::text;
   r pgmapcss_selector_part;
-  r1 record;
   r2 record;
+  property record;
   current_pseudo_element text;
   t text;
-  a text[];
+  c text;
+  prop_to_set hstore;
+  tags_to_set hstore;
 begin
   stat := $3;
 
@@ -50,79 +52,81 @@ begin
     end if;
   end if;
 
-    -- set values on 'current' for eval-statements
-    if array_upper(avals(properties.eval_assignments), 1) is not null or
-       array_upper(avals(properties.eval_properties), 1) is not null then
-      ret = ret || '  current.pseudo_element_ind = ' || current_pseudo_element || E';\n';
-    end if;
+  prop_to_set := ''::hstore;
+  tags_to_set := ''::hstore;
 
-    -- set all properties which don't need eval
-    ret = ret || '  current.styles[' || current_pseudo_element || '] = ' ||
-      'current.styles[' || current_pseudo_element || '] || ' ||
-      quote_nullable(cast(properties.properties as text)) || E';\n';
+  -- set values on 'current' for eval-statements
+  ret = ret || '  current.pseudo_element_ind = ' || current_pseudo_element || E';\n';
 
-    -- remember all possible property values
-    for r1 in select * from each(properties.properties) loop
-      t := stat.properties_values->(r1.key);
-      if t is null then
-	a := Array[]::text[];
+  foreach property in array properties.properties loop
+    -- property assignment
+    if property.assignment_type = 'P' then
+      if property.eval_value is null then
+	prop_to_set := prop_to_set || hstore(property.key, property.value);
+	stat.properties_values := hstore_array_append_unique(
+	  stat.properties_values, property.key, property.value);
+
       else
-	a := cast(t as text[]);
+	ret = ret || pgmapcss_compile_statement_print_set(prop_to_set, tags_to_set, current_pseudo_element);
+	prop_to_set := ''::hstore;
+	tags_to_set := ''::hstore;
+
+	ret = ret || '  current.styles[' || current_pseudo_element || '] = ' ||
+	  'current.styles[' || current_pseudo_element || '] || hstore(' ||
+	  quote_literal(property.key) || ', ' ||
+	  pgmapcss_compile_eval(property.eval_value) || E');\n';
+
+	stat.properties_values := hstore_array_append_unique(
+	  stat.properties_values, property.key, '*');
       end if;
 
-      if array_search(r1.value, a) is null then
-	stat.properties_values = stat.properties_values || hstore(r1.key, cast(
-	  array_append(a, r1.value) as text));
-      end if;
-    end loop;
+    -- tag assignment
+    elsif property.assignment_type = 'T' then
+      if property.eval_value is null then
+	tags_to_set := tags_to_set || hstore(property.key, property.value);
 
-    -- set all tag assignments which don't need eval
-    if array_upper(akeys(properties.assignments), 1) is not null then
-      ret = ret || '  current.tags = current.tags || ' ||
-	quote_nullable(cast(properties.assignments as text)) || E';\n';
-    end if;
-
-    -- set all eval-assignments on tags
-    for r1 in select * from each(properties.eval_assignments) loop
-      ret = ret || '  current.tags = current.tags || hstore(' ||
-        quote_literal(r1.key) || ', ' || r1.value || E');\n';
-    end loop;
-
-    -- set all eval-assignments on properties
-    for r1 in select * from each(properties.eval_properties) loop
-      ret = ret || '  current.styles[' || current_pseudo_element || '] = ' ||
-	'current.styles[' || current_pseudo_element || '] || hstore(' ||
-        quote_literal(r1.key) || ', ' || r1.value || E');\n';
-
-      -- remember all possible property values
-      t := stat.properties_values->(r1.key);
-      if t is null then
-	a := Array[]::text[];
       else
-	a := cast(t as text[]);
-      end if;
+	ret = ret || pgmapcss_compile_statement_print_set(prop_to_set, tags_to_set, current_pseudo_element);
+	prop_to_set := ''::hstore;
+	tags_to_set := ''::hstore;
 
-      if array_search('*', a) is null then
-	stat.properties_values = stat.properties_values || hstore(r1.key, cast(
-	  array_append(a, '*') as text));
+	ret = ret || '  current.tags = current.tags || hstore(' ||
+	quote_literal(property.key) || ', ' ||
+	pgmapcss_compile_eval(property.eval_value) || E');\n';
       end if;
-    end loop;
 
     -- unset tags
-    if array_upper(properties.unassignments, 1) is not null then
-      ret = ret || '  current.tags = current.tags - cast(' ||
-	quote_nullable(cast(properties.unassignments as text)) || E' as text[]);\n';
-    end if;
+    elsif property.assignment_type = 'U' then
+      ret = ret || pgmapcss_compile_statement_print_set(prop_to_set, tags_to_set, current_pseudo_element);
+      prop_to_set := ''::hstore;
+      tags_to_set := ''::hstore;
 
-    -- set has_pseudo_element to true
-    if r.create_pseudo_element then
-      ret = ret || '  current.has_pseudo_element[' || current_pseudo_element || E'] = true;\n';
-    end if;
+      ret = ret || '  current.tags = current.tags - ' ||
+        quote_literal(property.key) || E');\n';
 
-    -- if we combine this feature with other features, return
-    for r1 in select * from each(properties.combine) loop
-      ret = ret || '  return query select object.id, current.tags, current.styles[' || current_pseudo_element || ']->''geo'', object.types, null::text, null::hstore, ' || quote_nullable(r1.key) || E'::text, ' || r1.value || E';\n';
-    end loop;
+    -- combine
+    elsif property.assignment_type = 'C' then
+      ret = ret || pgmapcss_compile_statement_print_set(prop_to_set, tags_to_set, current_pseudo_element);
+      prop_to_set := ''::hstore;
+      tags_to_set := ''::hstore;
+
+      if property.eval_value is not null then
+	c := pgmapcss_compile_eval(property.eval_value);
+      else
+	c := quote_nullable(property.value);
+      end if;
+
+      ret = ret || '  return query select object.id, current.tags, current.styles[' || current_pseudo_element || ']->''geo'', object.types, null::text, null::hstore, ' || quote_nullable(property.key) || E'::text, ' || c || E';\n';
+
+    end if;
+  end loop;
+
+  ret = ret || pgmapcss_compile_statement_print_set(prop_to_set, tags_to_set, current_pseudo_element);
+
+  -- set has_pseudo_element to true
+  if r.create_pseudo_element then
+    ret = ret || '  current.has_pseudo_element[' || current_pseudo_element || E'] = true;\n';
+  end if;
 
   if r.pseudo_element = '*' then
     ret = ret || E'end loop;\n';
@@ -139,5 +143,31 @@ begin
   stat.func = stat.func || ret;
 
   return stat;
+end;
+$$ language 'plpgsql' immutable;
+
+create or replace function pgmapcss_compile_statement_print_set (
+  prop_to_set hstore,
+  tags_to_set hstore,
+  current_pseudo_element text
+)
+returns text
+as $$
+#variable_conflict use_variable
+declare
+  ret text := ''::text;
+begin
+  if array_upper(akeys(prop_to_set), 1) is not null then
+    ret = ret || '  current.styles[' || current_pseudo_element ||
+      '] = ' || 'current.styles[' || current_pseudo_element || '] || ' ||
+      quote_nullable(cast(prop_to_set as text)) || E';\n';
+  end if;
+
+  if array_upper(akeys(tags_to_set), 1) is not null then
+    ret = ret || '  current.tags = current.tags || ' ||
+      quote_nullable(cast(tags_to_set as text)) || E';\n';
+  end if;
+
+  return ret;
 end;
 $$ language 'plpgsql' immutable;

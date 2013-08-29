@@ -7,13 +7,13 @@ as $$
 declare
   r pgmapcss_selector;
   selectors pgmapcss_selector[];
-  properties pgmapcss_rule_properties;
+  properties pgmapcss_properties;
   content text;
   stat pgmapcss_compile_stat;
 begin
   content:=$1;
   stat.selectors := Array[]::pgmapcss_selector[];
-  stat.properties := Array[]::pgmapcss_rule_properties[];
+  stat.properties := Array[]::pgmapcss_properties[];
   stat.prop_list := ''::hstore;
 
   loop

@@ -62,16 +62,22 @@ create type pgmapcss_selector as (
   text_length		int
 );
 
-drop type if exists pgmapcss_rule_properties cascade;
-create type pgmapcss_rule_properties as (
-  properties            hstore,
-  eval_properties	hstore,
+drop type if exists pgmapcss_property cascade;
+create type pgmapcss_property as (
+  -- 'P'=property, 'T'=tag, 'U'=unset tag, 'C'=combine
+  assignment_type	char,
+  key			text,
+  value			text,
+  eval_value		text,
+  unit			text
+);
+
+drop type if exists pgmapcss_properties cascade;
+create type pgmapcss_properties as (
+  properties		pgmapcss_property[],
   prop_types		hstore,
   prop_has_value	hstore,
-  assignments		hstore,
-  eval_assignments	hstore,
-  unassignments		text[],
-  combine		hstore,
+  has_combine		boolean,
   text_length           int
 );
 
@@ -80,7 +86,7 @@ create type pgmapcss_compile_stat as (
   func          text,
   prop_list     hstore,
   selectors	pgmapcss_selector[],
-  properties	pgmapcss_rule_properties[],
+  properties	pgmapcss_properties[],
   properties_values	hstore,
   -- where_selectors: all selectors which make an object show
   pseudo_elements	text[]

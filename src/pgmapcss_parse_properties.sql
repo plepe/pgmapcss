@@ -2,30 +2,23 @@ drop function if exists pgmapcss_parse_properties(text);
 create or replace function pgmapcss_parse_properties (
   text
 )
-returns setof pgmapcss_rule_properties
+returns setof pgmapcss_properties
 as $$
 #variable_conflict use_variable
 declare
-  ret pgmapcss_rule_properties;
+  ret pgmapcss_properties;
+  ret1 pgmapcss_property;
   content text;
   m text;
-  key text;
-  value text;
-  assignment_type int;
   r record;
   r1 record;
-  unit text;
 begin
   content:=$1;
 
-  ret.properties:=''::hstore;
-  ret.prop_types:=''::hstore;
-  ret.prop_has_value:=''::hstore;
-  ret.assignments:=''::hstore;
-  ret.unassignments:=Array[]::text[];
-  ret.eval_assignments:=''::hstore;
-  ret.eval_properties:=''::hstore;
-  ret.combine:=''::hstore;
+  ret.properties := Array[]::pgmapcss_property[];
+  ret.prop_types := ''::hstore;
+  ret.prop_has_value := ''::hstore;
+  ret.has_combine := false;
 
   -- check for comments
   content := pgmapcss_parse_comments(content);
@@ -42,33 +35,40 @@ begin
   content := pgmapcss_parse_comments(content);
 
   loop
+    ret1.assignment_type := null;
+    ret1.key := null;
+    ret1.value := null;
+    ret1.eval_value := null;
+    ret1.unit := null;
+
     if content ~ '^\s*([a-zA-Z0-9_-]+)\s*:' then
-      key=substring(content from '^\s*([a-zA-Z0-9_-]+)\s*:');
-      assignment_type=1;
+      ret1.key := substring(content from '^\s*([a-zA-Z0-9_-]+)\s*:');
+      ret1.assignment_type := 'P';
 
       content=substring(content from '^\s*[a-zA-Z0-9_-]+\s*:\s*(.*)$');
 
     elsif content ~ '^\s*set\s+([a-zA-Z0-9_\-\.]+)\s*=' then
-      key=substring(content from '^\s*set\s+([a-zA-Z0-9_\-\.]+)\s*=');
-      assignment_type=2;
+      ret1.key := substring(content from '^\s*set\s+([a-zA-Z0-9_\-\.]+)\s*=');
+      ret1.assignment_type := 'T';
 
       content=substring(content from '^\s*set\s+[a-zA-Z0-9_\-\.]+\s*=\s*(.*)$');
 
     elsif content ~ '^\s*set\s+([a-zA-Z0-9_\-\.]+)\s*;' then
-      key=substring(content from '^\s*set\s+([a-zA-Z0-9_\-\.]+)\s*;');
-      assignment_type=2;
+      ret1.key := substring(content from '^\s*set\s+([a-zA-Z0-9_\-\.]+)\s*;');
+      ret1.assignment_type := 'T';
 
       content='yes;' || substring(content from '^\s*set\s+[a-zA-Z0-9_\-\.]+\s*;(.*)$');
 
     elsif content ~ '^\s*unset\s+([a-zA-Z0-9_\-\.]+)\s*;' then
-      key=substring(content from '^\s*unset\s+([a-zA-Z0-9_\-\.]+)\s*;');
-      assignment_type=3;
+      ret1.key := substring(content from '^\s*unset\s+([a-zA-Z0-9_\-\.]+)\s*;');
+      ret1.assignment_type := 'U';
 
-      content='no;' || substring(content from '^\s*unset\s+[a-zA-Z0-9_\-\.]+\s*;(.*)$');
+      content=';' || substring(content from '^\s*unset\s+[a-zA-Z0-9_\-\.]+\s*;(.*)$');
 
     elsif content ~ '^\s*combine\s+([a-zA-Z0-9_\-\.]+)\s+' then
-      key=substring(content from '^\s*combine\s+([a-zA-Z0-9_\-\.]+)\s+');
-      assignment_type=4;
+      ret1.key := substring(content from '^\s*combine\s+([a-zA-Z0-9_\-\.]+)\s+');
+      ret1.assignment_type := 'C';
+      ret.has_combine := true;
 
       content=substring(content from '^\s*combine\s+[a-zA-Z0-9_\-\.]+\s+(.*)$');
 
@@ -103,41 +103,14 @@ begin
 	return;
       end if;
 
-      if assignment_type = 1 then
-	ret.eval_properties := ret.eval_properties || hstore(key, pgmapcss_compile_eval(r.result));
-	ret.prop_types := ret.prop_types || hstore(key, 'text');
-	ret.prop_has_value := ret.prop_has_value || hstore(key, '1');
-      elsif assignment_type = 2 then
-	ret.eval_assignments := ret.eval_assignments || hstore(key, pgmapcss_compile_eval(r.result));
-      elsif assignment_type = 4 then
-        ret.combine := ret.combine || hstore(key, pgmapcss_compile_eval(r.result));
-      end if;
+      ret1.eval_value := r.result;
 
       content := substring(content, 6 + r.text_length);
       content := substring(content from '^[^;]*;\s*(.*)$');
 
     elsif r is not null then
     -- value is enclosed in quotes
-      value := r.result;
-
-      if assignment_type=1 then
-	ret.properties=ret.properties||hstore(key, value);
-	-- TODO: return type of value
-	ret.prop_types := ret.prop_types || hstore(key, 'text');
-	if (value != '') and (value is not null) then
-	  ret.prop_has_value := ret.prop_has_value || hstore(key, '1');
-	end if;
-
-      elsif assignment_type=2 then
-	ret.assignments=ret.assignments||hstore(key, value);
-
-      elsif assignment_type=3 then
-	ret.unassignments=array_append(ret.unassignments, key);
-
-      elsif assignment_type = 4 then
-        ret.combine := ret.combine || hstore(key, value);
-
-      end if;
+      ret1.value := r.result;
 
       content := substring(content, r.text_length + 1);
       content := substring(content from '^\s*;\s*(.*)$');
@@ -146,48 +119,23 @@ begin
       content := pgmapcss_parse_comments(content);
 
     elsif content ~ '^([^;]*);' then
-      value := rtrim(substring(content from '^([^;]*);'));
-      unit := null;
+      ret1.value := rtrim(substring(content from '^([^;]*);'));
 
-      if value = '' then
-	value := null;
+      if ret1.value = '' then
+	ret1.value := null;
 
-      elsif value ~ '^(.*)(px|m|u)$' then
-	unit := substring(value from '^(?:.*)(px|m|u)');
+      elsif ret1.value ~ '^(.*)(px|m|u)$' then
+	ret1.unit := substring(ret1.value from '^(?:.*)(px|m|u)');
 
 	-- no need to calculate pixel values
-	if unit = 'px' then
-	  value := substring(value from '^(.*)px');
+	if ret1.unit = 'px' then
+	  ret1.value := substring(ret1.value from '^(.*)px');
 
 	-- prepare an eval function to convert unit to pixel values
 	else
-	  r1 := pgmapcss_parse_eval('number("' || value || '")');
+	  ret1.eval_value := pgmapcss_parse_eval('number("' || ret1.value || '")');
+	  ret1.value := null;
 	end if;
-      end if;
-
-      if assignment_type=1 then
-	if unit is null or unit = 'px' then
-	  ret.properties=ret.properties||hstore(key, value);
-	else
-	  ret.eval_properties := ret.eval_properties || hstore(key, pgmapcss_compile_eval(r1.result));
-	end if;
-
-	-- TODO: return type of value
-	ret.prop_types := ret.prop_types || hstore(key, 'text');
-	if (value != '') and (value is not null) then
-	  ret.prop_has_value := ret.prop_has_value || hstore(key, '1');
-	end if;
-
-      elsif assignment_type=2 then
-	if unit is null or unit = 'px' then
-	  ret.assignments=ret.assignments||hstore(key, value);
-	else
-	  ret.eval_assignments := ret.eval_assignments || hstore(key, pgmapcss_compile_eval(r1.result));
-	end if;
-
-      elsif assignment_type=3 then
-	ret.unassignments=array_append(ret.unassignments, key);
-
       end if;
 
       content=substring(content from '^[^;]*;\s*(.*)$');
@@ -199,6 +147,17 @@ begin
       raise notice 'Error parsing prop value at "%..."', substring(content, 1, 40);
       return;
     end if;
+
+    if ret1.assignment_type = 'P' then
+      -- TODO: return type of value
+      ret.prop_types := ret.prop_types || hstore(ret1.key, 'text');
+      if ((ret1.value != '') and (ret1.value is not null)) or
+	  (ret1.eval_value is not null) then
+	ret.prop_has_value := ret.prop_has_value || hstore(ret1.key, '1');
+      end if;
+    end if;
+
+    ret.properties := array_append(ret.properties, ret1);
   end loop;
 
   return;
