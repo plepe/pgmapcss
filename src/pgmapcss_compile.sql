@@ -44,7 +44,7 @@ begin
   ret = ret || E'  i int;\n';
   ret = ret || E'begin\n';
   ret = ret || E'  current.pseudo_elements := ''' || cast(stat.pseudo_elements as text) || E''';\n';
-  ret = ret || E'  current.tags := object.tags;\n';
+  ret = ret || E'  current.tags := object.tags || hstore(''osm_id'', object.id);\n';
   -- initialize all styles with the 'geo' property
   ret = ret || E'  current.styles := array_fill(hstore(''geo'', object.geo), Array[' || array_upper(stat.pseudo_elements, 1) || E']);\n';
   ret = ret || E'  current.has_pseudo_element := array_fill(false, Array[' || array_upper(stat.pseudo_elements, 1) || E']);\n';

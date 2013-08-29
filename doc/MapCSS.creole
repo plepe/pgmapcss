@@ -75,6 +75,8 @@ You can combine several conditions, they will be combined by logical AND. E.g. {
 
 Matches are always case sensitive (except regexp). Valid characters for keys are letters, digits, '-', '_' and ':'. Valid characters for values are all characters expect '"', ''' and ']'. You may quote keys and values with '"' or ''' to use special characters.
 
+The tag 'osm_id' will be set to the ID of the object.
+
 ==== Comparision expressions ===
 |= Operator |= Description |= Compatibility
 | = | Exact match of the value. E.g. {{{[highway=residential]}}}. | MapCSS 0.2
