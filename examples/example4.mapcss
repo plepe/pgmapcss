@@ -14,8 +14,6 @@ relation[route=tram] > line|z14-[railway] {
    with the same combination of routes into a new type 'tram_routes'. */
 line|z14-[railway] {
   set ref_list = eval(sort(unique(tag(ref_list))));
-}
-line|z14-[railway] {
   combine tram_routes eval(tag(ref_list));
 }
 
@@ -33,9 +31,9 @@ tram_routes::label {
   z-index: 3;
 }
 
-/* Find all tram stops on the map and combine them (with the same name)
-   to the new type 'tram_stop'. */
-node|z14-[railway=tram_stop] {
+/* Find all tram stops on the map and combine them (with the same name - only
+   if they have a name) to the new type 'tram_stop'. */
+node|z14-[railway=tram_stop][name] {
   combine tram_stop eval(tag(name));
 }
 
