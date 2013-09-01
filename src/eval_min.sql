@@ -7,8 +7,19 @@ declare
   r text;
   f float;
   min float;
+  list text[];
 begin
-  foreach r in array param loop
+  if array_upper(param, 1) > 1 then
+    list := param;
+  else
+    list := string_to_array(param[1], ';');
+  end if;
+
+  if list is null then
+    return '';
+  end if;
+
+  foreach r in array list loop
     r := eval_number(Array[r], object, current, render_context);
 
     if r is not null and r != '' then

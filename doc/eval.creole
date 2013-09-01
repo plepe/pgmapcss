@@ -68,6 +68,8 @@ Missing functions (as of MapCSS 0.2):
 | unique | list | list | Removes duplicate values from a list.
 | sort | list | list | Orders list alphabetically ascending.
 | natsort | list | list | Orders list by a 'natural' sort order.
+| min | list | number | Returns lowest of the input values.
+| max | list | number | Returns highest of the input values.
 
 == Geometric functions ===
 * Geometric functions are not part of the MapCSS 0.2 standard
