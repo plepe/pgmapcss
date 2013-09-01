@@ -20,6 +20,7 @@ declare
   quote text := null;
   esc boolean := false;
   i int;
+  t text;
 begin
   content := substring($1, "offset");
   ret.result := '';
@@ -30,8 +31,14 @@ begin
     i := 2;
     loop
       if esc = true then
-	ret.result := ret.result || substring(content, i, 1);
+	-- Escaped character.
+	t := substring(content, i, 1);
 	esc := false;
+
+	ret.result := ret.result || (case
+	  when t = 'n' then E'\n'
+	  else t
+	end);
       else
 	if substring(content, i, 1) = E'\\' then
 	  esc := true;

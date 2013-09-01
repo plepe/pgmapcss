@@ -179,7 +179,7 @@ E.g.
 }
 }}}
 
-* You may enclose strings by single or double quotes.
+* You may enclose strings by single or double quotes. Within quoted strings you can escape characters by prefixing them with '\', e.g. '\"'. You can use '\n' to create a new line.
 * You may specify values with a unit, default: 'px' (Pixels on screen). Other supported unites: 'u' (Units in 900913 projection on the map), 'm' (Meters on the map; NOT IMPLEMENTED YET: currently 'u' is used instead).
 
 * Compatibility MapCSS 0.2: MOSTLY
