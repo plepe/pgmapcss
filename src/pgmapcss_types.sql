@@ -38,6 +38,8 @@ create type pgmapcss_condition as (
   op			text,
   key			text,
   value			text,
+  -- 0..string, 1..eval expression
+  value_type		smallint,
   text_length		int
 );
 

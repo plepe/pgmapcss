@@ -87,6 +87,7 @@ Matches are always case sensitive (except regexp). Valid characters for keys are
 | =~ | Regular expression match. Value matches given regular expression, e.g. {{{[highway=~/.*ary/]}}} matches primary. Use {{{[highway=~/.*ary/i]}}} for case insensitive matches. | MapCSS 0.2¹
 
 * You can prepend any of the expressions with ! to negate match, e.g. {{{[amenity*=bank][!amenity*=atm]}}} matches amenity=bank, amenity=bank;post_office but not amenity=bank;atm.
+* As value you may use an eval-statement as in the properties (see below) (except 'Regular expression match). E.g. {{{node[place=city][population>eval(100*100)]}}}
 
 ¹ MapCSS 0.2 does not define case insensitive matches.
 

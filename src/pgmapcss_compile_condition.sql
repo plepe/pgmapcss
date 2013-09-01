@@ -10,8 +10,15 @@ declare
   ret text := '';
   condition pgmapcss_condition;
   m text;
+  final_value text;
 begin
   condition := $1;
+
+  if condition.value_type = 0 then
+    final_value := quote_literal(condition.value);
+  elsif condition.value_type = 1 then
+    final_value := pgmapcss_compile_eval(condition.value);
+  end if;
 
   -- !
   if condition.op ~ '^!' then
@@ -25,34 +32,46 @@ begin
 
   -- =
   elsif condition.op = '=' then
-    ret := ret || prefix || 'tags @> ''' || quote_ident(condition.key) || '=>' || quote_ident(condition.value) || '''';
+    if condition.value_type = 0 then
+      ret := ret || prefix || 'tags @> ''' || quote_ident(condition.key) || '=>' || quote_ident(condition.value) || '''';
+    else
+      ret := ret || prefix || 'tags->' || quote_literal(condition.key) || ' = ' || final_value;
+    end if;
 
   -- !=
   elsif condition.op = '!=' then
-    ret := ret || 'not ' || prefix || 'tags @> ''' || quote_ident(condition.key) || '=>' || quote_ident(condition.value) || '''';
+    if condition.value_type = 0 then
+      ret := ret || 'not ' || prefix || 'tags @> ''' || quote_ident(condition.key) || '=>' || quote_ident(condition.value) || '''';
+    else
+      ret := ret || prefix || 'tags->' || quote_literal(condition.key) || ' != ' || final_value;
+    end if;
 
   -- < > <= >=
   elsif condition.op in ('<', '>', '<=', '>=') then
-    ret := ret || 'cast(' || prefix || 'tags->' || quote_literal(condition.key) || ' as numeric) ' || condition.op || ' ' || quote_literal(condition.value);
+    if condition.value_type = 0 then
+      ret := ret || 'cast(' || prefix || 'tags->' || quote_literal(condition.key) || ' as numeric) ' || condition.op || ' ' || final_value;
+    else
+      ret := ret || 'pgmapcss_to_float(' || prefix || 'tags->' || quote_literal(condition.key) || ') ' || condition.op || ' pgmapcss_to_float(' || final_value || ')';
+    end if;
 
   -- ^=
   elsif condition.op = '^=' then
     condition.value:=condition.value||'%';
-    ret := ret || prefix || 'tags->' || quote_literal(condition.key) || ' similar to ' || quote_literal(condition.value);
+    ret := ret || prefix || 'tags->' || quote_literal(condition.key) || ' similar to ' || final_value;
 
   -- $=
   elsif condition.op = '$=' then
     condition.value := '%' || condition.value;
-    ret := ret || prefix || 'tags->' || quote_literal(condition.key) || ' similar to ' || quote_literal(condition.value);
+    ret := ret || prefix || 'tags->' || quote_literal(condition.key) || ' similar to ' || final_value;
 
   -- *=
   elsif condition.op = '*=' then
     condition.value := '%' || condition.value || '%';
-    ret := ret || prefix || 'tags->' || quote_literal(condition.key) || ' similar to ' || quote_literal(condition.value);
+    ret := ret || prefix || 'tags->' || quote_literal(condition.key) || ' similar to ' || final_value;
 
   -- ~=
   elsif condition.op = '~=' then
-    ret := ret || quote_literal(condition.value) || ' = any(string_to_array(' || prefix || 'tags->' || quote_literal(condition.key) || ', '';''))';
+    ret := ret || final_value || ' = any(string_to_array(' || prefix || 'tags->' || quote_literal(condition.key) || ', '';''))';
 
   -- =~
   elsif condition.op = '=~' then

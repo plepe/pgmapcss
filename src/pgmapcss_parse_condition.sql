@@ -30,10 +30,20 @@ begin
     ret.text_length = ret.text_length + length(ret.op);
     content = substring(content, length(ret.op) + 1);
 
-    r := pgmapcss_parse_string(content, E'^([^\\]]+)\\]');
-    ret.value := r.result;
-    ret.text_length = ret.text_length + r.text_length;
-    content = substring(content, r.text_length + 1);
+    r := pgmapcss_parse_string(content, E'^eval\\(');
+    if r is not null then
+      r := pgmapcss_parse_eval(content, 6);
+      ret.value := r.result;
+      ret.value_type := 1;
+      ret.text_length = ret.text_length + r.text_length + 5;
+      content = substring(content, r.text_length + 1);
+    else
+      r := pgmapcss_parse_string(content, E'^([^\\]]+)\\]');
+      ret.value := r.result;
+      ret.value_type := 0;
+      ret.text_length = ret.text_length + r.text_length;
+      content = substring(content, r.text_length + 1);
+    end if;
 
     return ret;
   end if;
