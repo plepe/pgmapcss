@@ -119,8 +119,8 @@ if [ -s $STYLE_ID.stderr ] ; then
   echo "--=== Warnings and Errors ===--" >> $STYLE_ID.output
   X=$(sed -n '/CONTEXT:/{:a;N;/PL\/pgSQL function/!ba;s/.*\n//};p' $STYLE_ID.stderr)
 
-  echo $X >> $STYLE_ID.output
-  echo $X
+  echo "$X" >> $STYLE_ID.output
+  echo "$X"
 fi
 
 if [ -s $STYLE_ID.stdout ] ; then
