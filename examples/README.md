@@ -1,8 +1,8 @@
-Example 1: Major roads and parks
-================================
+Major roads and parks
+=====================
 For starters a simple example will be shown: Major roads and parks.
 
-![example1](example1.png)
+![roads_parks](roads_parks.png)
 ```css
 /* draw a green polygon for all parks */
 area[leisure=park] {
@@ -40,13 +40,13 @@ line|z12-[highway=tertiary]::label {
 }
 ```
 
-Example 2: Layering roads
-=========================
+Layering roads of a motorway junction
+=====================================
 This example shows how eval-statements for z-index can be used to layer roads correctly.
 
 Warning: This example needs Mapnik branch 'stroke-width-expr' or version 3.0 and accompaning modifications in file default-template.mapnik (search for 'stroke-width-expr' for details). If you run this example with Mapnik 2.2 the casing might be missing.
 
-![example2](example2.png)
+![motorway_junction](motorway_junction.png)
 ```css
 line[highway=motorway],
 line[highway=trunk] {
@@ -81,12 +81,12 @@ line.major_road[tunnel]::casing {
 }
 ```
 
-Example 3: Place nodes and their population
-===========================================
+Place nodes and their population
+================================
 In the 3rd example we see the places names of some villages and a simple
 diagram with the population size. Also the administrative boundaries are shown.
 
-![example3](example3.png)
+![places_population](places_population.png)
 ```css
 /* Print the name of all places */
 point[place] {
@@ -113,83 +113,13 @@ relation[boundary=administrative][admin_level<=8] {
 }
 ```
 
-Example 4: Tramway network
-==========================
-A route map of all tramway routes (and other means of transportation, but this should just be a simple example) should show all route references on their ways nicely sorted.
-
-Also most stations consist of many individual stops for all the busses and trams going in different directions, but on the map we want to print the name only once.
-
-This is something that usually needs quite some database magic, but can be achieved with some pgmapcss magic.
-
-![example4](example4.png)
-```css
-/* Draw all tram routes in red */
-line[route=tram] {
-  color: #ff0000;
-  width: 2;
-}
-
-/* For every route iterate over all members to save their 'ref' tag
-   to the child tag 'ref_list' */
-relation[route=tram] > line|z14-[railway] {
-  set ref_list = eval(push(tag(ref_list), parent_tag(ref)));
-}
-
-/* Remove duplicate refs from list, sort the list. Combine all lines
-   with the same combination of routes into a new type 'tram_routes'. */
-line|z14-[railway] {
-  set ref_list = eval(sort(unique(tag(ref_list))));
-}
-line|z14-[railway] {
-  combine tram_routes eval(tag(ref_list));
-}
-
-/* Render the tram_routes from the statement before. "Line Merge" the
-   geometry for nicer label placement. Sort the refs "naturally" and
-   merge with a colon. Repeat labels every ~128px. */
-tram_routes::label {
-  geo: eval(line_merge(prop(geo)));
-  text: eval(join(natsort(tag(ref_list)), ', '));
-  text-color: #ff0000;
-  text-halo-color: #ffffff;
-  text-halo-radius: 1;
-  text-position: line;
-  text-spacing: 128px;
-  z-index: 3;
-}
-
-/* Find all tram stops on the map and combine them (with the same name)
-   to the new type 'tram_stop'. */
-node|z14-[railway=tram_stop] {
-  combine tram_stop eval(tag(name));
-}
-
-/* Build a polygon (a "convex hull") from all the tram stop nodes and
-   draw a buffer of 7px around them. */
-tram_stop {
-  geo: eval(buffer(convex_hull(prop(geo)), 7px));
-  fill-color: #a0a0a07f;
-  width: 1;
-  color: #a0a0a0af;
-  z-index: 1;
-}
-
-/* Print the stop name on the polygon from the geometry of the "default"
-   pseudo element (the statement above) */
-tram_stop::label {
-  geo: eval(prop(geo, default));
-  text: eval(tag(name));
-  z-index: 2;
-}
-```
-
-Example 5: Combining features
-=============================
+Combining street parts
+======================
 Streets in OpenStreetMap are usually split into short junks to reflect changes in street layout: one way streets, bus routes, lanes, bicycles lanes, ... This raises a problem when rendering roads, as labels are missing (because they don't fit in a zoom level on the road) or are repeated at random intervals (when they just fit onto roads). pgmapcss 0.3 introduces 'combine', where features can be merged by statements.
 
 In this example features are merged by either major/minor road type and their name. In the left image features are not merged. The change in the right image is clearly visible, much more roads can be labeled.
 
-![example5](example5.png)
+![combined_roads](combined_roads.png)
 ```css
 line[highway=primary],
 line[highway=secondary],
@@ -232,6 +162,74 @@ street::label {
   text-position: line;
   text-spacing: 256;
   z-index: 1;
+}
+```
+
+Tramway network
+===============
+A route map of all tramway routes (and other means of transportation, but this should just be a simple example) should show all route references on their ways nicely sorted.
+
+Also most stations consist of many individual stops for all the busses and trams going in different directions, but on the map we want to print the name only once.
+
+This is something that usually needs quite some database magic, but can be achieved with some pgmapcss magic.
+
+![tramway_network](tramway_network.png)
+```css
+/* Draw all tram routes in red */
+line[route=tram] {
+  color: #ff0000;
+  width: 2;
+}
+
+/* For every route iterate over all members to save their 'ref' tag
+   to the child tag 'ref_list' */
+relation[route=tram] > line|z14-[railway] {
+  set ref_list = eval(push(tag(ref_list), parent_tag(ref)));
+}
+
+/* Remove duplicate refs from list, sort the list. Combine all lines
+   with the same combination of routes into a new type 'tram_routes'. */
+line|z14-[railway] {
+  set ref_list = eval(sort(unique(tag(ref_list))));
+  combine tram_routes eval(tag(ref_list));
+}
+
+/* Render the tram_routes from the statement before. "Line Merge" the
+   geometry for nicer label placement. Sort the refs "naturally" and
+   merge with a colon. Repeat labels every ~128px. */
+tram_routes::label {
+  geo: eval(line_merge(prop(geo)));
+  text: eval(join(natsort(tag(ref_list)), ', '));
+  text-color: #ff0000;
+  text-halo-color: #ffffff;
+  text-halo-radius: 1;
+  text-position: line;
+  text-spacing: 128px;
+  z-index: 3;
+}
+
+/* Find all tram stops on the map and combine them (with the same name - only
+   if they have a name) to the new type 'tram_stop'. */
+node|z14-[railway=tram_stop][name] {
+  combine tram_stop eval(tag(name));
+}
+
+/* Build a polygon (a "convex hull") from all the tram stop nodes and
+   draw a buffer of 7px around them. */
+tram_stop {
+  geo: eval(buffer(convex_hull(prop(geo)), 7px));
+  fill-color: #a0a0a07f;
+  width: 1;
+  color: #a0a0a0af;
+  z-index: 1;
+}
+
+/* Print the stop name on the polygon from the geometry of the "default"
+   pseudo element (the statement above) */
+tram_stop::label {
+  geo: eval(prop(geo, default));
+  text: eval(tag(name));
+  z-index: 2;
 }
 ```
 

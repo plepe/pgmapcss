@@ -1,6 +1,12 @@
 #!/bin/sh
 
-for i in `ls *mapcss` ; do
+for i in \
+  roads_parks.mapcss \
+  motorway_junction.mapcss \
+  places_population.mapcss \
+  combined_roads.mapcss \
+  tramway_network.mapcss \
+  ; do
   F=$(echo $i | cut -d. -f1)
 
   cat $F.md
