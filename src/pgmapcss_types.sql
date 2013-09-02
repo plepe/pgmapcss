@@ -80,7 +80,7 @@ create type pgmapcss_properties as (
   prop_types		hstore,
   prop_has_value	hstore,
   has_combine		boolean,
-  text_length           int
+  content		text
 );
 
 drop type if exists pgmapcss_compile_stat cascade;

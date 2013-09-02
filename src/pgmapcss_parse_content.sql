@@ -25,7 +25,8 @@ begin
     end loop;
 
     for properties in select * from pgmapcss_parse_properties(content) loop
-      content=substr(content, properties.text_length);
+      content := properties.content;
+      properties.content := null;
       stat.prop_list=stat.prop_list || properties.prop_types;
     end loop;
 

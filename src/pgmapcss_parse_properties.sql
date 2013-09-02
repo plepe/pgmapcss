@@ -73,7 +73,7 @@ begin
       content=substring(content from '^\s*combine\s+[a-zA-Z0-9_\-\.]+\s+(.*)$');
 
     elsif content ~ '^\s*}' then
-      ret.text_length=strpos($1, content)+1;
+      ret.content := substring(content from '^\s*}(.*)$');
 
       return next ret;
       return;
@@ -115,9 +115,6 @@ begin
       content := substring(content, r.text_length + 1);
       content := substring(content from '^\s*;\s*(.*)$');
 
-      -- check for comments
-      content := pgmapcss_parse_comments(content);
-
     elsif content ~ '^([^;]*);' then
       ret1.value := rtrim(substring(content from '^([^;]*);'));
 
@@ -140,13 +137,13 @@ begin
 
       content=substring(content from '^[^;]*;\s*(.*)$');
 
-      -- check for comments
-      content := pgmapcss_parse_comments(content);
-
     else
       raise notice 'Error parsing prop value at "%..."', substring(content, 1, 40);
       return;
     end if;
+
+    -- check for comments
+    content := pgmapcss_parse_comments(content);
 
     if ret1.assignment_type = 'P' then
       -- TODO: return type of value
