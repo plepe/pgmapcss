@@ -233,4 +233,4 @@ tram_stop::label {
 }
 ```
 
-Data: (c) [[http://www.openstreetmap.org|OpenStreetMap]] contributors.
+Data: (c) [OpenStreetMap](http://www.openstreetmap.org) contributors.

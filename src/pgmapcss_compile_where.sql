@@ -22,7 +22,7 @@ declare
 begin
   for r in select unnest(stat.selectors) selectors, unnest(stat.properties) properties loop
     -- TODO: make list of match-relevant tags configurable
-    if (r.properties).prop_has_value ?| Array['text', 'width', 'fill-color'] then
+    if (r.properties).prop_has_value ?| Array['text', 'width', 'fill-color', 'icon-image', 'fill-image', 'image'] then
       where_selectors := array_append(where_selectors, r.selectors);
 
     elsif (r.properties).has_combine then

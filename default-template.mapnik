@@ -14,6 +14,28 @@
     </Rule>
 # END
 
+<!-- POLYGON PATTERN -->
+    <Rule>
+<!--
+* Mapnik version >= 3: remove "# FOR" and "# END" and replace by
+      <Filter>[fill-color]</Filter>
+-->
+      <Filter>[fill-image]</Filter>
+      <PolygonPatternSymbolizer file="[fill-image]" />
+    </Rule>
+
+<!-- POINTS -->
+# FOR icon-opacity
+    <Rule>
+<!--
+* Mapnik version >= 3: remove "# FOR" and "# END" and replace by
+      <Filter>[icon-image]</Filter>
+-->
+      <Filter>[icon-image] and '[icon-opacity]' = [icon-opacity]</Filter>
+      <PointSymbolizer file="[icon-image]" opacity="[icon-opacity]" />
+    </Rule>
+# END
+
 <!--
 * Mapnik version >= 3: replace by
 
@@ -37,6 +59,12 @@
       <LineSymbolizer stroke="[color]" stroke-width="[width]" stroke-opacity="[opacity]" stroke-linejoin="[linejoin]" stroke-linecap="[linecap]" stroke-dasharray="[dashes]" />
     </Rule>
 # END
+
+<!-- LINE PATTERN -->
+    <Rule>
+      <Filter>[image]</Filter>
+      <LinePatternSymbolizer file="[image]" />
+    </Rule>
 
 <!-- TEXTS on Points -->
 # FOR font-family text-color text-halo-color text-offset max-width

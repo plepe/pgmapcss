@@ -18,4 +18,4 @@ for i in \
   echo
 done
 
-echo "Data: (c) [[http://www.openstreetmap.org|OpenStreetMap]] contributors."
+echo "Data: (c) [OpenStreetMap](http://www.openstreetmap.org) contributors."

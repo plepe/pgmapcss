@@ -5,7 +5,7 @@
 
 === Point properties ===
 |= CSS parameter |= Description |= Mapnik parameter |= support Mapnik 2.x |= Compatibility MapCSS 0.2
-| icon-image | URL (absolute or relative) of an image to use as an icon. Do not enclose filename in url() | file | yes | NOT SUPPORTED YET (also: no support for url() syntax yet)
+| icon-image | URL (absolute or relative) of an image to use as an icon. Do not enclose filename in url() | file | yes | YES (no support for url() syntax yet)
 | icon-opacity | Opacity of the icon image | opacity | no eval | YES
 | icon-width | Width of image. | - | automatic | IGNORED. scaling should be applied.
 | icon-height | Height of image. | - | automatic | IGNORED. scaling should be applied.
@@ -15,18 +15,18 @@
 | color | Colour of the line. | stroke | no eval | MOSTLY: rgb(..) not supported yet
 | width | The line width in pixels. | stroke-width | no eval ; branch [[https://github.com/mapnik/mapnik/tree/stroke-width-expr|stroke-width-expr]] adds support | YES
 | opacity | How transparent the line is, from 0 (transparent) to 1 (opaque). | stroke-opacity | no eval | YES
+| image |  The URL of an image to use for filling the line | | yes | YES (no support for url() syntax yet)
 | linejoin | The style for line corners: 'round' (default), 'miter' or 'bevel'. | stroke-linejoin | no eval | YES
 | linecap | The style for the end of the line: 'butt' (default), 'round' or 'square' | stroke-linecap | no eval | MOSTLY: 'butt' should be 'none'
 | dashes | An array of alternating on/off lengths | stroke-dasharray | no eval | YES
 
-* MapCSS 0.2 properties not (yet) supported: image, casing-* (you can use a pseudo element instead), extrude, extrude-*
+* MapCSS 0.2 properties not (yet) supported: casing-* (you can use a pseudo element instead), extrude, extrude-*
 
 === Area properties ===
 |= CSS parameter |= Description |= Mapnik parameter |= support Mapnik 2.x |= Compatibility MapCSS 0.2
 | fill-color | Colour in which to fill the area. | fill | no eval | MOSTLY: rgb(..) not suported
 | fill-opacity | How transparent the fill is, from 0 (transparent) to 1 (opaque) | fill-opacity | no eval | YES
-
-* MapCSS 0.2 properties not (yet) supported: fill-image
+| fill-image |  The URL of an image to use for filling the area | | yes | YES (no support for url() syntax yet)
 
 === Label properties ===
 |= CSS parameter |= Description |= Mapnik parameter |= support Mapnik 2.x |= Compatibility MapCSS 0.2
