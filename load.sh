@@ -128,6 +128,7 @@ if [ -s $STYLE_ID.stdout ] ; then
   cat $STYLE_ID.stdout >> $STYLE_ID.output
 else
   echo "Compiling failed. See $STYLE_ID.output for details."
+  exit 1
 fi
 
 rm $STYLE_ID.stderr
