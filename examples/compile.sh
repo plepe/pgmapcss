@@ -4,6 +4,7 @@ for i in \
   roads_parks.mapcss \
   motorway_junction.mapcss \
   places_population.mapcss \
+  highest_peaks.mapcss \
   combined_roads.mapcss \
   tramway_network.mapcss \
   ; do

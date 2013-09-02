@@ -113,6 +113,50 @@ relation[boundary=administrative][admin_level<=8] {
 }
 ```
 
+Highest Peaks
+=============
+The following map shows how to build relationships to "nearby" objects. Every
+(mountain?) peak is compared to the surrounding peaks (with a distance of up to
+128px) and if the peak is the highest it is highlighted.
+
+
+![highest_peaks](highest_peaks.png)
+```css
+/* For every peak find all other peaks in a distance of max. 128px and
+   build a list of the other peak's elevation in tag 'near_ele' */
+node[natural=peak] near[distance<128] node[natural=peak] {
+  set near_ele = eval(push(tag(near_ele), parent_tag(ele)));
+}
+
+/* For every peak calculate the max elevation of the nearby peaks and save in
+   tag 'max_near_ele'. Write name and elevation on the peak. */
+node[natural=peak] {
+  set max_near_ele = eval(max(tag(near_ele)));
+  text: eval(concat(tag(name), ' (', tag(ele), ')'));
+
+/* For debugging you could uncomment the following row. It print the elevation
+   of nearby peaks into a second second row. */
+// text: eval(concat(tag(name), ' ', tag(ele), '\n(', join(tag(near_ele), ', '), ')'));
+  z-index: 4;
+
+  icon-image: highest_peaks_small.svg;
+  text-offset: 7;
+}
+
+/* if this is the highest peak of all neighbouring peaks OR the only peak,
+   print name in red and in larger font. Also write name earlier to have higher
+   preference (z-index). */
+node[natural=peak][ele>=eval(tag(max_near_ele))],
+node[natural=peak][!near_ele] {
+  font-size: 14;
+  text-color: red;
+  z-index: 3;
+
+  icon-image: highest_peaks_large.svg;
+  text-offset: 8;
+}
+```
+
 Combining street parts
 ======================
 Streets in OpenStreetMap are usually split into short junks to reflect changes in street layout: one way streets, bus routes, lanes, bicycles lanes, ... This raises a problem when rendering roads, as labels are missing (because they don't fit in a zoom level on the road) or are repeated at random intervals (when they just fit onto roads). pgmapcss 0.3 introduces 'combine', where features can be merged by statements.
