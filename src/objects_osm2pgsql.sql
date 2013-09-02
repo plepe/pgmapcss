@@ -301,7 +301,7 @@ declare
   t text;
   f float;
 begin
-  t := eval_number(Array[max_distance], object, current, render_context);
+  t := eval_number(Array[max_distance, 'u'], object, current, render_context);
   if t = '' then
     f := 0;
   else
