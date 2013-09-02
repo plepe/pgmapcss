@@ -8,7 +8,7 @@ declare
   i text;
 begin
   foreach i in array param loop
-    ret := ret || i;
+    ret := ret || coalesce(i, '');
   end loop;
 
   return ret;

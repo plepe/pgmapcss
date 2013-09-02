@@ -16,6 +16,6 @@ begin
 
   list := array_append(list, param[2]);
 
-  return array_to_string(list, ';');
+  return array_to_string(list, ';', '');
 end;
 $$ language 'plpgsql' immutable;
