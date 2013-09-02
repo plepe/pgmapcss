@@ -18,6 +18,7 @@ begin
   if substring(content, 1, 1)='!' then
     content=substring(content, 2);
     ret.op := ret.op || '! ';
+    ret.text_length := ret.text_length + 1;
   end if;
 
   r := pgmapcss_parse_string(content, E'^([a-zA-Z_0-9\\-:]+)(=|!=|<|>|<=|>=|\\^=|\\$=|\\*=|~=|=~)');
@@ -53,7 +54,7 @@ begin
     ret.op := ret.op || 'has_tag';
     ret.key := r.result;
     ret.value := null;
-    ret.text_length := r.text_length;
+    ret.text_length := ret.text_length + r.text_length;
 
     return ret;
   end if;

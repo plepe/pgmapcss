@@ -21,9 +21,9 @@ begin
   end if;
 
   -- !
-  if condition.op ~ '^!' then
+  if condition.op ~ '^! ' then
     ret := ret || 'not ';
-    condition.op := substring(condition.op, 2);
+    condition.op := substring(condition.op, 3);
   end if;
 
   -- has_condition.key
