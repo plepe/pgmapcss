@@ -21,6 +21,10 @@ begin
   param := cast($1 as text[]);
   p := Array[]::text[];
 
+  if array_upper(param, 1) is null then
+    return '';
+  end if;
+
   if param[1] !~ '^[fo]:' then
     return pgmapcss_compile_eval(param[1]);
   end if;
