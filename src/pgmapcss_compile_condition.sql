@@ -1,7 +1,8 @@
 drop function if exists pgmapcss_compile_condition(pgmapcss_condition);
 create or replace function pgmapcss_compile_condition(
   pgmapcss_condition,
-  prefix	text	default ''
+  prefix	text	default '',
+  match_where boolean default false
 )
 returns text
 as $$
@@ -18,6 +19,17 @@ begin
     final_value := quote_literal(condition.value);
   elsif condition.value_type = 1 then
     final_value := pgmapcss_compile_eval(condition.value);
+  end if;
+
+  -- when compiling for get_where()
+  if match_where then
+    if condition.value_type = 1 then
+      if condition.op ~ '^! ' then
+	return 'true';
+      else
+	return prefix || 'tags ? ' || quote_literal(condition.key);
+      end if;
+    end if;
   end if;
 
   -- !

@@ -75,7 +75,7 @@ begin
 
       if (coalesce(ob.min_scale, 0) <= f) and
 	 ((ob.max_scale is null) or (ob.max_scale > f)) then
-	c := '(' || pgmapcss_compile_conditions(ob.conditions) || ')';
+	c := '(' || pgmapcss_compile_conditions(ob.conditions, '', true) || ')';
 
 	if h ? ob.type then
 	  h := h || hstore(ob.type, h->(ob.type) || ' or ' || c);
@@ -93,7 +93,7 @@ begin
 	  foreach c in array string_to_array(substring(k, 2), ';') loop
 	    sel1 := (stat.selectors)[cast(c as int)];
 	    ob1 := sel1.object;
-	    c := '(' || pgmapcss_compile_conditions(ob1.conditions) || ')';
+	    c := '(' || pgmapcss_compile_conditions(ob1.conditions, '', true) || ')';
 
 	    if h ? ob1.type then
 	      h := h || hstore(ob1.type, h->(ob1.type) || ' or ' || c);
