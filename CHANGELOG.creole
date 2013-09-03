@@ -1,3 +1,14 @@
+0.3.0 release 2013-09-03
+* Add link selectors '>', '<', 'near'
+* Statement 'combine' to combine multiple features into one
+* Support properties 'image', 'icon-image', 'fill-image', 'text-spacing'
+* Add tag 'osm_id' from the object's id
+* New eval functions: parent_tag(), link_tag(), unqiue(), sort(), natsort(), line_merge(), convex_hull()
+* Eval functions min(), max() accept list as input
+* Accept eval()-statement in selector conditions
+* New Examples: highest peaks, combined roads, tramway network
+* Lots of bug fixes :-)
+
 0.2.0 release 2013-08-23
 * simpler database query in .mapnik stylesheet using {style_id}_match(),
   optimizing queries for every zoom level for index usage
