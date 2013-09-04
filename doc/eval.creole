@@ -74,11 +74,15 @@ Missing functions (as of MapCSS 0.2):
 
 == Geometric functions ===
 * Geometric functions are not part of the MapCSS 0.2 standard
+* All lengths are accepted / returned as pixels on screen. You may specify a different unit, e.g. line_part(prop(geo), 5m, -5m)
 
 |= Function |= Parameters |= Return value |= Description
+| line_length | geometry | number | Returns the length of a line.
 | buffer | geometry, number | geometry | Draws a buffer of the specified size (default: pixels) around the input geometry, e.g. buffer(prop(geo), 100m); if no or invalid number is specified the input geometry is returned.
 | line_merge | geometry | geometry | Merges collected line strings; polygons and other geometries will get lost.
 | convex_hull | geometry | geometry | Create a convex hull from the input geometry: http://postgis.net/docs/ST_ConvexHull.html
-| locate_point | geometry, geometry | geometry | Return the closest point on the 1st geometry (line) near the 2nd geometry (point).
+| line_locate_point | geometry, geometry | geometry | Returns a number between 0 and the length of the line representing the location of the closest point on a line (1st geometry) to the given point (2nd geometry).
+| line_interpolate_point | geometry, number | geometry | Returns a point interpolated along a line. 2nd argument is a number between 0 and the length of the line (1st argument).
+| line_part | geometry, number[, number] | geometry | Return a linestring being a substring of the input line starting and ending at the given fractions of total length. 2nd argument ist start location, 3rd argument is end location between 0..length of line. If negative arguments are used the location is calculated from the end. If the 3rd argument is omitted the end of the line is assumed.
 | line | geometry, geometry, [geometry, ...] | geometry | Return a line of all input geometries (points).
 | line | list | geometry | Return a line of all input geometries (points).
