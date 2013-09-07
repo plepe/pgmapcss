@@ -86,3 +86,6 @@ Missing functions (as of MapCSS 0.2):
 | line_part | geometry, number[, number] | geometry | Return a linestring being a substring of the input line starting and ending at the given fractions of total length. 2nd argument ist start location, 3rd argument is end location between 0..length of line. If negative arguments are used the location is calculated from the end. If the 3rd argument is omitted the end of the line is assumed.
 | line | geometry, geometry, [geometry, ...] | geometry | Return a line of all input geometries (points).
 | line | list | geometry | Return a line of all input geometries (points).
+| azimuth | geometry, geometry | number | Returns the north-based azimuth as the angle in degrees measured clockwise from the vertical on point1 to point2 (see http://postgis.net/docs/ST_Azimuth.html)
+| translate | geometry, X number, Y number | geometry | Translates the geometry to a new location using the numeric parameters as offsets (default px).
+| rotate | geometry, angle number, [center geometry] | geometry | Rotates the geometry around the center geometry (or the centroid of the input geometry) by angle degrees.
