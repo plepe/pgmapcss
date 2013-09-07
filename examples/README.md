@@ -157,6 +157,60 @@ node[natural=peak][!near_ele] {
 }
 ```
 
+Housenumbers
+============
+Professional maps usually have the housenumbers rotated to be parallel to the associated street. The following mapcss file achieves this, by using an invisible line where the housenumber is printed on. The right image shows a "debug" view, where the construction of the "invisible" (here blue) line is shown. You can remove all statements marked with "DEBUG" from the mapcss file.
+
+![housenumbers](housenumbers.png)
+```css
+/* Housenumbers get the value of tag 'addr:housenumber' printed on them */
+point|z16-[addr:housenumber] {
+  text-color: #000000;
+  text-halo-color: #ffffffaf;
+  text-halo-radius: 1;
+  text: eval(tag(addr:housenumber));
+  z-index: 4;
+}
+
+/* Highways will be shown with a black line */
+line[highway] { z-index: 1; color: #000000; }
+line[highway=primary],
+line[highway=secondary],
+line[highway=tertiary],
+line[highway=residential] {
+  width: 2px;
+}
+line[highway=unclassified],
+line[highway=pedestrian] {
+  width: 1.5px;
+}
+line[highway=service] {
+  width: 1px;
+}
+
+/* Magic: all housenumbers in the vicinity (50px) of a highway get a class
+   'has_highway' and the closest point on the highway near that housenumber
+   will be calculated (as property 'geo' of pseudo element 'on_highway') */
+line[highway] near[index=1][distance<50] point|z16-[addr:housenumber]::on_highway {
+  geo: eval(line_interpolate_point(parent_geo(), line_locate_point(parent_geo(), prop(geo))));
+  set .has_highway;
+}
+
+/* For housenumbers with class 'has_highway' a perpendicular vector to the line
+   between the housenumber point and the 'on_highway' point with a length of
+   30px is constructed. The housenumber is print on the line (text-position).
+   */
+point.has_highway|z16-[addr:housenumber] {
+  geo: eval(rotate(line(
+	translate(prop(geo), '15px', 0),
+	translate(prop(geo), '-15px', 0)
+      ),
+      0-azimuth(prop(geo), prop(geo, on_highway))
+    ));
+  text-position: line;
+}
+```
+
 Combining street parts
 ======================
 Streets in OpenStreetMap are usually split into short junks to reflect changes in street layout: one way streets, bus routes, lanes, bicycles lanes, ... This raises a problem when rendering roads, as labels are missing (because they don't fit in a zoom level on the road) or are repeated at random intervals (when they just fit onto roads). pgmapcss 0.3 introduces 'combine', where features can be merged by statements.
