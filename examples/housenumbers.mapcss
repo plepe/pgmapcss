@@ -8,7 +8,7 @@ point|z16-[addr:housenumber] {
 }
 
 /* Highways will be shown with a black line */
-line[highway] { z-index: 1; color: #000000; }
+line[highway] { z-index: 0; color: #000000; }
 line[highway=primary],
 line[highway=secondary],
 line[highway=tertiary],
@@ -31,6 +31,14 @@ line[highway] near[index=1][distance<50] point|z16-[addr:housenumber]::on_highwa
   set .has_highway;
 }
 
+/* DEBUG: draw a red line between the housenumber and the 'on_highway' point */
+point.has_highway|z16-::housenumber_to_on_highway {
+  geo: eval(line(prop(geo, default), prop(geo, on_highway)));
+  width: 1px;
+  color: #ff7f7f;
+  z-index: 1;
+}
+
 /* For housenumbers with class 'has_highway' a perpendicular vector to the line
    between the housenumber point and the 'on_highway' point with a length of
    30px is constructed. The housenumber is print on the line (text-position).
@@ -43,4 +51,19 @@ point.has_highway|z16-[addr:housenumber] {
       0-azimuth(prop(geo), prop(geo, on_highway))
     ));
   text-position: line;
+}
+
+/* DEBUG: draw a line where the housenumber gets printed on */
+point.has_highway|z16-[addr:housenumber]::housenumber_line {
+  geo: eval(prop(geo, default));
+  color: #7f7fff;
+  width: 1px;
+  z-index: 2;
+}
+
+/* DEBUG: show a big dot on the 'on_highway' point */
+point.has_highway|z16-::on_highway {
+  geo: eval(buffer(prop(geo), 2px));
+  fill-color: #af3f3f;
+  z-index: 3;
 }
