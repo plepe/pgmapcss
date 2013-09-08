@@ -35,6 +35,8 @@ begin
       stat.properties := array_append(stat.properties, properties);
     end loop;
 
+    content := pgmapcss_parse_comments(content);
+
     if content is null or content ~ '^\s*$' then
       return stat;
     end if;
