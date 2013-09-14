@@ -1,5 +1,9 @@
 * properties marked in the "support Mapnik 2.x" with "no eval" can't be evaluated by an eval statement. A warning will be issued when compiling.
 
+=== General properties ===
+|= CSS parameter |= Description |= Default value |= Compatibility MapCSS 0.2
+| z-index | specify the order the objects are drawn: The objects with higher z-index are drawn on top of objects with lower z-index | 0 | YES
+
 === Canvas properties ===
 * Not supported yet
 
