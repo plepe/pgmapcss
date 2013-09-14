@@ -3,6 +3,7 @@
 === General properties ===
 |= CSS parameter |= Description |= Default value |= Compatibility MapCSS 0.2
 | z-index | specify the order the objects are drawn: The objects with higher z-index are drawn on top of objects with lower z-index | 0 | YES
+| *-major-z-index | this is similar to z-index, but has higher priority than z-index and affects the actual style element, so that texts are placed on top of lines which are placed on top of areas. | depends on style element | NO (the default emulates MapCSS specification)
 
 === Canvas properties ===
 * Not supported yet
@@ -13,6 +14,7 @@
 | icon-opacity | Opacity of the icon image | opacity | no eval | YES
 | icon-width | Width of image. | - | automatic | IGNORED. scaling should be applied.
 | icon-height | Height of image. | - | automatic | IGNORED. scaling should be applied.
+| point-major-z-index | see *-major-z-index. Default: 4 | - | |
 
 === Line properties ===
 |= CSS parameter |= Description |= Mapnik parameter |= support Mapnik 2.x |= Compatibility MapCSS 0.2
@@ -23,6 +25,7 @@
 | linejoin | The style for line corners: 'round' (default), 'miter' or 'bevel'. | stroke-linejoin | no eval | YES
 | linecap | The style for the end of the line: 'butt' (default), 'round' or 'square' | stroke-linecap | no eval | MOSTLY: 'butt' should be 'none'
 | dashes | An array of alternating on/off lengths | stroke-dasharray | no eval | YES
+| line-major-z-index | see *-major-z-index. Default: 3 | - | |
 
 * MapCSS 0.2 properties not (yet) supported: casing-* (you can use a pseudo element instead), extrude, extrude-*
 
@@ -31,6 +34,7 @@
 | fill-color | Colour in which to fill the area. | fill | no eval | MOSTLY: rgb(..) not suported
 | fill-opacity | How transparent the fill is, from 0 (transparent) to 1 (opaque) | fill-opacity | no eval | YES
 | fill-image |  The URL of an image to use for filling the area | | yes | YES (no support for url() syntax yet)
+| fill-major-z-index | see *-major-z-index. Default: 1 | - | |
 
 === Label properties ===
 |= CSS parameter |= Description |= Mapnik parameter |= support Mapnik 2.x |= Compatibility MapCSS 0.2
@@ -44,6 +48,8 @@
 | text-halo-radius |  The radius of the halo | halo-radius | eval() with ExpressionFormat | YES
 | text | The text for the label | | yes | NO: syntax different from MapCSS (see 'Parameter text' below)
 | text-spacing | Space between repeated labels. If spacing is 0 only one label is placed (default). | spacing | yes | no standard
+| point-text-major-z-index | for text-position=center. see *-major-z-index. Default: 5 | - | |
+| line-text-major-z-index | for text-position=line. see *-major-z-index. Default: 5.1 | - | |
 
 * MapCSS 0.2 properties not (yet) supported: font-weight, font-style, font-variant, text-decoration, text-transform
 
