@@ -27,54 +27,65 @@ sub possible_values {
   return @ret;
 }
 
+sub process {
+  my $f = $_[0];
+  my @keys = @{$_[1]};
+  my $rek = $_[2];
+  my @t = ();
+  my @res;
+
+  while (<$f>) {
+    if (m/^# FOR (.*)$/) {
+      my @k = split " ", $1;
+
+      push @t, process($f, \@k, $rek+1);
+    }
+    elsif (m/^# END/) {
+      last;
+    }
+    else {
+      push @t, $_;
+    }
+  }
+
+  foreach $key (@keys) {
+    @res = ();
+
+    foreach $value (possible_values($key)) {
+      if ($value eq 'NULL') {
+      }
+      elsif ($value eq '*') {
+	$error_keys{$key} = 1;
+      }
+      else {
+	foreach $row (@t) {
+	  my $r1 = $row;
+	  $r1 =~ s/\[$key\]/$value/;
+	  push @res, $r1;
+	}
+      }
+    }
+
+    @t = @res;
+  }
+
+  return @t;
+}
+
 # now process test-template.mapnik and replace COLOR placeholders by colors
 open $f, "<${BASE}-template.mapnik";
 open $r, ">${STYLE_ID}.mapnik";
-while (<$f>) {
-  if (m/^# FOR (.*)$/) {
-    @keys = split " ", $1;
-    @t = ();
-    while (<$f>) {
-      if (m/^# END/) {
-	last;
-      }
 
-      push @t, $_;
-    }
+@t = process($f, \(), 0);
+$t = join "", @t;
+$t =~ s/DBUSER/$DBUSER/ge;
+$t =~ s/DBPASS/$DBPASS/ge;
+$t =~ s/DBHOST/$DBHOST/ge;
+$t =~ s/DB/${DB}/ge;
+$t =~ s/STYLE_ID/$STYLE_ID/ge;
 
-    foreach $key (@keys) {
-      @res = ();
+print $r $t;
 
-      foreach $value (possible_values($key)) {
-	if ($value eq 'NULL') {
-	}
-	elsif ($value eq '*') {
-	  $error_keys{$key} = 1;
-	}
-	else {
-	  foreach $row (@t) {
-	    my $r1 = $row;
-	    $r1 =~ s/\[$key\]/$value/;
-	    push @res, $r1;
-	  }
-	}
-      }
-
-      @t = @res;
-    }
-
-    print $r join "", @t;
-  }
-  else {
-    $_ =~ s/DBUSER/$DBUSER/ge;
-    $_ =~ s/DBPASS/$DBPASS/ge;
-    $_ =~ s/DBHOST/$DBHOST/ge;
-    $_ =~ s/DB/${DB}/ge;
-    $_ =~ s/STYLE_ID/$STYLE_ID/ge;
-
-    print $r $_;
-  }
-}
 close($r);
 close($f);
 
