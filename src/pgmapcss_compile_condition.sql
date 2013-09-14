@@ -61,7 +61,7 @@ begin
   -- < > <= >=
   elsif condition.op in ('<', '>', '<=', '>=') then
     if condition.value_type = 0 then
-      ret := ret || 'cast(' || prefix || 'tags->' || quote_literal(condition.key) || ' as numeric) ' || condition.op || ' ' || final_value;
+      ret := ret || 'pgmapcss_to_float(' || prefix || 'tags->' || quote_literal(condition.key) || ') ' || condition.op || ' ' || final_value;
     else
       ret := ret || 'pgmapcss_to_float(' || prefix || 'tags->' || quote_literal(condition.key) || ') ' || condition.op || ' pgmapcss_to_float(' || final_value || ')';
     end if;
