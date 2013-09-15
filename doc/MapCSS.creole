@@ -179,16 +179,17 @@ E.g.
   background-color: rgb(0.5, 50%, 127);
   width: 2px;
   text: "2px";
+  icon: url("img/foo.png");
 }
 }}}
 
 * You may enclose strings by single or double quotes. Within quoted strings you can escape characters by prefixing them with '\', e.g. '\"'. You can use '\n' to create a new line.
 * You may specify values with a unit, default: 'px' (Pixels on screen). Other supported unites: 'u' (Units in 900913 projection on the map), 'm' (Meters on the map; NOT IMPLEMENTED YET: currently 'u' is used instead).
 * You can specify colors as hex value (e.g. #ff0000) or as rgb(r, g, b). If the value is an integer values between 0..255 are accepted. Floats are accepted in the range 0.0..1.0. Percentage values 0%..100% may be specified too.
+* You may specify URLs without url()
 
 * Compatibility MapCSS 0.2: MOSTLY
 ** no definition about quoting in MapCSS
-** url locator "url(img/foo.png)" not supported yet
 
 See file [[default.creole]] for properties of styles based on the 'default' style definition.
 

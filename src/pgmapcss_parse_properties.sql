@@ -133,6 +133,23 @@ begin
       end if;
 
       content := substring(content from '^rgb\((?:[0-9\.,%\s]+)\)\s*;(.*)$');
+
+    elsif content ~ '^url\(' then
+      r := pgmapcss_parse_string(substring(content, 5));
+
+      if r is not null then
+	ret1.value := r.result;
+	content := substring(content, 5 + r.text_length);
+
+	content := substring(content from '^\s*\)\s*;(.*)$');
+
+      else
+	ret1.value := substring(content from '^url\(\s*([^\)]*)\s*\)');
+
+	content := substring(content from '^url\(\s*(?:[^\)]*)\s*\)\s*;(.*)$');
+
+      end if;
+
     elsif r is not null then
     -- value is enclosed in quotes
       ret1.value := r.result;
