@@ -281,3 +281,13 @@ street {
   text: eval(tag(name));
 }
 }}}
+
+== Define Type of property ==
+The type of a property is specified by:
+{{{
+@type property_name property_type;
+}}}
+
+Currently supported types:
+* text: The value is used as is (default)
+* tag_name: The current value of the specified tag

@@ -1,5 +1,5 @@
 point[place] {
-  text: eval(concat('== ', tag(name), ' =='));
+  text: name;
   text-halo-radius: 2;
   text-halo-fill: #ffffff;	// Mapnik >= version 3.0 or branch harfbuzz
 

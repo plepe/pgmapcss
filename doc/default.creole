@@ -53,24 +53,12 @@
 | text-color | Colour of text | fill | eval() with ExpressionFormat and branch [[https://github.com/mapnik/mapnik/tree/harfbuzz|harfbuzz]] | YES
 | text-halo-color | The colour (hex or CSS) of the 'halo' or 'pull-out' used to make the text stand out from features underneath it. | halo-fill | no eval | YES
 | text-halo-radius |  The radius of the halo | halo-radius | eval() with ExpressionFormat | YES
-| text | The text for the label | | yes | NO: syntax different from MapCSS (see 'Parameter text' below)
+| text | The text for the label | | yes | YES
 | text-spacing | Space between repeated labels. If spacing is 0 only one label is placed (default). | spacing | yes | no standard
 | point-text-major-z-index | for text-position=center. see *-major-z-index. Default: 5 | - | |
 | line-text-major-z-index | for text-position=line. see *-major-z-index. Default: 5.1 | - | |
 
 * MapCSS 0.2 properties not (yet) supported: font-weight, font-style, font-variant, text-decoration, text-transform
-
-==== Parameter 'text' ====
-In contrast to the definition of MapCSS you need to specify an eval-statement, e.g.:
-{{{
-CSS file:
-  point[place=city] {
-    text: eval(tag(name));
-  }
-
-Mapnik stylesheet:
-  <TextSymbolizer ...>[text]</TextSymbolizer>
-}}}
 
 ==== "with ExpressionFormat" ====
 <TextSymbolizer> can't read parameters from expressions, but <ExpressionFormat> (which is an undocumented feature in Mapnik 2 as of 2013-07) can. <ExpressionFormat> (as well as <Format>) is a child of TextSymbolizer and can format a part of the symbol. Therefore you can do:
