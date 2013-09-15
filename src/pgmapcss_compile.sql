@@ -17,7 +17,7 @@ begin
 
   -- find all *-major-z-index
   stat.properties_values := stat.properties_values ||
-    hstore('all-major-z-index', (select cast(array_agg(v) as text) from (select unnest(cast(value as text[])) v from each(stat.properties_values) where key ~ 'major-z-index$' group by v) t));
+    hstore('all-major-z-index', (select cast(natcasesort(array_agg(v)) as text) from (select unnest(cast(value as text[])) v from each(stat.properties_values) where key ~ 'major-z-index$' group by v) t));
 
   -- Remove all old functions / data types
   ret = ret || 'drop type if exists ' || style_id || E'_result cascade;\n';
