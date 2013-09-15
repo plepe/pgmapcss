@@ -83,7 +83,6 @@ create type pgmapcss_property as (
 drop type if exists pgmapcss_properties cascade;
 create type pgmapcss_properties as (
   properties		pgmapcss_property[],
-  prop_types		hstore,
   prop_has_value	hstore,
   has_combine		boolean,
   content		text
@@ -92,7 +91,7 @@ create type pgmapcss_properties as (
 drop type if exists pgmapcss_compile_stat cascade;
 create type pgmapcss_compile_stat as (
   func          text,
-  prop_list     hstore,
+  prop_types    hstore,
   selectors	pgmapcss_selector[],
   properties	pgmapcss_properties[],
   properties_values	hstore,

@@ -14,7 +14,7 @@ begin
   content:=$1;
   stat.selectors := Array[]::pgmapcss_selector[];
   stat.properties := Array[]::pgmapcss_properties[];
-  stat.prop_list := ''::hstore;
+  stat.prop_types := ''::hstore;
 
   loop
     selectors:=Array[]::pgmapcss_selector[];
@@ -27,7 +27,6 @@ begin
     for properties in select * from pgmapcss_parse_properties(content) loop
       content := properties.content;
       properties.content := null;
-      stat.prop_list=stat.prop_list || properties.prop_types;
     end loop;
 
     foreach r in array selectors loop

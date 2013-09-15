@@ -17,7 +17,6 @@ begin
   content:=$1;
 
   ret.properties := Array[]::pgmapcss_property[];
-  ret.prop_types := ''::hstore;
   ret.prop_has_value := ''::hstore;
   ret.has_combine := false;
 
@@ -197,7 +196,6 @@ begin
 
     if ret1.assignment_type = 'P' then
       -- TODO: return type of value
-      ret.prop_types := ret.prop_types || hstore(ret1.key, 'text');
       if ((ret1.value != '') and (ret1.value is not null)) or
 	  (ret1.eval_value is not null) then
 	ret.prop_has_value := ret.prop_has_value || hstore(ret1.key, '1');

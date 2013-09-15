@@ -32,8 +32,8 @@ begin
   a = array_append(a, E'  _types\ttext[]');
   a = array_append(a, E'  _pseudo_element\ttext');
   a = array_append(a, E'  _properties\thstore');
-  for i in select * from each(stat.prop_list) loop
-    a = array_append(a, E'  ' || quote_ident(i.key) || E'\t' || i.value);
+  for i in select * from each(stat.properties_values) loop
+    a = array_append(a, E'  ' || quote_ident(i.key) || E'\ttext');
   end loop;
   ret = ret || array_to_string(a, E',\n');
   ret = ret || E'\n);\n\n';
@@ -100,8 +100,8 @@ begin
   ret = ret || E'  return query \n';
   ret = ret || E'    select \n';
   ret = ret || E'      id, tags, geo, types, pseudo_element, properties';
-  for i in select * from each(stat.prop_list) loop
-    ret = ret || E',\n      cast(properties->' || quote_literal(i.key) || E' as ' || quote_ident(i.value) || E')';
+  for i in select * from each(stat.properties_values) loop
+    ret = ret || E',\n      properties->' || quote_literal(i.key);
   end loop;
   ret = ret || E'    from\n';
   ret = ret || E'    (select (result).* from\n';
