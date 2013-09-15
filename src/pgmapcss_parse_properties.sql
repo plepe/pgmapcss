@@ -40,6 +40,7 @@ begin
     ret1.key := null;
     ret1.value := null;
     ret1.eval_value := null;
+    ret1.value_type := null;
     ret1.unit := null;
 
     if content ~ '^\s*([a-zA-Z0-9_-]+)\s*:' then
@@ -105,6 +106,7 @@ begin
       end if;
 
       ret1.eval_value := r.result;
+      ret1.value_type := 1;
 
       content := substring(content, 6 + r.text_length);
       content := substring(content from '^[^;]*;\s*(.*)$');
@@ -130,6 +132,7 @@ begin
 	end loop;
 
 	ret1.value := '#' || array_to_string(ta, '');
+	ret1.value_type := 3;
       end if;
 
       content := substring(content from '^rgb\((?:[0-9\.,%\s]+)\)\s*;(.*)$');
@@ -150,15 +153,19 @@ begin
 
       end if;
 
+      ret1.value_type := 4;
+
     elsif r is not null then
     -- value is enclosed in quotes
       ret1.value := r.result;
+      ret1.value_type := 2;
 
       content := substring(content, r.text_length + 1);
       content := substring(content from '^\s*;\s*(.*)$');
 
     elsif content ~ '^([^;]*);' then
       ret1.value := rtrim(substring(content from '^([^;]*);'));
+      ret1.value_type := 0;
 
       if ret1.value = '' then
 	ret1.value := null;
@@ -174,6 +181,7 @@ begin
 	else
 	  ret1.eval_value := pgmapcss_parse_eval('number("' || ret1.value || '")');
 	  ret1.value := null;
+	  ret1.value_type := 1;
 	end if;
       end if;
 

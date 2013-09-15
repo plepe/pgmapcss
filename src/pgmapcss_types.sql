@@ -71,6 +71,12 @@ create type pgmapcss_property as (
   key			text,
   value			text,
   eval_value		text,
+  value_type		smallint,
+  -- 0 .. value
+  -- 1 .. eval()
+  -- 2 .. quoted string
+  -- 3 .. rgb()
+  -- 4 .. url()
   unit			text
 );
 
