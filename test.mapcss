@@ -39,7 +39,7 @@ way|z11-14[highway=primary]
 way|z11-14[highway=primary]::casing
 {
   width: 4;
-  color: #A0A0A0;
+  color: rgb(0.5, 127, 50%);
 }
 
 way|z15-[highway=primary]
@@ -50,7 +50,7 @@ way|z15-[highway=primary]
 way|z15-[highway=primary]::casing
 {
   width: 7;
-  color: #A0A0A0;
+  color: rgb(0.5, 127, 50%);
 }
 way|z11-[bridge]::casing
 {

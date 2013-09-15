@@ -10,6 +10,7 @@ declare
   ret1 pgmapcss_property;
   content text;
   m text;
+  ta text[];
   r record;
   r1 record;
 begin
@@ -108,6 +109,30 @@ begin
       content := substring(content, 6 + r.text_length);
       content := substring(content from '^[^;]*;\s*(.*)$');
 
+    elsif content ~ '^rgb\(' then
+      m := substring(content from '^rgb\(([0-9\.,%\s]+)\)');
+
+      ta := string_to_array(m, ',');
+      if array_upper(ta, 1) != 3 then
+	raise notice 'Error parsing rgb() value: "%"', m;
+      else
+	for r in 1..3 loop
+	  if ta[r] ~ '^\s*([0-9]+)\s*$' then
+	    ta[r] := lpad(to_hex(cast(ta[r] as int)), 2, '0');
+	  elsif ta[r] ~ '^\s*([0-9]+\.[0-9]+)\s*$' then
+	    ta[r] := lpad(to_hex(cast(cast(ta[r] as float) * 255 as int)), 2, '0');
+	  elsif ta[r] ~ '^\s*([0-9]+(\.[0-9]+)?)%\s*$' then
+	    m := substring(ta[r] from '^\s*([0-9]+(\.[0-9]+)?)%\s*$');
+	    ta[r] := lpad(to_hex(cast(cast(m as float) * 2.55 as int)), 2, '0');
+	  else
+	    raise notice 'Can''t parse rgb() value: "%"', ta[r];
+	  end if;
+	end loop;
+
+	ret1.value := '#' || array_to_string(ta, '');
+      end if;
+
+      content := substring(content from '^rgb\((?:[0-9\.,%\s]+)\)\s*;(.*)$');
     elsif r is not null then
     -- value is enclosed in quotes
       ret1.value := r.result;

@@ -18,7 +18,7 @@
 
 === Line properties ===
 |= CSS parameter |= Description |= Mapnik parameter |= support Mapnik 2.x |= Compatibility MapCSS 0.2
-| color | Colour of the line. | stroke | no eval | MOSTLY: rgb(..) not supported yet
+| color | Colour of the line. | stroke | no eval | YES
 | width | The line width in pixels. | stroke-width | no eval ; branch [[https://github.com/mapnik/mapnik/tree/stroke-width-expr|stroke-width-expr]] adds support | YES
 | opacity | How transparent the line is, from 0 (transparent) to 1 (opaque). | stroke-opacity | no eval | YES
 | image |  The URL of an image to use for filling the line | | yes | YES (no support for url() syntax yet)
@@ -26,7 +26,7 @@
 | linecap | The style for the end of the line: 'butt' (default), 'round' or 'square' | stroke-linecap | no eval | MOSTLY: 'butt' should be 'none'
 | dashes | An array of alternating on/off lengths | stroke-dasharray | no eval | YES
 | line-major-z-index | see *-major-z-index. Default: 3 | - | |
-| casing-color | Colour of the casing (border) of a line. | stroke | no eval | MOSTLY: rgb(..) not supported yet
+| casing-color | Colour of the casing (border) of a line. | stroke | no eval | YES
 | casing-width | Width of the casing (border) of the line (add to 'width' of the line). | stroke-width | no eval ; branch [[https://github.com/mapnik/mapnik/tree/stroke-width-expr|stroke-width-expr]] adds support | YES
 | casing-opacity | How transparent the casing is, from 0 (transparent) to 1 (opaque). | stroke-opacity | no eval | YES
 | casing-linejoin | The style for casing corners: 'round' (default), 'miter' or 'bevel'. | stroke-linejoin | no eval | YES
@@ -38,7 +38,7 @@
 
 === Area properties ===
 |= CSS parameter |= Description |= Mapnik parameter |= support Mapnik 2.x |= Compatibility MapCSS 0.2
-| fill-color | Colour in which to fill the area. | fill | no eval | MOSTLY: rgb(..) not suported
+| fill-color | Colour in which to fill the area. | fill | no eval | YES
 | fill-opacity | How transparent the fill is, from 0 (transparent) to 1 (opaque) | fill-opacity | no eval | YES
 | fill-image |  The URL of an image to use for filling the area | | yes | YES (no support for url() syntax yet)
 | fill-major-z-index | see *-major-z-index. Default: 1 | - | |
@@ -50,8 +50,8 @@
 | text-position | Whether the text follows the path of the way ('line') or is centred on the area ('center') | placement | | YES
 | font-family | Name of the font to use | face-name | eval() with ExpressionFormat | syntax differnet (face-name includes weight/style option)
 | font-size | Size of the text | size | eval() with ExpressionFormat | YES
-| text-color | Colour of text | fill | eval() with ExpressionFormat and branch [[https://github.com/mapnik/mapnik/tree/harfbuzz|harfbuzz]] | MOSTLY: rgb(..) not suported
-| text-halo-color | The colour (hex or CSS) of the 'halo' or 'pull-out' used to make the text stand out from features underneath it. | halo-fill | no eval | MOSTLY: rgb(..) not suported
+| text-color | Colour of text | fill | eval() with ExpressionFormat and branch [[https://github.com/mapnik/mapnik/tree/harfbuzz|harfbuzz]] | YES
+| text-halo-color | The colour (hex or CSS) of the 'halo' or 'pull-out' used to make the text stand out from features underneath it. | halo-fill | no eval | YES
 | text-halo-radius |  The radius of the halo | halo-radius | eval() with ExpressionFormat | YES
 | text | The text for the label | | yes | NO: syntax different from MapCSS (see 'Parameter text' below)
 | text-spacing | Space between repeated labels. If spacing is 0 only one label is placed (default). | spacing | yes | no standard
