@@ -6,6 +6,7 @@ as $$
 #variable_conflict use_variable
 declare
   r pgmapcss_selector;
+  r1 record;
   selectors pgmapcss_selector[];
   properties pgmapcss_properties;
   content text;
@@ -18,6 +19,10 @@ begin
 
   loop
     selectors:=Array[]::pgmapcss_selector[];
+
+    r1 := pgmapcss_parse_defines(content, stat);
+    content := r1.content;
+    stat := r1.stat;
 
     for r in select * from pgmapcss_parse_selectors(content) loop
       selectors=array_append(selectors, r);

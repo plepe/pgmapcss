@@ -1,4 +1,5 @@
 /* DEFAULT VALUES (and make sure that result columns are available) */
+@type text tag_value;
 *::(*) {
 // General
   z-index: 0;
