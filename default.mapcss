@@ -3,6 +3,7 @@
 // General
   z-index: 0;
   fill-major-z-index: 1;
+  casing-major-z-index: 2;
   line-major-z-index: 3;
   point-major-z-index: 4;
   point-text-major-z-index: 5;
@@ -22,6 +23,13 @@
   linejoin: round;
   linecap: butt;
   dashes: none;
+// Casing LineSymbolizer
+  casing-width: ;
+  casing-color: ;
+  casing-opacity: 1;
+  casing-linejoin: round;
+  casing-linecap: butt;
+  casing-dashes: none;
 // LinePatternSymbolizer
   image: ;
 // TextSymbolizer

@@ -26,8 +26,15 @@
 | linecap | The style for the end of the line: 'butt' (default), 'round' or 'square' | stroke-linecap | no eval | MOSTLY: 'butt' should be 'none'
 | dashes | An array of alternating on/off lengths | stroke-dasharray | no eval | YES
 | line-major-z-index | see *-major-z-index. Default: 3 | - | |
+| casing-color | Colour of the casing (border) of a line. | stroke | no eval | MOSTLY: rgb(..) not supported yet
+| casing-width | Width of the casing (border) of the line (add to 'width' of the line). | stroke-width | no eval ; branch [[https://github.com/mapnik/mapnik/tree/stroke-width-expr|stroke-width-expr]] adds support | YES
+| casing-opacity | How transparent the casing is, from 0 (transparent) to 1 (opaque). | stroke-opacity | no eval | YES
+| casing-linejoin | The style for casing corners: 'round' (default), 'miter' or 'bevel'. | stroke-linejoin | no eval | YES
+| casing-linecap | The style for the end of the casing: 'butt' (default), 'round' or 'square' | stroke-linecap | no eval | MOSTLY: 'butt' should be 'none'
+| casing-dashes | An array of alternating on/off lengths | stroke-dasharray | no eval | YES
+| casing-major-z-index | see *-major-z-index. Default: 3 | - | |
 
-* MapCSS 0.2 properties not (yet) supported: casing-* (you can use a pseudo element instead), extrude, extrude-*
+* MapCSS 0.2 properties not (yet) supported: extrude, extrude-*
 
 === Area properties ===
 |= CSS parameter |= Description |= Mapnik parameter |= support Mapnik 2.x |= Compatibility MapCSS 0.2
