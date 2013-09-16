@@ -103,7 +103,7 @@ The tag 'osm_id' will be set to the ID of the object.
 === Pseudo classes ===
 After the condition selector(s), separated by ':'. Several pseudo classes may be specified. Optional.
 
-NOT SUPPORTED YET.
+Pseudo classes will be parsed, but as no pseudo classes are supported yet, the concerened rules will be simply disabled.
 
 === Pseudo elements ===
 After the pseudo class(es), separated by '::'. Optional.

@@ -21,6 +21,11 @@ begin
     ret := ret || ' and render_context.scale_denominator < ' || selector.max_scale;
   end if;
 
+  -- no support for pseudo classes yet -> ignore statement
+  if array_upper(selector.pseudo_classes, 1) is not null then
+    ret := ret || ' and false';
+  end if;
+
   return ret;
 end;
 $$ language 'plpgsql' immutable;
