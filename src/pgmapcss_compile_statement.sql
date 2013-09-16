@@ -64,21 +64,28 @@ begin
 
     -- property assignment
     if property.assignment_type = 'P' then
-      if prop_type != 'text' and property.value_type = 0 and property.value is not null then
-	ret = ret || pgmapcss_compile_statement_print_set(prop_to_set, tags_to_set, current_pseudo_element);
-	prop_to_set := ''::hstore;
-	tags_to_set := ''::hstore;
+      if property.value_type = 0 then
+	if property.value is null then
+	  prop_to_set := prop_to_set || hstore(property.key, property.value);
+	  stat.properties_values := hstore_array_append_unique(
+	    stat.properties_values, property.key, property.value);
 
-	ret = ret ||
-	  '  current.styles[' || current_pseudo_element || '] = ' ||
-	  'current.styles[' || current_pseudo_element || '] || hstore(' ||
-	  quote_literal(property.key) || ', pgmapcss_type_' ||
-	  quote_ident(prop_type) || E'(' ||
-	  quote_literal(property.value) ||
-	  E', object, current, render_context));\n';
+	elsif prop_type = 'tag_value' then
+	  ret = ret ||
+	    '  current.styles[' || current_pseudo_element || '] = ' ||
+	    'current.styles[' || current_pseudo_element || '] || hstore(' ||
+	    quote_literal(property.key) || ', (current.tags)->' ||
+	    quote_literal(property.value) || E');\n';
 
-	stat.properties_values := hstore_array_append_unique(
-	  stat.properties_values, property.key, '*');
+	  stat.properties_values := hstore_array_append_unique(
+	    stat.properties_values, property.key, '*');
+
+	else
+	  prop_to_set := prop_to_set || hstore(property.key, property.value);
+	  stat.properties_values := hstore_array_append_unique(
+	    stat.properties_values, property.key, property.value);
+
+        end if;
 
       elsif property.eval_value is null then
 	prop_to_set := prop_to_set || hstore(property.key, property.value);

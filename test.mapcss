@@ -1,6 +1,6 @@
 point[place] {
-  text: name;
   text-halo-radius: 2;
+  text: name;
   text-halo-fill: #ffffff;	// Mapnik >= version 3.0 or branch harfbuzz
 
   character-spacing: 1;

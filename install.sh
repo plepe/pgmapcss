@@ -74,7 +74,6 @@ for i in \
   pgmapcss_render_context.sql \
   pgmapcss_object.sql \
   pgmapcss_to.sql \
-  pgmapcss_type.sql \
   pgmapcss_parse_string.sql \
   pgmapcss_parse_condition.sql \
   pgmapcss_parse_comments.sql \
