@@ -10,7 +10,7 @@ declare
   t text;
 begin
   foreach i in array param loop
-    t := eval_number(Array[i], object, current, render_context);
+    t := eval_metric(Array[i], object, current, render_context);
 
     if t = '' then
       return '';

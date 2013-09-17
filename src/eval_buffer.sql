@@ -10,7 +10,7 @@ begin
     return param[1];
   end if;
 
-  t := eval_number(Array[param[2], 'u'], object, current, render_context);
+  t := eval_metric(Array[param[2], 'u'], object, current, render_context);
 
   if t is null or t = '' then
     return param[1];

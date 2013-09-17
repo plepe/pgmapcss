@@ -1,14 +1,21 @@
-create or replace function eval_line_length(param text[],
+create or replace function eval_num(param text[],
   object pgmapcss_object, current pgmapcss_current, render_context pgmapcss_render_context)
 returns text
 as $$
 #variable_conflict use_variable
 declare
+  f numeric;
 begin
-  if array_upper(param, 1) < 1 then
+  if array_upper(param, 1) is null then
     return '';
   end if;
 
-  return eval_metric(Array[ST_Length(param[1]) || 'u'], object, current, render_context);
+  begin
+    return cast(param[1] as numeric);
+  exception
+    when others then
+      return '';
+  end ;
 end;
 $$ language 'plpgsql' immutable;
+

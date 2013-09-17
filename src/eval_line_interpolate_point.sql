@@ -16,7 +16,7 @@ begin
   if array_upper(param, 1) < 2 then
     f := 0.5;
   else
-    f := cast(eval_number(Array[param[2], 'u'], object, current, render_context)
+    f := cast(eval_metric(Array[param[2], 'u'], object, current, render_context)
       as float) / l;
   end if;
 

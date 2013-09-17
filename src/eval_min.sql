@@ -20,7 +20,7 @@ begin
   end if;
 
   foreach r in array list loop
-    r := eval_number(Array[r], object, current, render_context);
+    r := eval_metric(Array[r], object, current, render_context);
 
     if r is not null and r != '' then
       f := cast(r as float);

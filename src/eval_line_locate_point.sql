@@ -10,7 +10,7 @@ begin
     return '';
   end if;
 
-  return eval_number(Array[
+  return eval_metric(Array[
     ST_Line_Locate_Point(param[1], param[2]) * ST_Length(param[1])
     || 'u'], object, current, render_context);
 end;

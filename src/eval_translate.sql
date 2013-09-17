@@ -13,8 +13,8 @@ begin
     return param[1];
   end if;
 
-  x := eval_number(Array[param[2], 'u'], object, current, render_context);
-  y := eval_number(Array[param[3], 'u'], object, current, render_context);
+  x := eval_metric(Array[param[2], 'u'], object, current, render_context);
+  y := eval_metric(Array[param[3], 'u'], object, current, render_context);
 
   return ST_Translate(param[1], x, y);
 end;

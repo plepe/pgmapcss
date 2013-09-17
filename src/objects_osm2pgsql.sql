@@ -301,7 +301,7 @@ declare
   t text;
   f float;
 begin
-  t := eval_number(Array[max_distance, 'u'], object, current, render_context);
+  t := eval_metric(Array[max_distance, 'u'], object, current, render_context);
   if t = '' then
     f := 0;
   else
@@ -316,7 +316,7 @@ begin
   return query select
     *,
     hstore(Array[
-      'distance', eval_number(Array[ST_Distance(object.geo, geo) || 'u', 'px'], object, current, render_context)
+      'distance', eval_metric(Array[ST_Distance(object.geo, geo) || 'u', 'px'], object, current, render_context)
     ]) link_tags
   from
     objects(r, where_clauses)

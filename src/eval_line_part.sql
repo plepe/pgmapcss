@@ -15,11 +15,11 @@ begin
 
   l := ST_Length(param[1]);
 
-  pos0 := cast(eval_number(Array[param[2], 'u'], object, current, render_context) as float);
+  pos0 := cast(eval_metric(Array[param[2], 'u'], object, current, render_context) as float);
   if array_upper(param, 1) < 3 then
     pos1 := l;
   else
-    pos1 := cast(eval_number(Array[param[3], 'u'], object, current, render_context) as float);
+    pos1 := cast(eval_metric(Array[param[3], 'u'], object, current, render_context) as float);
   end if;
 
   -- check for negative values

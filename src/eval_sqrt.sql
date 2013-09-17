@@ -8,7 +8,7 @@ declare
   t text;
 begin
   if array_upper(param, 1) >= 1 then
-    t := eval_number(Array[param[1]], object, current, render_context);
+    t := eval_metric(Array[param[1]], object, current, render_context);
 
     if t = '' then
       return '';

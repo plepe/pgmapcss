@@ -11,8 +11,8 @@ declare
   p2 float;
 begin
   if array_upper(param, 1) >= 2 then
-    p1 := cast(eval_number(Array[param[1]], object, current, render_context) as float);
-    p2 := cast(eval_number(Array[param[2]], object, current, render_context) as float);
+    p1 := cast(eval_metric(Array[param[1]], object, current, render_context) as float);
+    p2 := cast(eval_metric(Array[param[2]], object, current, render_context) as float);
     if p1 <= p2 then
       return 'true';
     else
