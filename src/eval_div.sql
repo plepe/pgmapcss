@@ -5,7 +5,7 @@ returns text
 as $$
 #variable_conflict use_variable
 declare
-  ret float := 1;
+  ret float := null;
   i text;
   t text;
 begin
