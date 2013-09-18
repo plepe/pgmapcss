@@ -291,3 +291,14 @@ The type of a property is specified by:
 Currently supported types:
 * text: The value is used as is (default)
 * tag_name: The current value of the specified tag
+
+== Define default values to other properties ==
+If the value of a property defaults to the value of another property, this is specified by:
+{{{
+@default_other property_name property_name_other;
+}}}
+
+E.g.
+{{{
+@default_other casing-linecap linecap; // value of 'casing-linecap' defaults to value of 'linecap'
+}}}

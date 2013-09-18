@@ -24,6 +24,13 @@ begin
 
       stat.prop_types := stat.prop_types || hstore(m, m1);
 
+    elsif content ~ '^\s*@default_other' then
+      m := substring(content from '\s*@default_other\s+([^\s]+)\s+([^\s]+)\s*;');
+      m1 := substring(content from '\s*@default_other\s+(?:[^\s]+)\s+([^\s]+)\s*;');
+      content := substring(content from '\s*@default_other\s+(?:[^\s]+)\s+(?:[^\s]+)\s*;(.*)$');
+
+      stat.prop_default_other := stat.prop_default_other || hstore(m, m1);
+
     else
       return;
 

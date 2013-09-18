@@ -66,6 +66,15 @@ begin
   ret = ret || E'  ret.tags=current.tags;\n';
   ret = ret || E'  for r in select * from (select generate_series(1, ' || array_upper(stat.pseudo_elements, 1) || E') i, unnest(current.styles) style) t order by coalesce(cast(style->''object-z-index'' as float), 0) asc loop\n';
   ret = ret || E'    if current.has_pseudo_element[r.i] then\n';
+
+  -- default_other values
+  for i in select * from each(stat.prop_default_other) loop
+    ret = ret || E'      if (current.styles[r.i]->' || quote_literal(i.key) ||
+      E') is null then current.styles[r.i] := current.styles[r.i] || hstore(' ||
+      quote_literal(i.key) || ', current.styles[r.i]->' ||
+      quote_literal(i.value) || E'); end if;\n';
+  end loop;
+
   ret = ret || E'      ret.geo=current.styles[r.i]->''geo'';\n';
   ret = ret || E'      current.styles[r.i] := current.styles[r.i] - ''geo''::text;\n';
   ret = ret || E'      ret.properties=current.styles[r.i];\n';

@@ -92,6 +92,7 @@ drop type if exists pgmapcss_compile_stat cascade;
 create type pgmapcss_compile_stat as (
   func          text,
   prop_types    hstore,
+  prop_default_other 	hstore, -- @default_other statements
   selectors	pgmapcss_selector[],
   properties	pgmapcss_properties[],
   properties_values	hstore,
