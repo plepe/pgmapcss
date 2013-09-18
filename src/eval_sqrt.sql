@@ -8,10 +8,14 @@ declare
   t text;
 begin
   if array_upper(param, 1) >= 1 then
-    t := eval_metric(Array[param[1]], object, current, render_context);
+    if param[1] = '' or param[1] is null then
+      t := '0';
+    else
+      t := eval_metric(Array[param[1]], object, current, render_context);
 
-    if t = '' then
-      return '';
+      if t = '' then
+	return '';
+      end if;
     end if;
 
     return cast(sqrt(cast(t as float)) as text);

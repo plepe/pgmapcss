@@ -10,10 +10,14 @@ declare
   t text;
 begin
   foreach i in array param loop
-    t := eval_metric(Array[i], object, current, render_context);
+    if i = '' or i is null then
+      t := '0';
+    else
+      t := eval_metric(Array[i], object, current, render_context);
 
-    if t = '' then
-      return '';
+      if t = '' then
+	return '';
+      end if;
     end if;
 
     ret := ret * cast(t as float);
