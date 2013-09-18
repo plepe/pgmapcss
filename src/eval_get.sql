@@ -12,7 +12,7 @@ begin
     return '';
   end if;
 
-  t := eval_metric(Array[param[2]], object, current, render_context);
+  t := eval_int(Array[param[2]], object, current, render_context);
 
   if t = '' then
     return '';

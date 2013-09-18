@@ -7,6 +7,7 @@ In fact all values are internally stored as strings, but are converted to data t
 | //string// | Any text; may be enclosed in quotes ("..." or '...'). (//none// is an empty string). | "foobar", 'foobar', foobar
 | //key// | A string which is used as key of tag or a property. | name:en
 | //number// | A chain of digits, may contain a '.' as decimal point. (//none// is treated as 0). May be suffixed by a unit name (see below). | 2.5, 5px, 30m
+| //int//, //float// | A number without unit | 2 resp. 2.5
 | //boolean// | true or false. If expression equals 0, "no", "false" or //none// the value is considerd false, true otherwise. If a function returns a boolean value, "true" or "false" is returned.
 | //list// | A list of values, separated by ';' | 'atm;bank'.
 | //geometry// | A (e)WKB representation of a geometry as used by PostGIS
@@ -49,7 +50,7 @@ If you read a number, unit conversion takes place. The following units are suppo
 | str | value | string | "Converts" input value to string. As every input is a string, does nothing. | MapCSS 0.2
 | int | value | number | Returns the integer part of the input (e.g. '-5.6' => '-5', '8.9' => '8'). Does not accept units.
 | num | value | number | Checks if the input is a number. If not, none is returned. | MapCSS 0.2
-| round | v number, s [number] | Round the input value v to s decimal places (or 0). E.g. round(-50.6, 1) => -51 | no standard
+| round | v number, [s int] | Round the input value v to s decimal places (or 0). E.g. round(-50.6, 1) => -51 | no standard
 | debug | value | value | raise a postgresql notice with the value; returns value. E.g. width: eval(debug(5+4)); | no standard
 
 === List functions ===
@@ -57,8 +58,8 @@ If you read a number, unit conversion takes place. The following units are suppo
 
 |= Function |= Parameters |= Return value |= Description
 | list | value, [value, [value, ...]] | list | Returns a list from all input values. E.g. list("Alice", "Bob") -> "Alice;Bob"
-| get | list, number | value | Returns the n-th element of the list (counting starts at 0)
-| set | list, number, value | list | Sets the n-th element of the list to value
+| get | list, int | value | Returns the n-th element of the list (counting starts at 0)
+| set | list, int , value | list | Sets the n-th element of the list to value
 | push | list, value | list | Appends value to list
 | split | string, string | list | Split the 1st string at occurences of the separator string (2nd string), e.g. split("Alice and Bob", " ") -> "Alice;and;Bob"
 | join | list, string | string | Join the list by the string, e.g. join("Alice;Bob", " and ") -> "Alice and Bob"
