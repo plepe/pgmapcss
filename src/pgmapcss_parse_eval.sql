@@ -43,7 +43,7 @@ begin
   param := Array[]::text[];
 
   loop
-    -- raise notice 'eval: (math%) (mode%) "%..."', math_level, mode, substring(content, i, 20);
+    raise notice 'eval: (math%) (mode%) "%..."', math_level, mode, substring(content, i, 20);
     if esc = true then
       current := current || current_whitespace || substring(content, i, 1);
       current_whitespace := '';
@@ -106,11 +106,12 @@ begin
 
       elsif
         (substring(content, i, 1) = '.' and mode = 2) or
+        (substring(content, i, 1) in ('+', '-') and mode in (1, 2)) or
         substring(content, i, 2) ~ op_regexp
       then
 
-	if substring(content, i, 1) = '.' then
-	  t := '.';
+	if substring(content, i, 1) in ('.', '+', '-') then
+	  t := substring(content, i, 1);
 	else
 	  t := substring(substring(content, i, 2) from op_regexp);
 	end if;
@@ -184,6 +185,8 @@ begin
 	current := '';
 	current_whitespace := '';
 	current_length := 0;
+	mode := 4;
+
       else
 	-- maybe ignore whitespace
 	if substring(content, i) ~ '^\s' then
@@ -192,9 +195,13 @@ begin
 	    current_whitespace := current_whitespace || substring(content, i, 1);
 	    current_length := current_length + 1;
 	  end if;
-	elsif mode > 1 then
+	elsif mode > 1 and mode != 4 then
 	  raise warning 'Error parsing eval statement at "%..."', substring(content, i, 20);
 	else
+	  if mode = 4 then
+	    mode := 1;
+	  end if;
+
 	  current := current || current_whitespace || substring(content, i, 1);
 	  current_whitespace := '';
 	  current_length := current_length + 1;
