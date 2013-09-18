@@ -34,7 +34,7 @@ begin
   -- raise notice 'parse_eval(''%'', %, ''%'')', content, math_level, current_op;
   
   -- compile eval operator regexp
-  select '^(' || array_to_string(array_agg(x), '|') || ')' into op_regexp from (select replace(regexp_replace(op, '(\+|\*)', E'\\ \\1', 'g'), ' ', '') x from eval_operators) t;
+  select '^(' || array_to_string(array_agg(x), '|') || ')' into op_regexp from (select replace(regexp_replace(op, '(\+|\*)', E'\\ \\1', 'g'), ' ', '') x from eval_operators where in_regexp = true) t;
 
   i := 1;
   current := ''::text;
@@ -103,8 +103,18 @@ begin
 	ret.result := cast(param as text);
 	ret.text_length := i;
 	return ret;
-      elsif substring(content, i, 2) ~ op_regexp then
-        t := substring(substring(content, i, 2) from op_regexp);
+
+      elsif
+        (substring(content, i, 1) = '.' and mode = 2) or
+        substring(content, i, 2) ~ op_regexp
+      then
+
+	if substring(content, i, 1) = '.' then
+	  t := '.';
+	else
+	  t := substring(substring(content, i, 2) from op_regexp);
+	end if;
+
 	i := i + length(t) - 1;
 	j :=  (CASE WHEN t in ('+', '-') THEN 3
 	            WHEN t in ('*', '/') THEN 2

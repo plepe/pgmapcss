@@ -22,6 +22,7 @@ If you read a number, unit conversion takes place. The following units are suppo
 == Operators ==
 |= Operator |= Description |= Compatibility
 | +, -, *, / | arithmetic operations (see add, sub, mul, div for description) | MapCSS 0.2
+| . | concatenate strings (strings need to be quoted though) | MapCSS 0.2
 | ==, !=, <> | string comparison (equal, not equal, not equal) | TODO: MapCSS 0.2: number comparison
 | >, >=, <=, < | number comparison | MapCSS 0.2
 | , or ; | several statements separated by , or ; will always return the value of the last statement.
