@@ -43,7 +43,7 @@ begin
   param := Array[]::text[];
 
   loop
-    raise notice 'eval: (math%) (mode%) "%..."', math_level, mode, substring(content, i, 20);
+    -- raise notice 'eval: (math%) (mode%) "%..."', math_level, mode, substring(content, i, 20);
     if esc = true then
       current := current || current_whitespace || substring(content, i, 1);
       current_whitespace := '';
