@@ -7,14 +7,12 @@ For starters a simple example will be shown: Major roads and parks.
 /* draw a green polygon for all parks */
 area[leisure=park] {
   fill-color: #00af00;
-}
+
 /* print a label on all parks */
-area[leisure=park]::label {
   text: eval(tag(name));
   font-family: "DejaVu Sans Oblique";
   font-size: 9;
   text-color: #005f00;
-  z-index: 3;
 }
 
 /* all major roads will be rendered with a 2px black line */
@@ -23,20 +21,15 @@ line|z12-[highway=secondary],
 line|z12-[highway=tertiary] {
   color: #000000;
   width: 2;
-  z-index: 1;
-}
+
 /* and a black label next to the line
    with a 50% transparent white halo */
-line|z12-[highway=primary]::label,
-line|z12-[highway=secondary]::label,
-line|z12-[highway=tertiary]::label {
   text: eval(tag(name));
   text-offset: 9;
   text-color: #000000;
   text-halo-color: #ffffff7f;
   text-halo-radius: 1;
-  line-position: line;
-  z-index: 2;
+  text-position: line;
 }
 ```
 
@@ -61,23 +54,16 @@ line[highway=trunk_link] {
 line.major_road {
   linecap: round;
   color: #ff0000;
-  z-index: eval(any(tag('layer'), 0)+0.5);
+  casing-width: 1;
+  casing-linecap: butt;
+  casing-color: #707070;
 }
-
-line.major_road::casing {
-  linecap: butt;
-  width: eval(prop(width, default)+2);
-  color: #707070;
-  z-index: eval(any(tag('layer'), 0));
-}
-line.major_road[bridge]::casing {
-  color: #000000;
+line.major_road[bridge] {
+  casing-color: #000000;
 }
 line.major_road[tunnel] {
   color: #ff7f7f;
-}
-line.major_road[tunnel]::casing {
-  dashes: 3, 3;
+  casing-dashes: 3, 3;
 }
 ```
 

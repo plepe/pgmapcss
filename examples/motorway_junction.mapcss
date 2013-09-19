@@ -11,21 +11,14 @@ line[highway=trunk_link] {
 line.major_road {
   linecap: round;
   color: #ff0000;
-  z-index: eval(any(tag('layer'), 0)+0.5);
+  casing-width: 1;
+  casing-linecap: butt;
+  casing-color: #707070;
 }
-
-line.major_road::casing {
-  linecap: butt;
-  width: eval(prop(width, default)+2);
-  color: #707070;
-  z-index: eval(any(tag('layer'), 0));
-}
-line.major_road[bridge]::casing {
-  color: #000000;
+line.major_road[bridge] {
+  casing-color: #000000;
 }
 line.major_road[tunnel] {
   color: #ff7f7f;
-}
-line.major_road[tunnel]::casing {
-  dashes: 3, 3;
+  casing-dashes: 3, 3;
 }
