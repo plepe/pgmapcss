@@ -1,8 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE Map>
 <Map srs="+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +no_defs +over" background-color="#ffffff">
-# FOR all-major-z-index
-  <Style name="pgmapcss [all-major-z-index]">
+  <Style name="pgmapcss">
 <!-- POLYGONS -->
 
 # FOR fill-color fill-opacity
@@ -11,7 +10,7 @@
 * Mapnik version >= 3: remove "# FOR" and "# END" and replace by
       <Filter>[fill-color]</Filter>
 -->
-      <Filter>'[all-major-z-index]' = [fill-major-z-index] and '[fill-color]' = [fill-color] and '[fill-opacity]' = [fill-opacity]</Filter>
+      <Filter>[style-element] = 'fill' and '[fill-color]' = [fill-color] and '[fill-opacity]' = [fill-opacity]</Filter>
       <PolygonSymbolizer fill="[fill-color]" fill-opacity="[fill-opacity]" />
     </Rule>
 # END
@@ -22,21 +21,9 @@
 * Mapnik version >= 3: remove "# FOR" and "# END" and replace by
       <Filter>[fill-color]</Filter>
 -->
-      <Filter>'[all-major-z-index]' = [fill-major-z-index] and [fill-image]</Filter>
+      <Filter>[style-element] = 'fill' and [fill-image]</Filter>
       <PolygonPatternSymbolizer file="[fill-image]" />
     </Rule>
-
-<!-- POINTS -->
-# FOR icon-opacity
-    <Rule>
-<!--
-* Mapnik version >= 3: remove "# FOR" and "# END" and replace by
-      <Filter>[icon-image]</Filter>
--->
-      <Filter>'[all-major-z-index]' = [point-major-z-index] and [icon-image] and '[icon-opacity]' = [icon-opacity]</Filter>
-      <PointSymbolizer file="[icon-image]" opacity="[icon-opacity]" />
-    </Rule>
-# END
 
 <!--
 * Mapnik version >= 3: replace by
@@ -57,7 +44,7 @@
 * Mapnik version >= 3: remove "# FOR" and "# END" and replace by
       <Filter>[width]</Filter>
 -->
-      <Filter>'[all-major-z-index]' = [casing-major-z-index] and '[width]' = [width] and '[casing-width]' = [casing-width] and '[casing-color]' = [casing-color] and '[casing-opacity]' = [casing-opacity] and '[casing-linejoin]' = [casing-linejoin] and '[casing-linecap]' = [casing-linecap] and '[casing-dashes]' = [casing-dashes]</Filter>
+      <Filter>[style-element] = 'casing' and '[width]' = [width] and '[casing-width]' = [casing-width] and '[casing-color]' = [casing-color] and '[casing-opacity]' = [casing-opacity] and '[casing-linejoin]' = [casing-linejoin] and '[casing-linecap]' = [casing-linecap] and '[casing-dashes]' = [casing-dashes]</Filter>
       <LineSymbolizer stroke="[casing-color]" stroke-width="[width] + [casing-width]" stroke-opacity="[casing-opacity]" stroke-linejoin="[casing-linejoin]" stroke-linecap="[casing-linecap]" stroke-dasharray="[casing-dashes]" />
     </Rule>
 # END
@@ -71,16 +58,28 @@
 * Mapnik version >= 3: remove "# FOR" and "# END" and replace by
       <Filter>[width]</Filter>
 -->
-      <Filter>'[all-major-z-index]' = [line-major-z-index] and '[width]' = [width] and '[color]' = [color] and '[opacity]' = [opacity] and '[linejoin]' = [linejoin] and '[linecap]' = [linecap] and '[dashes]' = [dashes]</Filter>
+      <Filter>[style-element] = 'line' and '[width]' = [width] and '[color]' = [color] and '[opacity]' = [opacity] and '[linejoin]' = [linejoin] and '[linecap]' = [linecap] and '[dashes]' = [dashes]</Filter>
       <LineSymbolizer stroke="[color]" stroke-width="[width]" stroke-opacity="[opacity]" stroke-linejoin="[linejoin]" stroke-linecap="[linecap]" stroke-dasharray="[dashes]" />
     </Rule>
 # END
 
 <!-- LINE PATTERN -->
     <Rule>
-      <Filter>'[all-major-z-index]' = [line-major-z-index] and [image]</Filter>
+      <Filter>[style-element] = 'line' and [image]</Filter>
       <LinePatternSymbolizer file="[image]" />
     </Rule>
+
+<!-- POINTS -->
+# FOR icon-opacity
+    <Rule>
+<!--
+* Mapnik version >= 3: remove "# FOR" and "# END" and replace by
+      <Filter>[icon-image]</Filter>
+-->
+      <Filter>[style-element] = 'point' and [icon-image] and '[icon-opacity]' = [icon-opacity]</Filter>
+      <PointSymbolizer file="[icon-image]" opacity="[icon-opacity]" />
+    </Rule>
+# END
 
 <!-- TEXTS on Points -->
 # FOR font-family text-color text-halo-color text-offset max-width
@@ -89,7 +88,7 @@
 * Mapnik version >= 3: remove "# FOR" and "# END" and replace by
       <Filter>[text] and [text-position] = 'center'</Filter>
 -->
-      <Filter>[text] and '[all-major-z-index]' = [point-text-major-z-index] and [text-position] = 'center' and '[font-family]' = [font-family] and '[text-color]' = [text-color] and '[text-halo-color]' = [text-halo-color] and '[text-offset]' = [text-offset] and '[max-width]' = [max-width]</Filter>
+      <Filter>[text] and [style-element] = 'point-text' and [text-position] = 'center' and '[font-family]' = [font-family] and '[text-color]' = [text-color] and '[text-halo-color]' = [text-halo-color] and '[text-offset]' = [text-offset] and '[max-width]' = [max-width]</Filter>
       <TextSymbolizer placement="point" face-name="[font-family]" fill="[text-color]" halo-fill="[text-halo-color]" dy="[text-offset]" wrap-width="[max-width]"><ExpressionFormat size="[font-size]" halo-radius="[text-halo-radius]" character-spacing="[character-spacing]" opacity="[text-opacity]" wrap-character="[wrap-character]">[text]</ExpressionFormat></TextSymbolizer>
     </Rule>
 # END
@@ -101,12 +100,11 @@
 * Mapnik version >= 3: remove "# FOR" and "# END" and replace by
       <Filter>[text] and [text-position] = 'line'</Filter>
 -->
-      <Filter>[text] and '[all-major-z-index]' = [line-text-major-z-index] and [text-position] = 'line' and '[font-family]' = [font-family] and '[text-color]' = [text-color] and '[text-halo-color]' = [text-halo-color] and '[text-offset]' = [text-offset] and '[max-width]' = [max-width] and '[text-spacing]' = [text-spacing]</Filter>
+      <Filter>[text] and [style-element] = 'line-text' and [text-position] = 'line' and '[font-family]' = [font-family] and '[text-color]' = [text-color] and '[text-halo-color]' = [text-halo-color] and '[text-offset]' = [text-offset] and '[max-width]' = [max-width] and '[text-spacing]' = [text-spacing]</Filter>
       <TextSymbolizer placement="line" face-name="[font-family]" fill="[text-color]" halo-fill="[text-halo-color]" dy="[text-offset]" wrap-width="[max-width]" spacing="[text-spacing]"><ExpressionFormat size="[font-size]" halo-radius="[text-halo-radius]" character-spacing="[character-spacing]" opacity="[text-opacity]" wrap-character="[wrap-character]">[text]</ExpressionFormat></TextSymbolizer>
     </Rule>
 # END
   </Style>
-# END all-major-z-index
 
   <Layer name="layer" status="on" srs="+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +no_defs +over">
     <Datasource>
@@ -121,11 +119,9 @@
       <Parameter name="srid">900913</Parameter>
       <Parameter name="cache-features">on</Parameter>
       <Parameter name="table">
-STYLE_ID_match(pgmapcss_render_context(!bbox!, !scale_denominator!))
+STYLE_ID_match(pgmapcss_render_context(!bbox!, !scale_denominator!), Array['fill', 'casing', 'line', 'point', 'point-text', 'line-text'])
       </Parameter>
     </Datasource>
-# FOR all-major-z-index
-    <StyleName>pgmapcss [all-major-z-index]</StyleName>
-# END
+    <StyleName>pgmapcss</StyleName>
   </Layer>
 </Map>

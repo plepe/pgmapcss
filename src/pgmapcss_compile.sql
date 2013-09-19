@@ -15,10 +15,6 @@ begin
   stat := pgmapcss_parse_content($2);
   stat := pgmapcss_compile_content(stat);
 
-  -- find all *-major-z-index
-  stat.properties_values := stat.properties_values ||
-    hstore('all-major-z-index', (select cast(natcasesort(array_agg(v)) as text) from (select unnest(cast(value as text[])) v from each(stat.properties_values) where key ~ 'major-z-index$' group by v) t));
-
   -- Remove all old functions / data types
   ret = ret || 'drop type if exists ' || style_id || E'_result cascade;\n';
 
@@ -32,6 +28,7 @@ begin
   a = array_append(a, E'  _types\ttext[]');
   a = array_append(a, E'  _pseudo_element\ttext');
   a = array_append(a, E'  _properties\thstore');
+  a = array_append(a, E'  "style-element"\ttext');
   for i in select * from each(stat.properties_values) loop
     a = array_append(a, E'  ' || quote_ident(i.key) || E'\ttext');
   end loop;
@@ -101,14 +98,20 @@ begin
   -- function to match objects in bbox
   ret = ret || E';\n';
   ret = ret || E'create or replace function ' || style_id || E'_match(\n';
-  ret = ret || E'  render_context\tpgmapcss_render_context\n';
+  ret = ret || E'  render_context\tpgmapcss_render_context,\n';
+  ret = ret || E'  "all-style-elements"\ttext[] default Array[''default'']\n';
   ret = ret || E') returns setof ' || style_id || E'_result as $body$\n';
   ret = ret || E'declare\n';
   ret = ret || E'  ret ' || style_id || E'_result;\n';
+  ret = ret || E'  "max-style-element" int;\n';
   ret = ret || E'begin\n';
+  ret = ret || E'  "max-style-element" := array_upper("all-style-elements", 1);\n';
   ret = ret || E'  return query \n';
   ret = ret || E'    select \n';
   ret = ret || E'      id, tags, geo, types, pseudo_element, properties';
+
+  -- repeat result for all style-elements
+  ret = ret || E'      , unnest("all-style-elements") as "style-element"';
   for i in select * from each(stat.properties_values) loop
     ret = ret || E',\n      properties->' || quote_literal(i.key);
   end loop;
@@ -127,7 +130,7 @@ begin
   ret = ret || E'        objects(render_context, ' || style_id || E'_get_where(render_context)) object\n';
   ret = ret || E'      offset 0) t\n';
   ret = ret || E'      group by (result).combine_type, coalesce((result).combine_id, (result).id || (result).pseudo_element) offset 0) t) t\n';
-  ret = ret || E'      order by coalesce(cast(properties->''z-index'' as float), 0) asc;\n\n';
+  ret = ret || E'      order by generate_series(1, "max-style-element") asc, coalesce(cast(properties->''z-index'' as float), 0) asc;\n\n';
   ret = ret || E'  return;\n';
   ret = ret || E'end;\n$body$ language ''plpgsql'' immutable;\n';
 

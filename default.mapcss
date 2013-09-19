@@ -8,12 +8,6 @@
 *::(*) {
 // General
   z-index: 0;
-  fill-major-z-index: 1;
-  casing-major-z-index: 2;
-  line-major-z-index: 3;
-  point-major-z-index: 4;
-  point-text-major-z-index: 5;
-  line-text-major-z-index: 5.1;
 // PointSymbolizer
   icon-image: ;
   icon-opacity: 1;

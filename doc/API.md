@@ -60,11 +60,11 @@ Example output:
 | "color"=>"#ff0000", "width"=>"4" | default | "name"=>"Testroad", "highway"=>"primary" | some geometry | #ff0000 | 4 | | |
 
 ## {style_id}_match
-Returns all matching objects and resulting properties in the current render context. Pseudo elements will add additional rows in the output. The result will be ordered by 'z-index' (asc, default 0).
+Returns all matching objects and resulting properties in the current render context. Pseudo elements will add additional rows in the output. Every row will be returned multiple times, for each element in the style-element array. The result will be ordered by 'index of style-element', 'z-index' (asc, default 0).
 
 Example:
 ```sql
-select * from test_match(pgmapcss_render_context(!bbox!, !scale_denominator!));
+select * from test_match(pgmapcss_render_context(!bbox!, !scale_denominator!), Array['fill', 'line', 'text']);
 ```
 
 Notes:
