@@ -130,7 +130,10 @@ begin
   ret = ret || E'        objects(render_context, ' || style_id || E'_get_where(render_context)) object\n';
   ret = ret || E'      offset 0) t\n';
   ret = ret || E'      group by (result).combine_type, coalesce((result).combine_id, (result).id || (result).pseudo_element) offset 0) t) t\n';
-  ret = ret || E'      order by generate_series(1, "max-style-element") asc, coalesce(cast(properties->''z-index'' as float), 0) asc;\n\n';
+  ret = ret || E'      order by \n';
+  ret = ret || E'        pgmapcss_to_float(properties->''layer'') asc,\n';
+  ret = ret || E'        generate_series(1, "max-style-element") asc,\n';
+  ret = ret || E'        coalesce(cast(properties->''z-index'' as float), 0) asc;\n\n';
   ret = ret || E'  return;\n';
   ret = ret || E'end;\n$body$ language ''plpgsql'' immutable;\n';
 

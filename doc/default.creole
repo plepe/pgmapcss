@@ -2,7 +2,10 @@
 
 === General properties ===
 |= CSS parameter |= Description |= Default value |= Compatibility MapCSS 0.2
-| z-index | specify the order the objects are drawn: The objects with higher z-index are drawn on top of objects with lower z-index | 0 | YES
+| layer | the highest level of ordering objects | the value of tag 'layer' (or 0) | see below
+| z-index | specify the order of objects in each layer: The objects with higher z-index are drawn on top of objects with lower z-index | 0 | YES
+
+* Property 'layer': MapCSS 0.2 does define the rendering order dependend on the layer-tag of the objects, but does not define a way to change that order from the stylesheet.
 
 === Canvas properties ===
 * Not supported yet

@@ -8,6 +8,7 @@
 *::(*) {
 // General
   z-index: 0;
+  layer: eval(any(int(tag('layer')), 0));
 // PointSymbolizer
   icon-image: ;
   icon-opacity: 1;
