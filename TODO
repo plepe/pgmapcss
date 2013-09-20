@@ -1,0 +1,19 @@
+* fonts
+* scaling icons
+* extrude-
+* canvas
+* linecap butt -> none
+* text-transform
+* shield-
+* MapCSS 0.2 style relations
+* way -> node relations
+* string as eval parameter?
+* @import
+
+Eval:
+* zmetric
+* eq, ne
+
+NOT POSSIBLE:
+* text-decoration
+* font-variant
