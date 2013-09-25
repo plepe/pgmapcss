@@ -93,6 +93,7 @@ create type pgmapcss_compile_stat as (
   func          text,
   prop_types    hstore,
   prop_default_other 	hstore, -- @default_other statements
+  prop_values	hstore, -- @check_value statements
   selectors	pgmapcss_selector[],
   properties	pgmapcss_properties[],
   properties_values	hstore,

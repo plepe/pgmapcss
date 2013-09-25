@@ -292,6 +292,14 @@ Currently supported types:
 * text: The value is used as is (default)
 * tag_name: The current value of the specified tag
 
+== Possible values ==
+The following statement defines possible values for a specific property:
+{{{
+@values property_name value1;value2;value3;
+}}}
+
+Other values will be accepted in the MapCSS file, but will be finally replaced by the default value (the first value).
+
 == Define default values to other properties ==
 If the value of a property defaults to the value of another property, this is specified by:
 {{{

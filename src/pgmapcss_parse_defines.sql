@@ -31,6 +31,13 @@ begin
 
       stat.prop_default_other := stat.prop_default_other || hstore(m, m1);
 
+    elsif content ~ '^\s*@values' then
+      m := substring(content from '\s*@values\s+([^\s]+)\s+([^\s]+)\s*;');
+      m1 := substring(content from '\s*@values\s+(?:[^\s]+)\s+([^\s]+)\s*;');
+      content := substring(content from '\s*@values\s+(?:[^\s]+)\s+(?:[^\s]+)\s*;(.*)$');
+
+      stat.prop_values := stat.prop_values || hstore(m, m1);
+
     else
       return;
 

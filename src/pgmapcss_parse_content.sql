@@ -17,6 +17,7 @@ begin
   stat.properties := Array[]::pgmapcss_properties[];
   stat.prop_types := ''::hstore;
   stat.prop_default_other := ''::hstore;
+  stat.prop_values := ''::hstore;
 
   loop
     selectors:=Array[]::pgmapcss_selector[];

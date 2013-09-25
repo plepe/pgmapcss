@@ -5,6 +5,11 @@
 @default_other casing-linecap linecap;
 @default_other casing-linejoin linejoin;
 
+// @values: Possible values of properties; the first value is the default value
+// linecap actually has 'none' as default value. the following statement automatically replaces 'none' by 'butt'
+@values linecap butt;round;square;
+@values casing-linecap butt;round;square;
+
 *::(*) {
 // General
   z-index: 0;
@@ -22,7 +27,7 @@
   color: ;
   opacity: 1;
   linejoin: round;
-  linecap: butt;
+  linecap: none;
   dashes: none;
 // Casing LineSymbolizer
   casing-width: ;
