@@ -9,6 +9,9 @@
 // linecap actually has 'none' as default value. the following statement automatically replaces 'none' by 'butt'
 @values linecap butt;round;square;
 @values casing-linecap butt;round;square;
+@values linejoin round;miter;bevel;
+@values casing-linejoin round;miter;bevel;
+@values text-position center;line;
 
 *::(*) {
 // General

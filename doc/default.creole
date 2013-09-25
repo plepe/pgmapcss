@@ -23,13 +23,13 @@
 | width | The line width in pixels. | stroke-width | no eval ; branch [[https://github.com/mapnik/mapnik/tree/stroke-width-expr|stroke-width-expr]] adds support | YES
 | opacity | How transparent the line is, from 0 (transparent) to 1 (opaque). | stroke-opacity | no eval | YES
 | image |  The URL of an image to use for filling the line | | yes | YES
-| linejoin | The style for line corners: 'round' (default), 'miter' or 'bevel'. | stroke-linejoin | no eval | YES
+| linejoin | The style for line corners: 'round' (default), 'miter' or 'bevel'. | stroke-linejoin | | YES
 | linecap | The style for the end of the line: 'none' (default), 'round' or 'square' | stroke-linecap | Mapnik uses 'butt' instead of 'none'; will be automatically mapped. | YES
 | dashes | An array of alternating on/off lengths | stroke-dasharray | no eval | YES
 | casing-color | Colour of the casing (border) of a line. | stroke | no eval | YES
 | casing-width | Width of the casing (border) of the line (add to 'width' of the line). | stroke-width | no eval ; branch [[https://github.com/mapnik/mapnik/tree/stroke-width-expr|stroke-width-expr]] adds support | YES
 | casing-opacity | How transparent the casing is, from 0 (transparent) to 1 (opaque). | stroke-opacity | no eval | YES
-| casing-linejoin | The style for casing corners: 'round' (default), 'miter' or 'bevel'. | stroke-linejoin | no eval | YES
+| casing-linejoin | The style for casing corners: 'round' (default), 'miter' or 'bevel'. | stroke-linejoin | | YES
 | casing-linecap | The style for the end of the casing: 'none' (default), 'round' or 'square' | stroke-linecap | see 'linecap' | YES
 | casing-dashes | An array of alternating on/off lengths | stroke-dasharray | no eval | YES
 
@@ -45,7 +45,7 @@
 |= CSS parameter |= Description |= Mapnik parameter |= support Mapnik 2.x |= Compatibility MapCSS 0.2
 | max-width | The maximum width of a text label for a point, after which it should wrap onto the next line. | wrap-width | no eval | YES
 | text-offset | The vertical offset from the centre of the way or point. | dy | no eval | YES
-| text-position | Whether the text follows the path of the way ('line') or is centred on the area ('center') | placement | | YES
+| text-position | Whether the text follows the path of the way ('line') or is centred on the area ('center', default) | placement | | YES
 | font-family | Name of the font to use | face-name | eval() with ExpressionFormat | syntax differnet (face-name includes weight/style option)
 | font-size | Size of the text | size | eval() with ExpressionFormat | YES
 | text-color | Colour of text | fill | eval() with ExpressionFormat and branch [[https://github.com/mapnik/mapnik/tree/harfbuzz|harfbuzz]] | YES
