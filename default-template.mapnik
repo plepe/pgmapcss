@@ -1,6 +1,96 @@
 <?xml version="1.0"?>
 <!DOCTYPE Map>
 <Map srs="+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +no_defs +over" background-color="#ffffff">
+  <!-- DejaVu Sans -->
+  <FontSet name="DejaVu Sans - normal - normal">
+    <Font face-name="DejaVu Sans Book" />
+    <Font face-name="unifont Medium" />
+  </FontSet>
+  <FontSet name="DejaVu Sans - bold - normal">
+    <Font face-name="DejaVu Sans Bold" />
+    <Font face-name="unifont Medium" />
+  </FontSet>
+  <FontSet name="DejaVu Sans - normal - italic">
+    <Font face-name="DejaVu Sans Oblique" />
+    <Font face-name="unifont Medium" />
+  </FontSet>
+  <FontSet name="DejaVu Sans - bold - italic">
+    <Font face-name="DejaVu Sans Bold Oblique" />
+    <Font face-name="unifont Medium" />
+  </FontSet>
+
+  <!-- DejaVu Sans Condensed -->
+  <FontSet name="DejaVu Sans Condensed - normal - normal">
+    <Font face-name="DejaVu Sans Condensed" />
+    <Font face-name="unifont Medium" />
+  </FontSet>
+  <FontSet name="DejaVu Sans Condensed - bold - normal">
+    <Font face-name="DejaVu Sans Condensed Bold" />
+    <Font face-name="unifont Medium" />
+  </FontSet>
+  <FontSet name="DejaVu Sans Condensed - normal - italic">
+    <Font face-name="DejaVu Sans Condensed Oblique" />
+    <Font face-name="unifont Medium" />
+  </FontSet>
+  <FontSet name="DejaVu Sans Condensed - bold - italic">
+    <Font face-name="DejaVu Sans Condensed Bold Oblique" />
+    <Font face-name="unifont Medium" />
+  </FontSet>
+
+  <!-- DejaVu Sans Mono -->
+  <FontSet name="DejaVu Sans Mono - normal - normal">
+    <Font face-name="DejaVu Sans Mono Book" />
+    <Font face-name="unifont Medium" />
+  </FontSet>
+  <FontSet name="DejaVu Sans Mono - bold - normal">
+    <Font face-name="DejaVu Sans Mono Bold" />
+    <Font face-name="unifont Medium" />
+  </FontSet>
+  <FontSet name="DejaVu Sans Mono - normal - italic">
+    <Font face-name="DejaVu Sans Mono Oblique" />
+    <Font face-name="unifont Medium" />
+  </FontSet>
+  <FontSet name="DejaVu Sans Mono - bold - italic">
+    <Font face-name="DejaVu Sans Mono Bold Oblique" />
+    <Font face-name="unifont Medium" />
+  </FontSet>
+
+  <!-- DejaVu Serif -->
+  <FontSet name="DejaVu Serif - normal - normal">
+    <Font face-name="DejaVu Serif Book" />
+    <Font face-name="unifont Medium" />
+  </FontSet>
+  <FontSet name="DejaVu Serif - bold - normal">
+    <Font face-name="DejaVu Serif Bold" />
+    <Font face-name="unifont Medium" />
+  </FontSet>
+  <FontSet name="DejaVu Serif - normal - italic">
+    <Font face-name="DejaVu Serif Oblique" />
+    <Font face-name="unifont Medium" />
+  </FontSet>
+  <FontSet name="DejaVu Serif - bold - italic">
+    <Font face-name="DejaVu Serif Bold Oblique" />
+    <Font face-name="unifont Medium" />
+  </FontSet>
+
+  <!-- DejaVu Serif Condensed -->
+  <FontSet name="DejaVu Serif Condensed - normal - normal">
+    <Font face-name="DejaVu Serif Condensed" />
+    <Font face-name="unifont Medium" />
+  </FontSet>
+  <FontSet name="DejaVu Serif Condensed - bold - normal">
+    <Font face-name="DejaVu Serif Condensed Bold" />
+    <Font face-name="unifont Medium" />
+  </FontSet>
+  <FontSet name="DejaVu Serif Condensed - normal - italic">
+    <Font face-name="DejaVu Serif Condensed Oblique" />
+    <Font face-name="unifont Medium" />
+  </FontSet>
+  <FontSet name="DejaVu Serif Condensed - bold - italic">
+    <Font face-name="DejaVu Serif Condensed Bold Oblique" />
+    <Font face-name="unifont Medium" />
+  </FontSet>
+
   <Style name="pgmapcss">
 <!-- POLYGONS -->
 
@@ -82,26 +172,26 @@
 # END
 
 <!-- TEXTS on Points -->
-# FOR font-family text-color text-halo-color text-offset max-width
+# FOR font-family font-weight font-style text-color text-halo-color text-offset max-width
     <Rule>
 <!--
 * Mapnik version >= 3: remove "# FOR" and "# END" and replace by
       <Filter>[text] and [text-position] = 'center'</Filter>
 -->
-      <Filter>[text] and [style-element] = 'point-text' and [text-position] = 'center' and '[font-family]' = [font-family] and '[text-color]' = [text-color] and '[text-halo-color]' = [text-halo-color] and '[text-offset]' = [text-offset] and '[max-width]' = [max-width]</Filter>
-      <TextSymbolizer placement="point" face-name="[font-family]" fill="[text-color]" halo-fill="[text-halo-color]" dy="[text-offset]" wrap-width="[max-width]"><ExpressionFormat size="[font-size]" halo-radius="[text-halo-radius]" character-spacing="[character-spacing]" opacity="[text-opacity]" wrap-character="[wrap-character]">[text]</ExpressionFormat></TextSymbolizer>
+      <Filter>[text] and [style-element] = 'point-text' and [text-position] = 'center' and '[font-family]' = [font-family] and '[font-weight]' = [font-weight] and '[font-style]' = [font-style] and '[text-color]' = [text-color] and '[text-halo-color]' = [text-halo-color] and '[text-offset]' = [text-offset] and '[max-width]' = [max-width]</Filter>
+      <TextSymbolizer placement="point" fontset-name="[font-family] - [font-weight] - [font-style]" fill="[text-color]" halo-fill="[text-halo-color]" dy="[text-offset]" wrap-width="[max-width]"><ExpressionFormat size="[font-size]" halo-radius="[text-halo-radius]" character-spacing="[character-spacing]" opacity="[text-opacity]" wrap-character="[wrap-character]">[text]</ExpressionFormat></TextSymbolizer>
     </Rule>
 # END
 
 <!-- TEXTS on Lines -->
-# FOR font-family text-color text-halo-color text-offset max-width text-spacing
+# FOR font-family font-weight font-style text-color text-halo-color text-offset max-width text-spacing
     <Rule>
 <!--
 * Mapnik version >= 3: remove "# FOR" and "# END" and replace by
       <Filter>[text] and [text-position] = 'line'</Filter>
 -->
-      <Filter>[text] and [style-element] = 'line-text' and [text-position] = 'line' and '[font-family]' = [font-family] and '[text-color]' = [text-color] and '[text-halo-color]' = [text-halo-color] and '[text-offset]' = [text-offset] and '[max-width]' = [max-width] and '[text-spacing]' = [text-spacing]</Filter>
-      <TextSymbolizer placement="line" face-name="[font-family]" fill="[text-color]" halo-fill="[text-halo-color]" dy="[text-offset]" wrap-width="[max-width]" spacing="[text-spacing]"><ExpressionFormat size="[font-size]" halo-radius="[text-halo-radius]" character-spacing="[character-spacing]" opacity="[text-opacity]" wrap-character="[wrap-character]">[text]</ExpressionFormat></TextSymbolizer>
+      <Filter>[text] and [style-element] = 'line-text' and [text-position] = 'line' and '[font-family]' = [font-family] and '[font-weight]' = [font-weight] and '[font-style]' = [font-style] and '[text-color]' = [text-color] and '[text-halo-color]' = [text-halo-color] and '[text-offset]' = [text-offset] and '[max-width]' = [max-width] and '[text-spacing]' = [text-spacing]</Filter>
+      <TextSymbolizer placement="line" fontset-name="[font-family] - [font-weight] - [font-style]" fill="[text-color]" halo-fill="[text-halo-color]" dy="[text-offset]" wrap-width="[max-width]" spacing="[text-spacing]"><ExpressionFormat size="[font-size]" halo-radius="[text-halo-radius]" character-spacing="[character-spacing]" opacity="[text-opacity]" wrap-character="[wrap-character]">[text]</ExpressionFormat></TextSymbolizer>
     </Rule>
 # END
   </Style>

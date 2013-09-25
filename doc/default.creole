@@ -46,7 +46,9 @@
 | max-width | The maximum width of a text label for a point, after which it should wrap onto the next line. | wrap-width | no eval | YES
 | text-offset | The vertical offset from the centre of the way or point. | dy | no eval | YES
 | text-position | Whether the text follows the path of the way ('line') or is centred on the area ('center', default) | placement | | YES
-| font-family | Name of the font to use | face-name | eval() with ExpressionFormat | syntax differnet (face-name includes weight/style option)
+| font-family | Name of the font to use (default: "DejaVu Sans") | | see 'Fonts' below | YES
+| font-weight |  'bold' or 'normal' (default) | | | YES
+| font-style |  'italic' or 'normal' (default) | | | YES
 | font-size | Size of the text | size | eval() with ExpressionFormat | YES
 | text-color | Colour of text | fill | eval() with ExpressionFormat and branch [[https://github.com/mapnik/mapnik/tree/harfbuzz|harfbuzz]] | YES
 | text-halo-color | The colour (hex or CSS) of the 'halo' or 'pull-out' used to make the text stand out from features underneath it. | halo-fill | no eval | YES
@@ -61,3 +63,8 @@
 {{{
   <TextSymbolizer face-name="something"><ExpressionFormat size="[font-size]" halo-radius="[text-halo-radius]">[text]</ExpressionFormat></TextSymbolizer>
 }}}
+
+=== Fonts ===
+There's a fontset for each font-family / font-weight / font-style combination, defined in default-template.mapnik. There's a default fallback to unifont too (which might change in the future). The name of the fontsets is "font-family - font-weight - font-style", e.g. "DejaVu Serif Condensed - bold - italic".
+
+Also all possible font-families are defined in default.mapcss in the @values font-family clause.

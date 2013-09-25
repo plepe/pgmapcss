@@ -12,6 +12,9 @@
 @values linejoin round;miter;bevel;
 @values casing-linejoin round;miter;bevel;
 @values text-position center;line;
+@values font-family DejaVu Sans;DejaVu Sans Condensed;DejaVu Sans Mono;DejaVu Serif;DejaVu Serif Condensed;
+@values font-weight normal;bold;
+@values font-style normal;italic;
 
 *::(*) {
 // General
@@ -43,7 +46,9 @@
   image: ;
 // TextSymbolizer
   text: ;
-  font-family: "DejaVu Sans Book";
+  font-family: "DejaVu Sans";
+  font-weight: normal;
+  font-style: normal;
   font-size: 12;
   text-color: #000000;
   text-halo-color: #ffffff;

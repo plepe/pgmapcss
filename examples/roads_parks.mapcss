@@ -4,7 +4,8 @@ area[leisure=park] {
 
 /* print a label on all parks */
   text: eval(tag(name));
-  font-family: "DejaVu Sans Oblique";
+  font-family: "DejaVu Sans";
+  font-style: italic;
   font-size: 9;
   text-color: #005f00;
 }
