@@ -1,16 +1,13 @@
-* scaling icons
-* extrude-
-* canvas
-* text-transform
 * shield-
+* canvas
+* Eval: eq, ne
 * MapCSS 0.2 style relations
 * way -> node relations
-* string as eval parameter?
+* text-transform
+* scaling icons
+* Eval: zmetric
+* extrude-
 * @import
-
-Eval:
-* zmetric
-* eq, ne
 
 NOT POSSIBLE:
 * text-decoration
