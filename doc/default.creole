@@ -68,3 +68,21 @@
 There's a fontset for each font-family / font-weight / font-style combination, defined in default-template.mapnik. There's a default fallback to unifont too (which might change in the future). The name of the fontsets is "font-family - font-weight - font-style", e.g. "DejaVu Serif Condensed - bold - italic".
 
 Also all possible font-families are defined in default.mapcss in the @values font-family clause.
+
+=== Shields ===
+|= CSS parameter |= Description |= Note Mapnik 2.x |= Compatibility MapCSS 0.2
+| shield-placement | Whether the shields follows the path of the way ('line', default for lines) or is centred on the area ('point', default for other features) | placement | | no standard
+| shield-font-family | Name of the font to use (default: same as font-family) | no eval | no standard
+| shield-font-weight |  'bold' or 'normal' (default: same as font-weight) | no eval | no standard
+| shield-font-style |  'italic' or 'normal' (default: same as font-style) | no eval | no standard
+| shield-font-size | Size of the text (default: same as font-size) | no eval | no standard
+| shield-text-color | Colour of text (default: #000000) | no eval | no standard
+| shield-text-halo-color | The colour (hex or CSS) of the 'halo' or 'pull-out' used to make the text stand out from features underneath it. | no eval | no standard
+| shield-text-halo-radius |  The radius of the halo | no eval | no standard
+| shield-text | The text for the shield | YES
+| shield-spacing | Space between repeated shields. If spacing is 0 only one label is placed (default: 196px). | no eval | no standard
+| shield-opacity |  How transparent the shield is, from 0 (transparent) to 1 (opaque) (default: 1) | no eval | YES
+| shield-image |  The URL (absolute or relative) of an image to use as a background for text. | | YES
+
+* MapCSS 0.2 properties not (yet) supported: shield-color, shield-frame-color, shield-frame-width, shield-casing-color, shield-casing-width, shield-shape.
+* Currently a shield-image is mandatory.

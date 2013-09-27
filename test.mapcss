@@ -8,17 +8,6 @@ point[place] {
 
   z-index: 10;
 }
-point[place]::buffer {
-  set radius=eval(sqrt(tag(population)));
-}
-point[place][radius>0]::buffer {
-  geo: eval(buffer(prop(geo), tag(radius)));
-  fill-color: #00ff00;
-  width: 1;
-  color: #007f00;
-  z-index: -2;
-}
-
 
 area[building] {
   fill-color: #707070;		// Mapnik >= version 3.0
@@ -80,4 +69,8 @@ line[railway] {
   text-halo-radius: 1;
 }
 
+line[highway] {
+  shield-text: ref;
+  shield-image: url('examples/highest_peaks_large.svg');
+}
 /* test */

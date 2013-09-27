@@ -1,9 +1,14 @@
 /* DEFAULT VALUES (and make sure that result columns are available) */
 @type text tag_value;
+@type shield-text tag_value;
 
 // The follwing properties default to the final value of another property
 @default_other casing-linecap linecap;
 @default_other casing-linejoin linejoin;
+@default_other shield-font-family font-family;
+@default_other shield-font-weight font-weight;
+@default_other shield-font-style font-style;
+@default_other shield-font-size font-size;
 
 // @values: Possible values of properties; the first value is the default value
 // linecap actually has 'none' as default value. the following statement automatically replaces 'none' by 'butt'
@@ -61,4 +66,21 @@
   wrap-character: " ";
   text-position: center;
   text-spacing: 0;
+// ShieldSymbolizer
+  shield-text: ;
+  shield-spacing: 196;
+  shield-image: ;
+  shield-opacity: 1;
+  shield-placement: point;
+  shield-text-color: #000000;
+  shield-font-family: ;
+  shield-font-weight: ;
+  shield-font-style: ;
+  shield-font-size: ;
+  shield-text-halo-color: #ffffff;
+  shield-text-opacity: 1;
+  shield-text-halo-radius: 0;
+}
+line::(*) {
+  shield-placement: line;
 }

@@ -194,7 +194,15 @@
       <TextSymbolizer placement="line" fontset-name="[font-family] - [font-weight] - [font-style]" fill="[text-color]" halo-fill="[text-halo-color]" dy="[text-offset]" wrap-width="[max-width]" spacing="[text-spacing]"><ExpressionFormat size="[font-size]" halo-radius="[text-halo-radius]" character-spacing="[character-spacing]" opacity="[text-opacity]" wrap-character="[wrap-character]">[text]</ExpressionFormat></TextSymbolizer>
     </Rule>
 # END
-  </Style>
+
+  <!-- SHIELDS -->
+# FOR shield-font-family shield-font-weight shield-font-style shield-font-size shield-text-color shield-text-halo-color shield-spacing shield-opacity shield-placement shield-text-halo-radius
+    <Rule>
+      <Filter>[shield-text] and [style-element] = 'shield' and '[shield-placement]' = [shield-placement] and '[shield-font-family]' = [shield-font-family] and '[shield-font-weight]' = [shield-font-weight] and '[shield-font-style]' = [shield-font-style] and '[shield-text-color]' = [shield-text-color] and '[shield-text-halo-color]' = [shield-text-halo-color] and '[shield-spacing]' = [shield-spacing] and '[shield-font-size]' = [shield-font-size] and '[shield-opacity]' = [shield-opacity] and '[shield-text-halo-radius]' = [shield-text-halo-radius]</Filter>
+      <ShieldSymbolizer placement="[shield-placement]" fontset-name="[shield-font-family] - [shield-font-weight] - [shield-font-style]" fill="[shield-text-color]" halo-fill="[shield-text-halo-color]" spacing="[shield-spacing]" size="[shield-font-size]" halo-radius="[shield-text-halo-radius]" opacity="[shield-opacity]" file="[shield-image]">[shield-text]</ShieldSymbolizer>
+    </Rule>
+# END
+</Style>
 
   <Layer name="layer" status="on" srs="+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +no_defs +over">
     <Datasource>
@@ -209,7 +217,7 @@
       <Parameter name="srid">900913</Parameter>
       <Parameter name="cache-features">on</Parameter>
       <Parameter name="table">
-STYLE_ID_match(pgmapcss_render_context(!bbox!, !scale_denominator!), Array['fill', 'casing', 'line', 'point', 'point-text', 'line-text'])
+STYLE_ID_match(pgmapcss_render_context(!bbox!, !scale_denominator!), Array['fill', 'casing', 'line', 'point', 'point-text', 'line-text', 'shield'])
       </Parameter>
     </Datasource>
     <StyleName>pgmapcss</StyleName>
