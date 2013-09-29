@@ -8,7 +8,10 @@
 * Property 'layer': MapCSS 0.2 does define the rendering order dependend on the layer-tag of the objects, but does not define a way to change that order from the stylesheet.
 
 === Canvas properties ===
-* Not supported yet
+|= CSS parameter |= Description |= support Mapnik 2.x |= Compatibility MapCSS 0.2
+| fill-color | The color of the background (default: fully transparent) | no eval | YES
+
+* MapCSS 0.2 properties not (yet) supported: antialiasing (always fully antialiased), fill-opacity (use alpha-channel on fill-color instead), fill-image
 
 === Point properties ===
 |= CSS parameter |= Description |= Mapnik parameter |= support Mapnik 2.x |= Compatibility MapCSS 0.2

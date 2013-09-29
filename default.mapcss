@@ -84,3 +84,6 @@
 line::(*) {
   shield-placement: line;
 }
+canvas {
+  fill-color: #00000000;
+}

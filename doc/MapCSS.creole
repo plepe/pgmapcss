@@ -35,11 +35,11 @@ First part of a selector; required.
 | area | Matches polygons (polygons as from osm2pgsql, incl. relations with type multipolygon)
 | point | Currently an alias for 'node'
 | line | Matches lines (way or relation)
-| canvas | The background (NOT SUPPORTED YET)
+| canvas | The background
 
 The type of an object is retrieved from the 'types'-array in object-value (see [[API.md]]). You can add/remove types from your database query.
 
-* Compatibility MapCSS 0.2: YES (with the exception of 'canvas')
+* Compatibility MapCSS 0.2: YES
 
 === Class selector ===
 After the type selector, separated by '.'. Optional.
