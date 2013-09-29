@@ -10,8 +10,9 @@
 === Canvas properties ===
 |= CSS parameter |= Description |= support Mapnik 2.x |= Compatibility MapCSS 0.2
 | fill-color | The color of the background (default: fully transparent) | no eval | YES
+| fill-image | use an image for the background instead of a color fill | no eval | YES
 
-* MapCSS 0.2 properties not (yet) supported: antialiasing (always fully antialiased), fill-opacity (use alpha-channel on fill-color instead), fill-image
+* MapCSS 0.2 properties not (yet) supported: antialiasing (always fully antialiased), fill-opacity (use alpha-channel on fill-color instead)
 
 === Point properties ===
 |= CSS parameter |= Description |= Mapnik parameter |= support Mapnik 2.x |= Compatibility MapCSS 0.2

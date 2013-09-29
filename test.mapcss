@@ -3,6 +3,7 @@ meta {
 }
 canvas {
   fill-color: #7f7f7f;
+  fill-image: url("background.png");
 }
 point[place] {
   text-halo-radius: 2;
