@@ -1,4 +1,3 @@
-* canvas
 * Eval: eq, ne
 * MapCSS 0.2 style relations
 * way -> node relations
@@ -11,3 +10,6 @@
 NOT POSSIBLE:
 * text-decoration
 * font-variant
+
+IDEAS:
+* extra functions for some object types (e.g. canvas, combined features, ...)
