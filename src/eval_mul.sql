@@ -1,4 +1,4 @@
-insert into eval_operators values ('*', 'mul');
+insert into eval_operators values ('*', 'mul', 2);
 create or replace function eval_mul(param text[],
   object pgmapcss_object, current pgmapcss_current, render_context pgmapcss_render_context)
 returns text

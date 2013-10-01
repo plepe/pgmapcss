@@ -33,6 +33,7 @@ declare
   -- 2 .. token finished, read quoted string
   -- 3 .. token finished (e.g. after brackets)
   op_regexp text;
+  op_math_level hstore;
 begin
   content := substring($1, "offset");
   ret.text_length := null;
@@ -40,6 +41,7 @@ begin
   
   -- compile eval operator regexp
   select '^(' || array_to_string(array_agg(x), '|') || ')' into op_regexp from (select replace(regexp_replace(op, '(\+|\*)', E'\\ \\1', 'g'), ' ', '') x from eval_operators) t;
+  select hstore(array_agg(op), array_agg(cast(eval_operators.math_level as text))) into op_math_level from eval_operators;
 
   i := 1;
   current := ''::text;
@@ -181,10 +183,7 @@ begin
       elsif content ~ op_regexp then
 	current := substring(content from op_regexp);
 
-	j :=  (CASE WHEN current in ('+', '-') THEN 2
-	            WHEN current in ('*', '/') THEN 3
-	            WHEN current in ('>', '>=', '<=', '<') THEN 4
-		    END);
+	j := cast(op_math_level->current as int);
 
 	if j > math_level then
 	  content := substring(content, length(current) + 1);
@@ -252,10 +251,7 @@ begin
 	  current_result := array_append(current_result, r.result);
 	  content := substring(content, r.text_length);
 	else
-	  j :=  (CASE WHEN current in ('+', '-') THEN 2
-	              WHEN current in ('*', '/') THEN 3
-	              WHEN current in ('>', '>=', '<=', '<') THEN 4
-		      END);
+	  j := cast(op_math_level->current as int);
 
 	  if j >= math_level then
 	    content := substring(content, length(current) + 1);

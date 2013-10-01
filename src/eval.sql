@@ -2,7 +2,7 @@ drop table if exists eval_operators;
 create table eval_operators (
   op		text		not null,
   func		text		not null,
-  in_regexp	boolean		not null default true,
+  math_level	int		not null default 0,
   primary key(op)
 );
 
