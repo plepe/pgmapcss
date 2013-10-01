@@ -94,6 +94,8 @@ begin
 	  r := pgmapcss_parse_eval(r1.result);
 
 	  r.text_length := r1.text_length;
+	else
+	  r := pgmapcss_parse_eval(content, 6);
 	end if;
       else
 	r := pgmapcss_parse_eval(content, 6);
