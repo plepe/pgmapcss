@@ -16,6 +16,10 @@ declare
 begin
   if substr($1, 1, 2) = 'v:' then
     return quote_literal(substr($1, 3));
+
+  elsif substr($1, 1, 2) = 'f:' then
+    return 'eval_' || quote_ident(substr($1, 3)) || '(''{}''' || eval_param || ')';
+
   end if;
 
   param := cast($1 as text[]);

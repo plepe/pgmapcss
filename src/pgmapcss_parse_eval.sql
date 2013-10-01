@@ -2,8 +2,8 @@
 create or replace function pgmapcss_parse_eval(
   			text,
   "offset"		int default 1,
-  math_level		int default 0,
-  current_op		text default null
+			int default 0,
+			text default null
 )
 returns pgmapcss_parse_string_return
 as $$
@@ -19,10 +19,15 @@ declare
   a text[];
   b text[];
   current text;
+  current_result text[];
   current_length int;
   current_whitespace text;
+  current_op text;
+  math_level int;
   param text[];
   mode int := 0;
+  last_mode int;
+  last_content text;
   -- 0 .. reading whitespace before token
   -- 1 .. reading token
   -- 2 .. token finished, read quoted string
@@ -34,192 +39,262 @@ begin
   -- raise notice 'parse_eval(''%'', %, ''%'')', content, math_level, current_op;
   
   -- compile eval operator regexp
-  select '^(' || array_to_string(array_agg(x), '|') || ')' into op_regexp from (select replace(regexp_replace(op, '(\+|\*)', E'\\ \\1', 'g'), ' ', '') x from eval_operators where in_regexp = true) t;
+  select '^(' || array_to_string(array_agg(x), '|') || ')' into op_regexp from (select replace(regexp_replace(op, '(\+|\*)', E'\\ \\1', 'g'), ' ', '') x from eval_operators) t;
 
   i := 1;
   current := ''::text;
   current_length := 0;
-  current_whitespace := '';
   param := Array[]::text[];
+  current_result := Array[]::text[];
+
+  math_level := $3;
+  current_op := $4;
 
   loop
+    -- make sure to break on parsing errors
+    if content = last_content and mode = last_mode then
+      raise exception 'Error parsing eval(...) at "%"', substring(content, 1, 20);
+    end if;
+    last_content := content;
+    last_mode := mode;
+
     -- raise notice 'eval: (math%) (mode%) "%..."', math_level, mode, substring(content, i, 20);
-    if esc = true then
-      current := current || current_whitespace || substring(content, i, 1);
-      current_whitespace := '';
-      current_length := current_length + 1;
-      esc := false;
 
-    else
-      if substring(content, i, 1) = E'\\' then
-	esc := true;
+    if mode = 0 then
+      -- whitespace
+      if content ~ '^\s+' then
+	content := substring(content from '^\s+(.*)$');
 
-	if mode = 0 then
-	  mode = 1;
-	elsif mode > 1 then
-	  raise warning 'Error parsing eval statement at "%..."', substring(content, i, 20);
-	end if;
+      -- a number, opt. with unit
+      elsif content ~ '^[\-\+]?[0-9]+(\.[0-9]+)?([Ee][\-\+][0-9]+)?(\s*(%|px|m|u))?' then
+        current_result := array_append(current_result,
+	  'v:' || substring(content from '^([\-\+]?[0-9]+(\.[0-9]+)?([Ee][\-\+][0-9]+)?(\s*(%|px|m|u))?)'));
+	content := substring(content from '^[\-\+]?[0-9]+(?:\.[0-9]+)?(?:[Ee][\-\+][0-9]+)?(?:\s*(?:%|px|m|u))?(.*)$');
+        mode := 20;
 
-      elsif substring(content, i, 1) in ('"', '''') then
-	if current != '' then
-	  raise warning 'Error parsing eval statement at "%..."', substring(content, i, 20);
-	end if;
+      -- an identifier
+      elsif content ~ '^[a-zA-Z_:][a-zA-Z_:0-9]*' then
+        current := substring(content from '^([a-zA-Z_:][a-zA-Z_:0-9]*)');
+	content := substring(content from '^[a-zA-Z_:][a-zA-Z_:0-9]*(.*)$');
+        mode := 10;
 
-        r := pgmapcss_parse_string(content, null, i);
+      -- opening bracket
+      elsif content ~ '^\(' then
+        content := substring(content, 2);
+	r := pgmapcss_parse_eval(content);
+	current_result := array_append(current_result,
+	  r.result);
+	content := substring(content, r.text_length);
 
-	current := coalesce(r.result, '');
-	current_length := current_length + r.text_length;
-	current_whitespace := '';
-	i := i + r.text_length - 1;
+	mode := 1;
+      
+      -- closing bracket, ',' or ';'
+      elsif content ~ '^(\)|,|;)' then
+        ret.result := null;
+	ret.text_length := strpos($1, content) - "offset";
 
-	mode=2;
-      elsif substring(content, i, 1) = '(' then
-	r := pgmapcss_parse_eval(content, i + 1);
-        i := i + r.text_length;
-
-	a := (cast(r.result as text[]));
-	if a[1] ~ '^{' then
-	  a := a[1];
-	end if;
-
-	if a[1] ~ '^o:,' then
-	  a[1] := 'f:' || current;
-	else
-	  a := Array['f:' || current, cast(a as text)];
-	end if;
-
-	param := array_append(param, cast(a as text));
-
-	current := '';
-	current_whitespace := '';
-	current_length := 0;
-	mode := 3;
-
-      elsif substring(content, i, 1) = ')' then
-	if current != '' then
-	  param := array_append(param, 'v:' || current);
-	end if;
-
-	ret.result := cast(param as text);
-	ret.text_length := i;
 	return ret;
 
-      elsif
-        (substring(content, i, 1) = '.' and mode = 2) or
-        (substring(content, i, 1) in ('+', '-') and mode in (1, 2)) or
-        substring(content, i, 2) ~ op_regexp
-      then
+      -- quoted string
+      elsif content ~ '^["'']' then
+        r := pgmapcss_parse_string(content);
+        current_result := array_append(current_result, 'v:' || r.result);
+	content := substring(content, r.text_length + 1);
 
-	if substring(content, i, 1) in ('.', '+', '-') then
-	  t := substring(content, i, 1);
+	mode := 20;
+
+      end if;
+
+    elsif mode = 1 then
+      -- whitespace
+      if content ~ '^\s+' then
+	content := substring(content from '^\s+(.*)$');
+
+      elsif content ~ '^\)' then
+        content := substring(content, 2);
+	mode := 20;
+
+      end if;
+
+    -- read an identifier, this could be a function call
+    elsif mode = 10 then
+      -- it is a function call
+      if content ~ '^\(' then
+	content := substring(content, 2);
+	current_result := array_append(current_result, 'f:' || current);
+
+	if content ~ '^\s*\)' then
+	  content := substring(content from '^\s*\)(.*)$');
+	  
+	  mode := 20;
+
 	else
-	  t := substring(substring(content, i, 2) from op_regexp);
+	  r := pgmapcss_parse_eval(content);
+	  current_result := array_append(current_result, r.result);
+	  content := substring(content, r.text_length);
+
+	  mode := 11;
 	end if;
 
-	i := i + length(t) - 1;
-	j :=  (CASE WHEN t in ('+', '-') THEN 3
-	            WHEN t in ('*', '/') THEN 2
-	            WHEN t in ('>', '>=', '<=', '<') THEN 2
-	            WHEN t in (',', ';') THEN 99
-	       END);
+      else
+	current_result := array_append(current_result, 'v:' || current);
+	mode := 20;
 
-	if t = current_op then
-	  if current != '' then
-	    param := array_append(param, 'v:' || current);
-	  end if;
-	  mode := 0;
-	elsif (j < math_level) then
-	  r := pgmapcss_parse_eval(content, i - current_length, j, t);
+      end if;
 
-	  i := i + r.text_length - current_length - 2;
-	  a := cast(r.result as text[]);
+    -- inbetween a function call
+    elsif mode = 11 then
+      if content ~ '^\s*[,;]' then
+	content := substring(content from '^\s*[,;](.*)$');
 
+	r := pgmapcss_parse_eval(content);
+	current_result := array_append(current_result, r.result);
+	content := substring(content, r.text_length);
 
-	  if array_upper(param, 1) > 1 then
-	    a := array_prepend(param[array_upper(param, 1)], a);
-            a := array_prepend('o:' || t, a);
-	    param := param[1:array_upper(param, 1)-1];
-	    param := array_append(param, cast(a as text));
+      elsif content ~ '^\s*\)' then
+	content := substring(content from '^\s*\)(.*)$');
 
-	  else
-	    param := array_append(param, cast(array_prepend('o:' || t, a) as text));
-	  end if;
+	mode := 20;
 
-	elsif math_level = 0 then
-	  if current = '' then
-	    r := pgmapcss_parse_eval(content, i + 1, j, t);
-	    i := i + r.text_length - 1;
+      end if;
 
-	    if array_upper(param, 1) = 1 then
-	      a := array_prepend('o:' || t, param);
-	      a := array_cat(a, cast(r.result as text[]));
-	      param := a;
-	    else
-	      a := Array['o:' || t, cast(param as text)];
-	      a := array_cat(a, cast(r.result as text[]));
-	      param := a;
-	    end if;
+    -- now we are awaiting an operator - or return
+    elsif mode = 20 then
+      if content ~ '^\s+' then
+	content := substring(content from '^\s+(.*)$');
 
-	  else
-	    r := pgmapcss_parse_eval(content, i - current_length, j, t);
-	    i := i - current_length + r.text_length - 2;
-	    current := '';
-	    current_whitespace := '';
-	    current_length := 0;
-
-	    a := cast(r.result as text[]);
-	    a := array_prepend('o:'||t, a);
-	    param := array_append(param, cast(a as text));
-	  end if;
+      elsif content ~ '^(\)|,|;)' or content = '' then
+	if content = '' then
+	  ret.text_length := length($1) - "offset" + 1;
 	else
-	  if current != '' then
-	    param := array_append(param, 'v:' || current);
+	  ret.text_length := strpos($1, content) - "offset" + 1;
+	end if;
+
+	if array_upper(current_result, 1) = 1 then
+	  ret.result := current_result[1];
+	else
+	  ret.result := cast(current_result as text);
+	end if;
+
+	return ret;
+
+      elsif content ~ op_regexp then
+	current := substring(content from op_regexp);
+
+	j :=  (CASE WHEN current in ('+', '-') THEN 2
+	            WHEN current in ('*', '/') THEN 3
+	            WHEN current in ('>', '>=', '<=', '<') THEN 4
+		    END);
+
+	if j > math_level then
+	  content := substring(content, length(current) + 1);
+
+	  current_op := current;
+	  math_level := j;
+
+	  if array_upper(current_result, 1) = 1 then
+	    current_result := Array[ 'o:' || current_op,
+	      current_result[1] ];
+	  else
+	    current_result := Array[ 'o:' || current_op,
+	      cast(current_result as text) ];
 	  end if;
 
-	  ret.result := param;
-	  ret.text_length := i;
+	  r := pgmapcss_parse_eval(content, 1, math_level, current_op);
+	  current_result := array_append(current_result, r.result);
+	  content := substring(content, r.text_length);
+
+	  mode := 21;
+        else
+	  if content = '' then
+	    ret.text_length := length($1) - "offset" + 1;
+	  else
+	    ret.text_length := strpos($1, content) - "offset" + 1;
+	  end if;
+
+	  if array_upper(current_result, 1) = 1 then
+	    ret.result := current_result[1];
+	  else
+	    ret.result := cast(current_result as text);
+	  end if;
 
 	  return ret;
 	end if;
 
-	current := '';
-	current_whitespace := '';
-	current_length := 0;
-	mode := 4;
+      end if;
 
-      else
-	-- maybe ignore whitespace
-	if substring(content, i) ~ '^\s' then
-	  -- ignore whitespace at beginning of token
-	  if mode != 0 then
-	    current_whitespace := current_whitespace || substring(content, i, 1);
-	    current_length := current_length + 1;
-	  end if;
-	elsif mode > 1 and mode != 4 then
-	  raise warning 'Error parsing eval statement at "%..."', substring(content, i, 20);
+    elsif mode = 21 then
+      if content ~ '^\s+' then
+	content := substring(content from '^\s+(.*)$');
+
+      elsif content ~ '^(\)|,|;)' or content = '' then
+	if content = '' then
+	  ret.text_length := length($1) - "offset" + 1;
 	else
-	  if mode = 4 then
-	    mode := 1;
+	  ret.text_length := strpos($1, content) - "offset" + 1;
+	end if;
+
+	if array_upper(current_result, 1) = 1 then
+	  ret.result := current_result[1];
+	else
+	  ret.result := cast(current_result as text);
+	end if;
+
+	return ret;
+
+      elsif content ~ op_regexp then
+	current := substring(content from op_regexp);
+
+	if current = current_op then
+	  content := substring(content, length(current) + 1);
+
+	  r := pgmapcss_parse_eval(content, 1, math_level, current_op);
+	  current_result := array_append(current_result, r.result);
+	  content := substring(content, r.text_length);
+	else
+	  j :=  (CASE WHEN current in ('+', '-') THEN 2
+	              WHEN current in ('*', '/') THEN 3
+	              WHEN current in ('>', '>=', '<=', '<') THEN 4
+		      END);
+
+	  if j >= math_level then
+	    content := substring(content, length(current) + 1);
+
+	    current_op := current;
+	    math_level := j;
+
+	    if array_upper(current_result, 1) = 1 then
+	      current_result := Array[ 'o:' || current_op,
+		current_result[1] ];
+	    else
+	      current_result := Array[ 'o:' || current_op,
+		cast(current_result as text) ];
+	    end if;
+
+	    r := pgmapcss_parse_eval(content, 1, math_level, current_op);
+	    current_result := array_append(current_result, r.result);
+	    content := substring(content, r.text_length);
+
+	  else
+	    if content = '' then
+	      ret.text_length := length($1) - "offset" + 1;
+	    else
+	      ret.text_length := strpos($1, content) - "offset" + 1;
+	    end if;
+
+	    if array_upper(current_result, 1) = 1 then
+	      ret.result := current_result[1];
+	    else
+	      ret.result := cast(current_result as text);
+	    end if;
+
+	    return ret;
+
 	  end if;
 
-	  current := current || current_whitespace || substring(content, i, 1);
-	  current_whitespace := '';
-	  current_length := current_length + 1;
-	  mode = 1;
 	end if;
+
       end if;
-    end if;
-
-    i := i + 1;
-
-    if i > length(content) then
-      if current != '' then
-	param := array_append(param, 'v:' || current);
-      end if;
-      ret.result := cast(param as text);
-      ret.text_length := i;
-
-      return ret;
     end if;
   end loop;
 end;
