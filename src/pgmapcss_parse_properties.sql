@@ -90,10 +90,10 @@ begin
     if content ~ '^eval\(' then
       r1 := pgmapcss_parse_string(content, null, 6);
       if r1.result is not null then
-        if substring(content, 6 + r1.text_length) ~ '^\s*\)\s*;' then
+        if r1.content ~ '^\s*\)\s*;' then
 	  r := pgmapcss_parse_eval(r1.result);
 
-	  r.text_length := r1.text_length;
+	  r.content := r1.content;
 	else
 	  r := pgmapcss_parse_eval(content, 6);
 	end if;
@@ -109,7 +109,7 @@ begin
       ret1.eval_value := r.result;
       ret1.value_type := 1;
 
-      content := substring(content, 6 + r.text_length);
+      content := r.content;
       content := substring(content from '^[^;]*;\s*(.*)$');
 
     elsif content ~ '^rgb\(' then
@@ -143,7 +143,7 @@ begin
 
       if r is not null then
 	ret1.value := r.result;
-	content := substring(content, 5 + r.text_length);
+	content := r.content;
 
 	content := substring(content from '^\s*\)\s*;(.*)$');
 
@@ -161,7 +161,7 @@ begin
       ret1.value := r.result;
       ret1.value_type := 2;
 
-      content := substring(content, r.text_length + 1);
+      content := r.content;
       content := substring(content from '^\s*;\s*(.*)$');
 
     elsif content ~ '^([^;]*);' then

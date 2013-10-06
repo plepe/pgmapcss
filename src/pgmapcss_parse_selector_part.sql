@@ -85,7 +85,7 @@ begin
   while selector ~ '^\[' loop
     r := pgmapcss_parse_condition(substring(selector, 2));
     ret.conditions=array_append(ret.conditions, r);
-    selector := substring(selector, r.text_length + 3);
+    selector := substring(r.content, 2);
   end loop;
 
   -- parse pseudo classes

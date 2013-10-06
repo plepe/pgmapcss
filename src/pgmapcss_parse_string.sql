@@ -1,7 +1,7 @@
 drop type if exists pgmapcss_parse_string_return cascade;
 create type pgmapcss_parse_string_return as (
   result	text,
-  text_length	int
+  content	text
 );
 
 -- parse a string from the current content. Returns the parsed string and the length that was read from the content.
@@ -43,7 +43,7 @@ begin
 	if substring(content, i, 1) = E'\\' then
 	  esc := true;
 	elsif substring(content, i, 1) = quote then
-	  ret.text_length = i;
+	  ret.content = substring(content, i + 1);
 
 	  return ret;
 	else
@@ -55,7 +55,7 @@ begin
 
       if i > length(content) then
 	ret.result = null;
-	ret.text_length = 0;
+	ret.content = '';
 
 	return ret;
       end if;
@@ -63,13 +63,13 @@ begin
 
   elsif content ~ no_quote_match then
     ret.result := substring(content from no_quote_match);
-    ret.text_length := length(ret.result);
+    ret.content := substring(content, length(ret.result) + 1);
 
     return ret;
   end if;
 
   ret.result = null;
-  ret.text_length = 0;
+  ret.content = '';
   return ret;
 end;
 $$ language 'plpgsql' immutable;

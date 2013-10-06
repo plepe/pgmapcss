@@ -40,7 +40,7 @@ create type pgmapcss_condition as (
   value			text,
   -- 0..string, 1..eval expression
   value_type		smallint,
-  text_length		int
+  content		text
 );
 
 drop type if exists pgmapcss_selector_part cascade;

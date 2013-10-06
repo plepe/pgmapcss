@@ -36,7 +36,7 @@ declare
   op_math_level hstore;
 begin
   content := substring($1, "offset");
-  ret.text_length := null;
+  ret.content := null;
   -- raise notice 'parse_eval(''%'', %, ''%'')', content, math_level, current_op;
   
   -- compile eval operator regexp
@@ -86,14 +86,14 @@ begin
 	r := pgmapcss_parse_eval(content);
 	current_result := array_append(current_result,
 	  r.result);
-	content := substring(content, r.text_length);
+	content := r.content;
 
 	mode := 1;
       
       -- closing bracket, ',' or ';'
       elsif content ~ '^(\)|,|;)' then
         ret.result := null;
-	ret.text_length := strpos($1, content) - "offset";
+	ret.content := content;
 
 	return ret;
 
@@ -101,7 +101,7 @@ begin
       elsif content ~ '^["'']' then
         r := pgmapcss_parse_string(content);
         current_result := array_append(current_result, 'v:' || r.result);
-	content := substring(content, r.text_length + 1);
+	content := r.content;
 
 	mode := 20;
 
@@ -133,7 +133,7 @@ begin
 	else
 	  r := pgmapcss_parse_eval(content);
 	  current_result := array_append(current_result, r.result);
-	  content := substring(content, r.text_length);
+	  content := r.content;
 
 	  mode := 11;
 	end if;
@@ -151,7 +151,7 @@ begin
 
 	r := pgmapcss_parse_eval(content);
 	current_result := array_append(current_result, r.result);
-	content := substring(content, r.text_length);
+	content := r.content;
 
       elsif content ~ '^\s*\)' then
 	content := substring(content from '^\s*\)(.*)$');
@@ -166,11 +166,7 @@ begin
 	content := substring(content from '^\s+(.*)$');
 
       elsif content ~ '^(\)|,|;)' or content = '' then
-	if content = '' then
-	  ret.text_length := length($1) - "offset" + 1;
-	else
-	  ret.text_length := strpos($1, content) - "offset" + 1;
-	end if;
+	ret.content := content;
 
 	if array_upper(current_result, 1) = 1 then
 	  ret.result := current_result[1];
@@ -201,15 +197,11 @@ begin
 
 	  r := pgmapcss_parse_eval(content, 1, math_level, current_op);
 	  current_result := array_append(current_result, r.result);
-	  content := substring(content, r.text_length);
+	  content := r.content;
 
 	  mode := 21;
         else
-	  if content = '' then
-	    ret.text_length := length($1) - "offset" + 1;
-	  else
-	    ret.text_length := strpos($1, content) - "offset" + 1;
-	  end if;
+	  ret.content := content;
 
 	  if array_upper(current_result, 1) = 1 then
 	    ret.result := current_result[1];
@@ -227,11 +219,7 @@ begin
 	content := substring(content from '^\s+(.*)$');
 
       elsif content ~ '^(\)|,|;)' or content = '' then
-	if content = '' then
-	  ret.text_length := length($1) - "offset" + 1;
-	else
-	  ret.text_length := strpos($1, content) - "offset" + 1;
-	end if;
+	ret.content := content;
 
 	if array_upper(current_result, 1) = 1 then
 	  ret.result := current_result[1];
@@ -249,7 +237,7 @@ begin
 
 	  r := pgmapcss_parse_eval(content, 1, math_level, current_op);
 	  current_result := array_append(current_result, r.result);
-	  content := substring(content, r.text_length);
+	  content := r.content;
 	else
 	  j := cast(op_math_level->current as int);
 
@@ -269,14 +257,10 @@ begin
 
 	    r := pgmapcss_parse_eval(content, 1, math_level, current_op);
 	    current_result := array_append(current_result, r.result);
-	    content := substring(content, r.text_length);
+	    content := r.content;
 
 	  else
-	    if content = '' then
-	      ret.text_length := length($1) - "offset" + 1;
-	    else
-	      ret.text_length := strpos($1, content) - "offset" + 1;
-	    end if;
+	    ret.content := content;
 
 	    if array_upper(current_result, 1) = 1 then
 	      ret.result := current_result[1];
