@@ -3,14 +3,13 @@ create or replace function pgmapcss_parse_eval(
   			text,
   "offset"		int default 1,
 			int default 0,
-			text default null
+			text default null,
+  OUT result text,
+  OUT content text
 )
-returns pgmapcss_parse_string_return
 as $$
 #variable_conflict use_variable
 declare
-  ret pgmapcss_parse_string_return;
-  content text;
   esc boolean := false;
   i int;
   j int;
@@ -36,7 +35,6 @@ declare
   op_math_level hstore;
 begin
   content := substring($1, "offset");
-  ret.content := null;
   -- raise notice 'parse_eval(''%'', %, ''%'')', content, math_level, current_op;
   
   -- compile eval operator regexp
@@ -92,10 +90,9 @@ begin
       
       -- closing bracket, ',' or ';'
       elsif content ~ '^(\)|,|;)' then
-        ret.result := null;
-	ret.content := content;
+        result := null;
 
-	return ret;
+	return;
 
       -- quoted string
       elsif content ~ '^["'']' then
@@ -166,15 +163,13 @@ begin
 	content := substring(content from '^\s+(.*)$');
 
       elsif content ~ '^(\)|,|;)' or content = '' then
-	ret.content := content;
-
 	if array_upper(current_result, 1) = 1 then
-	  ret.result := current_result[1];
+	  result := current_result[1];
 	else
-	  ret.result := cast(current_result as text);
+	  result := cast(current_result as text);
 	end if;
 
-	return ret;
+	return;
 
       elsif content ~ op_regexp then
 	current := substring(content from op_regexp);
@@ -201,15 +196,13 @@ begin
 
 	  mode := 21;
         else
-	  ret.content := content;
-
 	  if array_upper(current_result, 1) = 1 then
-	    ret.result := current_result[1];
+	    result := current_result[1];
 	  else
-	    ret.result := cast(current_result as text);
+	    result := cast(current_result as text);
 	  end if;
 
-	  return ret;
+	  return;
 	end if;
 
       end if;
@@ -219,15 +212,13 @@ begin
 	content := substring(content from '^\s+(.*)$');
 
       elsif content ~ '^(\)|,|;)' or content = '' then
-	ret.content := content;
-
 	if array_upper(current_result, 1) = 1 then
-	  ret.result := current_result[1];
+	  result := current_result[1];
 	else
-	  ret.result := cast(current_result as text);
+	  result := cast(current_result as text);
 	end if;
 
-	return ret;
+	return;
 
       elsif content ~ op_regexp then
 	current := substring(content from op_regexp);
@@ -260,15 +251,13 @@ begin
 	    content := r.content;
 
 	  else
-	    ret.content := content;
-
 	    if array_upper(current_result, 1) = 1 then
-	      ret.result := current_result[1];
+	      result := current_result[1];
 	    else
-	      ret.result := cast(current_result as text);
+	      result := cast(current_result as text);
 	    end if;
 
-	    return ret;
+	    return;
 
 	  end if;
 

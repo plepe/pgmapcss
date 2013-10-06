@@ -39,8 +39,7 @@ create type pgmapcss_condition as (
   key			text,
   value			text,
   -- 0..string, 1..eval expression
-  value_type		smallint,
-  content		text
+  value_type		smallint
 );
 
 drop type if exists pgmapcss_selector_part cascade;
