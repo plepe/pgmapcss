@@ -180,7 +180,7 @@ begin
 
 	-- prepare an eval function to convert unit to pixel values
 	else
-	  ret1.eval_value := pgmapcss_parse_eval('number("' || ret1.value || '")');
+	  ret1.eval_value := pgmapcss_parse_eval('metric("' || ret1.value || '")');
 	  ret1.value := null;
 	  ret1.value_type := 1;
 	end if;
