@@ -40,7 +40,7 @@ begin
   -- raise notice 'parse_eval(''%'', %, ''%'')', content, math_level, current_op;
   
   -- compile eval operator regexp
-  select '^(' || array_to_string(array_agg(x), '|') || ')' into op_regexp from (select replace(regexp_replace(op, '(\+|\*)', E'\\ \\1', 'g'), ' ', '') x from eval_operators) t;
+  select '^(' || array_to_string(array_agg(x), '|') || ')' into op_regexp from (select replace(regexp_replace(op, '([\?\.\+\*\^\$\\])', E'\\ \\1', 'g'), ' ', '') x from eval_operators) t;
   select hstore(array_agg(op), array_agg(cast(eval_operators.math_level as text))) into op_math_level from eval_operators;
 
   i := 1;
