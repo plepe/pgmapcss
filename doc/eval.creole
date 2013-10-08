@@ -23,7 +23,10 @@ If you read a number, unit conversion takes place. The following units are suppo
 |= Operator |= Description |= Compatibility
 | +, -, *, / | arithmetic operations (see add, sub, mul, div for description) | MapCSS 0.2
 | . | concatenate strings (strings need to be quoted though) | MapCSS 0.2
-| ==, !=, <> | string comparison (equal, not equal, not equal) | TODO: MapCSS 0.2: number comparison
+| == | Comparision (equal); perform canonization for numbers prior to comparison, so "2" == "2.0" == "02" | MapCSS 0.2
+| !=, <> | Comparision (differing); perform canonization for numbers prior to comparison (see ==); If more than two values are compared, ALL values must be differing. | MapCSS 0.2
+| eq, (also ===) | Comparision (identical); string comparison, therefore "2" ne "02". | MapCSS 0.2: "eq"
+| ne, (also !==) | Comparision (nonidentical); string comparison; If more than two values are compared, ALL values must be differing. | MapCSS 0.2: "ne"
 | >, >=, <=, < | number comparison | MapCSS 0.2
 | , or ; | several statements separated by , or ; will always return the value of the last statement.
 | ~= | list membership; whether list contains an element. | no standard
@@ -31,7 +34,10 @@ If you read a number, unit conversion takes place. The following units are suppo
 == Functions ==
 |= Function |= Parameters |= Return value |= Description | Compatibility
 | add, sub, mul, div | number, [number, [number, ...]] | number | arithmetic operations. If any of the input parameters is not a number, returns //none//, with the exception of //none//, which will be converted to 0. | no standard
-| eq, neq | text, [text, [text, ...]] | boolean | eq: Returns true if all input parameters are equal; neq: Returns true if all of the input parameters are different. | no standard
+| equal | text, [text, [text, ...]] | Equal comparison; perform canonization for numbers prior to comparison, so equal("2", "2.0", "02") => true | no standard
+| differing | text, [text, [text, ...]] | Not equal comparison; perform canonization for numbers prior to comparison; If more than two values are compared, ALL values must be differing; so differing("2", "2.0", "5") => false | no standard
+| identical | text, [text, [text, ...]] | Equal comparison; string comparison, so identical("2", "2.0", "02") => false | no standard
+| nonidentical | text, [text, [text, ...]] | Not equal comparison; string comparison; If more than two values are compared, ALL values must be differing; so nonidentical("2", "2", "5") => false | no standard
 | gt, ge, le, lt | number, number | boolean | compares two numbers. >, >=, <= or <. | no standard
 | sqrt | number | number | Square root of input value | MapCSS 0.2
 | prop | key, [string] | value | current value of the computed property on pseudo element param2 (default: current pseudo element). Examples: prop(width), prop(width, casing) | MapCSS 0.2 (no standard: pseudo element)
