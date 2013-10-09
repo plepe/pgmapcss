@@ -10,6 +10,7 @@ declare
   ret pgmapcss_selector;
   content text;
   m text;
+  tmp pgmapcss_selector_part;
 begin
   content:=$1;
 
@@ -22,9 +23,17 @@ begin
       ret.text_length := r.text_length;
 
       r := pgmapcss_parse_selector_part(content, '>|<|near');
-      ret.link_condition := r;
-      ret.text_length := ret.text_length + r.text_length;
-      content:=substr(content, r.text_length + 1);
+      if r.text_length is null then
+	-- if neither >, < or near found, assume '>'
+	tmp.type := '>';
+
+        ret.link_condition := tmp;
+      else
+	-- >, <, near
+	ret.link_condition := r;
+	ret.text_length := ret.text_length + r.text_length;
+	content:=substr(content, r.text_length + 1);
+      end if;
 
       r := pgmapcss_parse_selector_part(content);
       ret.object := r;

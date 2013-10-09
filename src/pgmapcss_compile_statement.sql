@@ -28,7 +28,7 @@ begin
   ret = ret || E')\nthen\n';
 
   -- if selector.link_parent then
-  if (selector.link_condition).type != '' then
+  if (selector.link_condition).type is not null then
     ret = ret || E'parent_index := 0;\n';
     ret = ret || E'for parent_object in ' || pgmapcss_compile_link_selector(selector) || E' loop\n';
     ret = ret || E'parent_index := parent_index + 1;\n';
@@ -158,7 +158,7 @@ begin
     ret = ret || E'end loop;\n';
   end if;
 
-  if (selector.link_condition).type != '' then
+  if (selector.link_condition).type is not null then
     ret = ret || E'end if;\n';
     ret = ret || E'end loop;\n';
     ret = ret || E'current.parent_object = null;\n';

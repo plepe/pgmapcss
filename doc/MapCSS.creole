@@ -138,6 +138,15 @@ You can access the tags of the parent with parent_tag(), though changes via set/
 
 The following link conditions are available:
 
+==== empty link selector ====
+The object is member of a parent relation.
+
+Link tags are not possible
+
+E.g. {{{relation[type=route] way}}}
+
+This syntax mostly follows MapCSS 0.2, but there are no pseudo tags added to the member.
+
 ==== '>' ====
 The object is member of a parent relation.
 
