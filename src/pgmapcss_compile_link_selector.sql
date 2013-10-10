@@ -8,7 +8,7 @@ declare
   r record;
   t text;
 begin
-  if (selector.link_condition).type = '>' then
+  if (selector.link_condition).type in ('>', '') then
     return 'select t_parent_object.* from ' ||
       'objects_relation_member_of(object.id) t_parent_object ' ||
       'where ' || pgmapcss_compile_selector_part(selector.link_parent, 't_parent_object.');

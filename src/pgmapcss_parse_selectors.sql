@@ -7,6 +7,8 @@ as $$
 #variable_conflict use_variable
 declare
   r pgmapcss_selector_part;
+  rn pgmapcss_selector_part;
+  r1 record;
   ret pgmapcss_selector;
   content text;
   m text;
@@ -24,8 +26,9 @@ begin
 
       r := pgmapcss_parse_selector_part(content, '>|<|near');
       if r.text_length is null then
-	-- if neither >, < or near found, assume '>'
-	tmp.type := '>';
+	-- if neither >, < or near found, set ''
+	tmp.type := '';
+	tmp.conditions := Array[]::pgmapcss_condition[];
 
         ret.link_condition := tmp;
       else
@@ -36,6 +39,25 @@ begin
       end if;
 
       r := pgmapcss_parse_selector_part(content);
+
+      -- if link selector is empty, copy conditions on pseudo tags to link condition
+      if (ret.link_condition).type = '' then
+	tmp := ret.link_condition;
+	rn := r;
+	rn.conditions := Array[]::pgmapcss_condition[];
+
+	foreach r1 in array r.conditions loop
+	  if r1.key in ('role', 'sequence_id') then
+	    tmp.conditions := array_append(tmp.conditions, r1);
+	  else
+	    rn.conditions := array_append(rn.conditions, r1);
+	  end if;
+	end loop;
+
+	r := rn;
+	ret.link_condition := tmp;
+      end if;
+
       ret.object := r;
       ret.text_length := ret.text_length + r.text_length;
       content:=substr(content, r.text_length + 1);

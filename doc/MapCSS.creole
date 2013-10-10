@@ -143,9 +143,15 @@ The object is member of a parent relation.
 
 Link tags are not possible
 
-E.g. {{{relation[type=route] way}}}
+E.g. {{{relation[type=route] way[role=proposed]}}}
 
-This syntax mostly follows MapCSS 0.2, but there are no pseudo tags added to the member.
+The following pseudo tags are available for conditions:
+* role: the member role of the object in the relation.
+* sequence_id: The index of the object in the relation.
+
+The same link tags will be set as in the '>' link selector (for the eval-function link_tag() ).
+
+* Compatibility MapCSS 0.2: YES
 
 ==== '>' ====
 The object is member of a parent relation.
