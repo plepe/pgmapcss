@@ -107,7 +107,7 @@ fi
 rm -f $STYLE_ID.output
 
 echo "* Compiling mapcss file"
-CONTENT=`cat $BASE.mapcss $FILE`
+CONTENT=`cat $BASE.mapcss ; $(dirname $0)/merge_imports.pl $FILE`
 psql -d "dbname=$DB user=$DBUSER host=$DBHOST password=$DBPASS" --set ON_ERROR_STOP=1 -P format=unaligned -c "select pgmapcss_install('$STYLE_ID', \$\$$CONTENT\$\$);" 2> $STYLE_ID.stderr | tail -n+2 | head -n-2 >> $STYLE_ID.stdout
 
 if [ -s $STYLE_ID.stdout ] ; then
