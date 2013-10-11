@@ -32,7 +32,7 @@ begin
   elsif m is not null then
     ret.type = m;
   else
-    raise notice 'can''t parse object class at "%..."', substring(selector, 0, 40);
+    raise exception 'can''t parse object class at "%..."', substring(selector, 0, 40);
   end if;
   selector := substring(selector, length(substring(selector from '^(\s*)(' || object_class_selector || ')')) + length(m) + 1);
 

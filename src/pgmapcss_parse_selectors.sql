@@ -24,19 +24,20 @@ begin
       ret.link_parent := r;
       ret.text_length := r.text_length;
 
-      r := pgmapcss_parse_selector_part(content, '>|<|near');
-      if r.text_length is null then
-	-- if neither >, < or near found, set ''
-	tmp.type := '';
-	tmp.conditions := Array[]::pgmapcss_condition[];
+      begin
+	r := pgmapcss_parse_selector_part(content, '>|<|near');
 
-        ret.link_condition := tmp;
-      else
-	-- >, <, near
 	ret.link_condition := r;
 	ret.text_length := ret.text_length + r.text_length;
 	content:=substr(content, r.text_length + 1);
-      end if;
+      exception
+	-- if neither >, < or near found, set ''
+        when others then
+	  tmp.type := '';
+	  tmp.conditions := Array[]::pgmapcss_condition[];
+
+	  ret.link_condition := tmp;
+      end;
 
       r := pgmapcss_parse_selector_part(content);
 
