@@ -12,14 +12,14 @@
 
 // @values: Possible values of properties; the first value is the default value
 // linecap actually has 'none' as default value. the following statement automatically replaces 'none' by 'butt'
-@values linecap butt;round;square;
-@values casing-linecap butt;round;square;
-@values linejoin round;miter;bevel;
-@values casing-linejoin round;miter;bevel;
-@values text-position center;line;
-@values font-family DejaVu Sans;DejaVu Sans Condensed;DejaVu Sans Mono;DejaVu Serif;DejaVu Serif Condensed;
-@values font-weight normal;bold;
-@values font-style normal;italic;
+@values linecap butt,round,square;
+@values casing-linecap butt,round,square;
+@values linejoin round,miter,bevel;
+@values casing-linejoin round,miter,bevel;
+@values text-position center,line;
+@values font-family DejaVu Sans,DejaVu Sans Condensed,DejaVu Sans Mono,DejaVu Serif,DejaVu Serif Condensed;
+@values font-weight normal,bold;
+@values font-style normal,italic;
 
 *::(*) {
 // General

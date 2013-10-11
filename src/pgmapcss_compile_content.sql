@@ -32,7 +32,7 @@ begin
   -- check final values (@values)
   -- replace possible property values by possible values
   for r in select * from each(stat.prop_values) loop
-    prop_values_list := string_to_array(r.value, ';');
+    prop_values_list := string_to_array(r.value, ',');
     list := Array[]::text[];
 
     for r1 in
