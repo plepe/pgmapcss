@@ -1,14 +1,43 @@
 #!/usr/bin/perl
 
+sub import_file {
+  my $url_desc = $_[0];
+  my $file;
+
+  if ($url_desc =~ /url\("(.*)"\)/) {
+    $file = $1;
+  }
+  elsif ($url_desc =~ /url\('(.*)'\)/) {
+    $file = $1;
+  }
+  elsif ($url_desc =~ /url\((.*)\)/) {
+    $file = $1;
+  }
+  elsif ($url_desc =~ /\s*(.*)\s*/) {
+    $file = $1;
+  }
+
+  my $f;
+  open $f, "<$file";
+
+  my @ret = <$f>;
+
+  close($f);
+
+  return @ret;
+}
+
 sub parse_file {
   my $FILE = $_[0];
   my $ret = "";
 
   open $f, "<$FILE";
+  @lines = <$f>;
 
   $open_comment = 0;
 
-  while (<$f>) {
+  while (scalar @lines) {
+    $_ = shift @lines;
     chop;
     $next_open_comment = $open_comment;
 
@@ -27,9 +56,9 @@ sub parse_file {
 	  $next_open_comment = 1;
 	}
 	elsif (m/(.*)\@import([^;]*);($3)/) {
-	  $_ = "$1$3";
+	  $_ = $1;
 
-	  # TODO: import file!
+	  @lines = ( import_file($2), $3, @lines );
 	}
 	else {
 	  $ret .= "$_\n";
