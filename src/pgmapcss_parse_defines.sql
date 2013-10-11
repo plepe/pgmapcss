@@ -38,6 +38,13 @@ begin
 
       stat.prop_values := stat.prop_values || hstore(m, m1);
 
+    -- ignore unknown @-statements
+    elsif content ~ '^\s*@[^;]*;' then
+      m := substring(content from '^\s*(@[^;]*;)');
+      content := substring(content from '^\s*@[^;]*;(.*)');
+
+      raise notice 'Ignoring statement "%"', m;
+
     else
       return;
 
