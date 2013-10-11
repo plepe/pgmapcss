@@ -10,12 +10,12 @@ declare
 begin
   if (selector.link_condition).type in ('>', '') then
     return 'select t_parent_object.* from ' ||
-      'objects_relation_member_of(object.id) t_parent_object ' ||
+      'objects_' || (selector.link_parent).type || '_member_of(object.id) t_parent_object ' ||
       'where ' || pgmapcss_compile_selector_part(selector.link_parent, 't_parent_object.');
 
   elsif (selector.link_condition).type = '<' then
     return 'select t_parent_object.* from ' ||
-      'objects_relation_members(object.id) t_parent_object ' ||
+      'objects_' || (selector.link_parent).type || '_members(object.id) t_parent_object ' ||
       'where ' || pgmapcss_compile_selector_part(selector.link_parent, 't_parent_object.');
 
   elsif (selector.link_condition).type = 'near' then

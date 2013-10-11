@@ -139,7 +139,7 @@ You can access the tags of the parent with parent_tag(), though changes via set/
 The following link conditions are available:
 
 ==== empty link selector ====
-The object is member of a parent relation.
+The object is member of a parent relation resp. a node of a parent way.
 
 Link tags are not possible
 
@@ -154,7 +154,7 @@ The same link tags will be set as in the '>' link selector (for the eval-functio
 * Compatibility MapCSS 0.2: YES
 
 ==== '>' ====
-The object is member of a parent relation.
+The object is member of a parent relation resp. a node of a parent way.
 
 The following link tags will be set:
 * index: an arbitrary counter for each matching parent (starting with 1).
@@ -165,7 +165,7 @@ The following link tags will be set:
 TODO: http://josm.openstreetmap.de/wiki/Help/Styles/MapCSSImplementation#Linkselector defines 'index' as the nth matching object in the relation.
 
 ==== '<' ====
-The object is a relation. The statement will be processed for all members (which is the 'parent object' in that case. E.g. {{{node <[role=stop] relation[route=bus]}}}.
+The object is a relation / way. The statement will be processed for all members / member nodes (which is the 'parent object' in that case. E.g. {{{node <[role=stop] relation[route=bus]}}}.
 
 The following link tags will be set:
 * index: an arbitrary counter for each matching parent (starting with 1).

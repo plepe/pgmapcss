@@ -28,6 +28,20 @@ if not exists (
 end if;
 end$$;
 
+-- Create index on planet_osm_ways nodes array
+do $$
+begin
+if not exists (
+  select 1
+  from pg_class
+  where relname = 'planet_osm_ways_nodes'
+  ) then
+
+  raise notice E'\ncreating planet_osm_ways nodes index - please be patient ...';
+  create index planet_osm_ways_nodes on planet_osm_ways using gin(nodes);
+end if;
+end$$;
+
 -- Use this functions only with a database based on an import with osm2pgsql
 create or replace function objects(render_context pgmapcss_render_context, where_clauses hstore)
 returns setof pgmapcss_object
@@ -149,6 +163,94 @@ begin
   end if;
 
   return;
+end;
+$$ language 'plpgsql' immutable;
+
+create or replace function objects_way(text)
+returns setof pgmapcss_parent_object
+as $$
+#variable_conflict use_variable
+declare
+  way_id bigint;
+begin
+  way_id := cast(substring($1, 2) as bigint);
+
+  return query select
+    'w' || id,
+    tags,
+    null::geometry,
+    Array['way', (CASE WHEN closed THEN 'area' ELSE 'line' END)],
+    hstore(Array[
+      'sequence_id', cast("sequence_id" as text),
+      'member_id', 'n' || cast(t.member_id as text),
+      'role', ''
+    ])
+  from (select
+      id,
+      hstore(tags) tags,
+      generate_series(0, array_upper(nodes, 1) -1 ) sequence_id,
+      unnest(nodes) member_id,
+      (nodes[1] = nodes[array_upper(nodes, 1)]) closed
+    from planet_osm_ways
+    where id=way_id
+  ) t;
+end;
+$$ language 'plpgsql' immutable;
+
+-- returns all ways the supplied node is member of, with the
+-- additional column link_tags, e.g. "index"=>"492", "member_id"=>"n1231934421"
+create or replace function objects_way_member_of(member_id text)
+returns setof pgmapcss_parent_object
+as $$
+#variable_conflict use_variable
+declare
+  w text[];
+  bbox text;
+  node_id bigint;
+begin
+  node_id := cast(substring(member_id, 2) as bigint);
+
+  return query select
+    (ob).*
+  from
+    (select
+      objects_way('w' || id) ob
+    from
+      planet_osm_ways
+    where
+      nodes @> Array[node_id]
+    offset 0
+    ) t
+  where
+    (ob).link_tags->'member_id' = member_id
+  ;
+end;
+$$ language 'plpgsql' immutable;
+
+-- returns all members of the way
+-- additional column link_tags, e.g. "index"=>"492", "member_id"=>"n1231934421"
+create or replace function objects_way_members(way_id text)
+returns setof pgmapcss_parent_object
+as $$
+#variable_conflict use_variable
+declare
+begin
+  return query
+  select * from
+  (select
+    r.link_tags->'member_id' id,
+    t1.tags,
+    t1.way,
+    Array['node', 'point'],
+    link_tags
+  from objects_way(way_id) r
+    left join planet_osm_point t1
+      on
+	cast(substring(r.link_tags->'member_id', 2) as bigint) = t1.osm_id
+  order by
+    cast(r.link_tags->'sequence_id' as int) asc
+  ) t
+  where t.id is not null;
 end;
 $$ language 'plpgsql' immutable;
 
