@@ -135,7 +135,7 @@
       <Filter>[width]</Filter>
 -->
       <Filter>[style-element] = 'casing' and '[width]' = [width] and '[casing-width]' = [casing-width] and '[casing-color]' = [casing-color] and '[casing-opacity]' = [casing-opacity] and '[casing-linejoin]' = [casing-linejoin] and '[casing-linecap]' = [casing-linecap] and '[casing-dashes]' = [casing-dashes]</Filter>
-      <LineSymbolizer stroke="[casing-color]" stroke-width="[width] + [casing-width]" stroke-opacity="[casing-opacity]" stroke-linejoin="[casing-linejoin]" stroke-linecap="[casing-linecap]" stroke-dasharray="[casing-dashes]" />
+      <LineSymbolizer stroke="[casing-color]" stroke-width="[width] + [casing-width] * 2" stroke-opacity="[casing-opacity]" stroke-linejoin="[casing-linejoin]" stroke-linecap="[casing-linecap]" stroke-dasharray="[casing-dashes]" />
     </Rule>
 # END
 
