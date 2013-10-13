@@ -125,6 +125,14 @@
 
 -->
 
+<!-- EXTRUDE -->
+# FOR extrude extrude-edge-color extrude-edge-opacity
+    <Rule>
+      <Filter>[style-element] = 'extrude' and '[extrude]' = [extrude] and '[extrude-edge-color]' = [extrude-edge-color] and '[extrude-edge-opacity]' = [extrude-edge-opacity]</Filter>
+      <BuildingSymbolizer fill="[extrude-edge-color]" fill-opacity="[extrude-edge-opacity]" height="[extrude]" />
+    </Rule>
+# END
+
 <!-- CASING LINES -->
 # FOR casing-color width casing-width casing-opacity casing-linejoin casing-linecap casing-dashes
     <Rule>
@@ -217,7 +225,7 @@
       <Parameter name="srid">900913</Parameter>
       <Parameter name="cache-features">on</Parameter>
       <Parameter name="table">
-STYLE_ID_match(pgmapcss_render_context(!bbox!, !scale_denominator!), Array['fill', 'casing', 'line', 'point', 'point-text', 'line-text', 'shield'])
+STYLE_ID_match(pgmapcss_render_context(!bbox!, !scale_denominator!), Array['fill', 'extrude', 'casing', 'line', 'point', 'point-text', 'line-text', 'shield'])
       </Parameter>
     </Datasource>
     <StyleName>pgmapcss</StyleName>

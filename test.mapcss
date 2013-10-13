@@ -20,6 +20,10 @@ area[building] {
   fill-color: #707070;		// Mapnik >= version 3.0
   width: 1;			// Mapnik >= version 3.0 or branch stroke-width-expr
   color: #000000;		// Mapnik >= version 3.0
+
+  extrude: 10;
+  extrude-face-color: #ff0000;
+  extrude-face-opacity: 1;
 }
 
 way|z11-::casing

@@ -9,6 +9,8 @@
 @default_other shield-font-weight font-weight;
 @default_other shield-font-style font-style;
 @default_other shield-font-size font-size;
+@default_other extrude-edge-color color;
+@default_other extrude-edge-opacity opacity;
 
 // @values: Possible values of properties; the first value is the default value
 // linecap actually has 'none' as default value. the following statement automatically replaces 'none' by 'butt'
@@ -80,6 +82,10 @@
   shield-text-halo-color: #ffffff;
   shield-text-opacity: 1;
   shield-text-halo-radius: 0;
+// BuildingSymoblizer
+  extrude: ;
+  extrude-edge-color: ;
+  extrude-edge-opacity: ;
 }
 line::(*) {
   shield-placement: line;
