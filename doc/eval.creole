@@ -60,6 +60,7 @@ If you read a number, unit conversion takes place. The following units are suppo
 | round | v number, [s int] | Round the input value v to s decimal places (or 0). E.g. round(-50.6, 1) => -51 | no standard
 | debug | value | value | raise a postgresql notice with the value; returns value. E.g. width: eval(debug(5+4)); | no standard
 | text_transform | string, "none" or "uppercase" or "lowercase" or "capitalize" | | no standard
+| osm_id | | text | ID of the object from OpenStreetMap, e.g. 'n1234' | no standard
 
 === List functions ===
 * List functions are not part of the MapCSS 0.2 standard
