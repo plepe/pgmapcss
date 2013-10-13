@@ -74,7 +74,6 @@ sub process {
 }
 
 # now process test-template.mapnik and replace COLOR placeholders by colors
-print "<${BASE}-${TEMPLATE}.mapnik\n";
 open $f, "<${BASE}-${TEMPLATE}.mapnik";
 open $r, ">${STYLE_ID}.mapnik";
 
