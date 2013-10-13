@@ -4,6 +4,7 @@ $DB=$ENV{DB};
 $DBUSER=$ENV{DBUSER};
 $DBPASS=$ENV{DBPASS};
 $DBHOST=$ENV{DBHOST};
+$TEMPLATE=$ENV{TEMPLATE};
 $BASE=$ENV{BASE};
 $STYLE_ID=$ENV{STYLE_ID};
 
@@ -73,7 +74,8 @@ sub process {
 }
 
 # now process test-template.mapnik and replace COLOR placeholders by colors
-open $f, "<${BASE}-template.mapnik";
+print "<${BASE}-${TEMPLATE}.mapnik\n";
+open $f, "<${BASE}-${TEMPLATE}.mapnik";
 open $r, ">${STYLE_ID}.mapnik";
 
 @t = process($f, \(), 0);

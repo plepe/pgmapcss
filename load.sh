@@ -15,12 +15,13 @@ function show_usage {
   echo "  -p, --password    Password for database (default: PASSWORD)"
   echo "  -h, --host        Host for database (default: localhost)"
   echo "  -f, --file        File to load (default: 'style_id'.mapcss)"
+  echo "  -t, --template    Template version (default: 'mapnik20')"
   echo "  -b, --base        mapcss/mapnik file building the base for the style "
   echo "                    (default: 'default' in the directory of load.sh; you "
   echo "                    may specify an absolute path)"
 }
 
-ARGS=$(getopt -o hd:u:p:H:f:b: -l "help,database:,user:,password:,host:,file:,base:" -n "load.sh" -- "$@");
+ARGS=$(getopt -o hd:u:p:H:f:t:b: -l "help,database:,user:,password:,host:,file:,template,base:" -n "load.sh" -- "$@");
 
 if [ $? -ne 0 ] ; then
   show_usage
@@ -34,6 +35,7 @@ export DBUSER=$USER
 export DBPASS="PASSWORD"
 export DBHOST="localhost"
 export FILE=""
+export TEMPLATE="mapnik20"
 export BASE="$(dirname $0)/default"
 export STYLE_ID=""
 
@@ -67,6 +69,11 @@ while true ; do
     -f|--file)
       shift;
       FILE=$1
+      shift;
+      ;;
+    -t|--template)
+      shift;
+      TEMPLATE=$1
       shift;
       ;;
     -b|--base)
@@ -107,7 +114,7 @@ fi
 rm -f $STYLE_ID.output
 
 echo "* Compiling mapcss file"
-CONTENT=`cat $BASE.mapcss ; $(dirname $0)/merge_imports.pl $FILE`
+CONTENT=`cat $BASE-$TEMPLATE.mapcss ; $(dirname $0)/merge_imports.pl $FILE`
 psql -d "dbname=$DB user=$DBUSER host=$DBHOST password=$DBPASS" --set ON_ERROR_STOP=1 -P format=unaligned -c "select pgmapcss_install('$STYLE_ID', \$\$$CONTENT\$\$);" 2> $STYLE_ID.stderr | tail -n+2 | head -n-2 >> $STYLE_ID.stdout
 
 if [ -s $STYLE_ID.stdout ] ; then
