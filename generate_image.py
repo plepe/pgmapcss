@@ -25,19 +25,19 @@ if __name__ == "__main__":
     try:
         mapfile = os.environ['MAPNIK_MAP_FILE']
     except KeyError:
-        mapfile = "osm.xml"
+        mapfile = "test.mapnik"
     
     map_uri = "image.png"
 
     #---------------------------------------------------
     #  Change this to the bounding box you want
     #
-    bounds = (-6.5, 49.5, 2.1, 59)
+    bounds = (-25.45, 37.70, -25.40, 37.75)
     #---------------------------------------------------
 
-    z = 10
-    imgx = 500 * z
-    imgy = 1000 * z
+    # z = 15
+    imgx = 1024
+    imgy = 1024
 
     m = mapnik.Map(imgx,imgy)
     mapnik.load_map(m,mapfile)
