@@ -1,8 +1,9 @@
+NEEDS WORK:
 * scaling icons
 * Eval: zmetric
-* extrude-
+* extrude- // very ugly when using BuildingSymbolizer
 
-NOT POSSIBLE:
+NOT POSSIBLE RIGHT NOW:
 * text-decoration
 * font-variant
 
