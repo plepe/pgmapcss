@@ -59,8 +59,9 @@
 | text-halo-radius |  The radius of the halo | halo-radius | eval() with ExpressionFormat | YES
 | text | The text for the label | | yes | YES
 | text-spacing | Space between repeated labels. If spacing is 0 only one label is placed (default). | spacing | yes | no standard
+| text-transform |  'none' (default), 'uppercase', 'lowercase' | | | MOSTLY ('capitalize') not supported
 
-* MapCSS 0.2 properties not (yet) supported: font-variant, text-decoration, text-transform
+* MapCSS 0.2 properties not (yet) supported: font-variant, text-decoration, text-transform (capitalize)
 
 ==== "with ExpressionFormat" ====
 <TextSymbolizer> can't read parameters from expressions, but <ExpressionFormat> (which is an undocumented feature in Mapnik 2 as of 2013-07) can. <ExpressionFormat> (as well as <Format>) is a child of TextSymbolizer and can format a part of the symbol. Therefore you can do:
@@ -87,6 +88,7 @@ Also all possible font-families are defined in default.mapcss in the @values fon
 | shield-spacing | Space between repeated shields. If spacing is 0 only one label is placed (default: 196px). | no eval | no standard
 | shield-opacity |  How transparent the shield is, from 0 (transparent) to 1 (opaque) (default: 1) | no eval | YES
 | shield-image |  The URL (absolute or relative) of an image to use as a background for text. | | YES
+| shield-text-transform |  'none' (default: same as text-transform), 'uppercase', 'lowercase' | | | no standard
 
 * MapCSS 0.2 properties not (yet) supported: shield-color, shield-frame-color, shield-frame-width, shield-casing-color, shield-casing-width, shield-shape.
 * Currently a shield-image is mandatory.

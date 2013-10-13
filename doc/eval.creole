@@ -59,6 +59,7 @@ If you read a number, unit conversion takes place. The following units are suppo
 | num | value | number | Checks if the input is a number. If not, none is returned. | MapCSS 0.2
 | round | v number, [s int] | Round the input value v to s decimal places (or 0). E.g. round(-50.6, 1) => -51 | no standard
 | debug | value | value | raise a postgresql notice with the value; returns value. E.g. width: eval(debug(5+4)); | no standard
+| text_transform | string, "none" or "uppercase" or "lowercase" | | no standard
 
 === List functions ===
 * List functions are not part of the MapCSS 0.2 standard

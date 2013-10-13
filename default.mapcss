@@ -9,6 +9,7 @@
 @default_other shield-font-weight font-weight;
 @default_other shield-font-style font-style;
 @default_other shield-font-size font-size;
+@default_other shield-text-transfrom text-transform;
 
 // @values: Possible values of properties; the first value is the default value
 // linecap actually has 'none' as default value. the following statement automatically replaces 'none' by 'butt'
@@ -20,6 +21,13 @@
 @values font-family DejaVu Sans,DejaVu Sans Condensed,DejaVu Sans Mono,DejaVu Serif,DejaVu Serif Condensed;
 @values font-weight normal,bold;
 @values font-style normal,italic;
+@values text-transform none,uppercase,lowercase;
+@values shield-text-transform none,uppercase,lowercase;
+
+// @postprocess: To calculate final value of property X call
+// eval-function as specified.
+@postprocess text text_transform(prop("text"), prop("text-transform"));
+@postprocess shield-text text_transform(prop("shield-text"), prop("shield-text-transform"));
 
 *::(*) {
 // General
@@ -66,6 +74,7 @@
   wrap-character: " ";
   text-position: center;
   text-spacing: 0;
+  text-transform: none;
 // ShieldSymbolizer
   shield-text: ;
   shield-spacing: 196;
@@ -80,6 +89,7 @@
   shield-text-halo-color: #ffffff;
   shield-text-opacity: 1;
   shield-text-halo-radius: 0;
+  shield-text-transform: ;
 }
 line::(*) {
   shield-placement: line;
