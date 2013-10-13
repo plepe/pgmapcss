@@ -10,7 +10,8 @@ area[leisure=park] {
 
 /* print a label on all parks */
   text: eval(tag(name));
-  font-family: "DejaVu Sans Oblique";
+  font-family: "DejaVu Sans";
+  font-style: italic;
   font-size: 9;
   text-color: #005f00;
 }
@@ -35,9 +36,7 @@ line|z12-[highway=tertiary] {
 
 Layering roads of a motorway junction
 =====================================
-This example shows how eval-statements for z-index can be used to layer roads correctly.
-
-Warning: This example needs Mapnik branch 'stroke-width-expr' or version 3.0 and accompaning modifications in file default-template.mapnik (search for 'stroke-width-expr' for details). If you run this example with Mapnik 2.2 the casing might be missing.
+pgmapcss automatically layers objects by its 'layer' tag, therefore the roads and bridges in the image automatically get layered correctly. You may force a specific layer by setting a property 'layer', e.g. area[landuse] { layer: -10; }.
 
 ![motorway_junction](motorway_junction.png)
 ```css
