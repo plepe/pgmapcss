@@ -85,7 +85,7 @@ $t =~ s/DB/${DB}/ge;
 $t =~ s/STYLE_ID/$STYLE_ID/ge;
 
 # replace canvas tags
-open $v, "psql -d \"dbname=$DB user=$DBUSER host=$DBHOST password=$DBPASS\" -t -F '\t' -A -c \"select (each(properties)).key, (each(properties)).value from test_check(pgmapcss_object('', '', null, Array['canvas']), pgmapcss_render_context(null, null));;\"|";
+open $v, "psql -d \"dbname=$DB user=$DBUSER host=$DBHOST password=$DBPASS\" -t -F '\t' -A -c \"select (each(properties)).key, (each(properties)).value from ${STYLE_ID}_check(pgmapcss_object('', '', null, Array['canvas']), pgmapcss_render_context(null, null));;\"|";
 while($r1 = <$v>) {
   chop($r1);
   @r1 = split("\t", $r1);
