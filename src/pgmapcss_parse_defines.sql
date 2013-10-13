@@ -10,6 +10,7 @@ as $$
 declare
   m text;
   m1 text;
+  r record;
 begin
   content := $1;
   stat := $2;
@@ -37,6 +38,15 @@ begin
       content := substring(content from '\s*@values\s+(?:[^\s]+)\s+(?:[^\s]+)\s*;(.*)$');
 
       stat.prop_values := stat.prop_values || hstore(m, m1);
+
+    elsif content ~ '^\s*@postprocess' then
+      m := substring(content from '\s*@postprocess\s+([^\s]+)\s+([^;]+)\s*;');
+      m1 := substring(content from '\s*@postprocess\s+(?:[^\s]+)\s+([^;]+)\s*;');
+      content := substring(content from '\s*@postprocess\s+(?:[^\s]+)\s+(?:[^;]+)\s*;(.*)$');
+
+      r := pgmapcss_parse_eval(m1);
+
+      stat.prop_postprocess := stat.prop_postprocess || hstore(m, r.result);
 
     -- ignore unknown @-statements
     elsif content ~ '^\s*@[^;]*;' then

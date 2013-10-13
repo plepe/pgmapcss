@@ -325,3 +325,14 @@ E.g.
 {{{
 @default_other casing-linecap linecap; // value of 'casing-linecap' defaults to value of 'linecap'
 }}}
+
+== Postprocess values ==
+Define postprocess functions:
+{{{
+@postprocess property_name function;
+}}}
+
+E.g.
+{{{
+@postprocess text text_transform(prop("text"), prop("text-transform"));
+}}}

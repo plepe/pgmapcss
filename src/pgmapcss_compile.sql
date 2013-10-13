@@ -82,6 +82,11 @@ begin
       quote_literal((string_to_array(i.value, ','))[1]) || E'); end if;\n';
   end loop;
 
+  -- post-process
+  for i in select * from each(stat.prop_postprocess) loop
+    ret = ret || E'      current.styles[r.i] := current.styles[r.i] || hstore(' || quote_literal(i.key) || ', ' || pgmapcss_compile_eval(i.value) || E');\n';
+  end loop;
+
   ret = ret || E'      ret.geo=current.styles[r.i]->''geo'';\n';
   ret = ret || E'      current.styles[r.i] := current.styles[r.i] - ''geo''::text;\n';
   ret = ret || E'      ret.properties=current.styles[r.i];\n';
