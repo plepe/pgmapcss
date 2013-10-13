@@ -1,4 +1,4 @@
-drop aggregate array_accum(anyarray) cascade;
+drop aggregate if exists array_accum(anyarray) cascade;
 CREATE AGGREGATE array_accum(anyarray) (
 SFUNC=array_cat,
 STYPE=anyarray,
