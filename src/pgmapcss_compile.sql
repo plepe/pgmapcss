@@ -76,10 +76,10 @@ begin
   for i in select * from each(stat.prop_values) loop
     ret = ret || E'      if not (current.styles[r.i]->' ||
       quote_literal(i.key) || E') = any(' ||
-      quote_literal(cast(string_to_array(i.value, ';') as text)) ||
+      quote_literal(cast(string_to_array(i.value, ',') as text)) ||
       E') then current.styles[r.i] := current.styles[r.i] || hstore(' ||
       quote_literal(i.key) || E', ' ||
-      quote_literal((string_to_array(i.value, ';'))[1]) || E'); end if;\n';
+      quote_literal((string_to_array(i.value, ','))[1]) || E'); end if;\n';
   end loop;
 
   ret = ret || E'      ret.geo=current.styles[r.i]->''geo'';\n';
