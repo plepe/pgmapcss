@@ -21,8 +21,8 @@
 @values font-family DejaVu Sans,DejaVu Sans Condensed,DejaVu Sans Mono,DejaVu Serif,DejaVu Serif Condensed;
 @values font-weight normal,bold;
 @values font-style normal,italic;
-@values text-transform none,uppercase,lowercase;
-@values shield-text-transform none,uppercase,lowercase;
+@values text-transform none,uppercase,lowercase,capitalize;
+@values shield-text-transform none,uppercase,lowercase,capitalize;
 
 // @postprocess: To calculate final value of property X call
 // eval-function as specified.

@@ -17,6 +17,7 @@ begin
     WHEN param[2] = 'none' THEN param[1]
     WHEN param[2] = 'uppercase' THEN upper(param[1])
     WHEN param[2] = 'lowercase' THEN lower(param[1])
+    WHEN param[2] = 'capitalize' THEN (select array_to_string(array_agg(v), ' ') from (select upper(substring(v, 1, 1)) || lower(substring(v, 2)) v from (select unnest(string_to_array('foo bar Test bLA', ' ')) v) t) t)
     ELSE param[1]
   END);
 end;
