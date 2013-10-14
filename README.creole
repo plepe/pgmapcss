@@ -24,42 +24,4 @@ Share this:
 * [[https://flattr.com/submit/auto?user_id=plepe&url=https://github.com/plepe/pgmapcss&title=PGMapCSS&language=&tags=github&category=software|Flattr this!]]
 * [[https://github.com/plepe/pgmapcss|Fork me on GitHub]]
 
-== Installation ==
-=== Create a database ===
-This installation has been done on Ubuntu 12.04 LTS with PostgreSQL 9.1 and PostGIS 1.5. If you use different versions on different systems the paths may vary.
-
-{{{
-psql "create database DB"
-}}}
-
-Add hstore and postgis functionality
-{{{
-psql -d DB -c "create extension hstore"
-psql -d DB -f /usr/share/postgresql/9.1/contrib/postgis-1.5/postgis.sql
-psql -d DB -f /usr/share/postgresql/9.1/contrib/postgis-1.5/spatial_ref_sys.sql
-}}}
-
-=== Import OSM data ===
-Import OSM-file with osm2pgsql
-{{{
-./osm2pgsql -d DB -s -S default.style --hstore-all -G data.osm
-}}}
-
-You may vary the parameters, but {{{--hstore-all}}} is really important.
-
-=== Load PGMapCSS ===
-The following script loads all necessary functions to compile / run PGMapCSS
-{{{
-./install.sh -d DB
-}}}
-
-Run {{{./install.sh -h}}} for additional options.
-
-Compile test.mapnik / test.mapcss style file
-{{{
-./load.sh -d DB test
-}}}
-
-Run {{{./load.sh -h}}} for additional options.
-
-Now you should have a working 'test.mapnik' XML file, which you can use in renderd or other programs.
+Find installation instructions in [[doc/install.creole]].

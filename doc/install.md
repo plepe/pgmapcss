@@ -19,7 +19,7 @@ psql -d "dbname=test user=user host=localhost password=PASSWORD" -f /usr/share/p
 psql -d "dbname=test user=user host=localhost password=PASSWORD" -f /usr/share/postgresql/9.1/contrib/postgis-1.5/spatial_ref_sys.sql
 ```
 
-Download an OSM file and import to database:
+Download an OSM file and import to database (you must add --hstore-all on newer osm2pgsql versions, as meaning of --hstore parameter changed):
 ```sh
 osm2pgsql -dtest -Uuser -Hlocalhost -W -s -S /usr/share/osm2pgsql/default.style --hstore -G azores-latest.osm.bz2
 ```
@@ -30,7 +30,8 @@ git clone https://github.com/plepe/pgmapcss.git
 cd pgmapcss
 ```
 
-Load pgmapcss functions, compile test.mapcss file:
+Load pgmapcss functions, compile test.mapcss file. (If you use Mapnik 2.2 (or
+higher) replace "-tmapnik20" by "-tmapnik22"):
 ```
 ./install.sh -dtest -uuser -pPASSWORD
 ./load.sh -dtest -uuser -pPASSWORD -tmapnik20 test.mapcss
