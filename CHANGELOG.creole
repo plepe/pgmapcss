@@ -4,6 +4,8 @@
     text-transform, shield-*, canvas{ fill-color, fill-image }
   * MapCSS 0.2 compatible link selectors, way->node relations
   * @import
+  * text, shield-text read either the value of a tag or a quoted string / eval
+    expression
 * Compatibility with Mapnik 2.0 and 2.2 (use -t on load.sh to choose version)
 * Re-implement eval-parser (as the old one was really buggy)
   * new eval functions: parent_geo(), locate_point(), line(), azimuth(),
