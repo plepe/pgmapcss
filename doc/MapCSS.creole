@@ -206,7 +206,9 @@ E.g.
 * Compatibility MapCSS 0.2: MOSTLY
 ** no definition about quoting in MapCSS
 
-See file [[default.creole]] for properties of styles based on the 'default' style definition.
+See documentation for properties of styles based on the 'default' style definition:
+* [[default-mapnik20.creole]] for Mapnik 2.0
+* [[default-mapnik22.creole]] for Mapnik 2.2
 
 === Assignments ===
 You may assign values to tags of the current object. This is independent from the current pseudo element descriptor.
