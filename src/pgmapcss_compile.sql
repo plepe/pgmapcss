@@ -66,7 +66,7 @@ begin
   ret = ret || E'  for r in select * from (select generate_series(1, ' || array_upper(stat.pseudo_elements, 1) || E') i, unnest(current.styles) style) t order by coalesce(cast(style->''object-z-index'' as float), 0) asc loop\n';
   ret = ret || E'    if current.has_pseudo_element[r.i] then\n';
 
-  for i in select dep.key main_key, prop.key "key" from each(stat.prop_depend) dep right join each(stat.properties_values) prop on prop.key = any(cast(dep.value as text[])) order by dep.key loop
+  for i in select dep.key main_key, prop.key "key", has_values.value from each(stat.prop_depend) dep right join each(stat.properties_values) prop on prop.key = any(cast(dep.value as text[])) left join each(stat.properties_values) has_values on dep.key=has_values.key where has_values.value != '{NULL}' or has_values.value is null order by dep.key loop
     if current_main_prop != i.main_key or
        (current_main_prop is not null and i.main_key is null) or
        (current_main_prop is null and i.main_key is not null) then
