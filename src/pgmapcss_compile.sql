@@ -10,6 +10,8 @@ declare
   ret text:=''::text;
   stat		pgmapcss_compile_stat;
   i record;
+  t text;
+  current_main_prop text;
   a text[];
 begin
   stat := pgmapcss_parse_content($2);
@@ -64,23 +66,46 @@ begin
   ret = ret || E'  for r in select * from (select generate_series(1, ' || array_upper(stat.pseudo_elements, 1) || E') i, unnest(current.styles) style) t order by coalesce(cast(style->''object-z-index'' as float), 0) asc loop\n';
   ret = ret || E'    if current.has_pseudo_element[r.i] then\n';
 
-  -- default_other values
-  for i in select * from each(stat.prop_default_other) loop
-    ret = ret || E'      if (current.styles[r.i]->' || quote_literal(i.key) ||
-      E') is null then current.styles[r.i] := current.styles[r.i] || hstore(' ||
-      quote_literal(i.key) || ', current.styles[r.i]->' ||
-      quote_literal(i.value) || E'); end if;\n';
+  for i in select dep.key main_key, prop.key "key" from each(stat.prop_depend) dep right join each(stat.properties_values) prop on prop.key = any(cast(dep.value as text[])) order by dep.key loop
+    if current_main_prop != i.main_key or
+       (current_main_prop is not null and i.main_key is null) or
+       (current_main_prop is null and i.main_key is not null) then
+
+      if current_main_prop is not null then
+	ret = ret || E'      end if;\n';
+      end if;
+
+      if i.main_key is not null then
+	ret = ret || E'      if current.styles[r.i] ? ' || quote_literal(i.main_key) || E' then\n';
+      end if;
+
+      current_main_prop := i.main_key;
+    end if;
+
+    -- default_other values
+    t := stat.prop_default_other->(i.key);
+    if t is not null then
+      ret = ret || E'      if (current.styles[r.i]->' || quote_literal(i.key) ||
+	E') is null then current.styles[r.i] := current.styles[r.i] || hstore(' ||
+	quote_literal(i.key) || ', current.styles[r.i]->' ||
+	quote_literal(t) || E'); end if;\n';
+    end if;
+
+    -- values
+    t := stat.prop_values->(i.key);
+    if t is not null then
+      ret = ret || E'      if not (current.styles[r.i]->' ||
+	quote_literal(i.key) || E') = any(' ||
+	quote_literal(cast(string_to_array(t, ',') as text)) ||
+	E') then current.styles[r.i] := current.styles[r.i] || hstore(' ||
+	quote_literal(i.key) || E', ' ||
+	quote_literal((string_to_array(t, ','))[1]) || E'); end if;\n';
+    end if;
   end loop;
 
-  -- values
-  for i in select * from each(stat.prop_values) loop
-    ret = ret || E'      if not (current.styles[r.i]->' ||
-      quote_literal(i.key) || E') = any(' ||
-      quote_literal(cast(string_to_array(i.value, ',') as text)) ||
-      E') then current.styles[r.i] := current.styles[r.i] || hstore(' ||
-      quote_literal(i.key) || E', ' ||
-      quote_literal((string_to_array(i.value, ','))[1]) || E'); end if;\n';
-  end loop;
+  if current_main_prop is not null then
+    ret = ret || E'      end if;\n';
+  end if;
 
   -- post-process
   for i in select * from each(stat.prop_postprocess) loop

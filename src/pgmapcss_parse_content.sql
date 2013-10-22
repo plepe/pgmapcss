@@ -19,6 +19,7 @@ begin
   stat.prop_default_other := ''::hstore;
   stat.prop_values := ''::hstore;
   stat.prop_postprocess := ''::hstore;
+  stat.prop_depend := ''::hstore;
 
   loop
     selectors:=Array[]::pgmapcss_selector[];

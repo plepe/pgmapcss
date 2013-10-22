@@ -94,6 +94,7 @@ create type pgmapcss_compile_stat as (
   prop_default_other 	hstore, -- @default_other statements
   prop_values	hstore, -- @check_value statements
   prop_postprocess hstore, -- @postprocess statements
+  prop_depend	hstore, -- @depend_property statements
   selectors	pgmapcss_selector[],
   properties	pgmapcss_properties[],
   properties_values	hstore,
