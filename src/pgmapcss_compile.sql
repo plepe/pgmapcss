@@ -147,6 +147,7 @@ begin
   ret = ret || E'begin\n';
   ret = ret || E'  "max-style-element" := array_upper("all-style-elements", 1);\n';
   ret = ret || E'  return query \n';
+  ret = ret || E'    select * from (\n';
   ret = ret || E'    select \n';
   ret = ret || E'      id, tags, geo, types, pseudo_element, properties';
 
@@ -173,7 +174,9 @@ begin
   ret = ret || E'      order by \n';
   ret = ret || E'        pgmapcss_to_float(properties->''layer'') asc,\n';
   ret = ret || E'        generate_series(1, "max-style-element") asc,\n';
-  ret = ret || E'        coalesce(cast(properties->''z-index'' as float), 0) asc;\n\n';
+  ret = ret || E'        coalesce(cast(properties->''z-index'' as float), 0) asc';
+  ret = ret || E'      ) t where\n';
+  ret = ret || E'        (select true = any(array_agg(x is not null)) from (select unnest(properties->(cast(' || quote_nullable(stat.prop_style_element) || E'->("style-element") as text[]))) x) t1) or not ' || quote_nullable(stat.prop_style_element) || E'? ("style-element");\n\n';
   ret = ret || E'  return;\n';
   ret = ret || E'end;\n$body$ language ''plpgsql'' immutable;\n';
 

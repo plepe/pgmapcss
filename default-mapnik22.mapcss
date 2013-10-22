@@ -35,6 +35,15 @@
 @depend_property casing-width casing-linecap,casing-linejoin;
 @depend_property shield-text shield-font-family,shield-font-weight,shield-font-style,shield-font-size,shield-text-transform;
 
+// @style_element_property
+@style_element_property fill fill-color;
+@style_element_property casing casing-width;
+@style_element_property line width,image;
+@style_element_property point icon-image;
+@style_element_property point-text text;
+@style_element_property line-text text;
+@style_element_property shield shield-text;
+
 *::(*) {
 // General
   z-index: 0;
