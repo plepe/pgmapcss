@@ -100,3 +100,4 @@ If you read a number, unit conversion takes place. The following units are suppo
 | azimuth | geometry, geometry | number | Returns the north-based azimuth as the angle in degrees measured clockwise from the vertical on point1 to point2 (see http://postgis.net/docs/ST_Azimuth.html)
 | translate | geometry, X number, Y number | geometry | Translates the geometry to a new location using the numeric parameters as offsets (default px).
 | rotate | geometry, angle number, [center geometry] | geometry | Rotates the geometry around the center geometry (or the centroid of the input geometry) by angle degrees.
+| area | geometry | number | returns area of polygon in square pixels
