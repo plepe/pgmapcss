@@ -61,6 +61,8 @@ If you read a number, unit conversion takes place. The following units are suppo
 | debug | value | value | raise a postgresql notice with the value; returns value. E.g. width: eval(debug(5+4)); | no standard
 | text_transform | string, "none" or "uppercase" or "lowercase" or "capitalize" | | no standard
 | osm_id | | text | ID of the object from OpenStreetMap, e.g. 'n1234' | no standard
+| zoom | | number | Returns current zoom level, e.g. '15' | no standard
+| scale_denominator | | number | Returns current scale denominator, e.g. '17061.8366708' (at zoom level 15) | no standard
 
 === List functions ===
 * List functions are not part of the MapCSS 0.2 standard
