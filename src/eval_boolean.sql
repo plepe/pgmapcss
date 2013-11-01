@@ -8,7 +8,7 @@ declare
   i text;
 begin
   if array_upper(param, 1) >= 1 then
-    if param[1] is null or trim(param[1]) in ('', 'no', 'false') or param[1] ~ '^[\-\+]0+(\.0+)?$' then
+    if param[1] is null or trim(param[1]) in ('', 'no', 'false') or param[1] ~ '^[\-\+]?0+(\.0+)?$' then
       return 'false';
     else
       return 'true';
