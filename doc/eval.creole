@@ -30,6 +30,9 @@ If you read a number, unit conversion takes place. The following units are suppo
 | >, >=, <=, < | number comparison | MapCSS 0.2
 | , or ; | several statements separated by , or ; will always return the value of the last statement.
 | ~= | list membership; whether list contains an element. | no standard
+| && | logical and | no standard
+| || | logical or | no standard
+| ! | logical not | no standard
 
 == Functions ==
 |= Function |= Parameters |= Return value |= Description | Compatibility
@@ -40,6 +43,7 @@ If you read a number, unit conversion takes place. The following units are suppo
 | nonidentical | text, [text, [text, ...]] | Not equal comparison; string comparison; If more than two values are compared, ALL values must be differing; so nonidentical("2", "2", "5") => false | no standard
 | gt, ge, le, lt | number, number | boolean | compares two numbers. >, >=, <= or <. | no standard
 | sqrt | number | number | Square root of input value | MapCSS 0.2
+| power | number, number | Calculates the first value (base) raised to the power of the second value (exp). E.g. power(2, 3) => 8 | no standard
 | prop | key, [string] | value | current value of the computed property on pseudo element param2 (default: current pseudo element). Examples: prop(width), prop(width, casing) | MapCSS 0.2 (no standard: pseudo element)
 | tag | key, [key, [key, ...]] | value | value of the tag key (e.g. tag("name") ). If several keys are passed, the first set tag is returned, e.g. tag("name:en", "int_name", "name"). | MapCSS 0.2 (only one key)
 | parent_tag | key, [key, [key, ...]] | value | value of the tag key (e.g. parent_tag("name") ) of the parent element in the link selector. If several keys are passed, the first set tag is returned, e.g. parent_tag("name:en", "int_name", "name"). | no standard
@@ -64,6 +68,9 @@ If you read a number, unit conversion takes place. The following units are suppo
 | osm_id | | text | ID of the object from OpenStreetMap, e.g. 'n1234' | no standard
 | zoom | | number | Returns current zoom level, e.g. '15' | no standard
 | scale_denominator | | number | Returns current scale denominator, e.g. '17061.8366708' (at zoom level 15) | no standard
+| and | value, [value, [value, ...]] | boolean | logical and | no standard
+| or | value, [value, [value, ...]] | boolean | logical or | no standard
+| not | value | boolean | logical not | no standard
 
 === List functions ===
 * List functions are not part of the MapCSS 0.2 standard
