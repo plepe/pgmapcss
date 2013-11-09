@@ -27,6 +27,7 @@ This is the list of properties when using Mapnik 2.2 (use -t mapnik22 when loadi
 |= CSS parameter |= Description |= Mapnik parameter |= support Mapnik 2.2 |= Compatibility MapCSS 0.2
 | color | Colour of the line. | stroke | no eval | YES
 | width | The line width in pixels. | stroke-width | no eval | YES
+| offset | Pixels to offset the line to the left or right (default: 0). | offset | no eval | no standard
 | opacity | How transparent the line is, from 0 (transparent) to 1 (opaque). | stroke-opacity | no eval | YES
 | image |  The URL of an image to use for filling the line | | yes | YES
 | linejoin | The style for line corners: 'round' (default), 'miter' or 'bevel'. | stroke-linejoin | | YES
@@ -34,6 +35,7 @@ This is the list of properties when using Mapnik 2.2 (use -t mapnik22 when loadi
 | dashes | An array of alternating on/off lengths | stroke-dasharray | no eval | YES
 | casing-color | Colour of the casing (border) of a line. | stroke | no eval | YES
 | casing-width | Width of the casing (border) of the line (added to 'width' of the line). | stroke-width | no eval | YES
+| casing-offset | Pixels to offset the casing of the line to the left or right (default: same as 'offset'). | offset | no eval | no standard
 | casing-opacity | How transparent the casing is, from 0 (transparent) to 1 (opaque). | stroke-opacity | no eval | YES
 | casing-linejoin | The style for casing corners: 'round' (default), 'miter' or 'bevel'. | stroke-linejoin | | YES
 | casing-linecap | The style for the end of the casing: 'none' (default), 'round' or 'square' | stroke-linecap | see 'linecap' | YES

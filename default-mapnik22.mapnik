@@ -126,7 +126,7 @@
 -->
 
 <!-- CASING LINES -->
-# FOR casing-color width casing-width casing-opacity casing-linejoin casing-linecap casing-dashes
+# FOR casing-color width casing-width casing-offset casing-opacity casing-linejoin casing-linecap casing-dashes
     <Rule>
 <!--
 * Mapnik branch stroke-width-expr: remove "width" from FOR and replace
@@ -134,13 +134,13 @@
 * Mapnik version >= 3: remove "# FOR" and "# END" and replace by
       <Filter>[width]</Filter>
 -->
-      <Filter>[style-element] = 'casing' and '[width]' = [width] and '[casing-width]' = [casing-width] and '[casing-color]' = [casing-color] and '[casing-opacity]' = [casing-opacity] and '[casing-linejoin]' = [casing-linejoin] and '[casing-linecap]' = [casing-linecap] and '[casing-dashes]' = [casing-dashes]</Filter>
-      <LineSymbolizer stroke="[casing-color]" stroke-width="[width] + [casing-width] * 2" stroke-opacity="[casing-opacity]" stroke-linejoin="[casing-linejoin]" stroke-linecap="[casing-linecap]" stroke-dasharray="[casing-dashes]" />
+      <Filter>[style-element] = 'casing' and '[width]' = [width] and '[casing-offset]' = [casing-offset] and '[casing-width]' = [casing-width] and '[casing-color]' = [casing-color] and '[casing-opacity]' = [casing-opacity] and '[casing-linejoin]' = [casing-linejoin] and '[casing-linecap]' = [casing-linecap] and '[casing-dashes]' = [casing-dashes]</Filter>
+      <LineSymbolizer stroke="[casing-color]" stroke-width="[width] + [casing-width] * 2" offset="[casing-offset]" stroke-opacity="[casing-opacity]" stroke-linejoin="[casing-linejoin]" stroke-linecap="[casing-linecap]" stroke-dasharray="[casing-dashes]" />
     </Rule>
 # END
 
 <!-- LINES -->
-# FOR color width opacity linejoin linecap dashes
+# FOR color width offset opacity linejoin linecap dashes
     <Rule>
 <!--
 * Mapnik branch stroke-width-expr: remove "width" from FOR and replace
@@ -148,8 +148,8 @@
 * Mapnik version >= 3: remove "# FOR" and "# END" and replace by
       <Filter>[width]</Filter>
 -->
-      <Filter>[style-element] = 'line' and '[width]' = [width] and '[color]' = [color] and '[opacity]' = [opacity] and '[linejoin]' = [linejoin] and '[linecap]' = [linecap] and '[dashes]' = [dashes]</Filter>
-      <LineSymbolizer stroke="[color]" stroke-width="[width]" stroke-opacity="[opacity]" stroke-linejoin="[linejoin]" stroke-linecap="[linecap]" stroke-dasharray="[dashes]" />
+      <Filter>[style-element] = 'line' and '[width]' = [width] and '[offset]' = [offset] and '[color]' = [color] and '[opacity]' = [opacity] and '[linejoin]' = [linejoin] and '[linecap]' = [linecap] and '[dashes]' = [dashes]</Filter>
+      <LineSymbolizer stroke="[color]" stroke-width="[width]" offset="[offset]" stroke-opacity="[opacity]" stroke-linejoin="[linejoin]" stroke-linecap="[linecap]" stroke-dasharray="[dashes]" />
     </Rule>
 # END
 
