@@ -3,7 +3,6 @@
 @type shield-text tag_value;
 
 // The follwing properties default to the final value of another property
-@default_other casing-offset offset;
 @default_other casing-linecap linecap;
 @default_other casing-linejoin linejoin;
 @default_other shield-font-family font-family;
@@ -34,7 +33,7 @@
 // @depend_property: don't check values for e.g. 'text-position' if no 'text' is set
 @depend_property text text-position,text-transform,font-family,font-weight,font-style;
 @depend_property width linecap,linejoin;
-@depend_property casing-width casing-offset,casing-linecap,casing-linejoin;
+@depend_property casing-width casing-linecap,casing-linejoin;
 @depend_property shield-text shield-font-family,shield-font-weight,shield-font-style,shield-font-size,shield-text-transform;
 
 // @style_element_property
@@ -60,7 +59,6 @@
   fill-image: ;
 // LineSymbolizer
   width: ;
-  offset: 0;
   color: ;
   opacity: 1;
   linejoin: round;
@@ -68,7 +66,6 @@
   dashes: "";
 // Casing LineSymbolizer
   casing-width: ;
-  casing-offset: ;
   casing-color: ;
   casing-opacity: 1;
   casing-linejoin: ;
