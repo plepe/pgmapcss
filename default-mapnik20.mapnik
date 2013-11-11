@@ -126,7 +126,7 @@
 -->
 
 <!-- CASING LINES -->
-# FOR casing-color width casing-width casing-offset casing-opacity casing-linejoin casing-linecap casing-dashes
+# FOR casing-color final-casing-width casing-offset casing-opacity casing-linejoin casing-linecap casing-dashes
     <Rule>
 <!--
 * Mapnik branch stroke-width-expr: remove "width" from FOR and replace
@@ -134,8 +134,8 @@
 * Mapnik version >= 3: remove "# FOR" and "# END" and replace by
       <Filter>[width]</Filter>
 -->
-      <Filter>[style-element] = 'casing' and '[width]' = [width] and '[casing-width]' = [casing-width] and '[casing-color]' = [casing-color] and '[casing-opacity]' = [casing-opacity] and '[casing-linejoin]' = [casing-linejoin] and '[casing-linecap]' = [casing-linecap] and '[casing-dashes]' = [casing-dashes]</Filter>
-      <LineSymbolizer stroke="[casing-color]" stroke-width="[width] + [casing-width] * 2" offset="[casing-offset]" stroke-opacity="[casing-opacity]" stroke-linejoin="[casing-linejoin]" stroke-linecap="[casing-linecap]" stroke-dasharray="[casing-dashes]" />
+      <Filter>[style-element] = 'casing' and '[final-casing-width]' = [final-casing-width] and '[casing-color]' = [casing-color] and '[casing-opacity]' = [casing-opacity] and '[casing-linejoin]' = [casing-linejoin] and '[casing-linecap]' = [casing-linecap] and '[casing-dashes]' = [casing-dashes]</Filter>
+      <LineSymbolizer stroke="[casing-color]" stroke-width="[final-casing-width]" offset="[casing-offset]" stroke-opacity="[casing-opacity]" stroke-linejoin="[casing-linejoin]" stroke-linecap="[casing-linecap]" stroke-dasharray="[casing-dashes]" />
     </Rule>
 # END
 
