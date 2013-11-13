@@ -50,7 +50,10 @@ as $$
 declare
   w text[];
   bbox text;
+  t timestamp with time zone;
 begin
+  t := clock_timestamp();
+
   if render_context.bbox is null then
     bbox := '';
   else
@@ -161,6 +164,9 @@ begin
       where osm_id<0 and ' || bbox || ' (' ||
         array_to_string(w, ' or ') || ')';
   end if;
+
+  -- Uncomment this line for profiling information
+  -- raise notice 'querying db objects took %', clock_timestamp() - t;
 
   return;
 end;
