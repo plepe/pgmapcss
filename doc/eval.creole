@@ -109,3 +109,4 @@ If you read a number, unit conversion takes place. The following units are suppo
 | translate | geometry, X number, Y number | geometry | Translates the geometry to a new location using the numeric parameters as offsets (default px).
 | rotate | geometry, angle number, [center geometry] | geometry | Rotates the geometry around the center geometry (or the centroid of the input geometry) by angle degrees.
 | area | geometry | number | returns area of polygon in square pixels
+| centroid | geometry | geometry | returns the centroid of the input geometry
