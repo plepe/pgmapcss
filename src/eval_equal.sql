@@ -14,7 +14,7 @@ begin
   end if;
 
   -- identical comparison
-  select count(v) into i from (select unnest(param) v group by v) t;
+  select count(coalesce(v, '')) into i from (select unnest(param) v group by v) t;
 
   if i = 1 then
     return 'true';
