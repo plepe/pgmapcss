@@ -26,12 +26,11 @@ begin
     result.op = result.op || substring(content from '^(=|!=|<|>|<=|>=|\^=|\$=|\*=|~=|=~)(.*)$');
     content = substring(content, length(result.op) + 1);
 
-    r := pgmapcss_parse_string(content, E'^eval\\(');
-    if r is not null then
+    if content ~ E'^eval\\(' then
       r := pgmapcss_parse_eval(content, 6);
       result.value := r.result;
       result.value_type := 1;
-      content = r.content;
+      content = substr(r.content, 3);
     else
       r := pgmapcss_parse_string(content, E'^([^\\]]+)\\]');
       result.value := r.result;
