@@ -21,7 +21,9 @@ begin
   end if;
 
   -- check for valid values
-  if f < 0 then
+  if f is null then
+    return '';
+  elsif f < 0 then
     f := 0;
   elsif f > 1 then
     f := 1;
