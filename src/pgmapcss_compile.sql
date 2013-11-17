@@ -145,7 +145,9 @@ begin
   ret = ret || E'declare\n';
   ret = ret || E'  ret ' || style_id || E'_result;\n';
   ret = ret || E'  "max-style-element" int;\n';
+  -- ret = ret || E'  t timestamp with time zone;\n'; -- profiling
   ret = ret || E'begin\n';
+  -- ret = ret || E'  t := clock_timestamp(); -- profiling\n'; -- profiling
   ret = ret || E'  "max-style-element" := array_upper("all-style-elements", 1);\n';
   ret = ret || E'  return query \n';
   ret = ret || E'    select * from (\n';
@@ -178,6 +180,7 @@ begin
   ret = ret || E'        coalesce(cast(properties->''z-index'' as float), 0) asc';
   ret = ret || E'      ) t where\n';
   ret = ret || E'        (select true = any(array_agg(x is not null)) from (select unnest(properties->(cast(' || quote_nullable(stat.prop_style_element) || E'->("style-element") as text[]))) x) t1) or not ' || quote_nullable(stat.prop_style_element) || E'? ("style-element");\n\n';
+  -- ret = ret || E'  raise notice ''total run of match() (incl. querying db objects) took %'', clock_timestamp() - t;\n'; -- profiling
   ret = ret || E'  return;\n';
   ret = ret || E'end;\n$body$ language ''plpgsql'' immutable;\n';
 
