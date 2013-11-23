@@ -23,6 +23,11 @@ begin
 
   -- when compiling for get_where()
   if match_where then
+    -- ignore generated tags (identified by leading .)
+    if substring(condition.key, 1, 1) = '.' then
+      return null;
+    end if;
+
     -- eval() statements
     if condition.value_type = 1 then
       -- ignore 'not' statements
