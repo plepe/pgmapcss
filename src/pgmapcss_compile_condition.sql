@@ -113,6 +113,10 @@ begin
 
   end if;
 
+  if ret = '' then
+    return null;
+  end if;
+
   return ret;
 end;
 $$ language 'plpgsql' immutable;
