@@ -23,9 +23,13 @@ begin
 
   -- when compiling for get_where()
   if match_where then
+    -- eval() statements
     if condition.value_type = 1 then
+      -- ignore 'not' statements
       if condition.op ~ '^! ' then
-	return 'true';
+	return null;
+
+      -- treat other conditions as has_key
       else
 	return prefix || 'tags ? ' || quote_literal(condition.key);
       end if;
@@ -109,7 +113,7 @@ begin
   -- unknown operator?
   else
     raise notice 'unknown condition operator: % (key: %, value: %)', condition.op, condition.key, condition.value;
-    ret := 'true';
+    return null;
 
   end if;
 
