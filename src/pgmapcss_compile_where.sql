@@ -21,7 +21,6 @@ declare
   k text;
 begin
   for r in select unnest(stat.selectors) selectors, unnest(stat.properties) properties loop
-    -- TODO: make list of match-relevant tags configurable
     if (r.properties).prop_has_value ?| (select array_agg(x) from (select unnest(cast((each(stat.prop_style_element)).value as text[])) x) t) then
       where_selectors := array_append(where_selectors, r.selectors);
 
