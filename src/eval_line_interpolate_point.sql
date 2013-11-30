@@ -16,8 +16,7 @@ begin
   if array_upper(param, 1) < 2 then
     f := 0.5;
   else
-    f := cast(eval_metric(Array[param[2], 'u'], object, current, render_context)
-      as float) / l;
+    f := pgmapcss_to_float(eval_metric(Array[param[2], 'u'], object, current, render_context)) / l;
   end if;
 
   -- check for valid values
