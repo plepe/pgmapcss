@@ -128,7 +128,7 @@ begin
       tags_to_set := ''::hstore;
 
       ret = ret || '  current.tags = current.tags - ' ||
-        quote_literal(property.key) || E');\n';
+        quote_literal(property.key) || E'::text;\n';
 
     -- combine
     elsif property.assignment_type = 'C' then

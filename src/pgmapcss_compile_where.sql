@@ -20,9 +20,10 @@ declare
   assignments hstore := ''::hstore;
   k text;
 begin
+  -- where_selectors: find list of selectors which are relevent for db where
+  -- matches (all that have an entry in @style_element_property)
   for r in select unnest(stat.selectors) selectors, unnest(stat.properties) properties loop
-    -- TODO: make list of match-relevant tags configurable
-    if (r.properties).prop_has_value ?| Array['text', 'width', 'fill-color', 'icon-image', 'fill-image', 'image'] then
+    if (r.properties).prop_has_value ?| (select array_agg(x) from (select unnest(cast((each(stat.prop_style_element)).value as text[])) x) t) then
       where_selectors := array_append(where_selectors, r.selectors);
 
     elsif (r.properties).has_combine then
@@ -31,19 +32,21 @@ begin
     end if;
   end loop;
 
-  -- map conditions which are based on a (possible) set-statement back to their
-  -- original selectors
+  -- assignments: map conditions which are based on a (possible) set-statement
+  -- back to their original selectors:
+  -- hstore, 'tag=>value' => 'list of indexes in selectors array',
+  -- e.g. "'.foo'=>*"=>"8;9"
   for r in select
     generate_series(1, array_upper(stat.selectors, 1)) i,
     unnest(stat.selectors) selectors,
     unnest(stat.properties) properties
   loop
-    -- TODO: we could check for key/value, hence key=>*
+    -- TODO: we could check for key/value, hence key=>* (all possible values)
     for r1 in select * from unnest((r.properties).properties) loop
       if r1.assignment_type = 'T' then
 	k := quote_nullable(r1.key) || '=>*';
 	assignments := assignments || hstore(k,
-	  coalesce(assignments->k, '') || ';' || r.i);
+	  coalesce(assignments->k || ';', '') || r.i);
       end if;
     end loop;
   end loop;
@@ -90,15 +93,24 @@ begin
 	if assignments ? (quote_nullable(r.key) || '=>*') then
 	  k := assignments->(quote_nullable(r.key) || '=>*');
 
-	  foreach c in array string_to_array(substring(k, 2), ';') loop
+	  foreach c in array string_to_array(k, ';') loop
 	    sel1 := (stat.selectors)[cast(c as int)];
 	    ob1 := sel1.object;
-	    c := '(' || pgmapcss_compile_conditions(ob1.conditions, '', true) || ')';
 
-	    if h ? ob1.type then
-	      h := h || hstore(ob1.type, h->(ob1.type) || ' or ' || c);
-	    else
-	      h := h || hstore(ob1.type, c);
+	    -- check if as well the statement with the assignment as well as
+	    -- the current selector are active at the current zoom level
+	    if (coalesce(ob.min_scale, 0) <= f) and
+	       ((ob.max_scale is null) or (ob.max_scale > f)) and
+	       (coalesce(ob1.min_scale, 0) <= f) and
+	       ((ob1.max_scale is null) or (ob1.max_scale > f)) then
+
+	      c := '(' || pgmapcss_compile_conditions(ob1.conditions, '', true) || ')';
+
+	      if h ? ob1.type then
+		h := h || hstore(ob1.type, h->(ob1.type) || ' or ' || c);
+	      else
+		h := h || hstore(ob1.type, c);
+	      end if;
 	    end if;
 	  end loop;
 	end if;

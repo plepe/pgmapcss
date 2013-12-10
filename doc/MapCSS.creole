@@ -338,3 +338,17 @@ E.g.
 {{{
 @postprocess text text_transform(prop("text"), prop("text-transform"));
 }}}
+
+== Depending properties ==
+{{{
+@depend_property main_property dep_property1,dep_property2,...;
+}}}
+
+For @default_other, @values: don't process depending values if main property is not set.
+
+== Style-Elements depending on property ==
+{{{
+@style_element_property line width,image;
+}}}
+
+A database row for style element 'fill' will only be returned when a property 'width' or 'image' is set.

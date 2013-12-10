@@ -10,6 +10,8 @@ declare
   ret text:=''::text;
   stat		pgmapcss_compile_stat;
   i record;
+  t text;
+  current_main_prop text;
   a text[];
 begin
   stat := pgmapcss_parse_content($2);
@@ -63,24 +65,48 @@ begin
   ret = ret || E'  ret.tags=current.tags;\n';
   ret = ret || E'  for r in select * from (select generate_series(1, ' || array_upper(stat.pseudo_elements, 1) || E') i, unnest(current.styles) style) t order by coalesce(cast(style->''object-z-index'' as float), 0) asc loop\n';
   ret = ret || E'    if current.has_pseudo_element[r.i] then\n';
+  ret = ret || E'      current.pseudo_element_ind = r.i;\n';
 
-  -- default_other values
-  for i in select * from each(stat.prop_default_other) loop
-    ret = ret || E'      if (current.styles[r.i]->' || quote_literal(i.key) ||
-      E') is null then current.styles[r.i] := current.styles[r.i] || hstore(' ||
-      quote_literal(i.key) || ', current.styles[r.i]->' ||
-      quote_literal(i.value) || E'); end if;\n';
+  for i in select dep.key main_key, prop.key "key", has_values.value from each(stat.prop_depend) dep right join each(stat.properties_values) prop on prop.key = any(cast(dep.value as text[])) left join each(stat.properties_values) has_values on dep.key=has_values.key where has_values.value != '{NULL}' or has_values.value is null order by dep.key loop
+    if current_main_prop != i.main_key or
+       (current_main_prop is not null and i.main_key is null) or
+       (current_main_prop is null and i.main_key is not null) then
+
+      if current_main_prop is not null then
+	ret = ret || E'      end if;\n';
+      end if;
+
+      if i.main_key is not null then
+	ret = ret || E'      if current.styles[r.i] ? ' || quote_literal(i.main_key) || E' then\n';
+      end if;
+
+      current_main_prop := i.main_key;
+    end if;
+
+    -- default_other values
+    t := stat.prop_default_other->(i.key);
+    if t is not null then
+      ret = ret || E'      if (current.styles[r.i]->' || quote_literal(i.key) ||
+	E') is null then current.styles[r.i] := current.styles[r.i] || hstore(' ||
+	quote_literal(i.key) || ', current.styles[r.i]->' ||
+	quote_literal(t) || E'); end if;\n';
+    end if;
+
+    -- values
+    t := stat.prop_values->(i.key);
+    if t is not null then
+      ret = ret || E'      if not (current.styles[r.i]->' ||
+	quote_literal(i.key) || E') = any(' ||
+	quote_literal(cast(string_to_array(t, ',') as text)) ||
+	E') then current.styles[r.i] := current.styles[r.i] || hstore(' ||
+	quote_literal(i.key) || E', ' ||
+	quote_literal((string_to_array(t, ','))[1]) || E'); end if;\n';
+    end if;
   end loop;
 
-  -- values
-  for i in select * from each(stat.prop_values) loop
-    ret = ret || E'      if not (current.styles[r.i]->' ||
-      quote_literal(i.key) || E') = any(' ||
-      quote_literal(cast(string_to_array(i.value, ',') as text)) ||
-      E') then current.styles[r.i] := current.styles[r.i] || hstore(' ||
-      quote_literal(i.key) || E', ' ||
-      quote_literal((string_to_array(i.value, ','))[1]) || E'); end if;\n';
-  end loop;
+  if current_main_prop is not null then
+    ret = ret || E'      end if;\n';
+  end if;
 
   -- post-process
   for i in select * from each(stat.prop_postprocess) loop
@@ -119,9 +145,12 @@ begin
   ret = ret || E'declare\n';
   ret = ret || E'  ret ' || style_id || E'_result;\n';
   ret = ret || E'  "max-style-element" int;\n';
+  -- ret = ret || E'  t timestamp with time zone;\n'; -- profiling
   ret = ret || E'begin\n';
+  -- ret = ret || E'  t := clock_timestamp(); -- profiling\n'; -- profiling
   ret = ret || E'  "max-style-element" := array_upper("all-style-elements", 1);\n';
   ret = ret || E'  return query \n';
+  ret = ret || E'    select * from (\n';
   ret = ret || E'    select \n';
   ret = ret || E'      id, tags, geo, types, pseudo_element, properties';
 
@@ -148,7 +177,10 @@ begin
   ret = ret || E'      order by \n';
   ret = ret || E'        pgmapcss_to_float(properties->''layer'') asc,\n';
   ret = ret || E'        generate_series(1, "max-style-element") asc,\n';
-  ret = ret || E'        coalesce(cast(properties->''z-index'' as float), 0) asc;\n\n';
+  ret = ret || E'        coalesce(cast(properties->''z-index'' as float), 0) asc';
+  ret = ret || E'      ) t where\n';
+  ret = ret || E'        (select true = any(array_agg(x is not null)) from (select unnest(properties->(cast(' || quote_nullable(stat.prop_style_element) || E'->("style-element") as text[]))) x) t1) or not ' || quote_nullable(stat.prop_style_element) || E'? ("style-element");\n\n';
+  -- ret = ret || E'  raise notice ''total run of match() (incl. querying db objects) took %'', clock_timestamp() - t;\n'; -- profiling
   ret = ret || E'  return;\n';
   ret = ret || E'end;\n$body$ language ''plpgsql'' immutable;\n';
 

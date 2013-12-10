@@ -1,4 +1,4 @@
-insert into eval_operators values ('<=', 'le', 5);
+insert into eval_operators values ('<=', 'le', 7);
 create or replace function eval_le(param text[],
   object pgmapcss_object, current pgmapcss_current, render_context pgmapcss_render_context)
 returns text

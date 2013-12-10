@@ -10,6 +10,11 @@ begin
     return '';
   end if;
 
+  if param[1] is null or param[1] = '' or
+     param[2] is null or param[2] = '' then
+    return '';
+  end if;
+
   return degrees(ST_Azimuth(param[1], param[2]));
 end;
 $$ language 'plpgsql' immutable;

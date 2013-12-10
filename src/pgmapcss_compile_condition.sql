@@ -23,9 +23,18 @@ begin
 
   -- when compiling for get_where()
   if match_where then
+    -- ignore generated tags (identified by leading .)
+    if substring(condition.key, 1, 1) = '.' then
+      return null;
+    end if;
+
+    -- eval() statements
     if condition.value_type = 1 then
+      -- ignore 'not' statements
       if condition.op ~ '^! ' then
-	return 'true';
+	return null;
+
+      -- treat other conditions as has_key
       else
 	return prefix || 'tags ? ' || quote_literal(condition.key);
       end if;
@@ -109,8 +118,12 @@ begin
   -- unknown operator?
   else
     raise notice 'unknown condition operator: % (key: %, value: %)', condition.op, condition.key, condition.value;
-    ret := 'true';
+    return null;
 
+  end if;
+
+  if ret = '' then
+    return null;
   end if;
 
   return ret;

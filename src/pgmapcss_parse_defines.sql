@@ -48,6 +48,22 @@ begin
 
       stat.prop_postprocess := stat.prop_postprocess || hstore(m, r.result);
 
+    elsif content ~ '^\s*@depend_property' then
+      m := substring(content from '\s*@depend_property\s+([^\s]+)\s+([^\s]+)\s*;');
+      m1 := substring(content from '\s*@depend_property\s+(?:[^\s]+)\s+([^\s]+)\s*;');
+      content := substring(content from '\s*@depend_property\s+(?:[^\s]+)\s+(?:[^\s]+)\s*;(.*)$');
+      m1 := cast(string_to_array(m1, ',') as text);
+
+      stat.prop_depend := stat.prop_depend || hstore(m, m1);
+
+    elsif content ~ '^\s*@style_element_property' then
+      m := substring(content from '\s*@style_element_property\s+([^\s]+)\s+([^\s]+)\s*;');
+      m1 := substring(content from '\s*@style_element_property\s+(?:[^\s]+)\s+([^\s]+)\s*;');
+      content := substring(content from '\s*@style_element_property\s+(?:[^\s]+)\s+(?:[^\s]+)\s*;(.*)$');
+      m1 := cast(string_to_array(m1, ',') as text);
+
+      stat.prop_style_element := stat.prop_style_element || hstore(m, m1);
+
     -- ignore unknown @-statements
     elsif content ~ '^\s*@[^;]*;' then
       m := substring(content from '^\s*(@[^;]*;)');

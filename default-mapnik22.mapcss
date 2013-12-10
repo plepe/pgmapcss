@@ -3,6 +3,7 @@
 @type shield-text tag_value;
 
 // The follwing properties default to the final value of another property
+@default_other casing-offset offset;
 @default_other casing-linecap linecap;
 @default_other casing-linejoin linejoin;
 @default_other shield-font-family font-family;
@@ -28,6 +29,22 @@
 // eval-function as specified.
 @postprocess text text_transform(prop("text"), prop("text-transform"));
 @postprocess shield-text text_transform(prop("shield-text"), prop("shield-text-transform"));
+@postprocess final-casing-width prop("width") + prop("casing-width") * 2;
+
+// @depend_property: don't check values for e.g. 'text-position' if no 'text' is set
+@depend_property text text-position,text-transform,font-family,font-weight,font-style;
+@depend_property width linecap,linejoin;
+@depend_property casing-width casing-offset,casing-linecap,casing-linejoin;
+@depend_property shield-text shield-font-family,shield-font-weight,shield-font-style,shield-font-size,shield-text-transform;
+
+// @style_element_property
+@style_element_property fill fill-color;
+@style_element_property casing casing-width;
+@style_element_property line width,image;
+@style_element_property point icon-image;
+@style_element_property point-text text;
+@style_element_property line-text text;
+@style_element_property shield shield-text;
 
 *::(*) {
 // General
@@ -43,6 +60,7 @@
   fill-image: ;
 // LineSymbolizer
   width: ;
+  offset: 0;
   color: ;
   opacity: 1;
   linejoin: round;
@@ -50,11 +68,13 @@
   dashes: none;
 // Casing LineSymbolizer
   casing-width: ;
+  casing-offset: ;
   casing-color: ;
   casing-opacity: 1;
   casing-linejoin: ;
   casing-linecap: ;
   casing-dashes: none;
+  final-casing-width: ; // used internally to add width and casing-width
 // LinePatternSymbolizer
   image: ;
 // TextSymbolizer

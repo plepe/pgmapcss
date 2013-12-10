@@ -1,4 +1,4 @@
-insert into eval_operators values ('==', 'equal', 5);
+insert into eval_operators values ('==', 'equal', 7);
 create or replace function eval_equal(param text[],
   object pgmapcss_object, current pgmapcss_current, render_context pgmapcss_render_context)
 returns text
@@ -14,7 +14,7 @@ begin
   end if;
 
   -- identical comparison
-  select count(v) into i from (select unnest(param) v group by v) t;
+  select count(coalesce(v, '')) into i from (select unnest(param) v group by v) t;
 
   if i = 1 then
     return 'true';

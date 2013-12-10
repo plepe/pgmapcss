@@ -46,7 +46,23 @@ begin
     f:=trim(substr(param[1], 3));
   end if;
 
-  return 'eval_' || f || '(' || t || eval_param || ')';
+  if f = 'cond' then
+    -- special compiliation for cond(boolean, true-cmd, false-cmd)
+    ret := '(CASE WHEN eval_boolean(Array[' || p[1] || ']' || eval_param ||
+      ') = ''true'' THEN ' || p[2];
+
+    if array_upper(p, 1) > 2 then
+      ret := ret || ' ELSE ' || p[3];
+    end if;
+
+    ret := ret || ' END)';
+
+    return ret;
+
+  else
+    return 'eval_' || f || '(' || t || eval_param || ')';
+
+  end if;
 
   return '';
 end;

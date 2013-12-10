@@ -13,8 +13,23 @@ $STYLE_ID=$ENV{STYLE_ID};
 # possible_values: return list of all possible values for a key
 sub possible_values {
   my $key = $_[0];
-# TODO: escape characters
   my @ret = ();
+# TODO: escape characters
+
+  if($key eq "final-casing-width") {
+    my %ret;
+    my @ret_width = possible_values("width");
+    my @ret_caswidth = possible_values("casing-width");
+
+    foreach $width (@ret_width) {
+      foreach $caswidth (@ret_caswidth) {
+	$ret{$width + 2 * $caswidth} = 1;
+      }
+    }
+
+    @ret = keys %ret;
+    return @ret;
+  }
 
   my $v;
   my $r;

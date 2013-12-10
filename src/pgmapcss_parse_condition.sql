@@ -18,7 +18,7 @@ begin
     result.op := result.op || '! ';
   end if;
 
-  r := pgmapcss_parse_string(content, E'^([a-zA-Z_0-9\\-:]+)(=|!=|<|>|<=|>=|\\^=|\\$=|\\*=|~=|=~)');
+  r := pgmapcss_parse_string(content, E'^([a-zA-Z_0-9\\-\.:]+)(=|!=|<|>|<=|>=|\\^=|\\$=|\\*=|~=|=~)');
   if r.result is not null then
     result.key := r.result;
     content = r.content;
@@ -26,12 +26,11 @@ begin
     result.op = result.op || substring(content from '^(=|!=|<|>|<=|>=|\^=|\$=|\*=|~=|=~)(.*)$');
     content = substring(content, length(result.op) + 1);
 
-    r := pgmapcss_parse_string(content, E'^eval\\(');
-    if r is not null then
+    if content ~ E'^eval\\(' then
       r := pgmapcss_parse_eval(content, 6);
       result.value := r.result;
       result.value_type := 1;
-      content = r.content;
+      content = substr(r.content, 3);
     else
       r := pgmapcss_parse_string(content, E'^([^\\]]+)\\]');
       result.value := r.result;
@@ -42,7 +41,7 @@ begin
     return;
   end if;
 
-  r := pgmapcss_parse_string(content, E'^([a-zA-Z_0-9\\-\\:]+)\\]');
+  r := pgmapcss_parse_string(content, E'^([a-zA-Z_0-9\\-\.\\:]+)\\]');
   if r.result is not null then
     result.op := result.op || 'has_tag';
     result.key := r.result;
