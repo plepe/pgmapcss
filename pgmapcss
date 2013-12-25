@@ -2,10 +2,15 @@
 import re
 import pprint
 from parser.parse_file import *
+from compiler.compile_style import *
 
 file_name = 'foo.mapcss'
 
 stat = {}
 content = parse_file(stat, file=file_name)
+
+style = compile_style('foo', stat)
+
 pp = pprint.PrettyPrinter()
 pp.pprint(stat)
+pp.pprint(style)
