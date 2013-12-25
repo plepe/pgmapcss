@@ -41,6 +41,11 @@ def compile_statement(statement, stat):
             if prop['value_type'] == 0:
                 prop_to_set[prop['key']] = prop['value']
 
+                if not prop['key'] in stat['properties_values']:
+                    stat['properties_values'][prop['key']] = set()
+
+                stat['properties_values'][prop['key']].add(prop['value'])
+
         elif prop['assignment_type'] == 'T':
             if prop['value_type'] == 0:
                 tags_to_set[prop['key']] = prop['value']
