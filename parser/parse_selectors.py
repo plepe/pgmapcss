@@ -76,7 +76,17 @@ def parse_selector_part(current, to_parse, object_class_selector='\s|[a-z_]+'):
     return to_parse
 
 def parse_selectors(selectors, to_parse):
-    current = {}
-    to_parse = parse_selector_part(current, to_parse)
-    selectors.append(current)
+    while True:
+      current = {}
+      to_parse = parse_selector_part(current, to_parse)
+      selectors.append(current)
+
+      if re.match('\s*,', to_parse):
+        m = re.match('\s*,', to_parse)
+
+        to_parse = to_parse[len(m.group(0)):]
+
+      else:
+        break
+
     return to_parse
