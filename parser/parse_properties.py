@@ -31,7 +31,7 @@ def parse_properties(properties, to_parse):
 
         elif re.match('\s*unset\s+([a-zA-Z0-9_\-\.]+)\s*;', to_parse):
             m = re.match('\s*unset\s+([a-zA-Z0-9_\-\.]+)\s*;', to_parse)
-            current['assignment_type'] = 'U'
+            current['assignment_type'] = 'T'
             current['key'] = m.group(1)
 
             to_parse = ';' + to_parse[len(m.group(0)):]
@@ -43,6 +43,9 @@ def parse_properties(properties, to_parse):
             m = re.match('\s*(.*)\s*;', to_parse)
             current['value_type'] = 0;
             current['value'] = m.group(1)
+
+            if current['value'] == '':
+                current['value'] = None
 
             to_parse = to_parse[len(m.group(0)):]
         else:

@@ -45,10 +45,6 @@ def compile_statement(statement, stat):
             if prop['value_type'] == 0:
                 tags_to_set[prop['key']] = prop['value']
 
-        elif prop['assignment_type'] == 'U':
-            if prop['value_type'] == 0:
-                tags_to_set[prop['key']] = None
-
     ret += print_props_and_tags(current_pseudo_element, prop_to_set, tags_to_set)
 
     if object_selector['pseudo_element'] == '*':
