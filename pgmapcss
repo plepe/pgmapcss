@@ -13,4 +13,5 @@ style = compile_style('foo', stat)
 
 pp = pprint.PrettyPrinter()
 pp.pprint(stat)
-pp.pprint(style)
+#pp.pprint(style)
+print(style['function'])
