@@ -1,17 +1,22 @@
 from .parse_selectors import parse_selectors
+from .parse_properties import parse_properties
 
-class File:
-    pass
-
-def parse_file(file):
+def parse_file(stat, file):
     content = open(file).read()
     to_parse = content
-    stat = File()
-    stat.selectors = []
+    stat['statements'] = []
 
     while(to_parse):
         selectors = []
         to_parse = parse_selectors(selectors, to_parse)
-        stat.selectors += selectors
+
+        properties = []
+        to_parse = parse_properties(properties, to_parse)
+
+        for i in selectors:
+            stat['statements'].append({
+                'selectors': i,
+                'properties': properties
+            })
 
     return stat

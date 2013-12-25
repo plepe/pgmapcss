@@ -1,0 +1,11 @@
+#!/usr/bin/env python3
+import re
+import pprint
+from parser.parse_file import *
+
+file_name = 'foo.mapcss'
+
+stat = {}
+content = parse_file(stat, file=file_name)
+pp = pprint.PrettyPrinter()
+pp.pprint(stat)
