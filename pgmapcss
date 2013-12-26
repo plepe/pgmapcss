@@ -3,15 +3,28 @@ import re
 import pprint
 from parser.parse_file import *
 from compiler.compile_style import *
+import argparse
 
-file_name = 'foo.mapcss'
+parser = argparse.ArgumentParser(description='Compiles a MapCSS style description into PostgreSQL functions and builds an accompanying Mapnik stylesheet.')
 
-stat = {}
-content = parse_file(stat, file=file_name)
+parser.add_argument('style_id', type=str, help='''\
+  style_id is a required argument. The compiled functions will be prefixed
+  by 'style_id', e.g. 'style_id_match()'. Also the resulting mapnik style file
+  will be called style_id.mapnik.
+''')
 
-style = compile_style('foo', stat)
+if __name__ == '__main__':
+    args = parser.parse_args()
 
-pp = pprint.PrettyPrinter()
-pp.pprint(stat)
-#pp.pprint(style)
-print(style['function'])
+    style_id = args.style_id
+    file_name = style_id + '.mapcss'
+
+    stat = {}
+    content = parse_file(stat, file=file_name)
+
+    style = compile_style(style_id, stat)
+
+    pp = pprint.PrettyPrinter()
+    pp.pprint(stat)
+    #pp.pprint(style)
+    print(style['function'])
