@@ -1,5 +1,5 @@
 from .compile_selector_part import compile_selector_part
-import pghstore
+import pg
 
 def print_props_and_tags(current_pseudo_element, prop_to_set, tags_to_set):
   ret = ''
@@ -7,12 +7,12 @@ def print_props_and_tags(current_pseudo_element, prop_to_set, tags_to_set):
   if len(prop_to_set):
       ret += 'current.styles[' + current_pseudo_element + '] = ' +\
           'current.styles[' + current_pseudo_element + '] || \'' +\
-          pghstore.dumps(prop_to_set).replace("'", "''") + '\';\n'
+          pg.format(prop_to_set) + '\';\n'
       prop_to_set.clear()
 
   if len(tags_to_set):
       ret += 'current.tags = current.tags || \'' +\
-          pghstore.dumps(tags_to_set) + '\';\n'
+          pg.format(tags_to_set) + '\';\n'
       tags_to_set.clear()
 
   return ret
