@@ -1,4 +1,54 @@
 import pghstore
+import re
+
+def tag_combinations(keys, stat, base={}):
+    combinations_list = [base.copy()]
+
+    for k in keys:
+        new_combinations_list = []
+
+        if k in stat['properties_values']:
+            for combination in combinations_list:
+                for v in stat['properties_values'][k]:
+                    c = combination.copy()
+                    c[k] = v
+                    new_combinations_list.append(c)
+        else:
+            for combination in combinations_list:
+                c = combination.copy()
+                c[k] = ''
+                new_combinations_list.append(c)
+
+        combinations_list = new_combinations_list
+
+    return combinations_list
+
+def process(f1, replacement, stat, rek=0):
+    text = ''
+
+    while True:
+        r = f1.readline()
+
+        if not r:
+            break;
+
+        elif re.match('# FOR\s', r):
+            m = re.match('# FOR\s*(.*)', r)
+            k = m.group(1).split(' ')
+            combinations_list = tag_combinations(k, stat, base=replacement)
+            f1_pos = f1.tell()
+
+            for c in combinations_list:
+                f1.seek(f1_pos)
+                text += process(f1, c, stat, rek + 1)
+
+        elif re.match('# END', r):
+            break;
+
+        else:
+            text += r.format(**replacement)
+
+    return text
 
 def process_mapnik(style_id, args, stat, db):
     f1 = open('mapnik/mapnik-2.0.mapnik', 'r')
@@ -22,15 +72,7 @@ def process_mapnik(style_id, args, stat, db):
         for (k, v) in canvas_properties.items():
             replacement['canvas|' + k] = v or ''
 
-    while True:
-        r = f1.readline()
-
-        if not r:
-            break;
-
-        r = r.format(**replacement)
-
-        f2.write(r)
+    f2.write(process(f1, replacement, stat))
 
     f1.close()
     f2.close()
