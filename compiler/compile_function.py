@@ -1,8 +1,11 @@
 from .compile_statement import compile_statement
+import pg
 
 def compile_function(id, stat):
     replacement = {
-      'style_id': id
+      'style_id': id,
+      'pseudo_elements': pg.format(stat['pseudo_elements']),
+      'count_pseudo_elements': len(stat['pseudo_elements'])
     }
 
     ret = '''\
@@ -19,6 +22,13 @@ declare
   o pgmapcss_object;
   i int;
 begin
+  current.pseudo_elements := {pseudo_elements};
+  current.tags := object.tags || hstore('osm_id', object.id);
+  current.types := object.types;
+  -- initialize all styles with the 'geo' property
+  current.styles := array_fill(hstore('geo', object.geo), Array[{count_pseudo_elements}]);
+  current.has_pseudo_element := array_fill(false, Array[{count_pseudo_elements}]);
+
 '''.format(**replacement)
 
     stat['properties_values'] = {}
@@ -26,7 +36,22 @@ begin
     for i in stat['statements']:
         ret += compile_statement(i, stat)
 
-    ret += '''\
+    ret += '''
+  ret.id=object.id;
+  ret.types=object.types;
+  ret.tags=current.tags;
+  for r in select * from (select generate_series(1, {count_pseudo_elements}) i, unnest(current.styles) style) t order by coalesce(cast(style->'object-z-index' as float), 0) asc loop
+    if current.has_pseudo_element[r.i] then
+      current.pseudo_element_ind = r.i;
+
+      ret.geo=current.styles[r.i]->'geo';
+      current.styles[r.i] := current.styles[r.i] - 'geo'::text;
+      ret.properties=current.styles[r.i];
+      ret.pseudo_element=(current.pseudo_elements)[r.i];
+      return next ret;
+    end if;
+  end loop;
+
   return;
 end;
 $body$ language 'plpgsql' immutable;
