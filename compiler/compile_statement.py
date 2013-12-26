@@ -6,13 +6,13 @@ def print_props_and_tags(current_pseudo_element, prop_to_set, tags_to_set):
 
   if len(prop_to_set):
       ret += 'current.styles[' + current_pseudo_element + '] = ' +\
-          'current.styles[' + current_pseudo_element + '] || \'' +\
-          pg.format(prop_to_set) + '\';\n'
+          'current.styles[' + current_pseudo_element + '] || ' +\
+          pg.format(prop_to_set) + ';\n'
       prop_to_set.clear()
 
   if len(tags_to_set):
-      ret += 'current.tags = current.tags || \'' +\
-          pg.format(tags_to_set) + '\';\n'
+      ret += 'current.tags = current.tags || ' +\
+          pg.format(tags_to_set) + ';\n'
       tags_to_set.clear()
 
   return ret
