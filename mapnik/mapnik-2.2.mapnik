@@ -207,17 +207,17 @@
   <Layer name="layer" status="on" srs="+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +no_defs +over">
     <Datasource>
       <Parameter name="type">postgis</Parameter>
-      <Parameter name="dbname">DB</Parameter>
-      <Parameter name="user">DBUSER</Parameter>
-      <Parameter name="password">DBPASS</Parameter>
-      <Parameter name="host">DBHOST</Parameter>
+      <Parameter name="dbname">{database}</Parameter>
+      <Parameter name="user">{user}</Parameter>
+      <Parameter name="password">{password}</Parameter>
+      <Parameter name="host">{host}</Parameter>
       <Parameter name="estimate_extent">false</Parameter>
       <Parameter name="extent">-20037508,-19929239,20037508,19929239</Parameter>
       <Parameter name="geometry_field">_geo</Parameter>
       <Parameter name="srid">900913</Parameter>
       <Parameter name="cache-features">on</Parameter>
       <Parameter name="table">
-STYLE_ID_match(pgmapcss_render_context(!bbox!, !scale_denominator!), Array['fill', 'casing', 'line', 'point', 'point-text', 'line-text', 'shield'])
+{style_id}_match(pgmapcss_render_context(!bbox!, !scale_denominator!), Array['fill', 'casing', 'line', 'point', 'point-text', 'line-text', 'shield'])
       </Parameter>
     </Datasource>
     <StyleName>pgmapcss</StyleName>
