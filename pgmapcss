@@ -3,6 +3,7 @@ import re
 import pprint
 from parser.parse_file import *
 from compiler.compile_style import *
+from mapnik.process_mapnik import *
 import argparse
 import postgresql
 import getpass
@@ -58,3 +59,4 @@ if __name__ == '__main__':
     print(style['function'])
 
     install(style_id, style)
+    process_mapnik(style_id, stat)
