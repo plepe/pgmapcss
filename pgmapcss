@@ -4,6 +4,8 @@ import pprint
 from parser.parse_file import *
 from compiler.compile_style import *
 import argparse
+import postgresql
+import getpass
 
 parser = argparse.ArgumentParser(description='Compiles a MapCSS style description into PostgreSQL functions and builds an accompanying Mapnik stylesheet.')
 
@@ -12,6 +14,31 @@ parser.add_argument('style_id', type=str, help='''\
   by 'style_id', e.g. 'style_id_match()'. Also the resulting mapnik style file
   will be called style_id.mapnik.
 ''')
+
+parser.add_argument('-d', '--database', dest='database',
+    default=getpass.getuser(),
+    help='Name of database (default: username)')
+
+parser.add_argument('-u', '--user', dest='user',
+    default=getpass.getuser(),
+    help='User for database (default: username)')
+
+parser.add_argument('-p', '--password', dest='password',
+    default='PASSWORD',
+    help='Password for database (default: PASSWORD)')
+
+parser.add_argument('-H', '--host', dest='host',
+    default='localhost',
+    help='Host for database (default: localhost)')
+
+def install(style_id, style):
+    db = postgresql.open(
+        host=args.host,
+        password=args.password,
+        database=args.database,
+        user=args.user
+    )
+    db.execute(style['function'])
 
 if __name__ == '__main__':
     args = parser.parse_args()
@@ -28,3 +55,5 @@ if __name__ == '__main__':
     pp.pprint(stat)
     #pp.pprint(style)
     print(style['function'])
+
+    install(style_id, style)
