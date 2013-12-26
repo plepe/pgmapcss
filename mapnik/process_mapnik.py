@@ -1,22 +1,30 @@
 import pghstore
 import re
 
+def properties_values(key, stat):
+    if key == 'final-casing-width':
+        # build unique list of all width / casing-width combinations
+        return list(set([ str(float(width or '0') + 2 * float(casing_width or '0')) \
+            for width in properties_values('width', stat) \
+            for casing_width in properties_values('casing-width', stat) \
+        ]))
+
+    if not key in stat['properties_values']:
+        return ['']
+
+    else:
+        return stat['properties_values'][key]
+
 def tag_combinations(keys, stat, base={}):
     combinations_list = [base.copy()]
 
     for k in keys:
         new_combinations_list = []
 
-        if k in stat['properties_values']:
-            for combination in combinations_list:
-                for v in stat['properties_values'][k]:
-                    c = combination.copy()
-                    c[k] = v
-                    new_combinations_list.append(c)
-        else:
-            for combination in combinations_list:
+        for combination in combinations_list:
+            for v in properties_values(k, stat):
                 c = combination.copy()
-                c[k] = ''
+                c[k] = v
                 new_combinations_list.append(c)
 
         combinations_list = new_combinations_list
