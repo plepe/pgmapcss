@@ -7,7 +7,7 @@ def print_props_and_tags(current_pseudo_element, prop_to_set, tags_to_set):
   if len(prop_to_set):
       ret += 'current.styles[' + current_pseudo_element + '] = ' +\
           'current.styles[' + current_pseudo_element + '] || \'' +\
-          pghstore.dumps(prop_to_set) + '\';\n'
+          pghstore.dumps(prop_to_set).replace("'", "''") + '\';\n'
       prop_to_set.clear()
 
   if len(tags_to_set):
