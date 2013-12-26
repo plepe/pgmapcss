@@ -32,14 +32,10 @@ parser.add_argument('-H', '--host', dest='host',
     default='localhost',
     help='Host for database (default: localhost)')
 
-def install(style_id, style):
-    db = postgresql.open(
-        host=args.host,
-        password=args.password,
-        database=args.database,
-        user=args.user
-    )
+def install(style_id, style, db):
     db.execute(open('src/pgmapcss_types.sql').read())
+    db.execute(open('src/pgmapcss_object.sql').read())
+    db.execute(open('src/pgmapcss_render_context.sql').read())
     db.execute(style['function'])
 
 if __name__ == '__main__':
@@ -58,5 +54,12 @@ if __name__ == '__main__':
     #pp.pprint(style)
     print(style['function'])
 
-    install(style_id, style)
-    process_mapnik(style_id, args, stat)
+    db = postgresql.open(
+        host=args.host,
+        password=args.password,
+        database=args.database,
+        user=args.user
+    )
+
+    install(style_id, style, db)
+    process_mapnik(style_id, args, stat, db)
