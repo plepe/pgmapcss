@@ -29,7 +29,7 @@ def compile_statement(statement, stat):
         current_pseudo_element = 'i'
         ret += 'for i in 1..array_upper(current.pseudo_elements, 1) loop\n'
     else:
-        current_pseudo_element = str(stat['pseudo_elements'].index(object_selector['pseudo_element']))
+        current_pseudo_element = str(stat['pseudo_elements'].index(object_selector['pseudo_element']) + 1)
     ret += 'current.pseudo_element_ind = ' + current_pseudo_element + ';\n'
 
     prop_to_set = {}
