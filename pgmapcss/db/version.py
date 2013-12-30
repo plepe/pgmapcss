@@ -28,6 +28,9 @@ def db_version_check():
 
     v = db_version()
 
+    if not v:
+        return None
+
     if v['table_layout'] != db_version_table_layout:
         return 2
 
