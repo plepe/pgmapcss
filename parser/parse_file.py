@@ -1,11 +1,13 @@
 from .parse_selectors import parse_selectors
 from .parse_properties import parse_properties
+from .strip_comments import strip_comments
 import re
 
 def parse_file(stat, file):
     content = open(file).read()
-    to_parse = content
     stat['statements'] = []
+
+    to_parse = strip_comments(content)
 
 # read statements until there's only whitespace left
     while not re.match('\s*$', to_parse):
