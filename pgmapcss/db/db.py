@@ -20,7 +20,7 @@ def connect(args):
     return conn
 
 def db_update(conn):
-    files = [ 'pgmapcss_object.sql', 'pgmapcss_render_context.sql', 'objects_osm2pgsql.sql', 'array_search.sql', 'natcasesort.sql', 'pgmapcss_to.sql' ]
+    files = [ 'pgmapcss_object.sql', 'pgmapcss_render_context.sql', 'objects_osm2pgsql.sql', 'array_search.sql', 'natcasesort.sql', 'pgmapcss_to.sql', 'array_unique.sql', 'hstore_merge.sql' ]
 
     for f in files:
         print('Installing', f)
