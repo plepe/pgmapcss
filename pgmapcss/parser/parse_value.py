@@ -74,7 +74,6 @@ def parse_value(current, to_parse):
             elif re.match('\s*([0-9]+(\.[0-9]+)?)%\s*$', v): # percentage: 0%..100%
                 m = re.match('\s*([0-9]+(\.[0-9]+)?)%\s*$', v)
                 values[i] = float(m.group(1))
-                print(values[i])
                 if values[i] < 0.0 or values[i] > 100.0:
                     raise ParseError(to_parse, 'Error parsing rgb() value, value {} out of range (0%..100%)'.format(v))
                 values[i] = round(values[i] * 2.55)
