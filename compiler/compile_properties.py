@@ -2,8 +2,7 @@ import pg
 
 def compile_properties(statement, stat):
     ret = ''
-    prop_to_set = {}
-    tags_to_set = {}
+    to_set = { 'prop': {}, 'tags': {} }
 
     for prop in statement['properties']:
         if prop['assignment_type'] == 'P':
@@ -11,7 +10,7 @@ def compile_properties(statement, stat):
                 pass
 
             else:
-                prop_to_set[prop['key']] = prop['value']
+                to_set['prop'][prop['key']] = prop['value']
 
                 if not prop['key'] in stat['properties_values']:
                     stat['properties_values'][prop['key']] = set()
@@ -23,24 +22,24 @@ def compile_properties(statement, stat):
                 pass
 
             else:
-                tags_to_set[prop['key']] = prop['value']
+                to_set['tags'][prop['key']] = prop['value']
 
-    ret += print_props_and_tags(statement['current_pseudo_element'], prop_to_set, tags_to_set)
+    ret += print_props_and_tags(statement['current_pseudo_element'], to_set)
 
     return ret
 
-def print_props_and_tags(current_pseudo_element, prop_to_set, tags_to_set):
+def print_props_and_tags(current_pseudo_element, to_set):
   ret = ''
 
-  if len(prop_to_set):
+  if len(to_set['prop']):
       ret += 'current.styles[' + current_pseudo_element + '] = ' +\
           'current.styles[' + current_pseudo_element + '] || ' +\
-          pg.format(prop_to_set) + ';\n'
-      prop_to_set.clear()
+          pg.format(to_set['prop']) + ';\n'
+      to_set['prop'].clear()
 
-  if len(tags_to_set):
+  if len(to_set['tags']):
       ret += 'current.tags = current.tags || ' +\
-          pg.format(tags_to_set) + ';\n'
-      tags_to_set.clear()
+          pg.format(to_set['tags']) + ';\n'
+      to_set['tags'].clear()
 
   return ret
