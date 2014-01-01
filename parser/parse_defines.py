@@ -1,4 +1,4 @@
-from .parse_types import *
+from .parse_value import *
 from .strip_comments import strip_comments
 import re
 

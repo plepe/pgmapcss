@@ -38,7 +38,10 @@ def compile_statement(statement, stat):
 # TODO: prop_type
     for prop in statement['properties']:
         if prop['assignment_type'] == 'P':
-            if prop['value_type'] == 0:
+            if prop['value_type'] == 'eval':
+                pass
+
+            else:
                 prop_to_set[prop['key']] = prop['value']
 
                 if not prop['key'] in stat['properties_values']:
@@ -47,7 +50,10 @@ def compile_statement(statement, stat):
                 stat['properties_values'][prop['key']].add(prop['value'])
 
         elif prop['assignment_type'] == 'T':
-            if prop['value_type'] == 0:
+            if prop['value_type'] == 'eval':
+                pass
+
+            else:
                 tags_to_set[prop['key']] = prop['value']
 
     ret += print_props_and_tags(current_pseudo_element, prop_to_set, tags_to_set)

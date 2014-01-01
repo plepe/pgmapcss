@@ -1,4 +1,5 @@
 import re
+from .parse_value import parse_value
 
 def parse_properties(properties, to_parse):
     if re.match('\s*\{', to_parse):
@@ -39,18 +40,7 @@ def parse_properties(properties, to_parse):
 # TODO: ERROR
             pass
 
-        if re.match('\s*(.*)\s*;', to_parse):
-            m = re.match('\s*(.*)\s*;', to_parse)
-            current['value_type'] = 0;
-            current['value'] = m.group(1)
-
-            if current['value'] == '':
-                current['value'] = None
-
-            to_parse = to_parse[len(m.group(0)):]
-        else:
-# TODO: ERROR
-            pass
+        to_parse = parse_value(current, to_parse)
 
         properties.append(current)
 
