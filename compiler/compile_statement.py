@@ -1,21 +1,5 @@
 from .compile_selector_part import compile_selector_part
-import pg
-
-def print_props_and_tags(current_pseudo_element, prop_to_set, tags_to_set):
-  ret = ''
-
-  if len(prop_to_set):
-      ret += 'current.styles[' + current_pseudo_element + '] = ' +\
-          'current.styles[' + current_pseudo_element + '] || ' +\
-          pg.format(prop_to_set) + ';\n'
-      prop_to_set.clear()
-
-  if len(tags_to_set):
-      ret += 'current.tags = current.tags || ' +\
-          pg.format(tags_to_set) + ';\n'
-      tags_to_set.clear()
-
-  return ret
+from .compile_properties import compile_properties
 
 def compile_statement(statement, stat):
     ret = ''
@@ -26,37 +10,14 @@ def compile_statement(statement, stat):
 
     # set current.pseudo_element_ind
     if object_selector['pseudo_element'] == '*':
-        current_pseudo_element = 'i'
+        statement['current_pseudo_element'] = 'i'
         ret += 'for i in 1..array_upper(current.pseudo_elements, 1) loop\n'
     else:
-        current_pseudo_element = str(stat['pseudo_elements'].index(object_selector['pseudo_element']) + 1)
-    ret += 'current.pseudo_element_ind = ' + current_pseudo_element + ';\n'
-
-    prop_to_set = {}
-    tags_to_set = {}
+        statement['current_pseudo_element'] = str(stat['pseudo_elements'].index(object_selector['pseudo_element']) + 1)
+    ret += 'current.pseudo_element_ind = ' + statement['current_pseudo_element'] + ';\n'
 
 # TODO: prop_type
-    for prop in statement['properties']:
-        if prop['assignment_type'] == 'P':
-            if prop['value_type'] == 'eval':
-                pass
-
-            else:
-                prop_to_set[prop['key']] = prop['value']
-
-                if not prop['key'] in stat['properties_values']:
-                    stat['properties_values'][prop['key']] = set()
-
-                stat['properties_values'][prop['key']].add(prop['value'])
-
-        elif prop['assignment_type'] == 'T':
-            if prop['value_type'] == 'eval':
-                pass
-
-            else:
-                tags_to_set[prop['key']] = prop['value']
-
-    ret += print_props_and_tags(current_pseudo_element, prop_to_set, tags_to_set)
+    ret += compile_properties(statement, stat)
 
     if object_selector['pseudo_element'] == '*':
         ret += 'end loop;\n'
@@ -64,7 +25,7 @@ def compile_statement(statement, stat):
 # create_pseudo_element
     if not 'create_pseudo_element' in object_selector or \
         object_selector['create_pseudo_element']:
-        ret += 'current.has_pseudo_element[' + current_pseudo_element + '] = true;\n'
+        ret += 'current.has_pseudo_element[' + statement['current_pseudo_element'] + '] = true;\n'
 
     ret += 'end if;\n\n'
 
