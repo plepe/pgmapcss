@@ -4,8 +4,11 @@ from .parse_properties import parse_properties
 from .strip_comments import strip_comments
 import re
 
-def parse_file(stat, file):
-    content = open(file).read()
+def parse_file(stat, file, base_style=None):
+    content = ''
+    if base_style:
+        content += open(base_style).read()
+    content += open(file).read()
     stat['statements'] = []
     stat['defines'] = {}
 
@@ -13,7 +16,6 @@ def parse_file(stat, file):
 
 # read statements until there's only whitespace left
     while not re.match('\s*$', to_parse):
-        print(to_parse)
         to_parse = parse_defines(stat, to_parse)
 
         selectors = []

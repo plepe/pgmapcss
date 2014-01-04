@@ -61,7 +61,7 @@ def process(f1, replacement, stat, rek=0):
     return text
 
 def process_mapnik(style_id, args, stat, db):
-    f1 = open('mapnik/mapnik-2.0.mapnik', 'r')
+    f1 = open('mapnik/' + args.base_style + '.mapnik', 'r')
     f2 = open(style_id + '.mapnik', 'w')
 
     replacement = {

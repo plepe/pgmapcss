@@ -33,6 +33,10 @@ parser.add_argument('-H', '--host', dest='host',
     default='localhost',
     help='Host for database (default: localhost)')
 
+parser.add_argument('-t', '--template', dest='base_style',
+    required=True,
+    help='mapcss/mapnik base style for the correct mapnik version, e.g. "mapnik-2.0"')
+
 def init_db(db):
     db.execute(open('src/pgmapcss_types.sql').read())
 
@@ -57,12 +61,15 @@ if __name__ == '__main__':
     init_db(db)
 
     stat = {}
-    content = parse_file(stat, file=file_name)
 
-    style = compile_style(style_id, stat)
+    base_style = 'mapnik/' + args.base_style + '.mapcss'
+    content = parse_file(stat, file=file_name, base_style=base_style)
 
     pp = pprint.PrettyPrinter()
     pp.pprint(stat)
+
+    style = compile_style(style_id, stat)
+
     #pp.pprint(style)
     for i in style:
         print("***** " + i + " *****\n" + style[i])

@@ -175,7 +175,11 @@
       <Parameter name="srid">900913</Parameter>
       <Parameter name="cache-features">on</Parameter>
       <Parameter name="table">
-({columns}, geo as _geo from {style_id}_match(pgmapcss_render_context(!bbox!, !scale_denominator!), Array['fill', 'casing', 'line', 'point', 'point-text', 'line-text', 'shield'])) t
+(select
+  {columns},
+  "style-element",
+  geo as _geo
+from {style_id}_match(pgmapcss_render_context(!bbox!, !scale_denominator!), Array['fill', 'casing', 'line', 'point', 'point-text', 'line-text', 'shield'])) t
       </Parameter>
     </Datasource>
     <StyleName>pgmapcss</StyleName>
