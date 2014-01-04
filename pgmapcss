@@ -38,6 +38,7 @@ def install(style_id, style, db):
     db.execute(open('src/pgmapcss_render_context.sql').read())
     db.execute(style['function_check'])
     db.execute(style['function_get_where'])
+    db.execute(style['function_match'])
 
 if __name__ == '__main__':
     args = parser.parse_args()
