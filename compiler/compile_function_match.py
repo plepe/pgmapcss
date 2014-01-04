@@ -1,6 +1,12 @@
+import pg
+
 def compile_function_match(id, stat):
     replacement = {
-      'style_id': id
+      'style_id': id,
+      'style_element_property': pg.format({
+          k: '{' + ','.join(v['value'].split(';')) + '}'
+          for k, v in stat['defines']['style_element_property'].items()
+      })
     }
 
     ret = '''\
@@ -19,7 +25,7 @@ begin
     select * from (
     select
       id, tags, geo, types, pseudo_element, properties,
-      unnest("all-style-elements") as "style-element"
+      unnest("all-style-elements") as "style-element", null::text, null::text
     from
       (select (result).* from
         (select
@@ -40,7 +46,7 @@ begin
           generate_series(1, "max-style-element") asc,
           coalesce(cast(properties->'z-index' as float), 0) asc
         ) t where
-          (select true = any(array_agg(x is not null)) from (select unnest(properties->(cast(' || quote_nullable(stat.prop_style_element) || E'->("style-element") as text[]))) x) t1) or not ' || quote_nullable(stat.prop_style_element) || E'? ("style-element");
+          (select true = any(array_agg(x is not null)) from (select unnest(properties->(cast({style_element_property}->("style-element") as text[]))) x) t1) or not {style_element_property} ? ("style-element");
     raise notice 'total run of match() (incl. querying db objects) took %', clock_timestamp() - t; -- profiling
     return;
 end;
