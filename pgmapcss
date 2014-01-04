@@ -7,6 +7,7 @@ from mapnik.process_mapnik import *
 import argparse
 import getpass
 import db
+import os
 
 parser = argparse.ArgumentParser(description='Compiles a MapCSS style description into PostgreSQL functions and builds an accompanying Mapnik stylesheet.')
 
@@ -32,10 +33,15 @@ parser.add_argument('-H', '--host', dest='host',
     default='localhost',
     help='Host for database (default: localhost)')
 
-def install(style_id, style, db):
+def init_db(db):
     db.execute(open('src/pgmapcss_types.sql').read())
+
+    for f in os.listdir('eval_functions/'):
+        db.execute(open('eval_functions/' + f).read())
     db.execute(open('src/pgmapcss_object.sql').read())
     db.execute(open('src/pgmapcss_render_context.sql').read())
+
+def install(style_id, style, db):
     db.execute(style['function_check'])
     db.execute(style['function_get_where'])
     db.execute(style['function_match'])
@@ -47,6 +53,8 @@ if __name__ == '__main__':
     file_name = style_id + '.mapcss'
 
     db = db.connect(args)
+
+    init_db(db)
 
     stat = {}
     content = parse_file(stat, file=file_name)
