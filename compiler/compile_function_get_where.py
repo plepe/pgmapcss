@@ -20,7 +20,8 @@ def get_where_selectors(max_scale, min_scale, stat):
         for w in v['properties']
         if w['key'] in style_element_properties and w['assignment_type'] == 'P' and
             v['selectors']['min_scale'] <= min_scale and
-            (v['selectors']['max_scale'] == None or v['selectors']['max_scale'] >= max_scale)
+            (v['selectors']['max_scale'] == None or v['selectors']['max_scale'] >= max_scale) and
+            not 'create_pseudo_element' in v['selectors']
     ]
 
     # TODO combine
@@ -52,7 +53,8 @@ def get_where_selectors(max_scale, min_scale, stat):
             j[2] < i and s['key'] == j[0] and
             (j[1] == True or s['value'] == j[1]) and
             v['selectors']['min_scale'] <= min_scale and
-            (v['selectors']['max_scale'] == None or v['selectors']['max_scale'] >= max_scale)
+            (v['selectors']['max_scale'] == None or v['selectors']['max_scale'] >= max_scale) and
+            not 'create_pseudo_element' in v['selectors']
     ]
 
     # uniq list
