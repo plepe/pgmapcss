@@ -1,5 +1,5 @@
 import pg
-from .all_scale_denominators import all_scale_denominators
+from .stat import *
 from .compile_condition import compile_condition
 
 def get_where_selectors(max_scale, min_scale, stat):
@@ -61,7 +61,7 @@ def get_where_selectors(max_scale, min_scale, stat):
 def compile_get_where(id, stat):
     ret = ''
 
-    scale_denominators = all_scale_denominators(stat)
+    scale_denominators = stat_all_scale_denominators(stat)
 
     max_scale = None
     for min_scale in scale_denominators:
