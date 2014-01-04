@@ -30,3 +30,6 @@ def format(value):
         value = "'" + value + "'"
 
     return value
+
+def ident(value):
+    return '"' + value.replace('"', '""') + '"'

@@ -1,5 +1,7 @@
 import pghstore
 import re
+from compiler.stat import *
+import pg
 
 def properties_values(key, stat):
     if key == 'final-casing-width':
@@ -69,6 +71,11 @@ def process_mapnik(style_id, args, stat, db):
         'database': args.database,
         'user': args.user
     }
+
+    replacement['columns'] = ', '.join([
+        'properties->' + pg.format(prop) + ' as ' + pg.ident(prop)
+        for prop in stat_properties(stat)
+    ])
 
     print("select * from {style_id}_check(pgmapcss_object('', '', null, Array['canvas']), pgmapcss_render_context(null, null))".format(**replacement))
     res = db.prepare("select * from {style_id}_check(pgmapcss_object('', '', null, Array['canvas']), pgmapcss_render_context(null, null))".format(**replacement))
