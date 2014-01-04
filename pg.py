@@ -20,6 +20,10 @@ def format(value):
         value = 'Array[' + ','.join([format(i) for i in value]) + ']'
         esc_quotes = False
 
+    elif type(value) == type(None):
+        value = 'null'
+        esc_quotes = False
+
     else:
         raise Exception('pg.format(): ' + str(type(value)) + ' not supported')
 
