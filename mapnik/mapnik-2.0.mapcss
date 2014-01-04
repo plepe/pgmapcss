@@ -26,9 +26,9 @@
 
 // @postprocess: To calculate final value of property X call
 // eval-function as specified.
-@postprocess text text_transform(prop("text"), prop("text-transform"));
-@postprocess shield-text text_transform(prop("shield-text"), prop("shield-text-transform"));
-@postprocess final-casing-width prop("width") + prop("casing-width") * 2;
+@postprocess text eval(text_transform(prop("text"), prop("text-transform")));
+@postprocess shield-text eval(text_transform(prop("shield-text"), prop("shield-text-transform")));
+@postprocess final-casing-width eval(prop("width") + prop("casing-width") * 2);
 
 // @depend_property: don't check values for e.g. 'text-position' if no 'text' is set
 @depend_property text text-position,text-transform,font-family,font-weight,font-style;

@@ -1,4 +1,5 @@
 from .compile_statement import compile_statement
+from .compile_eval import compile_eval
 import pg
 
 def compile_function(id, stat):
@@ -43,7 +44,13 @@ begin
   for r in select * from (select generate_series(1, {count_pseudo_elements}) i, unnest(current.styles) style) t order by coalesce(cast(style->'object-z-index' as float), 0) asc loop
     if current.has_pseudo_element[r.i] then
       current.pseudo_element_ind = r.i;
+'''.format(**replacement)
 
+    # postprocess requested properties (see @postprocess)
+    for k, v in stat['defines']['postprocess'].items():
+        ret += '      current.styles[r.i] := current.styles[r.i] || hstore(' + pg.format(k) + ', ' + compile_eval(v['value']) + ');\n'
+
+    ret += '''
       ret.geo=current.styles[r.i]->'geo';
       current.styles[r.i] := current.styles[r.i] - 'geo'::text;
       ret.properties=current.styles[r.i];

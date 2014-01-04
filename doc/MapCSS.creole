@@ -336,7 +336,7 @@ Define postprocess functions:
 
 E.g.
 {{{
-@postprocess text text_transform(prop("text"), prop("text-transform"));
+@postprocess text eval(text_transform(prop("text"), prop("text-transform")));
 }}}
 
 == Depending properties ==
