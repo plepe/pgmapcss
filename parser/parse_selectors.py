@@ -1,7 +1,7 @@
 from .parse_condition import parse_condition
 import re
 
-def parse_selector_part(current, to_parse, object_class_selector='\s|[a-z_]+'):
+def parse_selector_part(current, to_parse, object_class_selector='\*|[a-z_]+'):
     max_scale_denominator = 3.93216e+08;
     current['conditions']  = []
     current['pseudo_element'] = 'default'
@@ -12,7 +12,7 @@ def parse_selector_part(current, to_parse, object_class_selector='\s|[a-z_]+'):
     m = re.match('\s*(' + object_class_selector + ')', to_parse)
     if m:
         if m.group(1) == '*':
-            pass
+            current['type'] = True
         else:
             current['type'] = m.group(1)
 

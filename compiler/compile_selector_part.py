@@ -3,7 +3,7 @@ from .compile_condition import compile_condition
 def compile_selector_part(selector, stat, prefix='current.'):
     ret = []
 
-    if 'type' in selector:
+    if selector['type'] != True:
         ret.append('\'' + selector['type'] + '\'=ANY(' + prefix + 'types)')
 
     if 'min_scale' in selector and selector['min_scale'] != 0:
@@ -20,5 +20,8 @@ def compile_selector_part(selector, stat, prefix='current.'):
         c = compile_condition(i, stat, prefix=prefix)
         if c:
             ret.append(c)
+
+    if len(ret) == 0:
+        return 'true'
 
     return ' and '.join(ret)

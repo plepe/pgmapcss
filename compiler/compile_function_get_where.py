@@ -82,7 +82,13 @@ def compile_function_get_where(id, stat):
             for i in where_selectors
         ]
 
-        types = [ t for t, cs in conditions ]
+        # Move all conditions with * as type selector to all other types
+        all_types_conditions = []
+        for c in conditions:
+            if c[0] == True:
+                all_types_conditions.append(c[1])
+
+        types = [ t for t, cs in conditions if t != True ]
 
         conditions = {
             t:
@@ -90,7 +96,7 @@ def compile_function_get_where(id, stat):
                     cs
                     for t2, cs in conditions
                     if t == t2
-                ]) + ')'
+                ] + all_types_conditions ) + ')'
             for t in types
         }
 
