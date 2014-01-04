@@ -1,3 +1,4 @@
+from .parse_condition import parse_condition
 import re
 
 def parse_selector_part(current, to_parse, object_class_selector='\s|[a-z_]+'):
@@ -28,7 +29,7 @@ def parse_selector_part(current, to_parse, object_class_selector='\s|[a-z_]+'):
 
         current['classes'].append(m.group(1))
 
-        current['conditions'].append(('has_tag', '.' + m.group(1)))
+        current['conditions'].append({ 'op': 'has_tag', 'key': '.' + m.group(1) })
 
         to_parse = to_parse[len(m.group(0)):]
 
@@ -48,6 +49,8 @@ def parse_selector_part(current, to_parse, object_class_selector='\s|[a-z_]+'):
         to_parse = to_parse[len(m.group(0)):]
 
 # parse conditions - TODO
+    while re.match('\[', to_parse):
+        to_parse = parse_condition(current, to_parse[1:])
 
 # parse pseudo classes
     while re.match(':([a-zA-Z0-9_]+)', to_parse):
