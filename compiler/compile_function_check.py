@@ -32,7 +32,7 @@ def print_checks(prop, stat, main_prop=None):
 
     return ret
 
-def compile_function(id, stat):
+def compile_function_check(id, stat):
     replacement = {
       'style_id': id,
       'pseudo_elements': pg.format(stat['pseudo_elements']),

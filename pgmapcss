@@ -36,8 +36,8 @@ def install(style_id, style, db):
     db.execute(open('src/pgmapcss_types.sql').read())
     db.execute(open('src/pgmapcss_object.sql').read())
     db.execute(open('src/pgmapcss_render_context.sql').read())
-    db.execute(style['function'])
-    db.execute(style['get_where'])
+    db.execute(style['function_check'])
+    db.execute(style['function_get_where'])
 
 if __name__ == '__main__':
     args = parser.parse_args()
@@ -55,8 +55,8 @@ if __name__ == '__main__':
     pp = pprint.PrettyPrinter()
     pp.pprint(stat)
     #pp.pprint(style)
-    print(style['function'])
-    print(style['get_where'])
+    for i in style:
+        print("***** " + i + " *****\n" + style[i])
 
     install(style_id, style, db)
     process_mapnik(style_id, args, stat, db)

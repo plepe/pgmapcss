@@ -58,7 +58,7 @@ def get_where_selectors(max_scale, min_scale, stat):
     # uniq list
     return list(set(where_selectors))
 
-def compile_get_where(id, stat):
+def compile_function_get_where(id, stat):
     ret = ''
 
     scale_denominators = stat_all_scale_denominators(stat)
