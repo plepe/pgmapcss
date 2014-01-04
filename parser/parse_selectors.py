@@ -5,6 +5,8 @@ def parse_selector_part(current, to_parse, object_class_selector='\s|[a-z_]+'):
     max_scale_denominator = 3.93216e+08;
     current['conditions']  = []
     current['pseudo_element'] = 'default'
+    current['min_scale'] = 0
+    current['max_scale'] = None
 
 # parse object class (way, node, canvas, ...)
     m = re.match('\s*(' + object_class_selector + ')', to_parse)
