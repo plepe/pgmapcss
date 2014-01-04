@@ -12,10 +12,14 @@ def properties_values(key, stat):
         ]))
 
     if not key in stat['properties_values']:
-        return ['']
+        return []
 
     else:
-        return stat['properties_values'][key]
+        return [
+            v
+            for v in stat['properties_values'][key]
+            if v != None
+        ]
 
 def tag_combinations(keys, stat, base={}):
     combinations_list = [base.copy()]
@@ -47,6 +51,13 @@ def process(f1, replacement, stat, rek=0):
             k = m.group(1).split(' ')
             combinations_list = tag_combinations(k, stat, base=replacement)
             f1_pos = f1.tell()
+
+            # if no combinations found, skip to next # END
+            if len(combinations_list) == 0:
+                while(True):
+                    r = f1.readline()
+                    if re.match('# END', r):
+                        break;
 
             for c in combinations_list:
                 f1.seek(f1_pos)
