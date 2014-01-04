@@ -1,5 +1,6 @@
 import re
 from .parse_string import parse_string
+from .parse_eval import parse_eval
 
 def parse_url(current, to_parse):
     m = re.match('\s*url\(', to_parse)
@@ -50,14 +51,26 @@ def parse_value(current, to_parse):
             return s[1][len(m.group(0)):]
 
     # eval( ... )
-    elif re.match('eval\s*\(', to_parse):
-        # TODO
-        m = re.match('eval\s*\((.*)\)\s*;', to_parse)
-        if m:
-            current['value'] = m.group(1)
-            current['value_type'] = 'eval'
-            return to_parse[len(m.group(0)):]
-        pass
+    elif re.match('eval\s*\(\s*', to_parse):
+        m = re.match('eval\s*\(\s*', to_parse)
+        to_parse = to_parse[len(m.group(0)):]
+
+        r = parse_string(to_parse)
+        if r[0]:
+            value = parse_eval(r[0])
+            to_parse = r[1]
+        else:
+            (value, to_parse) = parse_eval(to_parse)
+
+        m = re.match('\s*\)\s*;', to_parse)
+        if not m:
+            raise Exception('Error parsing eval statement')
+
+        to_parse = to_parse[len(m.group(0)):]
+
+        current['value'] = value
+        current['value_type'] = 'eval'
+        return to_parse
 
     # rgb(R, G, B)
     elif re.match('rgb\s*\(', to_parse):
