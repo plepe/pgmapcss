@@ -1,6 +1,36 @@
 from .compile_statement import compile_statement
 from .compile_eval import compile_eval
+from .stat import *
 import pg
+
+def print_checks(prop, stat, main_prop=None):
+    ret = ''
+
+    # @default_other
+    if 'default_other' in stat['defines'] and prop in stat['defines']['default_other']:
+        other = stat['defines']['default_other'][prop]['value']
+        ret += 'if (current.styles[r.i]->' + pg.format(prop) + ') is null ' +\
+            'then current.styles[r.i] := current.styles[r.i] || hstore(' +\
+            pg.format(prop) + ', current.styles[r.i]->' +\
+            pg.format(other) + '); end if;\n'
+
+    # @values
+    if 'values' in stat['defines'] and prop in stat['defines']['values']:
+        values = stat['defines']['values'][prop]['value'].split(';')
+        used_values = stat_property_values(prop, stat)
+
+        # if there are used values which are not allowed, always check
+        # resulting value and - if not allowed - replace by the first
+        # allowed value
+        if len([ v for v in used_values if not v in values ]):
+            ret += 'if not (current.styles[r.i]->' +\
+                pg.format(prop) + ') = any(' +\
+                pg.format(values) + ') then ' +\
+                'current.styles[r.i] := current.styles[r.i] || hstore(' +\
+                pg.format(prop) + ', ' +\
+                pg.format(values[0]) + '); end if;\n';
+
+    return ret
 
 def compile_function(id, stat):
     replacement = {
@@ -45,6 +75,28 @@ begin
     if current.has_pseudo_element[r.i] then
       current.pseudo_element_ind = r.i;
 '''.format(**replacement)
+
+    # handle @values, @default_other for all properties
+    done_prop = []
+    # start with props from @depend_property
+    for main_prop, props in stat['defines']['depend_property'].items():
+        props = props['value'].split(';')
+        r = ''
+
+        r += print_checks(main_prop, stat)
+        done_prop.append(main_prop)
+
+        for prop in props:
+            r += print_checks(prop, stat, main_prop=main_prop)
+            done_prop.append(prop)
+
+        if r != '':
+            ret += '      if current.styles[r.i] ? ' + pg.format(main_prop) + ' then\n'
+            ret += r
+            ret += '      end if;\n'
+
+    for prop in [ prop for prop in stat_properties(stat) if not prop in done_prop ]:
+        ret += print_checks(prop, stat)
 
     # postprocess requested properties (see @postprocess)
     for k, v in stat['defines']['postprocess'].items():

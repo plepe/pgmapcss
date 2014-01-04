@@ -312,10 +312,10 @@ Currently supported types:
 == Possible values ==
 The following statement defines possible values for a specific property:
 {{{
-@values property_name value1;value2;value3;
+@values property_name "value1;value2;value3";
 }}}
 
-Other values will be accepted in the MapCSS file, but will be finally replaced by the default value (the first value).
+Other values will be accepted in the MapCSS file, but will finally be replaced by the default value (the first value).
 
 == Define default values to other properties ==
 If the value of a property defaults to the value of another property, this is specified by:
@@ -341,7 +341,7 @@ E.g.
 
 == Depending properties ==
 {{{
-@depend_property main_property dep_property1,dep_property2,...;
+@depend_property main_property "dep_property1;dep_property2;...";
 }}}
 
 For @default_other, @values: don't process depending values if main property is not set.

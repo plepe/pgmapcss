@@ -13,16 +13,16 @@
 
 // @values: Possible values of properties; the first value is the default value
 // linecap actually has 'none' as default value. the following statement automatically replaces 'none' by 'butt'
-@values linecap butt,round,square;
-@values casing-linecap butt,round,square;
-@values linejoin round,miter,bevel;
-@values casing-linejoin round,miter,bevel;
-@values text-position center,line;
-@values font-family DejaVu Sans,DejaVu Sans Condensed,DejaVu Sans Mono,DejaVu Serif,DejaVu Serif Condensed;
-@values font-weight normal,bold;
-@values font-style normal,italic;
-@values text-transform none,uppercase,lowercase,capitalize;
-@values shield-text-transform none,uppercase,lowercase,capitalize;
+@values linecap "butt;round;square";
+@values casing-linecap "butt;round;square";
+@values linejoin "round;miter;bevel";
+@values casing-linejoin "round;miter;bevel";
+@values text-position "center;line";
+@values font-family "DejaVu Sans;DejaVu Sans Condensed;DejaVu Sans Mono;DejaVu Serif;DejaVu Serif Condensed";
+@values font-weight "normal;bold";
+@values font-style "normal;italic";
+@values text-transform "none;uppercase;lowercase;capitalize";
+@values shield-text-transform "none;uppercase;lowercase;capitalize";
 
 // @postprocess: To calculate final value of property X call
 // eval-function as specified.
@@ -31,10 +31,10 @@
 @postprocess final-casing-width eval(prop("width") + prop("casing-width") * 2);
 
 // @depend_property: don't check values for e.g. 'text-position' if no 'text' is set
-@depend_property text text-position,text-transform,font-family,font-weight,font-style;
-@depend_property width linecap,linejoin;
-@depend_property casing-width casing-linecap,casing-linejoin;
-@depend_property shield-text shield-font-family,shield-font-weight,shield-font-style,shield-font-size,shield-text-transform;
+@depend_property text "text-position;text-transform;font-family;font-weight;font-style";
+@depend_property width "linecap;linejoin";
+@depend_property casing-width "casing-linecap;casing-linejoin";
+@depend_property shield-text "shield-font-family;shield-font-weight;shield-font-style;shield-font-size;shield-text-transform";
 
 // @style_element_property
 @style_element_property fill fill-color;
