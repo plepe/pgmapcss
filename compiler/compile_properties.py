@@ -6,9 +6,6 @@ def compile_properties(statement, stat):
     to_set = { 'prop': {}, 'tags': {} }
 
     for prop in statement['properties']:
-        if not prop['key'] in stat['properties_values']:
-            stat['properties_values'][prop['key']] = set()
-
         if prop['assignment_type'] == 'P':
             if prop['value_type'] == 'eval':
                 ret += print_props_and_tags(statement['current_pseudo_element'], to_set)
@@ -16,8 +13,6 @@ def compile_properties(statement, stat):
                     'current.styles[' + statement['current_pseudo_element'] + '] || ' +\
                     'hstore(' + pg.format(prop['key']) + ', ' +\
                     compile_eval(prop['value']) + ');\n'
-
-                stat['properties_values'][prop['key']].add(True)
 
             else:
                 if prop['value_type'] == 'value' and \
@@ -30,12 +25,8 @@ def compile_properties(statement, stat):
                         'hstore(' + pg.format(prop['key']) + ', (current.tags)-> ' +\
                         pg.format(prop['value']) + ');\n'
 
-                    stat['properties_values'][prop['key']].add(True)
-
                 else:
                     to_set['prop'][prop['key']] = prop['value']
-
-                    stat['properties_values'][prop['key']].add(prop['value'])
 
         elif prop['assignment_type'] == 'T':
             if prop['value_type'] == 'eval':

@@ -17,7 +17,7 @@ def print_checks(prop, stat, main_prop=None):
     # @values
     if 'values' in stat['defines'] and prop in stat['defines']['values']:
         values = stat['defines']['values'][prop]['value'].split(';')
-        used_values = stat_property_values(prop, stat)
+        used_values = stat_property_values(prop, stat, include_illegal_values=True)
 
         # if there are used values which are not allowed, always check
         # resulting value and - if not allowed - replace by the first
@@ -61,8 +61,6 @@ begin
   current.has_pseudo_element := array_fill(false, Array[{count_pseudo_elements}]);
 
 '''.format(**replacement)
-
-    stat['properties_values'] = {}
 
     for i in stat['statements']:
         ret += compile_statement(i, stat)

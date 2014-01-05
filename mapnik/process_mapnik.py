@@ -11,15 +11,7 @@ def properties_values(key, stat):
             for casing_width in properties_values('casing-width', stat) \
         ]))
 
-    if not key in stat['properties_values']:
-        return []
-
-    else:
-        return [
-            v
-            for v in stat['properties_values'][key]
-            if v != None
-        ]
+    return stat_property_values(key, stat)
 
 def tag_combinations(keys, stat, base={}):
     combinations_list = [base.copy()]
