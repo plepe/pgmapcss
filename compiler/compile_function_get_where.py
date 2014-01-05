@@ -8,8 +8,9 @@ def get_where_selectors(max_scale, min_scale, stat):
 
     # get list of properties which are 'important' (create a symbol)
     style_element_properties = [
-        j['value']
+        k
         for i, j in stat['defines']['style_element_property'].items()
+        for k in j['value'].split(';')
     ]
 
     # where_selectors: find list of selectors which are relevent for db where

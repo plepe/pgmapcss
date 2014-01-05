@@ -40,7 +40,7 @@
 // @style_element_property
 @style_element_property fill fill-color;
 @style_element_property casing casing-width;
-@style_element_property line width,image;
+@style_element_property line "width;image";
 @style_element_property point icon-image;
 @style_element_property point-text text;
 @style_element_property line-text text;

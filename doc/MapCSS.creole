@@ -348,7 +348,7 @@ For @default_other, @values: don't process depending values if main property is 
 
 == Style-Elements depending on property ==
 {{{
-@style_element_property line width,image;
+@style_element_property line "width;color";
 }}}
 
-A database row for style element 'fill' will only be returned when a property 'width' or 'image' is set.
+A database row for style element 'line' will only be returned when the properties 'width' and 'color' are set.
