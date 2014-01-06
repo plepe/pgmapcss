@@ -18,7 +18,9 @@ def parse_file(stat, file, base_style=None):
 
 # read statements until there's only whitespace left
     while not f.match('\s*$'):
-        parse_defines(stat, f)
+        r = parse_defines(stat, f)
+        if r and r[0] == 'import':
+            parse_file(stat, r[1])
 
         selectors = []
         parse_selectors(selectors, f)

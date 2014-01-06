@@ -11,8 +11,8 @@ def parse_defines(stat, to_parse):
 
         if define_type == 'import':
             current = {}
-            parse_url(current, to_parse.to_parse())
-            # to_parse = strip_comments(open(current['value']).read()) + to_parse
+            parse_url(current, to_parse)
+            return ( 'import', current['value'] )
 
         else:
             if not to_parse.match('\s*([A-Za-z0-9_\-]*)\s+'):
