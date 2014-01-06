@@ -26,6 +26,11 @@ def parse_properties(properties, to_parse):
             current['key'] = to_parse.match_group(1)
 
             to_parse.rewind(';')
+
+        elif to_parse.match('\s*combine\s+([a-zA-Z0-9_\-\.]+)\s+'):
+            current['assignment_type'] = 'C'
+            current['key'] = to_parse.match_group(1)
+
         else:
             raise Exception('Error parsing properties, expecing property or set statement')
 

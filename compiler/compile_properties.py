@@ -1,6 +1,14 @@
 import pg
 from .compile_eval import compile_eval
 
+def compile_value(prop, stat):
+    if prop['value_type'] == 'eval':
+        return compile_eval(prop['value'])
+
+    else:
+        return pg.format(prop['value'])
+
+
 def compile_properties(statement, stat):
     ret = ''
     to_set = { 'prop': {}, 'tags': {} }
@@ -38,6 +46,10 @@ def compile_properties(statement, stat):
 
             else:
                 to_set['tags'][prop['key']] = prop['value']
+
+        elif prop['assignment_type'] == 'C':
+            ret += print_props_and_tags(statement['current_pseudo_element'], to_set)
+            ret += 'return query select object.id, current.tags, current.styles[' + statement['current_pseudo_element'] + ']->\'geo\', object.types, null::text, null::hstore, null::text, ' + pg.format(prop['key']) + '::text, ' + compile_value(prop, stat) + ';\n';
 
     ret += print_props_and_tags(statement['current_pseudo_element'], to_set)
 
