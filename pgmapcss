@@ -3,6 +3,7 @@ import sys
 import re
 import pprint
 from parser.parse_file import *
+from parser.ParseError import *
 from compiler.compile_style import *
 from mapnik.process_mapnik import *
 import argparse
@@ -68,7 +69,10 @@ if __name__ == '__main__':
     stat = {}
 
     base_style = 'mapnik/' + args.base_style + '.mapcss'
-    if not parse_file(stat, file=file_name, base_style=base_style):
+    try:
+        parse_file(stat, file=file_name, base_style=base_style)
+    except ParseError as e:
+        print(e)
         sys.exit(1)
 
     pp = pprint.PrettyPrinter()

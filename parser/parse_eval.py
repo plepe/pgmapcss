@@ -1,6 +1,7 @@
 import re
 import db
 from .parse_string import parse_string
+from .ParseError import *
 
 eval_operators = None
 
@@ -29,7 +30,7 @@ def parse_eval(to_parse, math_level=0, current_op=None, rek=0):
     while True:
         # make sure to break on parsing errors
         if to_parse.pos() == last_to_parse and mode == last_mode:
-            raise Exception('Error parsing eval(...) at')
+            raise ParseError(to_parse, 'Error parsing eval(...) at')
 
         last_to_parse = to_parse.pos()
         last_mode = mode

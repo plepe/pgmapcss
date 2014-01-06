@@ -1,4 +1,5 @@
 from .parse_string import parse_string
+from .ParseError import *
 
 def parse_condition(current, to_parse):
     condition = { 'op': '' }
@@ -14,7 +15,7 @@ def parse_condition(current, to_parse):
         condition['key'] = to_parse.match_group(1)
 
     else:
-        raise Exception('parse condition: Can\'t parse condition key')
+        raise ParseError(to_parse, 'parse condition: Can\'t parse condition key')
 
     if to_parse.match('(=~|!=|<|>|<=|>=|\^=|\$=|\*=|~=|=)'):
         condition['op'] += to_parse.match_group(1)
@@ -26,7 +27,7 @@ def parse_condition(current, to_parse):
         condition['value'] = r
 
         if not to_parse.match('\]'):
-            raise Exception('parse condition: expecting ]')
+            raise ParseError(to_parse, 'parse condition: expecting ]')
     else:
         m = to_parse.match('([^\]]*)\]')
         condition['value'] = to_parse.match_group(1)

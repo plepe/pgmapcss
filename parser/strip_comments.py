@@ -1,5 +1,6 @@
 import re
 from .parse_string import parse_string
+from .ParseError import *
 
 def strip_comments(to_parse):
     done = ''
@@ -42,7 +43,7 @@ def strip_comments(to_parse):
             s = parse_string(to_parse)
 
             if s == None:
-                raise Exception('striping comments: error parsing string')
+                raise ParseError(to_parse, 'striping comments: error parsing string')
 
             l = to_parse.pos() - p
 

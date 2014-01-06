@@ -1,8 +1,9 @@
 from .parse_value import parse_value
+from .ParseError import *
 
 def parse_properties(properties, to_parse):
     if not to_parse.match('\s*\{'):
-        raise Exception('Error parsing, expecting {')
+        raise ParseError(to_parse, 'Error parsing, expecting {')
 
     while to_parse.to_parse():
         current = {}
@@ -32,7 +33,7 @@ def parse_properties(properties, to_parse):
             current['key'] = to_parse.match_group(1)
 
         else:
-            raise Exception('Error parsing properties, expecing property or set statement')
+            raise ParseError(to_parse, 'Error parsing properties, expecing property or set statement')
 
         parse_value(current, to_parse)
 
