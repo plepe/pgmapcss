@@ -5,12 +5,14 @@ from .strip_comments import strip_comments
 import re
 
 def parse_file(stat, file, base_style=None):
-    content = ''
     if base_style:
-        content += open(base_style).read()
-    content += open(file).read()
-    stat['statements'] = []
-    stat['defines'] = {}
+        parse_file(stat, base_style)
+
+    if not 'statements' in stat:
+        stat['statements'] = []
+        stat['defines'] = {}
+
+    content = open(file).read()
 
     to_parse = strip_comments(content)
 
