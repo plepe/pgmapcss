@@ -28,8 +28,10 @@ def strip_comments(to_parse):
             if to_parse.match('//([^\n]*)\n'):
                 done += ' ' * (len(to_parse.match_group(0)) - 1) + '\n'
 
-            elif to_parse.match('/\*.*\*/'):
-                done += ' ' * len(to_parse.match_group(0))
+            elif to_parse.match('/\*'):
+                p = to_parse.to_parse().find('*/')
+                t = to_parse.wind(p + 2) # wind to end of comment
+                done += re.sub('.', ' ', t) # replace all characters but newline by space
 
             else:
                 done += c
