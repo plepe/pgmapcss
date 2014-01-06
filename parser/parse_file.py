@@ -21,10 +21,18 @@ def parse_file(stat, file, base_style=None):
         parse_defines(stat, f)
 
         selectors = []
-        parse_selectors(selectors, f)
+        try:
+            parse_selectors(selectors, f)
+        except Exception as e:
+            print(f.show_pos(message=str(e)))
+            return False
 
         properties = []
-        parse_properties(properties, f)
+        try:
+            parse_properties(properties, f)
+        except Exception as e:
+            print(f.show_pos(message=str(e)))
+            return False
 
         for i in selectors:
             stat['statements'].append({
@@ -32,4 +40,4 @@ def parse_file(stat, file, base_style=None):
                 'properties': properties
             })
 
-    return stat
+    return True
