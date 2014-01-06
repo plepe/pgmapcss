@@ -44,6 +44,10 @@ def init_db(db):
         db.execute(open('eval_functions/' + f).read())
     db.execute(open('src/pgmapcss_object.sql').read())
     db.execute(open('src/pgmapcss_render_context.sql').read())
+    db.execute(open('src/objects_osm2pgsql.sql').read())
+    db.execute(open('src/array_search.sql').read())
+    db.execute(open('src/natcasesort.sql').read())
+    db.execute(open('src/pgmapcss_to.sql').read())
 
 def install(style_id, style, db):
     db.execute(style['function_check'])
