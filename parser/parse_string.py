@@ -1,25 +1,23 @@
-import re
-
 parse_string_repl = { 'n': '\n' }
 
-def parse_string(content):
+def parse_string(to_parse):
     done = ''
     parsed = ''
     pos = 0
 
-    c = content[0]
-    if c != '"' and c != "'":
-        return [ None, content, None ]
+    if not to_parse.match('[\'"]'):
+        return None
 
-    pos = 1
+    c = to_parse.match_group(0)
     esc = False
     parsed += c
 
-    while pos < len(content):
-        parsed += content[pos]
+    while to_parse.to_parse():
+        next_char = to_parse.to_parse()[0]
+        to_parse.wind(1)
 
         if esc:
-            t = content[pos]
+            t = next_char
             esc = False
 
             if t in parse_string_repl:
@@ -28,13 +26,11 @@ def parse_string(content):
                 done += t
 
         else:
-            if content[pos] == '\\':
+            if next_char == '\\':
                 esc = True
-            elif content[pos] == c:
-                return [ done, content[pos + 1:], parsed ]
+            elif next_char == c:
+                return done
             else:
-                done += content[pos]
+                done += next_char
 
-        pos = pos + 1
-
-    return [ done, '', parsed ]
+    return done

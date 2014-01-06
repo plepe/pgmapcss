@@ -9,89 +9,64 @@ def parse_selector_part(current, to_parse, object_class_selector='\*|[a-z_]+'):
     current['max_scale'] = None
 
 # parse object class (way, node, canvas, ...)
-    m = re.match('\s*(' + object_class_selector + ')', to_parse)
-    if m:
-        if m.group(1) == '*':
+    if to_parse.match('\s*(' + object_class_selector + ')'):
+        if to_parse.match_group(1) == '*':
             current['type'] = True
         else:
-            current['type'] = m.group(1)
+            current['type'] = to_parse.match_group(1)
 
-        to_parse = to_parse[len(m.group(0)):]
     else:
         return None
 
 # parse classes
-    while re.match('\.([a-zA-Z0-9_]+)', to_parse):
-        m = re.match('\.([a-zA-Z0-9_]+)', to_parse)
-
+    while to_parse.match('\.([a-zA-Z0-9_]+)'):
         if 'classes' in current:
             pass
         else:
             current['classes'] = []
 
-        current['classes'].append(m.group(1))
+        current['classes'].append(to_parse.match_group(1))
 
-        current['conditions'].append({ 'op': 'has_tag', 'key': '.' + m.group(1) })
-
-        to_parse = to_parse[len(m.group(0)):]
+        current['conditions'].append({ 'op': 'has_tag', 'key': '.' + to_parse.match_group(1) })
 
 # parse zoom level
-    if re.match('\|z([0-9]*)(-?)([0-9]*)', to_parse):
-        m = re.match('\|z([0-9]*)(-?)([0-9]*)', to_parse)
+    if to_parse.match('\|z([0-9]*)(-?)([0-9]*)'):
+        if to_parse.match_group(1):
+            current['max_scale'] = max_scale_denominator / 2 ** (int(to_parse.match_group(1)) - 1)
 
-        if m.group(1):
-            current['max_scale'] = max_scale_denominator / 2 ** (int(m.group(1)) - 1)
+        if to_parse.match_group(1) and not to_parse.match_group(2):
+            current['min_scale'] = max_scale_denominator / 2 ** (int(to_parse.match_group(1)))
 
-        if m.group(1) and not m.group(2):
-            current['min_scale'] = max_scale_denominator / 2 ** (int(m.group(1)))
-
-        if m.group(3):
-            current['min_scale'] = max_scale_denominator / 2 ** (int(m.group(3)))
-
-        to_parse = to_parse[len(m.group(0)):]
+        if to_parse.match_group(3):
+            current['min_scale'] = max_scale_denominator / 2 ** (int(to_parse.match_group(3)))
 
 # parse conditions - TODO
-    while re.match('\[', to_parse):
-        to_parse = parse_condition(current, to_parse[1:])
+    while to_parse.match('\['):
+        parse_condition(current, to_parse)
 
 # parse pseudo classes
-    while re.match(':([a-zA-Z0-9_]+)', to_parse):
-        m = re.match(':([a-zA-Z0-9_]+)', to_parse)
-
+    while to_parse.match(':([a-zA-Z0-9_]+)'):
         if 'pseudo_classes' in current:
             pass
         else:
             current['pseudo_classes'] = []
 
-        current['pseudo_classes'].append(m.group(1))
-
-        to_parse = to_parse[len(m.group(0)):]
+        current['pseudo_classes'].append(to_parse.match_group(1))
 
 # parse pseudo element
-    while re.match('::(\(?)([a-zA-Z0-9_\*]+)(\)?)', to_parse):
-        m = re.match('::(\(?)([a-zA-Z0-9_\*]+)(\)?)', to_parse)
-
-        if m.group(1) and m.group(3):
+    while to_parse.match('::(\(?)([a-zA-Z0-9_\*]+)(\)?)'):
+        if to_parse.match_group(1) and to_parse.match_group(3):
             current['create_pseudo_element'] = False
 
-        current['pseudo_element'] = m.group(2)
-
-        to_parse = to_parse[len(m.group(0)):]
+        current['pseudo_element'] = to_parse.match_group(2)
 
     return to_parse
 
 def parse_selectors(selectors, to_parse):
     while True:
       current = {}
-      to_parse = parse_selector_part(current, to_parse)
+      parse_selector_part(current, to_parse)
       selectors.append(current)
 
-      if re.match('\s*,', to_parse):
-        m = re.match('\s*,', to_parse)
-
-        to_parse = to_parse[len(m.group(0)):]
-
-      else:
-        break
-
-    return to_parse
+      if not to_parse.match('\s*,'):
+        return

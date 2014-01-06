@@ -3,98 +3,72 @@ from .parse_string import parse_string
 from .parse_eval import parse_eval
 
 def parse_url(current, to_parse):
-    m = re.match('\s*url\(', to_parse)
-    if m:
-        to_parse = to_parse[len(m.group(0)):]
+    if to_parse.match('\s*url\('):
         s = parse_string(to_parse)
 
-        if s[0]:
-            to_parse = to_parse[len(s[2]):]
-            m1 = re.match('\s*\)\s*;', to_parse)
-            if m1:
-                to_parse = to_parse[len(m1.group(0)):]
-                current['value'] = s[0]
+        if s:
+            if to_parse.match('\s*\)\s*;'):
+                current['value'] = s
                 current['value_type'] = 'url'
-                return to_parse
+                return
 
         else:
-            m1 = re.match('([^\)]*)\);', to_parse)
-            if m1:
-                to_parse = to_parse[len(m1.group(0)):]
-                current['value'] = m.group(1)
+            if to_parse.match('([^\)]*)\);'):
+                current['value'] = to_parse.match_group(1)
                 current['value_type'] = 'url'
-                return to_parse
+                return
     else:
-        m = re.match('\s*([^;]*);', to_parse)
-        if m:
-            to_parse = to_parse[len(m.group(0)):]
-            current['value'] = m.group(1)
+        if to_parse.match('\s*([^;]*);'):
+            current['value'] = to_parse.match_group(1)
             current['value_type'] = 'url'
             return to_parse
 
 def parse_value(current, to_parse):
     # strip prepending whitespace
     while True:
-        m = re.match('\s+', to_parse)
-        if not m:
+        if not to_parse.match('\s+'):
             break;
-
-        to_parse = to_parse[len(m.group(0)):]
 
     # "..." or '...'
     s = parse_string(to_parse)
-    if s[0] is not None:
-        m = re.match('\s*;', s[1])
-        if m:
-            current['value'] = s[0]
+    if s is not None:
+        if to_parse.match('\s*;'):
+            current['value'] = s
             current['value_type'] = 'string'
-            return s[1][len(m.group(0)):]
+            return
 
     # eval( ... )
-    elif re.match('eval\s*\(\s*', to_parse):
-        m = re.match('eval\s*\(\s*', to_parse)
-        to_parse = to_parse[len(m.group(0)):]
-
+    elif to_parse.match('eval\s*\(\s*'):
         r = parse_string(to_parse)
-        if r[0]:
-            value = parse_eval(r[0])
-            to_parse = r[1]
+        if r:
+            value = parse_eval(r)
         else:
-            (value, to_parse) = parse_eval(to_parse)
+            value = parse_eval(to_parse)
 
-        m = re.match('\s*\)\s*;', to_parse)
-        if not m:
+        if not to_parse.match('\s*\)\s*;'):
             raise Exception('Error parsing eval statement')
-
-        to_parse = to_parse[len(m.group(0)):]
 
         current['value'] = value
         current['value_type'] = 'eval'
-        return to_parse
+        return
 
     # rgb(R, G, B)
-    elif re.match('rgb\s*\(', to_parse):
+    elif to_parse.match('rgb\s*\((.*)\)\s*;'):
         # TODO
-        m = re.match('rgb\s*\((.*)\)\s*;', to_parse)
-        if m:
-            current['value'] = m.group(1)
-            current['value_type'] = 'rgb'
-            return to_parse[len(m.group(0)):]
-        pass
+        current['value'] = to_parse.match_group(1)
+        current['value_type'] = 'rgb'
+        return
 
     # url( ... )
-    elif re.match('url\s*\(', to_parse):
+    elif to_parse.match('url\s*\(', wind=None):
         return parse_url(current, to_parse)
 
     # else
-    if re.match('\s*([^;]*)\s*;', to_parse):
-        m = re.match('\s*([^;]*)\s*;', to_parse)
+    if to_parse.match('\s*([^;]*)\s*;'):
         current['value_type'] = 'value';
-        current['value'] = m.group(1)
+        current['value'] = to_parse.match_group(1)
 
         if current['value'] == '':
             current['value'] = None
 
-        to_parse = to_parse[len(m.group(0)):]
-
-    return to_parse
+    return

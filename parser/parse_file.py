@@ -2,7 +2,7 @@ from .parse_defines import parse_defines
 from .parse_selectors import parse_selectors
 from .parse_properties import parse_properties
 from .strip_comments import strip_comments
-import re
+from .ParseFile import *
 
 def parse_file(stat, file, base_style=None):
     if base_style:
@@ -12,19 +12,19 @@ def parse_file(stat, file, base_style=None):
         stat['statements'] = []
         stat['defines'] = {}
 
-    content = open(file).read()
+    f = ParseFile(file)
 
-    to_parse = strip_comments(content)
+    f.set_content(strip_comments(f))
 
 # read statements until there's only whitespace left
-    while not re.match('\s*$', to_parse):
-        to_parse = parse_defines(stat, to_parse)
+    while not f.match('\s*$'):
+        parse_defines(stat, f)
 
         selectors = []
-        to_parse = parse_selectors(selectors, to_parse)
+        parse_selectors(selectors, f)
 
         properties = []
-        to_parse = parse_properties(properties, to_parse)
+        parse_properties(properties, f)
 
         for i in selectors:
             stat['statements'].append({

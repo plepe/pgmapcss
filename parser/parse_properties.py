@@ -1,52 +1,39 @@
-import re
 from .parse_value import parse_value
 
 def parse_properties(properties, to_parse):
-    if re.match('\s*\{', to_parse):
-        m = re.match('\s*\{', to_parse)
-        to_parse = to_parse[len(m.group(0)):]
+    if not to_parse.match('\s*\{'):
+        raise Exception('Error parsing, expecting {')
 
-    while to_parse:
+    while to_parse.to_parse():
         current = {}
 
-        if re.match('\s*([a-zA-Z0-9_\-]+)\s*:', to_parse):
-            m = re.match('\s*([a-zA-Z0-9_\-]+)\s*:', to_parse)
+        if to_parse.match('\s*([a-zA-Z0-9_\-]+)\s*:'):
             current['assignment_type'] = 'P'
-            current['key'] = m.group(1)
+            current['key'] = to_parse.match_group(1)
 
-            to_parse = to_parse[len(m.group(0)):]
-
-        elif re.match('\s*set\s+([a-zA-Z0-9_\-\.]+)\s*=', to_parse):
-            m = re.match('\s*set\s+([a-zA-Z0-9_\-\.]+)\s*=', to_parse)
+        elif to_parse.match('\s*set\s+([a-zA-Z0-9_\-\.]+)\s*='):
             current['assignment_type'] = 'T'
-            current['key'] = m.group(1)
+            current['key'] = to_parse.match_group(1)
 
-            to_parse = to_parse[len(m.group(0)):]
-
-        elif re.match('\s*set\s+([a-zA-Z0-9_\-\.]+)\s*;', to_parse):
-            m = re.match('\s*set\s+([a-zA-Z0-9_\-\.]+)\s*;', to_parse)
+        elif to_parse.match('\s*set\s+([a-zA-Z0-9_\-\.]+)\s*;'):
             current['assignment_type'] = 'T'
-            current['key'] = m.group(1)
+            current['key'] = to_parse.match_group(1)
 
-            to_parse = 'yes;' + to_parse[len(m.group(0)):]
+            to_parse.rewind('yes;')
 
-        elif re.match('\s*unset\s+([a-zA-Z0-9_\-\.]+)\s*;', to_parse):
-            m = re.match('\s*unset\s+([a-zA-Z0-9_\-\.]+)\s*;', to_parse)
+        elif to_parse.match('\s*unset\s+([a-zA-Z0-9_\-\.]+)\s*;'):
             current['assignment_type'] = 'T'
-            current['key'] = m.group(1)
+            current['key'] = to_parse.match_group(1)
 
-            to_parse = ';' + to_parse[len(m.group(0)):]
+            to_parse.rewind(';')
         else:
-# TODO: ERROR
-            pass
+            raise Exception('Error parsing properties, expecing property or set statement')
 
-        to_parse = parse_value(current, to_parse)
+        parse_value(current, to_parse)
 
         properties.append(current)
 
-        if re.match('\s*\}', to_parse):
-            m = re.match('\s*\}', to_parse)
-            to_parse = to_parse[len(m.group(0)):]
-            return to_parse
+        if to_parse.match('\s*\}'):
+            return
 
-    return to_parse
+    return

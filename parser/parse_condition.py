@@ -1,52 +1,37 @@
 from .parse_string import parse_string
-import re
 
 def parse_condition(current, to_parse):
     condition = { 'op': '' }
 
-    if re.match('!', to_parse):
-        to_parse = to_parse[1:]
+    if to_parse.match('!'):
         condition['op'] += '! '
 
     r = parse_string(to_parse)
-    if r[0]:
-        condition['key'] = r[0]
-        to_parse = r[1]
+    if r:
+        condition['key'] = r
 
-    elif re.match('([a-zA-Z_0-9\\-\.:]+)', to_parse):
-        m = re.match('([a-zA-Z_0-9\\-\.:]+)', to_parse)
-        condition['key'] = m.group(1)
-        to_parse = to_parse[len(m.group(1)):]
+    elif to_parse.match('([a-zA-Z_0-9\\-\.:]+)'):
+        condition['key'] = to_parse.match_group(1)
 
     else:
-        # TODO error?
-        pass
+        raise Exception('parse condition: Can\'t parse condition key')
 
-    m = re.match('(=~|!=|<|>|<=|>=|\^=|\$=|\*=|~=|=)', to_parse)
-    if m:
-        condition['op'] += m.group(1)
-        to_parse = to_parse[len(m.group(1)):]
+    if to_parse.match('(=~|!=|<|>|<=|>=|\^=|\$=|\*=|~=|=)'):
+        condition['op'] += to_parse.match_group(1)
     else:
         condition['op'] += 'has_tag'
 
     r = parse_string(to_parse)
-    if r[0]:
-        condition['value'] = r[0]
-        to_parse = r[1]
+    if r:
+        condition['value'] = r
 
-        if not re.match('\]', to_parse):
-            # TODO error
-            pass
-        else:
-            to_parse = to_parse[1:]
+        if not to_parse.match('\]'):
+            raise Exception('parse condition: expecting ]')
     else:
-        m = re.match('([^\]]*)\]', to_parse)
-        condition['value'] = m.group(1)
-        to_parse = to_parse[len(m.group(0)):]
+        m = to_parse.match('([^\]]*)\]')
+        condition['value'] = to_parse.match_group(1)
 
     if not 'conditions' in current:
         current['conditions'] = []
 
     current['conditions'].append(condition)
-
-    return to_parse
