@@ -67,7 +67,12 @@ def parse_value(current, to_parse):
     # else
     if to_parse.match('\s*([^;]*)\s*;'):
         current['value_type'] = 'value';
-        current['value'] = to_parse.match_group(1)
+        current['value'] = to_parse.match_group(1).strip()
+
+        m = re.match('(.*)(px|m|u)$', current['value'])
+        if m:
+            current['value'] = m.group(1)
+            current['unit'] = m.group(2)
 
         if current['value'] == '':
             current['value'] = None
