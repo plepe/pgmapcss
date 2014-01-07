@@ -2,6 +2,7 @@ import pghstore
 import re
 from compiler.stat import *
 import pg
+unresolvable_properties = set()
 
 def properties_values(key, stat):
     if key == 'final-casing-width':
@@ -11,7 +12,13 @@ def properties_values(key, stat):
             for casing_width in properties_values('casing-width', stat) \
         ]))
 
-    return stat_property_values(key, stat)
+    values = stat_property_values(key, stat)
+
+    if True in values:
+        values = { v for v in values if v is not True }
+        unresolvable_properties.add(key)
+
+    return values
 
 def tag_combinations(keys, stat, base={}):
     combinations_list = [base.copy()]
@@ -94,3 +101,6 @@ def process_mapnik(style_id, args, stat, db):
 
     f1.close()
     f2.close()
+
+    if len(unresolvable_properties):
+        print('WARNING: Not all values for the following properties could be guessed (e.g. as they are the result of an eval-expression, and therefore some features in the resulting image(s) may be missing: ' + ', '.join(unresolvable_properties))
