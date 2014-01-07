@@ -17,7 +17,7 @@ def parse_condition(current, to_parse):
     else:
         raise ParseError(to_parse, 'parse condition: Can\'t parse condition key')
 
-    if to_parse.match('(=~|!=|<|>|<=|>=|\^=|\$=|\*=|~=|=)'):
+    if to_parse.match('(=~|!=|<=|>=|<|>|\^=|\$=|\*=|~=|=)'):
         condition['op'] += to_parse.match_group(1)
     else:
         condition['op'] += 'has_tag'
