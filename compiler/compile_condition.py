@@ -1,20 +1,15 @@
 import pg
 import re
+from .compile_eval import compile_eval
 
 def compile_condition(condition, stat, prefix='current.', match_where=False):
     ret = ''
 
-    if not 'value_type' in condition:
-        condition['value_type'] = None
-    print(condition)
+    if condition['value_type'] == 'eval':
+        final_value = compile_eval(condition['value'])
 
-    if 'value' in condition:
-        if condition['value_type'] == 'eval':
-            pass # TODO
-        else:
-            final_value = pg.format(condition['value'])
     else:
-        final_value = None
+        final_value = pg.format(condition['value'])
 
     # when compiling for get_where()
     if match_where:
