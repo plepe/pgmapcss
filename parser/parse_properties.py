@@ -23,7 +23,7 @@ def parse_properties(properties, to_parse):
             to_parse.rewind('yes;')
 
         elif to_parse.match('\s*unset\s+([a-zA-Z0-9_\-\.]+)\s*;'):
-            current['assignment_type'] = 'T'
+            current['assignment_type'] = 'U'
             current['key'] = to_parse.match_group(1)
 
             to_parse.rewind(';')

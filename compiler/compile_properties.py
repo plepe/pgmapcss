@@ -29,6 +29,10 @@ def compile_properties(statement, stat):
                     'hstore(' + pg.format(prop['key']) + ', ' +\
                     c[1] + ');\n'
 
+        elif prop['assignment_type'] == 'U':
+            ret += print_props_and_tags(statement['current_pseudo_element'], to_set)
+            ret += 'current.tags = ' +\
+                'current.tags - ' + pg.format(prop['key']) + '::text;\n'
 
         elif prop['assignment_type'] == 'C':
             ret += print_props_and_tags(statement['current_pseudo_element'], to_set)
