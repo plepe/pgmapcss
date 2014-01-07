@@ -29,9 +29,8 @@ def parse_file(stat, file, base_style=None):
         parse_properties(properties, f)
 
         for i in selectors:
-            stat['statements'].append({
-                'selectors': i,
-                'properties': properties
-            })
+            statement = i.copy()
+            statement['properties'] = properties
+            stat['statements'].append(statement)
 
     return True

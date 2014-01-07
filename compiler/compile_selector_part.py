@@ -1,4 +1,4 @@
-from .compile_condition import compile_condition
+from .compile_conditions import compile_conditions
 
 def compile_selector_part(selector, stat, prefix='current.'):
     ret = []
@@ -16,10 +16,7 @@ def compile_selector_part(selector, stat, prefix='current.'):
     if ('pseudo_classes' in selector) and (len(selector['pseudo_classes']) > 0):
         ret.append('false')
 
-    for i in selector['conditions']:
-        c = compile_condition(i, stat, prefix=prefix)
-        if c:
-            ret.append(c)
+    ret.append(compile_conditions(selector['conditions'], stat, prefix=prefix))
 
     if len(ret) == 0:
         return 'true'

@@ -7,7 +7,7 @@ def compile_style(id, stat):
 
 # find list of pseudo elements
     stat['pseudo_elements'] = list(set(
-        [ (i['selectors']['pseudo_element']) for i in stat['statements'] ]
+        [ (i['selector']['pseudo_element']) for i in stat['statements'] ]
     ))
     ret['function_check'] = compile_function_check(id, stat)
     ret['function_get_where'] = compile_function_get_where(id, stat)

@@ -21,9 +21,9 @@ def get_where_selectors(max_scale, min_scale, stat):
         for w in v['properties']
         if ((w['key'] in style_element_properties and w['assignment_type'] == 'P') or
             w['assignment_type'] == 'C') and
-            v['selectors']['min_scale'] <= min_scale and
-            (v['selectors']['max_scale'] == None or v['selectors']['max_scale'] >= max_scale) and
-            not 'create_pseudo_element' in v['selectors']
+            v['selector']['min_scale'] <= min_scale and
+            (v['selector']['max_scale'] == None or v['selector']['max_scale'] >= max_scale) and
+            not 'create_pseudo_element' in v['selector']
     ]
 
     # TODO combine
@@ -38,8 +38,8 @@ def get_where_selectors(max_scale, min_scale, stat):
         )
         for i, v in enumerate(stat['statements'])
         for p in v['properties'] if p['assignment_type'] == 'T'
-        if v['selectors']['min_scale'] <= min_scale and
-            (v['selectors']['max_scale'] == None or v['selectors']['max_scale'] >= max_scale)
+        if v['selector']['min_scale'] <= min_scale and
+            (v['selector']['max_scale'] == None or v['selector']['max_scale'] >= max_scale)
     ]
 
     # assignments: map conditions which are based on a (possible) set-statement
@@ -48,16 +48,16 @@ def get_where_selectors(max_scale, min_scale, stat):
         j[2]
         for j in list_tag_assignments
         for i, v in enumerate(stat['statements'])
-        for s in v['selectors']['conditions']
+        for s in v['selector']['conditions']
         for w in v['properties']
         if ((w['key'] in style_element_properties and
             w['assignment_type'] == 'P') or
             w['assignment_type'] == 'C') and
             j[2] < i and s['key'] == j[0] and
             (j[1] == True or s['value'] == j[1]) and
-            v['selectors']['min_scale'] <= min_scale and
-            (v['selectors']['max_scale'] == None or v['selectors']['max_scale'] >= max_scale) and
-            not 'create_pseudo_element' in v['selectors']
+            v['selector']['min_scale'] <= min_scale and
+            (v['selector']['max_scale'] == None or v['selector']['max_scale'] >= max_scale) and
+            not 'create_pseudo_element' in v['selector']
     ]
 
     # uniq list
@@ -75,12 +75,12 @@ def compile_function_get_where(id, stat):
         # compile all selectors
         conditions = [
             (
-                stat['statements'][i]['selectors']['type'],
+                stat['statements'][i]['selector']['type'],
                 ' and '.join(
                     [ 'true' ] +
                     [
                         compile_condition(c, stat, prefix='', match_where=True) or 'true'
-                        for c in stat['statements'][i]['selectors']['conditions']
+                        for c in stat['statements'][i]['selector']['conditions']
                     ]
                 )
             )

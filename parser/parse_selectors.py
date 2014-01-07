@@ -1,8 +1,10 @@
 from .parse_condition import parse_condition
+from .ParseError import *
 import re
 
-def parse_selector_part(current, to_parse, object_class_selector='\*|[a-z_]+'):
+def parse_selector_part(to_parse, object_class_selector='\*|[a-z_]+'):
     max_scale_denominator = 3.93216e+08;
+    current = {}
     current['conditions']  = []
     current['pseudo_element'] = 'default'
     current['min_scale'] = 0
@@ -16,7 +18,7 @@ def parse_selector_part(current, to_parse, object_class_selector='\*|[a-z_]+'):
             current['type'] = to_parse.match_group(1)
 
     else:
-        return None
+        raise ParseError(to_parse, 'Can\'t parse object class')
 
 # parse classes
     while to_parse.match('\.([a-zA-Z0-9_]+)'):
@@ -60,13 +62,43 @@ def parse_selector_part(current, to_parse, object_class_selector='\*|[a-z_]+'):
 
         current['pseudo_element'] = to_parse.match_group(2)
 
-    return to_parse
+    return current
 
 def parse_selectors(selectors, to_parse):
     while True:
-      current = {}
-      parse_selector_part(current, to_parse)
-      selectors.append(current)
+        selector = {}
+        selectors.append(selector)
 
-      if not to_parse.match('\s*,'):
-        return
+        sel1 = parse_selector_part(to_parse)
+        sel2 = None
+        sel3 = None
+
+        try:
+            sel2 = parse_selector_part(to_parse, '>|<|near')
+        except ParseError:
+            pass
+
+        try:
+            sel3 = parse_selector_part(to_parse)
+        except ParseError:
+            if sel2: # if a link selector exists we need a 3rd selector
+                raise
+
+        if sel1 and sel2 and sel3:
+            selector['parent_selector'] = sel1
+            selector['link_selector'] = sel2
+            selector['selector'] = sel3
+
+        elif sel1 and not sel2 and sel3:
+            selector['parent_selector'] = sel1
+            selector['link_selector'] = {
+                'type': '',
+                'conditions': []
+            }
+            selector['selector'] = sel3
+
+        else:
+            selector['selector'] = sel1
+
+        if not to_parse.match('\s*,'):
+          return
