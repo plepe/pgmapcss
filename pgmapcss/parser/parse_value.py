@@ -69,7 +69,7 @@ def parse_value(current, to_parse):
                 values[i] = float(v)
                 if values[i] < 0.0 or values[i] > 1.0:
                     raise ParseError(to_parse, 'Error parsing rgb() value, value {} out of range (0.0..1.0)'.format(v))
-                values[i] = round(v * 255)
+                values[i] = round(values[i] * 255)
 
             elif re.match('\s*([0-9]+(\.[0-9]+)?)%\s*$', v): # percentage: 0%..100%
                 m = re.match('\s*([0-9]+(\.[0-9]+)?)%\s*$', v)
