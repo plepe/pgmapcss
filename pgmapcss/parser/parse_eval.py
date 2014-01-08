@@ -19,7 +19,9 @@ def parse_eval(to_parse, math_level=0, current_op=None, rek=0):
     if eval_operators == None:
         read_eval_operators()
 
-    eval_op_regexp = '(' + '|'.join([re.sub(r'([\?\.\+\*\^\$\|\\])', r'\\\1', k) for k in eval_operators]) + ')'
+    # sort eval_operators by length desc (so that e.g. > does not match >=)
+    ops = sorted([ k for k in eval_operators ], key=len, reverse=True)
+    eval_op_regexp = '(' + '|'.join([re.sub(r'([\?\.\+\*\^\$\|\\])', r'\\\1', k) for k in ops]) + ')'
     current = ''
     current_result = []
     mode = 0
