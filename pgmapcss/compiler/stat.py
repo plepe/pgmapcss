@@ -35,7 +35,7 @@ def stat_property_values(prop, stat, include_illegal_values=False):
         allowed_values = stat['defines']['values'][prop]['value'].split(';')
 
         if True in values:
-            values = values + allowed_values
+            values = values.union(allowed_values)
 
         values = {
             v if v in allowed_values else allowed_values[0]
