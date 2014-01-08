@@ -54,7 +54,7 @@ def get_where_selectors(max_scale, min_scale, stat):
             w['assignment_type'] == 'P') or
             w['assignment_type'] == 'C') and
             j[2] < i and s['key'] == j[0] and
-            (j[1] == True or s['value'] == j[1]) and
+            (j[1] == True or not 'value' in s or s['value'] == j[1]) and
             v['selector']['min_scale'] <= min_scale and
             (v['selector']['max_scale'] == None or v['selector']['max_scale'] >= max_scale) and
             not 'create_pseudo_element' in v['selector']

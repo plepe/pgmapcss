@@ -4,11 +4,12 @@ from .compile_eval import compile_eval
 
 def compile_condition(condition, stat, prefix='current.', match_where=False):
     ret = ''
+    final_value = None
 
-    if condition['value_type'] == 'eval':
+    if 'value_type' in condition and condition['value_type'] == 'eval':
         final_value = compile_eval(condition['value'])
 
-    else:
+    elif 'value' in condition:
         final_value = db.format(condition['value'])
 
     # when compiling for get_where()
