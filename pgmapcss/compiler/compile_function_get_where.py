@@ -1,4 +1,4 @@
-import pg
+import pgmapcss.db as db
 from .stat import *
 from .compile_condition import compile_condition
 
@@ -114,7 +114,7 @@ def compile_function_get_where(id, stat):
 
         ret += \
             ' render_context.scale_denominator >= ' + str(min_scale) + ' then\n' +\
-            '    return ' + pg.format(conditions) + ';\n'
+            '    return ' + db.format(conditions) + ';\n'
 
     ret += '  end if;\n\n'
 

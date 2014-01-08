@@ -1,4 +1,4 @@
-import pg
+import pgmapcss.db as db
 from .compile_eval import compile_eval
 
 def compile_value(prop, stat):
@@ -13,7 +13,7 @@ def compile_value(prop, stat):
         prop['assignment_type'] == 'P' and \
         'type' in stat['defines'] and \
         prop['key'] in stat['defines']['type']:
-        return None, '(current.tags)->' + pg.format(prop['value'])
+        return None, '(current.tags)->' + db.format(prop['value'])
 
     else:
-        return prop['value'], pg.format(prop['value'])
+        return prop['value'], db.format(prop['value'])

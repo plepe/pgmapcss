@@ -1,9 +1,16 @@
 import re
+import os
+import pgmapcss.mapnik
 
 class ParseFile():
     def __init__(self, filename):
         self._filename = filename
-        self._content = open(filename).read()
+
+        if os.path.exists(filename):
+            self._content = open(filename).read()
+        else:
+            self._content = pgmapcss.mapnik.get_base_style(filename)
+
         self._original_content = self._content
         self._to_parse = self._content
 

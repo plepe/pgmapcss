@@ -2,13 +2,11 @@
 import sys
 import re
 import pprint
-from parser.parse_file import *
-from parser.ParseError import *
-from compiler.compile_style import *
-from mapnik.process_mapnik import *
+import pgmapcss.parser
+import pgmapcss.compiler
 import argparse
 import getpass
-import db
+import pgmapcss.db
 import os
 
 parser = argparse.ArgumentParser(description='Compiles a MapCSS style description into PostgreSQL functions and builds an accompanying Mapnik stylesheet.')
@@ -39,50 +37,32 @@ parser.add_argument('-t', '--template', dest='base_style',
     required=True,
     help='mapcss/mapnik base style for the correct mapnik version, e.g. "mapnik-2.0"')
 
-def init_db(db):
-    db.execute(open('src/pgmapcss_types.sql').read())
-
-    for f in os.listdir('eval_functions/'):
-        db.execute(open('eval_functions/' + f).read())
-    db.execute(open('src/pgmapcss_object.sql').read())
-    db.execute(open('src/pgmapcss_render_context.sql').read())
-    db.execute(open('src/objects_osm2pgsql.sql').read())
-    db.execute(open('src/array_search.sql').read())
-    db.execute(open('src/natcasesort.sql').read())
-    db.execute(open('src/pgmapcss_to.sql').read())
-
-def install(style_id, style, db):
-    db.execute(style['function_check'])
-    db.execute(style['function_get_where'])
-    db.execute(style['function_match'])
-
-if __name__ == '__main__':
+def main():
     args = parser.parse_args()
 
     style_id = args.style_id
     file_name = style_id + '.mapcss'
 
-    db = db.connect(args)
+    conn = pgmapcss.db.connect(args)
 
-    init_db(db)
+    pgmapcss.db.init_db(conn)
 
     stat = {}
 
-    base_style = 'mapnik/' + args.base_style + '.mapcss'
     try:
-        parse_file(stat, file=file_name, base_style=base_style)
-    except ParseError as e:
+        pgmapcss.parser.parse_file(stat, file=file_name, base_style=args.base_style)
+    except pgmapcss.parser.ParseError as e:
         print(e)
         sys.exit(1)
 
     pp = pprint.PrettyPrinter()
     pp.pprint(stat)
 
-    style = compile_style(style_id, stat)
+    style = pgmapcss.compiler.compile_style(style_id, stat)
 
     #pp.pprint(style)
     for i in style:
         print("***** " + i + " *****\n" + style[i])
 
-    install(style_id, style, db)
-    process_mapnik(style_id, args, stat, db)
+    pgmapcss.db.install(style_id, style, conn)
+    pgmapcss.mapnik.process_mapnik(style_id, args, stat, conn)

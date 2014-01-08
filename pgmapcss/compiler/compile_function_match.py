@@ -1,9 +1,9 @@
-import pg
+import pgmapcss.db as db
 
 def compile_function_match(id, stat):
     replacement = {
       'style_id': id,
-      'style_element_property': pg.format({
+      'style_element_property': db.format({
           k: '{' + ','.join(v['value'].split(';')) + '}'
           for k, v in stat['defines']['style_element_property'].items()
       })

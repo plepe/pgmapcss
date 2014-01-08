@@ -1,5 +1,4 @@
-import pg
-import db
+import pgmapcss.db as db
 import re
 eval_param = ', object, current, render_context'
 
@@ -15,7 +14,7 @@ def compile_eval(value):
 
     if type(value) == str:
         if value[0:2] == 'v:':
-            return pg.format(value[2:])
+            return db.format(value[2:])
         elif value[0:2] == 'f:':
             return 'eval_' + valid_func_name(value[2:]) + '(\'{}\'' + eval_param + ')'
         else:

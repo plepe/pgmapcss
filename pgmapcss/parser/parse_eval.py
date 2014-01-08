@@ -1,5 +1,5 @@
 import re
-import db
+import pgmapcss.db
 from .parse_string import parse_string
 from .ParseError import *
 
@@ -9,7 +9,7 @@ def read_eval_operators():
     global eval_operators
     eval_operators = {}
 
-    conn = db.connection()
+    conn = pgmapcss.db.connection()
     res = conn.prepare('select * from eval_operators')
 
     for elem in res():

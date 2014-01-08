@@ -1,7 +1,8 @@
 import pghstore
 import re
-from compiler.stat import *
-import pg
+from pgmapcss.compiler.stat import *
+from pkg_resources import *
+import pgmapcss.db as db
 unresolvable_properties = set()
 
 def properties_values(key, stat):
@@ -41,6 +42,7 @@ def process(f1, replacement, stat, rek=0):
 
     while True:
         r = f1.readline()
+        r = r.decode('utf-8')
 
         if not r:
             break;
@@ -55,6 +57,7 @@ def process(f1, replacement, stat, rek=0):
             if len(combinations_list) == 0:
                 while(True):
                     r = f1.readline()
+                    r = r.decode('utf-8')
                     if re.match('# END', r):
                         break;
 
@@ -70,8 +73,8 @@ def process(f1, replacement, stat, rek=0):
 
     return text
 
-def process_mapnik(style_id, args, stat, db):
-    f1 = open('mapnik/' + args.base_style + '.mapnik', 'r')
+def process_mapnik(style_id, args, stat, conn):
+    f1 = resource_stream(__name__, args.base_style + '.mapnik')
     f2 = open(style_id + '.mapnik', 'w')
 
     replacement = {
@@ -83,7 +86,7 @@ def process_mapnik(style_id, args, stat, db):
     }
 
     replacement['columns'] = ', '.join([
-        'properties->' + pg.format(prop) + ' as ' + pg.ident(prop)
+        'properties->' + db.format(prop) + ' as ' + db.ident(prop)
         for prop in stat_properties(stat)
     ])
 

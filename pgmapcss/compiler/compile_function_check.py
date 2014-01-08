@@ -1,7 +1,7 @@
 from .compile_statement import compile_statement
 from .compile_eval import compile_eval
 from .stat import *
-import pg
+import pgmapcss.db as db
 
 def print_checks(prop, stat, main_prop=None):
     ret = ''
@@ -9,10 +9,10 @@ def print_checks(prop, stat, main_prop=None):
     # @default_other
     if 'default_other' in stat['defines'] and prop in stat['defines']['default_other']:
         other = stat['defines']['default_other'][prop]['value']
-        ret += 'if (current.styles[r.i]->' + pg.format(prop) + ') is null ' +\
+        ret += 'if (current.styles[r.i]->' + db.format(prop) + ') is null ' +\
             'then current.styles[r.i] := current.styles[r.i] || hstore(' +\
-            pg.format(prop) + ', current.styles[r.i]->' +\
-            pg.format(other) + '); end if;\n'
+            db.format(prop) + ', current.styles[r.i]->' +\
+            db.format(other) + '); end if;\n'
 
     # @values
     if 'values' in stat['defines'] and prop in stat['defines']['values']:
@@ -24,18 +24,18 @@ def print_checks(prop, stat, main_prop=None):
         # allowed value
         if len([ v for v in used_values if not v in values ]):
             ret += 'if not (current.styles[r.i]->' +\
-                pg.format(prop) + ') = any(' +\
-                pg.format(values) + ') then ' +\
+                db.format(prop) + ') = any(' +\
+                db.format(values) + ') then ' +\
                 'current.styles[r.i] := current.styles[r.i] || hstore(' +\
-                pg.format(prop) + ', ' +\
-                pg.format(values[0]) + '); end if;\n';
+                db.format(prop) + ', ' +\
+                db.format(values[0]) + '); end if;\n';
 
     return ret
 
 def compile_function_check(id, stat):
     replacement = {
       'style_id': id,
-      'pseudo_elements': pg.format(stat['pseudo_elements']),
+      'pseudo_elements': db.format(stat['pseudo_elements']),
       'count_pseudo_elements': len(stat['pseudo_elements'])
     }
 
@@ -89,7 +89,7 @@ begin
             done_prop.append(prop)
 
         if r != '':
-            ret += '      if current.styles[r.i] ? ' + pg.format(main_prop) + ' then\n'
+            ret += '      if current.styles[r.i] ? ' + db.format(main_prop) + ' then\n'
             ret += r
             ret += '      end if;\n'
 
@@ -98,7 +98,7 @@ begin
 
     # postprocess requested properties (see @postprocess)
     for k, v in stat['defines']['postprocess'].items():
-        ret += '      current.styles[r.i] := current.styles[r.i] || hstore(' + pg.format(k) + ', ' + compile_eval(v['value']) + ');\n'
+        ret += '      current.styles[r.i] := current.styles[r.i] || hstore(' + db.format(k) + ', ' + compile_eval(v['value']) + ');\n'
 
     ret += '''
       ret.geo=current.styles[r.i]->'geo';

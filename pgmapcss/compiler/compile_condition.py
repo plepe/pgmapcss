@@ -1,4 +1,4 @@
-import pg
+import pgmapcss.db as db
 import re
 from .compile_eval import compile_eval
 
@@ -9,7 +9,7 @@ def compile_condition(condition, stat, prefix='current.', match_where=False):
         final_value = compile_eval(condition['value'])
 
     else:
-        final_value = pg.format(condition['value'])
+        final_value = db.format(condition['value'])
 
     # when compiling for get_where()
     if match_where:
@@ -25,7 +25,7 @@ def compile_condition(condition, stat, prefix='current.', match_where=False):
 
           # treat other conditions as has_key
           else:
-            return prefix + 'tags ? ' + pg.format(condition['key']);
+            return prefix + 'tags ? ' + db.format(condition['key']);
 
     # !
     if condition['op'][0:2] == '! ':
@@ -35,44 +35,44 @@ def compile_condition(condition, stat, prefix='current.', match_where=False):
 
     # has_tag
     if condition['op'] == 'has_tag':
-        ret += prefix + 'tags ? ' + pg.format(condition['key'])
+        ret += prefix + 'tags ? ' + db.format(condition['key'])
 
     # =
     elif condition['op'] == '=':
         if condition['value_type'] == None:
-            ret += prefix + 'tags @> ' + pg.format({ condition['key']: condition['value'] })
+            ret += prefix + 'tags @> ' + db.format({ condition['key']: condition['value'] })
         else:
-            ret += prefix + 'tags->' + pg.format(condition['key']) + ' = ' + final_value
+            ret += prefix + 'tags->' + db.format(condition['key']) + ' = ' + final_value
 
     # !=
     elif condition['op'] == '!=':
         if condition['value_type'] == None:
-            ret += 'not ' + prefix + 'tags @> ' + pg.format({ condition['key']: condition['value'] })
+            ret += 'not ' + prefix + 'tags @> ' + db.format({ condition['key']: condition['value'] })
         else:
-            ret += prefix + 'tags->' + pg.format(condition['key']) + ' != ' + final_value
+            ret += prefix + 'tags->' + db.format(condition['key']) + ' != ' + final_value
 
     # < > <= >=
     elif condition['op'] in ('<', '>', '<=', '>='):
         if condition['value_type'] == None:
-            ret += 'pgmapcss_to_float(' + prefix + 'tags->' + pg.format(condition['key']) + ') ' + condition['op'] + ' ' + final_value;
+            ret += 'pgmapcss_to_float(' + prefix + 'tags->' + db.format(condition['key']) + ') ' + condition['op'] + ' ' + final_value;
         else:
-            ret += 'pgmapcss_to_float(' + prefix + 'tags->' + pg.format(condition['key']) + ') ' + condition['op'] + ' pgmapcss_to_float(' + final_value + ')';
+            ret += 'pgmapcss_to_float(' + prefix + 'tags->' + db.format(condition['key']) + ') ' + condition['op'] + ' pgmapcss_to_float(' + final_value + ')';
 
     # ^=
     elif condition['op'] == '^=':
-        ret += prefix + 'tags->' + pg.format(condition['key']) + ' similar to (' + final_value + ' || \'%\')';
+        ret += prefix + 'tags->' + db.format(condition['key']) + ' similar to (' + final_value + ' || \'%\')';
 
     # $=
     elif condition['op'] == '$=':
-        ret += prefix + 'tags->' + pg.format(condition['key']) + ' similar to (\'%\' || ' + final_value + ')';
+        ret += prefix + 'tags->' + db.format(condition['key']) + ' similar to (\'%\' || ' + final_value + ')';
 
     # *=
     elif condition['op'] == '*=':
-        ret += prefix + 'tags->' + pg.format(condition['key']) + ' similar to (\'%\' || ' + final_value + ' || \'%\')';
+        ret += prefix + 'tags->' + db.format(condition['key']) + ' similar to (\'%\' || ' + final_value + ' || \'%\')';
 
     # ~=
     elif condition['op'] == '~=':
-        ret += final_value + ' = any(string_to_array(' + prefix + 'tags->' + pg.format(condition['key']) + ', \';\'))';
+        ret += final_value + ' = any(string_to_array(' + prefix + 'tags->' + db.format(condition['key']) + ', \';\'))';
 
     # =~
     elif condition['op'] == '=~':
@@ -88,7 +88,7 @@ def compile_condition(condition, stat, prefix='current.', match_where=False):
             condition['value'] = m.group(1)
             condition['op'] = '~*'
 
-        ret += prefix + 'tags->' + pg.format(condition['key']) + ' ' + condition['op'] + ' ' + pg.format(condition['value'])
+        ret += prefix + 'tags->' + db.format(condition['key']) + ' ' + condition['op'] + ' ' + db.format(condition['value'])
 
     # unknown operator?
     else:

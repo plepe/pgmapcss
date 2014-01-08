@@ -1,4 +1,4 @@
-import pg
+import pgmapcss.db as db
 from .compile_eval import compile_eval
 from .compile_value import compile_value
 
@@ -15,7 +15,7 @@ def compile_properties(statement, stat):
                 ret += print_props_and_tags(statement['current_pseudo_element'], to_set)
                 ret += 'current.styles[' + statement['current_pseudo_element'] + '] = ' +\
                     'current.styles[' + statement['current_pseudo_element'] + '] || ' +\
-                    'hstore(' + pg.format(prop['key']) + ', ' +\
+                    'hstore(' + db.format(prop['key']) + ', ' +\
                     c[1] + ');\n'
 
         elif prop['assignment_type'] == 'T':
@@ -26,17 +26,17 @@ def compile_properties(statement, stat):
                 ret += print_props_and_tags(statement['current_pseudo_element'], to_set)
                 ret += 'current.tags = ' +\
                     'current.tags || ' +\
-                    'hstore(' + pg.format(prop['key']) + ', ' +\
+                    'hstore(' + db.format(prop['key']) + ', ' +\
                     c[1] + ');\n'
 
         elif prop['assignment_type'] == 'U':
             ret += print_props_and_tags(statement['current_pseudo_element'], to_set)
             ret += 'current.tags = ' +\
-                'current.tags - ' + pg.format(prop['key']) + '::text;\n'
+                'current.tags - ' + db.format(prop['key']) + '::text;\n'
 
         elif prop['assignment_type'] == 'C':
             ret += print_props_and_tags(statement['current_pseudo_element'], to_set)
-            ret += 'return query select object.id, current.tags, current.styles[' + statement['current_pseudo_element'] + ']->\'geo\', object.types, null::text, null::hstore, null::text, ' + pg.format(prop['key']) + '::text, ' + compile_value(prop, stat)[1] + ';\n';
+            ret += 'return query select object.id, current.tags, current.styles[' + statement['current_pseudo_element'] + ']->\'geo\', object.types, null::text, null::hstore, null::text, ' + db.format(prop['key']) + '::text, ' + compile_value(prop, stat)[1] + ';\n';
 
     ret += print_props_and_tags(statement['current_pseudo_element'], to_set)
 
@@ -48,12 +48,12 @@ def print_props_and_tags(current_pseudo_element, to_set):
   if len(to_set['prop']):
       ret += 'current.styles[' + current_pseudo_element + '] = ' +\
           'current.styles[' + current_pseudo_element + '] || ' +\
-          pg.format(to_set['prop']) + ';\n'
+          db.format(to_set['prop']) + ';\n'
       to_set['prop'].clear()
 
   if len(to_set['tags']):
       ret += 'current.tags = current.tags || ' +\
-          pg.format(to_set['tags']) + ';\n'
+          db.format(to_set['tags']) + ';\n'
       to_set['tags'].clear()
 
   return ret

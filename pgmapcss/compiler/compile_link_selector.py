@@ -1,6 +1,6 @@
 from .compile_selector_part import compile_selector_part
 from .compile_conditions import compile_conditions
-import pg
+import pgmapcss.db as db
 
 def compile_link_selector(statement, stat):
     if statement['link_selector']['type'] in ('>', ''):
@@ -23,8 +23,8 @@ def compile_link_selector(statement, stat):
                 distance = r['value']
 
         return 'select * from ' +\
-            'objects_near(' + pg.format(distance) + ', object, current, render_context, ' +\
-            pg.format({
+            'objects_near(' + db.format(distance) + ', object, current, render_context, ' +\
+            db.format({
                 statement['parent_selector']['type']: compile_conditions(statement['parent_selector']['conditions'], stat)
             }) + ')'
 
