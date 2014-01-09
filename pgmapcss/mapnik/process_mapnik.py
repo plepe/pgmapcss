@@ -104,5 +104,7 @@ def process_mapnik(style_id, args, stat, conn):
     f1.close()
     f2.close()
 
+    print('File ' + style_id + '.mapnik successfully written.')
+
     if len(unresolvable_properties):
         print('WARNING: Not all values for the following properties could be guessed (e.g. as they are the result of an eval-expression, and therefore some features in the resulting image(s) may be missing: ' + ', '.join(unresolvable_properties))
