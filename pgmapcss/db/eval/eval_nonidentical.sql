@@ -1,5 +1,3 @@
-insert into eval_operators values ('!==', 'nonidentical', 7);
-insert into eval_operators values ('ne', 'nonidentical', 7);
 create or replace function eval_nonidentical(param text[],
   object pgmapcss_object, current pgmapcss_current, render_context pgmapcss_render_context)
 returns text

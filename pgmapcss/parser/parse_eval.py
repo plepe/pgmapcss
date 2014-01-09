@@ -2,18 +2,20 @@ import re
 import pgmapcss.db
 from .parse_string import parse_string
 from .ParseError import *
+import pgmapcss.db.eval
 
 eval_operators = None
 
 def read_eval_operators():
     global eval_operators
-    eval_operators = {}
+    eval_functions = pgmapcss.db.eval.load()
 
-    conn = pgmapcss.db.connection()
-    res = conn.prepare('select * from eval_operators')
-
-    for elem in res():
-        eval_operators[elem['op']] = elem
+    eval_operators = {
+        op: { 'op': op, 'math_level': v['math_level'] }
+        for k, v in eval_functions.items()
+        if 'op' in v
+        for op in v['op']
+    }
 
 def parse_eval(to_parse, math_level=0, current_op=None, rek=0):
     if eval_operators == None:

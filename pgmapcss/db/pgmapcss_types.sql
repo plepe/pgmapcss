@@ -45,11 +45,3 @@ create type pgmapcss_result as (
   combine_type		text,
   combine_id		text
 );
-
-drop table if exists eval_operators;
-create table eval_operators (
-  op		text		not null,
-  func		text		not null,
-  math_level	int		not null default 0,
-  primary key(op)
-);
