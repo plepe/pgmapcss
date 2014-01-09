@@ -1,5 +1,6 @@
 import pgmapcss.db as db
 import re
+import pgmapcss.db.eval
 eval_param = ', object, current, render_context'
 
 def valid_func_name(func):
@@ -39,12 +40,9 @@ def compile_eval(value):
     elif value[0][0:2] == 'f:':
         func = value[0][2:]
 
-    if func == 'cond':
-        ret = '(CASE WHEN eval_boolean(Array[' + param[0] + ']' + eval_param + ') = \'true\' THEN ' + param[1]
-        if len(param) > 2:
-            ret += ' ELSE ' + param[2]
-        ret += ' END)'
-        return ret
+    eval_functions = pgmapcss.db.eval.load().list()
+    if func in eval_functions and 'compiler' in eval_functions[func]:
+        return eval_functions[func]['compiler'](func, param, eval_param)
 
     else:
         return 'eval_' + valid_func_name(func) + '(Array[' + ', '.join(param) + ']::text[]' + eval_param + ')'

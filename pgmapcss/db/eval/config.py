@@ -1,11 +1,18 @@
 from .functions import Functions
 import pgmapcss.db
 
-eval_functions = {}
+eval_functions = None
+
+def compile_cond(func, param, eval_param):
+    ret = '(CASE WHEN eval_boolean(Array[' + param[0] + ']' + eval_param + ') = \'true\' THEN ' + param[1]
+    if len(param) > 2:
+        ret += ' ELSE ' + param[2]
+    ret += ' END)'
+    return ret
 
 def load():
     global eval_functions
-    if len(eval_functions) > 0:
+    if eval_functions:
         return eval_functions
 
     eval_functions = Functions()
@@ -27,6 +34,7 @@ def load():
     eval_functions.register('not', op='!', math_level=2)
     eval_functions.register('or', op='||', math_level=1)
     eval_functions.register('sub', op='-', math_level=1)
+    eval_functions.register('cond', compiler=compile_cond)
 
     conn = pgmapcss.db.connection()
     res = conn.prepare("select proname from pg_catalog.pg_namespace n join pg_catalog.pg_proc p on pronamespace = n.oid where nspname = any (current_schemas(false)) and proname similar to 'eval_%'")()
