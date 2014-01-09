@@ -17,10 +17,16 @@ def parse_file(stat, file, base_style=None):
     f.set_content(strip_comments(f))
 
 # read statements until there's only whitespace left
-    while not f.match('\s*$'):
-        r = parse_defines(stat, f)
-        if r and r[0] == 'import':
-            parse_file(stat, r[1])
+    while True:
+        while True:
+            r = parse_defines(stat, f)
+            if not r:
+                break;
+            elif r and r[0] == 'import':
+                parse_file(stat, r[1])
+
+        if f.match('\s*$'):
+            return True
 
         selectors = []
         parse_selectors(selectors, f)
@@ -32,5 +38,3 @@ def parse_file(stat, file, base_style=None):
             statement = i.copy()
             statement['properties'] = properties
             stat['statements'].append(statement)
-
-    return True
