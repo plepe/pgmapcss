@@ -8,7 +8,7 @@ unresolvable_properties = set()
 def properties_values(key, stat):
     if key == 'final-casing-width':
         # build unique list of all width / casing-width combinations
-        return list(set([ str(float(width or '0') + 2 * float(casing_width or '0')) \
+        return list(set([ '%g' % (float(width or '0') + 2 * float(casing_width or '0')) \
             for width in properties_values('width', stat) \
             for casing_width in properties_values('casing-width', stat) \
         ]))
