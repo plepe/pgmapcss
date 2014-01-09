@@ -45,6 +45,11 @@ def main():
     args = parser.parse_args()
 
     style_id = args.style_id
+
+    m = re.match('(.*)\.mapcss$', style_id)
+    if m:
+        style_id = m.group(1)
+
     file_name = style_id + '.mapcss'
 
     conn = pgmapcss.db.connect(args)
