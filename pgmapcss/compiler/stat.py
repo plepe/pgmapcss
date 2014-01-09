@@ -28,6 +28,11 @@ def stat_property_values(prop, stat, include_illegal_values=False):
         if p['assignment_type'] == 'P' and p['key'] == prop
     }
 
+    if 'default_other' in stat['defines'] and prop in stat['defines']['default_other']:
+        other = stat['defines']['default_other'][prop]['value']
+        other = stat_property_values(other, stat, include_illegal_values)
+        values = values.union(other)
+
     if include_illegal_values:
         return values
 
