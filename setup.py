@@ -15,4 +15,8 @@ setup(
         'pgmapcss.mapnik': [ '*.mapcss', '*.mapnik' ]
     },
     scripts = [ 'bin/pgmapcss' ],
+    install_requires = [
+      "pghstore",
+      "py-postgresql",
+    ]
 )
