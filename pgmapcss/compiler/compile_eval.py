@@ -13,6 +13,8 @@ def valid_func_name(func):
 def compile_eval(value):
     global eval_param
 
+    eval_functions = pgmapcss.db.eval.load().list()
+
     if type(value) == str:
         if value[0:2] == 'v:':
             return db.format(value[2:])
@@ -31,16 +33,11 @@ def compile_eval(value):
 
     if value[0][0:2] == 'o:':
         conn = db.connection()
-        res = conn.prepare('select * from eval_operators where op = $1')
-        result = res(value[0][2:])
-        if not len(result):
-            raise Exception('compiling eval: unknown operator ' + result[0][2:])
-        func = result[0]['func']
+        func = [ k for k, v in eval_functions.items() if 'op' in v and value[0][2:] in v['op'] ][0]
 
     elif value[0][0:2] == 'f:':
         func = value[0][2:]
 
-    eval_functions = pgmapcss.db.eval.load().list()
     if func in eval_functions and 'compiler' in eval_functions[func]:
         return eval_functions[func]['compiler'](func, param, eval_param)
 
