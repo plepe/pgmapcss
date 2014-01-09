@@ -82,14 +82,21 @@ def main():
         print(e)
         sys.exit(1)
 
+    debug = open(style_id + '.output', 'w')
+
     pp = pprint.PrettyPrinter()
-    pp.pprint(stat)
+
+    debug.write("***** Structure of parsed MapCSS style *****\n")
+    debug.write(pp.pformat(stat) + '\n')
 
     style = pgmapcss.compiler.compile_style(style_id, stat)
 
     #pp.pprint(style)
     for i in style:
-        print("***** " + i + " *****\n" + style[i])
+        debug.write("\n***** " + i + " *****\n" + style[i])
 
     pgmapcss.db.install(style_id, style, conn)
     pgmapcss.mapnik.process_mapnik(style_id, args, stat, conn)
+
+    debug.close()
+    print('Debug output wrote to ' + style_id + '.output')
