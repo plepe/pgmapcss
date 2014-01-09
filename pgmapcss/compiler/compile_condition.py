@@ -30,7 +30,6 @@ def compile_condition(condition, stat, prefix='current.', match_where=False):
 
     # !
     if condition['op'][0:2] == '! ':
-        print('here')
         ret += 'not '
         condition['op'] = condition['op'][2:]
 

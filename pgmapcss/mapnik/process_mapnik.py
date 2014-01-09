@@ -90,7 +90,6 @@ def process_mapnik(style_id, args, stat, conn):
         for prop in stat_properties(stat)
     ])
 
-    print("select * from {style_id}_check(pgmapcss_object('', '', null, Array['canvas']), pgmapcss_render_context(null, null))".format(**replacement))
     res = db.prepare("select * from {style_id}_check(pgmapcss_object('', '', null, Array['canvas']), pgmapcss_render_context(null, null))".format(**replacement))
     result = res()
     if len(result) > 0:
