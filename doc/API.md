@@ -1,21 +1,6 @@
 # Using PGMapCSS
 The postgresql function `pgmapcss_install(style_id, file_content)` converts the passed css file to some functions and a data type, as described in this page.
 
-## Type {style_id}_result
-A data type `{style_id}_result` will be created which returns some fixed columns and a column for each property.
-
-Return values (Data Type '{style_id}_result'):
-
-| Name   | Type     | Description        |
-| ------ | -------- | ------------------ |
-| _style | hstore   | All resulting properties |
-| _pseudo_element | text | The current pseudo element, default: 'default'.
-| _tags  | hstore   | The resulting tags, as modified by set and unset statements. |
-| _geo   | geometry | (Modified) geometry |
-| ...    | text     | A column for every property found in the CSS file. |
-
-The `{style_id}_check` and `{style_id}_match` functions each return 0..n rows of type `{style_id}_result`.
-
 ## Function {style_id}_check
 Checks whether a single object matches any of the selectors in the CSS style at the current zoom level and returns the resulting properties. May return 0..n rows (a row per pseudo element), ordered by 'object-z-index' (asc, default 0).
 

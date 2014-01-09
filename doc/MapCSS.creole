@@ -312,10 +312,10 @@ Currently supported types:
 == Possible values ==
 The following statement defines possible values for a specific property:
 {{{
-@values property_name value1;value2;value3;
+@values property_name "value1;value2;value3";
 }}}
 
-Other values will be accepted in the MapCSS file, but will be finally replaced by the default value (the first value).
+Other values will be accepted in the MapCSS file, but will finally be replaced by the default value (the first value).
 
 == Define default values to other properties ==
 If the value of a property defaults to the value of another property, this is specified by:
@@ -336,19 +336,19 @@ Define postprocess functions:
 
 E.g.
 {{{
-@postprocess text text_transform(prop("text"), prop("text-transform"));
+@postprocess text eval(text_transform(prop("text"), prop("text-transform")));
 }}}
 
 == Depending properties ==
 {{{
-@depend_property main_property dep_property1,dep_property2,...;
+@depend_property main_property "dep_property1;dep_property2;...";
 }}}
 
 For @default_other, @values: don't process depending values if main property is not set.
 
 == Style-Elements depending on property ==
 {{{
-@style_element_property line width,image;
+@style_element_property line "width;color";
 }}}
 
-A database row for style element 'fill' will only be returned when a property 'width' or 'image' is set.
+A database row for style element 'line' will only be returned when the properties 'width' and 'color' are set.

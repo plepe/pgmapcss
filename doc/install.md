@@ -2,7 +2,15 @@ Installation on a plain Ubuntu 12.04.3 Server:
 
 Install additional packages:
 ```sh
-sudo apt-get install postgresql postgresql-contrib postgresql-9.1-postgis python-mapnik2 git osm2pgsql
+sudo apt-get install postgresql postgresql-contrib postgresql-9.1-postgis python-mapnik2 git osm2pgsql python3 python3-setuptools
+```
+
+More dependencies:
+* pghstore
+```sh
+git clone https://github.com/plepe/pghstore.git
+cd pghstore
+sudo python3 setup.py install
 ```
 
 Create database:
