@@ -1,5 +1,6 @@
 import postgresql
 from pkg_resources import *
+from .version import *
 conn = None
 
 def connection():
@@ -14,10 +15,12 @@ def connect(args):
         user=args.user
     )
 
+    db_version_check()
+
     return conn
 
-def init_db(conn):
-    files = [ 'pgmapcss_types.sql', 'pgmapcss_object.sql', 'pgmapcss_render_context.sql', 'objects_osm2pgsql.sql', 'array_search.sql', 'natcasesort.sql', 'pgmapcss_to.sql' ]
+def db_update(conn):
+    files = [ 'pgmapcss_object.sql', 'pgmapcss_render_context.sql', 'objects_osm2pgsql.sql', 'array_search.sql', 'natcasesort.sql', 'pgmapcss_to.sql' ]
 
     for f in files:
         print('Installing', f)
@@ -31,6 +34,20 @@ def init_db(conn):
             c = c.decode('utf-8')
             conn.execute(c)
             print('Installing', f)
+
+    db_version_update()
+
+def db_init(conn):
+    files = [ 'pgmapcss_types.sql' ]
+
+    for f in files:
+        print('Installing', f)
+        c = resource_string(__name__, f)
+        c = c.decode('utf-8')
+        conn.execute(c)
+
+    db_version_create()
+    db_update(conn)
 
 def install(style_id, style, conn):
     conn.execute(style['function_check'])
