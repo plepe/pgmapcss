@@ -1,3 +1,18 @@
+0.5.0 release 2014-01-?
+* Complete rewrite of parser, compiler and preprocessor in Python3.
+* Optimizations:
+  * only style-elements that will result in a symbol are
+    returned, controlled by the @style_element_property define.
+  * check validity of properties of their main property is set (see
+    @depend_property)
+  * cond() does no longer calculate the values of both paths.
+    (compile to a (CASE WHEN ... THEN ... ELSE ... END) construct)
+* New eval functions / operators:
+  zoom, scale_denominator, switch, power, and (&&), or (||), ! (not),
+  centroid
+* New style properties: offset, casing-offset (Mapnik 2.2 only)
+* Bugfixes (and new bugs due to the rewrite!)
+
 0.4.0 release 2013-10-14
 * Mostly compatible with MapCSS 0.2 (Rendering order, CSS properties):
   * new CSS properties: casing-*, layer, font-family -weight -style,
