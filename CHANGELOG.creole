@@ -1,4 +1,4 @@
-0.5.0 release 2014-01-?
+0.5.0 release 2014-01-10
 * Complete rewrite of parser, compiler and preprocessor in Python3.
 * Optimizations:
 ** only style-elements that will result in a symbol are returned, controlled by the @style_element_property define.

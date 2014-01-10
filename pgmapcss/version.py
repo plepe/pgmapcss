@@ -1,7 +1,7 @@
 __all__ = 'VERSION', 'VERSION_INFO'
 
 #: (:class:`tuple`) The version tuple e.g. ``(0, 9, 2)``.
-VERSION_INFO = (0, 5, 0, 'pre1')
+VERSION_INFO = (0, 5, 0)
 
 #: (:class:`basestring`) The version string e.g. ``'0.9.2'``.
 if len(VERSION_INFO) == 4:
