@@ -97,6 +97,8 @@ Mapnik < 3.0 can't read dynamic color values. Therefore pgmapcss has to know all
 |= Function |= Parameters |= Return value |= Description
 | rgb | red, green, blue. The following formats are recognised: integer 0..255, float 0.0..1.0, percent 0%..100%, e.g. rgb(0.1, 127, 90%) | A color in hex notation, e.g. '#1a7fe5' | Creates a color from the input parameters
 | rgba | red, green, blue, alpha. As rgb(), but with an additional alpha channel with 0=transparent and 1.0 / 255 / 100%=fully opaque. E.g. rgba(0.1, 127, 90%, 50%) | A color in hex notation, e.g. '#1a7fe57f' | Creates a color with an alpha channel from the input parameters
+| deluma | color (hex notation, e.g. #123456), factor (float, e.g. 0.5) | color in hex notation | reduce color luma by a given factor
+| lighten | color (hex notation, e.g. #123456), factor (float, e.g. 0.5) | color in hex notation | lighten a color by a given factor
 
 == Geometric functions ===
 * Geometric functions are not part of the MapCSS 0.2 standard
