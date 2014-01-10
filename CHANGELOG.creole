@@ -1,34 +1,24 @@
 0.5.0 release 2014-01-?
 * Complete rewrite of parser, compiler and preprocessor in Python3.
 * Optimizations:
-  * only style-elements that will result in a symbol are
-    returned, controlled by the @style_element_property define.
-  * check validity of properties of their main property is set (see
-    @depend_property)
-  * cond() does no longer calculate the values of both paths.
-    (compile to a (CASE WHEN ... THEN ... ELSE ... END) construct)
-* New eval functions / operators:
-  zoom, scale_denominator, switch, power, and (&&), or (||), ! (not),
-  centroid
+** only style-elements that will result in a symbol are returned, controlled by the @style_element_property define.
+** check validity of properties of their main property is set (see @depend_property)
+** cond() does no longer calculate the values of both paths. (compile to a (CASE WHEN ... THEN ... ELSE ... END) construct)
+* New eval functions / operators: zoom, scale_denominator, switch, power, and (&&), or (||), not (!), centroid
 * New style properties: offset, casing-offset (Mapnik 2.2 only)
 * Bugfixes (and new bugs due to the rewrite!)
 
 0.4.0 release 2013-10-14
 * Mostly compatible with MapCSS 0.2 (Rendering order, CSS properties):
-  * new CSS properties: casing-*, layer, font-family -weight -style,
-    text-transform, shield-*, canvas{ fill-color, fill-image }
-  * MapCSS 0.2 compatible link selectors, way->node relations
-  * @import
-  * text, shield-text read either the value of a tag or a quoted string / eval
-    expression
+** new CSS properties: casing-*, layer, font-family -weight -style, text-transform, shield-*, canvas{ fill-color, fill-image }
+** MapCSS 0.2 compatible link selectors, way->node relations
+** @import
+** text, shield-text read either the value of a tag or a quoted string / eval expression
 * Compatibility with Mapnik 2.0 and 2.2 (use -t on load.sh to choose version)
 * Re-implement eval-parser (as the old one was really buggy)
-  * new eval functions: parent_geo(), locate_point(), line(), azimuth(),
-    rotate(), translate(), int(), num(), rename number() to metric(), str(),
-    round(), text_transform(), osm_id()
-  * fix/add operators: ==, !=, <>, eq, ne, ===, !==, .
-* Control behaviour of properties with @type, @values, @default_other,
-  @postprocess
+** new eval functions: parent_geo(), locate_point(), line(), azimuth(), rotate(), translate(), int(), num(), rename number() to metric(), str(), round(), text_transform(), osm_id()
+** fix/add operators: ==, !=, <>, eq, ne, ===, !==, .
+* Control behaviour of properties with @type, @values, @default_other, @postprocess
 * [[doc/install.creole|New installation instructions]]
 * generate_image.py to render image
 
