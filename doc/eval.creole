@@ -91,6 +91,13 @@ If you read a number, unit conversion takes place. The following units are suppo
 | min | list | number | Returns lowest of the input values.
 | max | list | number | Returns highest of the input values.
 
+== Color functions ==
+Mapnik < 3.0 can't read dynamic color values. Therefore pgmapcss has to know all possible colors during preprocessing and create styles. pgmapcss can't guess the results of eval()-functions, therefore those should not be used. Mapnik on the expr-v2 branch (as of Jan 10, 2014) can read dynamic color values for some properties (see doc/expr-v2.creole for details) and these color functions can be used.
+
+|= Function |= Parameters |= Return value |= Description
+| rgb | red, green, blue. The following formats are recognised: integer 0..255, float 0.0..1.0, percent 0%..100%, e.g. rgb(0.1, 127, 90%) | A color in hex notation, e.g. '#1a7fe5' | Creates a color from the input parameters
+| rgba | red, green, blue, alpha. As rgb(), but with an additional alpha channel with 0=transparent and 1.0 / 255 / 100%=fully opaque. E.g. rgba(0.1, 127, 90%, 50%) | A color in hex notation, e.g. '#1a7fe57f' | Creates a color with an alpha channel from the input parameters
+
 == Geometric functions ===
 * Geometric functions are not part of the MapCSS 0.2 standard
 * All lengths are accepted / returned as pixels on screen. You may specify a different unit, e.g. line_part(prop(geo), 5m, -5m)
