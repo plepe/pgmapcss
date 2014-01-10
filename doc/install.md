@@ -7,6 +7,7 @@ sudo apt-get install postgresql postgresql-contrib postgresql-9.1-postgis python
 
 More dependencies:
 * pghstore
+
 ```sh
 git clone https://github.com/plepe/pghstore.git
 cd pghstore
