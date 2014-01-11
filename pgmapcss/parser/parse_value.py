@@ -2,6 +2,7 @@ import re
 from .parse_string import parse_string
 from .parse_eval import parse_eval
 from .ParseError import *
+from .ParseFile import ParseFile
 
 def parse_url(current, to_parse):
     if to_parse.match('\s*url\('):
@@ -40,10 +41,18 @@ def parse_value(current, to_parse):
 
     # eval( ... )
     elif to_parse.match('eval\s*\(\s*'):
+        fp = to_parse.pos()
         r = parse_string(to_parse)
+        value = None
         if r:
-            value = parse_eval(r)
-        else:
+            r = ParseFile(content=r)
+            try:
+                value = parse_eval(r)
+            except ParseError as e:
+                to_parse.seek(fp)
+                pass
+
+        if value == None:
             value = parse_eval(to_parse)
 
         if not to_parse.match('\s*\)\s*;'):

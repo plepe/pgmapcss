@@ -39,7 +39,7 @@ def parse_eval(to_parse, math_level=0, current_op=None, rek=0):
         last_to_parse = to_parse.pos()
         last_mode = mode
 
-        # print('eval: (rek{}, math{}, mode{}) "{}..."'.format(rek, math_level, mode, to_parse[0:20]))
+        # print('eval: (rek{}, math{}, mode{}) "{}..."'.format(rek, math_level, mode, to_parse.to_parse()[0:20]))
 
         if mode == 0:
             # whitespace
@@ -64,7 +64,7 @@ def parse_eval(to_parse, math_level=0, current_op=None, rek=0):
 
             # closing bracket, ',' or ';'
             elif to_parse.match('(\)|,|;)', wind=None):
-                return to_parse
+                return
 
             # quoted string
             elif to_parse.match('["\']', wind=None):
