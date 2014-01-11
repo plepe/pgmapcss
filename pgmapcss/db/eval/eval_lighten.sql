@@ -20,9 +20,9 @@ begin
   factor = pgmapcss_to_float(param[2]);
 
   -- from https://github.com/yvecai/mapnik-opensnowmap.org/blob/master/offset-style/build-relations-style.py
-  colors[1] = round((1 - factor) * colors[1] + factor * 255)
-  colors[2] = round((1 - factor) * colors[2] + factor * 255)
-  colors[3] = round((1 - factor) * colors[3] + factor * 255)
+  colors[1] = round((1 - factor) * colors[1] + factor * 255);
+  colors[2] = round((1 - factor) * colors[2] + factor * 255);
+  colors[3] = round((1 - factor) * colors[3] + factor * 255);
 
   if array_upper(colors, 1) = 4 then
     return '#' ||
