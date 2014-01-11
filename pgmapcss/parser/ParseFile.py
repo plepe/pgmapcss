@@ -68,6 +68,14 @@ class ParseFile():
     def pos(self):
         return len(self._content) - len(self._to_parse)
 
+    def seek(self, pos):
+        current_pos = self.pos()
+
+        if current_pos < pos:
+            self.wind(pos - current_pos)
+        elif current_pos > pos:
+            self.rewind(current_pos - pos)
+
     def coord(self):
         parsed = self._content[:-len(self._to_parse)]
         lines = parsed.count('\n')
