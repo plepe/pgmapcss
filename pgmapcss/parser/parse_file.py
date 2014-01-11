@@ -3,16 +3,17 @@ from .parse_selectors import parse_selectors
 from .parse_properties import parse_properties
 from .strip_comments import strip_comments
 from .ParseFile import *
+import pgmapcss.mapnik
 
-def parse_file(stat, file, base_style=None):
+def parse_file(stat, filename=None, base_style=None, content=None):
     if base_style:
-        parse_file(stat, base_style)
+        parse_file(stat, content=pgmapcss.mapnik.get_base_style(base_style))
 
     if not 'statements' in stat:
         stat['statements'] = []
         stat['defines'] = {}
 
-    f = ParseFile(file)
+    f = ParseFile(filename=filename, content=content)
 
     f.set_content(strip_comments(f))
 

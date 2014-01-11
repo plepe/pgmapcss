@@ -30,10 +30,10 @@ def db_update(conn):
 
     for f in resource_listdir(__name__, 'eval/'):
         if f[-4:] == '.sql':
+            print('Installing', f)
             c = resource_string(__name__, 'eval/' + f)
             c = c.decode('utf-8')
             conn.execute(c)
-            print('Installing', f)
 
     db_version_update()
 

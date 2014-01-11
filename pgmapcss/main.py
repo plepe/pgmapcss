@@ -82,7 +82,7 @@ def main():
     stat = {}
 
     try:
-        pgmapcss.parser.parse_file(stat, file=file_name, base_style=args.base_style)
+        pgmapcss.parser.parse_file(stat, filename=file_name, base_style=args.base_style)
     except pgmapcss.parser.ParseError as e:
         print(e)
         sys.exit(1)
