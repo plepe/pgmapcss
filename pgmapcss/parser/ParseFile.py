@@ -1,15 +1,14 @@
 import re
 import os
-import pgmapcss.mapnik
 
 class ParseFile():
-    def __init__(self, filename):
+    def __init__(self, filename=None, content=None):
         self._filename = filename
 
-        if os.path.exists(filename):
-            self._content = open(filename).read()
-        else:
-            self._content = pgmapcss.mapnik.get_base_style(filename)
+        if not content is None:
+            self._content = content
+        elif not filename is None:
+            self._content = open(self._filename).read()
 
         self._original_content = self._content
         self._to_parse = self._content
@@ -85,7 +84,12 @@ class ParseFile():
         if last_line_pos == -1:
             last_line_pos = 0
 
-        ret += message + '; file: "' + self._filename + '" at line: ' + str( c[0] + 1 ) + ' column: ' + str( c[1] + 1 ) + '\n'
+        ret += message + '; '
+        if self._filename:
+            ret += 'file: "' + self._filename + '" '
+        else:
+            ret += '<string> '
+        ret += 'at line: ' + str( c[0] + 1 ) + ' column: ' + str( c[1] + 1 ) + '\n'
         ret += parsed[last_line_pos:] + self._to_parse[:self._to_parse.find('\n')] + '\n'
         ret += ' ' * (len(parsed) - last_line_pos) + '^-- ' + marker_message
 
