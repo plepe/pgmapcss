@@ -16,7 +16,7 @@ def compile_link_selector(statement, stat):
             compile_selector_part(statement['parent_selector'], stat, 't_parent_object.')
 
     elif statement['link_selector']['type'] == 'near':
-        distance = 100
+        distance = '100'
 
         for r in statement['link_selector']['conditions']:
             if r['key'] == 'distance' and r['op'] in ('<', '<='):
@@ -26,7 +26,7 @@ def compile_link_selector(statement, stat):
             'objects_near(' + db.format(distance) + ', object, current, render_context, ' +\
             db.format({
                 statement['parent_selector']['type']: compile_conditions(statement['parent_selector']['conditions'], stat)
-            }) + ')'
+            }) + '::hstore)'
 
     else:
         raise Exception('Unknown link selector "{type}"'.format(**selector['link_selector']))
