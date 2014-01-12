@@ -160,7 +160,7 @@ def parse_eval(to_parse, math_level=0, current_op=None, rek=0):
                 if current == current_op:
                       to_parse.wind(len(to_parse.match_group(0)))
 
-                      parse_eval(to_parse, math_level, current_op, rek=rek+1)
+                      result = parse_eval(to_parse, math_level, current_op, rek=rek+1)
                       current_result.append(result)
 
                 else:
