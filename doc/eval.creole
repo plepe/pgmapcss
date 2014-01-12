@@ -46,6 +46,7 @@ If you read a number, unit conversion takes place. The following units are suppo
 | power | number, number | Calculates the first value (base) raised to the power of the second value (exp). E.g. power(2, 3) => 8 | no standard
 | prop | key, [string] | value | current value of the computed property on pseudo element param2 (default: current pseudo element). Examples: prop(width), prop(width, casing) | MapCSS 0.2 (no standard: pseudo element)
 | tag | key, [key, [key, ...]] | value | value of the tag key (e.g. tag("name") ). If several keys are passed, the first set tag is returned, e.g. tag("name:en", "int_name", "name"). | MapCSS 0.2 (only one key)
+| parent_id | | text | Return the id of the current parent object. | no standard
 | parent_tag | key, [key, [key, ...]] | value | value of the tag key (e.g. parent_tag("name") ) of the parent element in the link selector. If several keys are passed, the first set tag is returned, e.g. parent_tag("name:en", "int_name", "name"). | no standard
 | parent_geo | | geometry | Return the geometry of the current parent object. | no standard
 | link_tag | key, [key, [key, ...]] | value | Depending on the type of the link, a couple of tags are automatically set, e.g. 'index', 'distance'. See [[MapCSS.creole]] for details. | no standard
