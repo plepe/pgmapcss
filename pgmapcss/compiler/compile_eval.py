@@ -11,6 +11,7 @@ def valid_func_name(func):
         raise Exception('Illegal eval function name: ' + func)
 
 def compile_eval(value):
+    return 'None'
     global eval_param
 
     eval_functions = pgmapcss.db.eval.load().list()

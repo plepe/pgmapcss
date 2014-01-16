@@ -1,6 +1,6 @@
 import pgmapcss.db as db
 from .stat import *
-from .compile_condition import compile_condition
+from .compile_condition_sql import compile_condition_sql
 
 def get_where_selectors(max_scale, min_scale, stat):
     # where_selectors contains indexes of all selectors which we need for match queries
@@ -79,7 +79,7 @@ def compile_function_get_where(id, stat):
                 ' and '.join(
                     [ 'true' ] +
                     [
-                        compile_condition(c, stat, prefix='', match_where=True) or 'true'
+                        compile_condition_sql(c, stat, prefix='') or 'true'
                         for c in stat['statements'][i]['selector']['conditions']
                     ]
                 )
