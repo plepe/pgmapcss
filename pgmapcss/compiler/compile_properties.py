@@ -9,7 +9,7 @@ def compile_properties(statement, stat):
     for prop in statement['properties']:
         if prop['assignment_type'] == 'P':
             c = compile_value(prop, stat)
-            if c[0]:
+            if c[0] != False:
                 to_set['prop'][prop['key']] = c[0]
             else:
                 ret += print_props_and_tags(statement['current_pseudo_element'], to_set)
@@ -20,7 +20,7 @@ def compile_properties(statement, stat):
 
         elif prop['assignment_type'] == 'T':
             c = compile_value(prop, stat)
-            if c[0]:
+            if c[0] != False:
                 to_set['tags'][prop['key']] = prop['value']
             else:
                 ret += print_props_and_tags(statement['current_pseudo_element'], to_set)
