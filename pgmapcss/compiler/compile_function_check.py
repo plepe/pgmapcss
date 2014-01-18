@@ -2,6 +2,7 @@ from .compile_statement import compile_statement
 from .compile_eval import compile_eval
 from .stat import *
 import pgmapcss.db as db
+import pgmapcss.eval
 
 def print_checks(prop, stat, main_prop=None):
     ret = ''
@@ -50,7 +51,11 @@ def to_float(v):
         return float(v)
     except ValueError:
         return None
+'''.format(**replacement)
 
+    ret += pgmapcss.eval.load().print()
+
+    ret += '''\
 # initialize variables
 current = {{
     'pseudo_elements': {pseudo_elements},

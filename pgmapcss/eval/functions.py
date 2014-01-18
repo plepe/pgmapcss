@@ -5,7 +5,17 @@ class Functions:
     def list(self):
         return self.eval_functions
 
-    def register(self, func, op=None, math_level=None, compiler=None):
+    def print(self):
+        ret = ''
+
+        for func, f in self.eval_functions.items():
+            if 'src' in f:
+                ret += f['src']
+
+        return ret
+
+
+    def register(self, func, op=None, math_level=None, compiler=None, src=None):
         f = {}
 
         if func in self.eval_functions:
@@ -22,5 +32,8 @@ class Functions:
 
         if compiler:
             f['compiler'] = compiler
+
+        if src:
+            f['src'] = src
 
         self.eval_functions[func] = f

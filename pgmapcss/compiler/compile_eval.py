@@ -1,6 +1,5 @@
-import pgmapcss.db as db
 import re
-import pgmapcss.db.eval
+import pgmapcss.eval
 eval_param = ', object, current, render_context'
 
 def valid_func_name(func):
@@ -14,7 +13,7 @@ def compile_eval(value):
     return 'None'
     global eval_param
 
-    eval_functions = pgmapcss.db.eval.load().list()
+    eval_functions = pgmapcss.eval.load().list()
 
     if type(value) == str:
         if value[0:2] == 'v:':

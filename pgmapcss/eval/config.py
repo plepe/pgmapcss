@@ -1,5 +1,7 @@
 from .functions import Functions
+from pkg_resources import *
 import pgmapcss.db
+import re
 
 eval_functions = None
 
@@ -37,8 +39,13 @@ def load():
     eval_functions.register('cond', compiler=compile_cond)
 
     conn = pgmapcss.db.connection()
-    res = conn.prepare("select proname from pg_catalog.pg_namespace n join pg_catalog.pg_proc p on pronamespace = n.oid where nspname = any (current_schemas(false)) and proname similar to 'eval_%'")()
-    [ eval_functions.register(r[0][5:]) for r in res ]
 
+    for f in resource_listdir(__name__, ''):
+        m = re.match('eval_(.*).py', f)
+        if m:
+            func = m.group(1)
+            c = resource_string(__name__, f)
+            c = c.decode('utf-8')
+            eval_functions.register(func, src=c)
 
     return eval_functions.list()

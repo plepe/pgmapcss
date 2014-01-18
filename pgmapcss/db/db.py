@@ -28,13 +28,6 @@ def db_update(conn):
         c = c.decode('utf-8')
         conn.execute(c)
 
-    for f in resource_listdir(__name__, 'eval/'):
-        if f[-4:] == '.sql':
-            print('Installing', f)
-            c = resource_string(__name__, 'eval/' + f)
-            c = c.decode('utf-8')
-            conn.execute(c)
-
     db_version_update()
 
 def db_init(conn):
