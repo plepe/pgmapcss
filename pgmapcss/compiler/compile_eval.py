@@ -1,6 +1,6 @@
 import re
 import pgmapcss.eval
-eval_param = ', object, current, render_context'
+eval_param = '' #, object, current, render_context'
 
 def valid_func_name(func):
     if re.match('[a-zA-Z_0-9]+$', func):
@@ -10,16 +10,15 @@ def valid_func_name(func):
         raise Exception('Illegal eval function name: ' + func)
 
 def compile_eval(value):
-    return 'None'
     global eval_param
 
     eval_functions = pgmapcss.eval.load().list()
 
     if type(value) == str:
         if value[0:2] == 'v:':
-            return db.format(value[2:])
+            return repr(value[2:])
         elif value[0:2] == 'f:':
-            return 'eval_' + valid_func_name(value[2:]) + '(\'{}\'' + eval_param + ')'
+            return 'eval_' + valid_func_name(value[2:]) + '(\'[]\'' + eval_param + ')'
         else:
             raise Exception('compiling eval: ' + repr(value))
 
@@ -32,7 +31,6 @@ def compile_eval(value):
     param = [ compile_eval(i) for i in value[1:] ]
 
     if value[0][0:2] == 'o:':
-        conn = db.connection()
         func = [ k for k, v in eval_functions.items() if 'op' in v and value[0][2:] in v['op'] ][0]
 
     elif value[0][0:2] == 'f:':
@@ -42,4 +40,4 @@ def compile_eval(value):
         return eval_functions[func]['compiler'](func, param, eval_param)
 
     else:
-        return 'eval_' + valid_func_name(func) + '(Array[' + ', '.join(param) + ']::text[]' + eval_param + ')'
+        return 'eval_' + valid_func_name(func) + '([' + ', '.join(param) + ']' + eval_param + ')'
