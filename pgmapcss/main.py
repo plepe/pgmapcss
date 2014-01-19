@@ -4,6 +4,7 @@ import re
 import pprint
 import pgmapcss.parser
 import pgmapcss.compiler
+import pgmapcss.version
 import argparse
 import getpass
 import pgmapcss.db
@@ -42,6 +43,7 @@ parser.add_argument('-r', '--database-update', dest='database_update',
     help='Whether the database should be updated to the current version. Possible values: "re-init": re-initializes the database, need to re-compile all pgmapcss styles, "update": update all database functions, "none": do not update, "auto": if necessary a database functions update will be performed.')
 
 def main():
+    print('pgmapcss version %s' % pgmapcss.version.VERSION)
     args = parser.parse_args()
 
     style_id = args.style_id
