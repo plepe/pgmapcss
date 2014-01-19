@@ -4,3 +4,13 @@ def eval_or(param):
             return 'true'
 
     return 'false'
+
+# TESTS
+# IN [ 'true', 'true' ]
+# OUT 'true'
+# IN [ 'true', 'false' ]
+# OUT 'true'
+# IN [ 'false', 'true' ]
+# OUT 'true'
+# IN [ 'false', 'false' ]
+# OUT 'false'

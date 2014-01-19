@@ -9,3 +9,5 @@ def eval_tag(param):
 # OUT 'Foobar'
 # IN ['ref', 'name']
 # OUT 'Foobar'
+# IN ['ref']
+# OUT ''

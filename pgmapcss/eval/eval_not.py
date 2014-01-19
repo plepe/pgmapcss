@@ -6,3 +6,13 @@ def eval_not(param):
         return 'false'
 
     return 'true'
+
+# TESTS
+# IN ['foo']
+# OUT 'false'
+# IN ['true']
+# OUT 'false'
+# IN ['false']
+# OUT 'true'
+# IN ['0']
+# OUT 'true'

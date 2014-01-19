@@ -4,3 +4,7 @@ def eval_concat(param):
         ret += p or ''
 
     return ret
+
+# TESTS
+# IN ['foo', 'bar']
+# OUT 'foobar'

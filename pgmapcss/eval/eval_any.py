@@ -4,3 +4,13 @@ def eval_any(param):
             return p
 
     return ''
+
+# TESTS
+# IN ['foo', 'bar']
+# OUT 'foo'
+# IN ['', 'bar']
+# OUT 'bar'
+# IN ['', '', '']
+# OUT ''
+# IN []
+# OUT ''

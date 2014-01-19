@@ -5,3 +5,7 @@ def eval_split(param):
     l = param[0].split(param[1])
 
     return ';'.join(l)
+
+# TESTS
+# IN ['foo--bar', '--']
+# OUT 'foo;bar'

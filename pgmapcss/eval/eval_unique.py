@@ -6,3 +6,7 @@ def eval_unique(param):
         param = param[0].split(';')
 
     return ';'.join(set(param))
+
+# TESTS
+# IN ['foo;bar;foo']
+# OUT 'foo;bar'

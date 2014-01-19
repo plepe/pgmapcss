@@ -4,6 +4,10 @@ def eval_sort(param):
 
     l = param[0].split(';')
 
-    sorted(l)
+    l = sorted(l)
 
     return ';'.join(l)
+
+# TESTS
+# IN ['foo;bar']
+# OUT 'bar;foo'

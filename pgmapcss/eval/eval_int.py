@@ -3,6 +3,17 @@ def eval_int(param):
         return ''
 
     try:
-        return '%d' % int(param[0])
+        v = float(param[0])
+        return '%d' % v
     except ValueError:
         return ''
+
+# TESTS
+# IN ['5']
+# OUT '5'
+# IN ['5.0']
+# OUT '5'
+# IN ['5.9']
+# OUT '5'
+# IN ['-5.9']
+# OUT '-5'

@@ -9,3 +9,13 @@ def eval_power(param):
     f2 = float(f2) if f2 != '' else 0.0
 
     return '%G' % (f1 ** f2)
+
+# TESTS
+# IN ['2', '3']
+# OUT '8'
+# IN ['2', '0.5']
+# OUT '1.41421'
+# IN ['5', '1']
+# OUT '5'
+# IN ['5', '0']
+# OUT '1'

@@ -8,3 +8,19 @@ def eval_boolean(param):
             return 'false'
 
     return 'true'
+
+# TESTS
+# IN ['1']
+# OUT 'true'
+# IN ['0']
+# OUT 'false'
+# IN ['']
+# OUT 'false'
+# IN ['no']
+# OUT 'false'
+# IN ['yes']
+# OUT 'true'
+# IN ['foo']
+# OUT 'true'
+# IN []
+# OUT ''

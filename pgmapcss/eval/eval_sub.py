@@ -14,4 +14,12 @@ def eval_sub(param):
       else:
           ret = ret - f
 
-  return ret
+  return '%G' % ret
+
+# TESTS
+# IN ['4', '2', '2']
+# OUT '0'
+# IN ['5.6', '2.3']
+# OUT '3.3'
+# IN ['3', '5.0']
+# OUT '-2'

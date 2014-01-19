@@ -48,3 +48,11 @@ def eval_metric(param):
 # OUT '5'
 # IN ['5.0']
 # OUT '5'
+# IN ['5.5']
+# OUT '5.5'
+# IN ['']
+# OUT ''
+# IN ['10px', 'u']
+# OUT '23.903'
+# IN ['10u']
+# OUT '4.18358'
