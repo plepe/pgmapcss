@@ -47,7 +47,7 @@ def to_float(v, default=None):
         return default
 '''.format(**replacement)
 
-    ret += pgmapcss.eval.load().print()
+    ret += pgmapcss.eval.functions().print()
 
     ret += '''\
 # initialize variables

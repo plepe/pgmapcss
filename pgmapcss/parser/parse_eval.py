@@ -8,7 +8,7 @@ eval_operators = None
 
 def read_eval_operators():
     global eval_operators
-    eval_functions = pgmapcss.eval.load()
+    eval_functions = pgmapcss.eval.functions().list()
 
     eval_operators = {
         op: { 'op': op, 'math_level': v['math_level'] }

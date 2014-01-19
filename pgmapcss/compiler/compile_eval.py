@@ -12,7 +12,7 @@ def valid_func_name(func):
 def compile_eval(value):
     global eval_param
 
-    eval_functions = pgmapcss.eval.load().list()
+    eval_functions = pgmapcss.eval.functions().list()
 
     if type(value) == str:
         if value[0:2] == 'v:':

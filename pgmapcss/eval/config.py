@@ -3,8 +3,6 @@ from pkg_resources import *
 import pgmapcss.db
 import re
 
-eval_functions = None
-
 def compile_cond(func, param, eval_param):
     ret = '(' + param[1] + ' if eval_boolean([' + param[0] + ']' + eval_param + ') == \'true\''
     if len(param) > 2:
@@ -15,10 +13,6 @@ def compile_cond(func, param, eval_param):
     return ret
 
 def load():
-    global eval_functions
-    if eval_functions:
-        return eval_functions
-
     eval_functions = Functions()
 
     eval_functions.register('add', op='+', math_level=3)
@@ -50,4 +44,4 @@ def load():
             c = c.decode('utf-8')
             eval_functions.register(func, src=c)
 
-    return eval_functions.list()
+    return eval_functions
