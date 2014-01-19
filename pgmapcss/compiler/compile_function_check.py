@@ -45,6 +45,7 @@ create or replace function {style_id}_check(
   render_context\tpgmapcss_render_context
 ) returns setof pgmapcss_result as $body$
 import pghstore
+import re
 # eval-functions
 def to_float(v):
     try:
@@ -58,6 +59,7 @@ def to_float(v):
     ret += '''\
 # initialize variables
 current = {{
+    'object': object,
     'pseudo_elements': {pseudo_elements},
     'tags': pghstore.loads(object['tags']),
     'types': object['types'],
