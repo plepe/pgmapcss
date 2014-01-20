@@ -60,9 +60,7 @@ def parse_selector_part(to_parse, object_class_selector='\*|[a-z_]+'):
         if to_parse.match_group(1) and to_parse.match_group(3):
             current['create_pseudo_element'] = False
 
-        pseudo_element = to_parse.match_group(2)
-        if pseudo_element != '*':
-            current['pseudo_element'] = pseudo_element
+        current['pseudo_element'] = to_parse.match_group(2)
 
     return current
 
