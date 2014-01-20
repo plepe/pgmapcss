@@ -25,31 +25,31 @@ def compile_condition(condition, stat, prefix='current.', var="current['tags']")
 
     # =
     elif condition['op'] == '=':
-        ret += var + '[' + key + "] == " + final_value
+        ret += var + '.get(' + key + ") == " + final_value
 
     # !=
     elif condition['op'] == '!=':
-        ret += var + '[' + key + "] != " + final_value
+        ret += var + '.get(' + key + ") != " + final_value
 
     # < > <= >=
     elif condition['op'] in ('<', '>', '<=', '>='):
-        ret += 'to_float(' + var + '[' + key + ']) ' + condition['op'] + ' to_float(' + final_value + ')';
+        ret += '(' + key + ' in ' + var + ' and to_float(' + var + '[' + key + ']) ' + condition['op'] + ' to_float(' + final_value + '))';
 
     # ^=
     elif condition['op'] == '^=':
-        ret += var + '[' + key + '].find(' + final_value + ') == 0'
+        ret += var + '.get(' + key + ", '').startswith(" + final_value + ')'
 
     # $=
     elif condition['op'] == '$=':
-        ret += var + '[' + key + '].rpartition(' + final_value + ")[2] == ''"
+        ret += var + '.get(' + key + ", '').endswith(" + final_value + ')'
 
     # *=
     elif condition['op'] == '*=':
-        ret += final_value + ' in ' + var + '[' + key + ']'
+        ret += final_value + ' in ' + var + '.get(' + key + ", '')"
 
     # ~=
     elif condition['op'] == '~=':
-        ret += final_value + ' in ' + var + '[' + key + "].split(';')"
+        ret += final_value + ' in ' + var + '.get(' + key + ", '').split(';')"
 
     # =~
     elif condition['op'] == '=~':
@@ -64,7 +64,7 @@ def compile_condition(condition, stat, prefix='current.', var="current['tags']")
             condition['value'] = m.group(1)
             flags = ', re.IGNORECASE'
 
-        ret += 're.search(' + condition['value'] + ', ' + var + '[' + key + ']' + flags + ')'
+        ret += '(' + key + ' in ' + var + ' and re.search(' + condition['value'] + ', ' + var + '[' + key + ']' + flags + '))'
 
     # unknown operator?
     else:

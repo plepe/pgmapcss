@@ -17,7 +17,7 @@ def compile_value(prop, stat):
         'type' in stat['defines'] and \
         prop['key'] in stat['defines']['type'] and \
         stat['defines']['type'][prop['key']]['value'] == "tag_value":
-        return "current['tags'][" + repr(prop['value']) +']'
+        return "current['tags'].get(" + repr(prop['value']) + ")"
 
     else:
         return repr(prop['value'])
