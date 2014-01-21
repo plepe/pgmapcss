@@ -2,7 +2,7 @@ import pgmapcss.db as db
 import re
 from .compile_eval import compile_eval
 
-def compile_condition(condition, stat, prefix='current.', var="current['tags']"):
+def compile_condition(condition, stat, var="current['tags']"):
     ret = ''
     final_value = None
 
