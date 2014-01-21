@@ -1,37 +1,32 @@
 def eval_line_interpolate_point(param):
-    pass
-#create or replace function eval_line_interpolate_point(param text[],
-#  object pgmapcss_object, current pgmapcss_current, render_context pgmapcss_render_context)
-#returns text
-#as $$
-##variable_conflict use_variable
-#declare
-#  f float;
-#  l float;
-#begin
-#  if array_upper(param, 1) < 1 then
-#    return '';
-#  end if;
-#
-#  l := ST_Length(param[1]);
-#
-#  if array_upper(param, 1) < 2 then
-#    f := 0.5;
-#  else
-#    f := pgmapcss_to_float(eval_metric(Array[param[2], 'u'], object, current, render_context)) / l;
-#  end if;
-#
-#  -- check for valid values
-#  if f is null then
-#    return '';
-#  elsif f < 0 then
-#    f := 0;
-#  elsif f > 1 then
-#    f := 1;
-#  end if;
-#
-#  return ST_Line_Interpolate_Point(param[1], f);
-#end;
-#$$ language 'plpgsql' immutable;
-#
-#
+    if len(param) == 0:
+        return ''
+
+    if len(param) == 1:
+        f = 0.5
+        l = None
+
+    else:
+        l = eval_line_length([param[0]])
+        f = eval_metric([param[1], 'px'])
+        if f == '':
+            return ''
+        f = float(f) / float(l)
+
+    if f < 0.0:
+        f = 0.0
+    elif f > 1.0:
+        f = 1.0
+
+    plan = plpy.prepare('select ST_Line_Interpolate_Point($1, $2) as r', ['geometry', 'float'])
+    res = plpy.execute(plan, [ param[0], float(f) ])
+
+    return res[0]['r']
+
+# TESTS
+# IN ['010200002031BF0D0002000000EC51B8DE163A3A410AD7A36078B45641295C8F826E393A4152B81E8573B45641']
+# OUT '010100002031BF0D000AD7A3B0C2393A41AE47E1F275B45641'
+# IN ['010200002031BF0D0002000000EC51B8DE163A3A410AD7A36078B45641295C8F826E393A4152B81E8573B45641', '0u']
+# OUT '010100002031BF0D00EC51B8DE163A3A410AD7A36078B45641'
+# IN ['010200002031BF0D0002000000EC51B8DE163A3A410AD7A36078B45641295C8F826E393A4152B81E8573B45641', '5px']
+# OUT '010100002031BF0D0096A850FF0A3A3A414E8FF20878B45641'
