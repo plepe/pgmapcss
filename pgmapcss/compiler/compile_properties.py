@@ -17,7 +17,7 @@ def compile_properties(statement, stat, indent=''):
                 '[' + repr(prop['key']) + '] = ' + c + '\n'
 
         elif prop['assignment_type'] == 'U':
-            ret += indent + "current['tags'].pop(" + repr(prop['key']) + '\n'
+            ret += indent + "current['tags'].pop(" + repr(prop['key']) + ')\n'
 
         elif prop['assignment_type'] == 'C':
             ret += indent + '''yield({
