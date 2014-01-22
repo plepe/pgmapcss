@@ -61,7 +61,9 @@ current = { 'object': { 'id': 'n123', 'tags': { 'amenity': 'restaurant', 'name':
 render_context = {'bbox': '010300002031BF0D000100000005000000DBF1839BB5DC3B41E708549B2B705741DBF1839BB5DC3B41118E9739B171574182069214CCE23B41118E9739B171574182069214CCE23B41E708549B2B705741DBF1839BB5DC3B41E708549B2B705741', 'scale_denominator': 8536.77}
 '''
         ret += self.print()
-        ret += 'return eval_' + func + '(param)'
+        ret += 'ret = eval_' + func + '(param)\n'
+        ret += 'if type(ret) != str:\n    return "not a string: " + repr(ret)\n'
+        ret += 'return ret\n'
         ret += "$body$ language 'plpython3u' immutable;"
         conn = db.connection()
         conn.execute(ret)
