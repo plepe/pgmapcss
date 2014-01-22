@@ -1,3 +1,3 @@
 def eval_random(param):
     import random
-    return random.random()
+    return float_to_str(random.random())
