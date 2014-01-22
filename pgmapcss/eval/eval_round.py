@@ -13,7 +13,7 @@ def eval_round(param):
         i = eval_int(param[1:2])
         i = int(i) if i != '' else 0
 
-    return '%G' % round(v, i)
+    return float_to_str(round(v, i))
 
 # TESTS
 # IN ['50.6']

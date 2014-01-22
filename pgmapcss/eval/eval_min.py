@@ -7,7 +7,7 @@ def eval_min(param):
     values = [ eval_metric(v) for v in param ]
     values = [ float(v) for v in param if v != '' ]
 
-    return '%G' % min(values)
+    return float_to_str(min(values))
 
 # TESTS
 # IN ['1.0', '5', '3']

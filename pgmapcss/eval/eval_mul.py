@@ -9,7 +9,7 @@ def eval_mul(params):
 
         ret = ret * float(v)
 
-    return '%G' % ret
+    return float_to_str(ret)
 
 # TESTS
 # IN ['1', '2']

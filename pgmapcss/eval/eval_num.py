@@ -7,7 +7,7 @@ def eval_num(param):
     except ValueError:
         return ''
 
-    return '%G' % value
+    return float_to_str(value)
 
 # TESTS
 # IN ['5.0']

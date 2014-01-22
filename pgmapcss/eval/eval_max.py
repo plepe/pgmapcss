@@ -7,7 +7,7 @@ def eval_max(param):
     values = [ eval_metric(v) for v in param ]
     values = [ float(v) for v in param if v != '' ]
 
-    return '%G' % max(values)
+    return float_to_str(max(values))
 
 # TESTS
 # IN ['1.0', '5', '3']

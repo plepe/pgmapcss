@@ -16,7 +16,7 @@ def eval_div(param):
       else:
           ret = ret / f
 
-  return '%G' % ret
+  return float_to_str(ret)
 
 # TESTS
 # IN ['5', '1']

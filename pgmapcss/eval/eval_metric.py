@@ -39,7 +39,7 @@ def eval_metric(param):
         else:
             return ''
 
-    return '%G' % value
+    return float_to_str(value)
 
 # TESTS
 # IN ['5px']
@@ -53,10 +53,10 @@ def eval_metric(param):
 # IN ['']
 # OUT ''
 # IN ['10px', 'u']
-# OUT '23.903'
+# OUT '23.902956'
 # IN ['10u']
-# OUT '4.18358'
+# OUT '4.183582984464349'
 # IN ['-10px', 'u']
-# OUT '-23.903'
+# OUT '-23.902956'
 # IN ['-10u']
-# OUT '-4.18358'
+# OUT '-4.183582984464349'

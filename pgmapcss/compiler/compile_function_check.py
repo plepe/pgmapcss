@@ -45,6 +45,11 @@ def to_float(v, default=None):
         return float(v)
     except ValueError:
         return default
+def float_to_str(v, default=None):
+    r = repr(v)
+    if r[-2:] == '.0':
+        r = r[:-2]
+    return r
 '''.format(**replacement)
 
     ret += pgmapcss.eval.functions().print()

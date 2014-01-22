@@ -1,5 +1,5 @@
 def eval_scale_denominator(param):
-    return render_context['scale_denominator']
+    return float_to_str(render_context['scale_denominator'])
 
 # TESTS
 # IN []
