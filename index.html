@@ -1,0 +1,69 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Pgmapcss by plepe</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Pgmapcss</h1>
+        <p>PGMapCSS is a library for PostgreSQL/PostGIS which works between an osm2pgsql based database and Mapnik (and maybe other renderers). It processes database (usually OpenStreetMap) objects according to MapCSS rules and calculates resulting colors, widths and other properties for Symbolizers, even geometric modifications.</p>
+
+        <p class="view"><a href="https://github.com/plepe/pgmapcss">View the Project on GitHub <small>plepe/pgmapcss</small></a></p>
+
+
+        <ul>
+          <li><a href="https://github.com/plepe/pgmapcss/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/plepe/pgmapcss/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/plepe/pgmapcss">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <p>== PGMapCSS ==
+PGMapCSS is an implementation of [[<a href="http://www.mapcss.org/%7CMapCSS%5D">http://www.mapcss.org/|MapCSS]</a>] in Postgresql
+/ plpgsql for use with <a href="but%20should%20work%20with%20other%20programs%20too">[http://www.mapnik.org/|Mapnik]</a>. Therefore you can
+reduce your Mapnik stylesheet to a minimum; all style calculation is done in
+the database, providing more advanced functionality.</p>
+
+<p>There were already several efforts to implement stylesheets based on Cascading Stylesheets (CSS) for Mapnik:</p>
+
+<ul>
+<li>[[<a href="https://github.com/mapnik/Cascadenik%7CCascadenik%5D">https://github.com/mapnik/Cascadenik|Cascadenik]</a>]</li>
+<li>[[<a href="http://wiki.openstreetmap.org/wiki/Carto%7CCartoCSS%5D">http://wiki.openstreetmap.org/wiki/Carto|CartoCSS]</a>]</li>
+</ul><p>All these tools are pre-processors, that convert a CSS stylesheet into a Mapnik stylesheet. PGMapCSS takes a different approach: The stylesheet is compiled into PostgreSQL/plpgsql functions which are evaluated at runtime. Therefore more advanced calculations are possible, even geometric modifications. Read [[doc/MapCSS.creole]] to learn about the features of PGMapCSS's MapCSS implementation.</p>
+
+<p><strong>[[examples/README.md|Show me some examples!]]</strong></p>
+
+<p>The Mapnik style just contains a single database query and the basic styles, referencing all options from the database queries. You can think of those styles as templates, which you can reference from your style sheet.</p>
+
+<p>As Mapnik 2.2 does not support using expressions for most symbolizer parameters, some pre-processing on the Mapnik Stylefile has to take place. The Mapnik XML file is generated from a template.</p>
+
+<p>PGMapCSS is designed for Mapnik but might work with other renderers too. See file [[doc/compatibility.creole|Compatibility]] for more information.</p>
+
+<p>Developers: Every compiled style consists of a couple of PostgreSQL functions. See [[doc/API.md]] for details.</p>
+
+<p>Share this:</p>
+
+<ul>
+<li>[[<a href="https://flattr.com/submit/auto?user_id=plepe&amp;url=https://github.com/plepe/pgmapcss&amp;title=PGMapCSS&amp;language=&amp;tags=github&amp;category=software%7CFlattr">https://flattr.com/submit/auto?user_id=plepe&amp;url=https://github.com/plepe/pgmapcss&amp;title=PGMapCSS&amp;language=&amp;tags=github&amp;category=software|Flattr</a> this!]]</li>
+<li>[[<a href="https://github.com/plepe/pgmapcss%7CFork">https://github.com/plepe/pgmapcss|Fork</a> me on GitHub]]</li>
+</ul><p>Find installation instructions in [[doc/install.md]].</p>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/plepe">plepe</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+    
+  </body>
+</html>
