@@ -4,9 +4,8 @@ returns text
 as $$
 #variable_conflict use_variable
 declare
-  x text;
 begin
-  if eval_boolean(Array[x], object, current, render_context) = 'true' then
+  if eval_boolean(param, object, current, render_context) = 'true' then
     return 'false';
   end if;
 
