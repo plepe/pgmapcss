@@ -31,7 +31,7 @@ def load():
     eval_functions.register('lt', op='<', math_level=7)
     eval_functions.register('mul', op='*', math_level=4)
     eval_functions.register('nonidentical', op=('!==', 'ne'), math_level=7)
-    eval_functions.register('not', op='!', math_level=2)
+    eval_functions.register('not', op='!', math_level=10, unary=True)
     eval_functions.register('or', op='||', math_level=1)
     eval_functions.register('sub', op='-', math_level=1)
     eval_functions.register('cond', compiler=compile_cond)

@@ -5,15 +5,24 @@ from .ParseError import *
 import pgmapcss.db.eval
 
 eval_operators = None
+unary_operators = None
 
 def read_eval_operators():
     global eval_operators
+    global unary_operators
     eval_functions = pgmapcss.db.eval.load()
 
     eval_operators = {
         op: { 'op': op, 'math_level': v['math_level'] }
         for k, v in eval_functions.items()
-        if 'op' in v
+        if 'op' in v and v['unary'] == False
+        for op in v['op']
+    }
+
+    unary_operators = {
+        op: { 'op': op, 'math_level': v['math_level'] }
+        for k, v in eval_functions.items()
+        if 'op' in v and v['unary'] == True
         for op in v['op']
     }
 
@@ -24,6 +33,8 @@ def parse_eval(to_parse, math_level=0, current_op=None, rek=0):
     # sort eval_operators by length desc (so that e.g. > does not match >=)
     ops = sorted([ k for k in eval_operators ], key=len, reverse=True)
     eval_op_regexp = '(' + '|'.join([re.sub(r'([\?\.\+\*\^\$\|\\])', r'\\\1', k) for k in ops]) + ')'
+    ops = sorted([ k for k in unary_operators ], key=len, reverse=True)
+    unary_op_regexp = '(' + '|'.join([re.sub(r'([\?\.\+\*\^\$\|\\])', r'\\\1', k) for k in ops]) + ')'
     current = ''
     current_result = []
     mode = 0
@@ -70,6 +81,19 @@ def parse_eval(to_parse, math_level=0, current_op=None, rek=0):
             elif to_parse.match('["\']', wind=None):
                 r = parse_string(to_parse)
                 current_result.append('v:' + r)
+                mode = 20
+
+            # unary operator
+            elif to_parse.match(unary_op_regexp, wind=None):
+                current = to_parse.match_group(1)
+                to_parse.wind(len(to_parse.match_group(0)))
+
+                j = int(unary_operators[current]['math_level'])
+
+                result = parse_eval(to_parse, math_level=j, rek=rek+1)
+
+                current_result.append([ 'o:!', result ])
+                current = ''
                 mode = 20
 
         elif mode == 1:
