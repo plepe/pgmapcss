@@ -5,7 +5,7 @@ class Functions:
     def list(self):
         return self.eval_functions
 
-    def register(self, func, op=None, math_level=None, compiler=None):
+    def register(self, func, op=None, math_level=None, compiler=None, unary=False):
         f = {}
 
         if func in self.eval_functions:
@@ -22,5 +22,9 @@ class Functions:
 
         if compiler:
             f['compiler'] = compiler
+
+        # only change unary when operation has been passed
+        if op:
+            f['unary'] = unary
 
         self.eval_functions[func] = f

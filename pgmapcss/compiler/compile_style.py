@@ -11,7 +11,6 @@ def compile_style(id, stat):
         for i in stat['statements']
         if i['selector']['pseudo_element'] != '*'
     })
-    print(stat['pseudo_elements'])
     ret['function_check'] = compile_function_check(id, stat)
     ret['function_get_where'] = compile_function_get_where(id, stat)
     ret['function_match'] = compile_function_match(id, stat)

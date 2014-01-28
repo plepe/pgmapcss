@@ -31,7 +31,7 @@ If you read a number, unit conversion takes place. The following units are suppo
 | , or ; | several statements separated by , or ; will always return the value of the last statement.
 | ~= | list membership; whether list contains an element. | no standard
 | && | logical and | no standard
-| || | logical or | no standard
+| {{{||}}} | logical or | no standard
 | ! | logical not | no standard
 
 == Functions ==
