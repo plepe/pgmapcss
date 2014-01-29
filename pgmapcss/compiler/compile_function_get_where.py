@@ -108,15 +108,13 @@ def compile_function_get_where(id, stat):
         max_scale = min_scale
 
         if ret == '':
-            ret += '  if'
+            ret += 'if'
         else:
-            ret += '  elsif'
+            ret += 'elif'
 
         ret += \
-            ' render_context.scale_denominator >= ' + str(min_scale) + ' then\n' +\
-            '    return ' + db.format(conditions) + ';\n'
-
-    ret += '  end if;\n\n'
+            ' render_context[\'scale_denominator\'] >= ' + str(min_scale) + ':\n' +\
+            '    return pghstore.dumps(' + repr(conditions) + ')\n'
 
     replacement = {
       'style_id': id,
@@ -127,11 +125,9 @@ def compile_function_get_where(id, stat):
 create or replace function {style_id}_get_where(
   render_context\tpgmapcss_render_context
 ) returns hstore as $body$
-declare
-begin
+import pghstore
 {content}
-end;
-$body$ language 'plpgsql' immutable;
+$body$ language 'plpython3u' immutable;
 '''.format(**replacement)
 
     return ret
