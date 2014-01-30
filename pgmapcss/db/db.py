@@ -49,3 +49,6 @@ def install(style_id, style, conn):
 
 def prepare(sql):
     return conn.prepare(sql)
+
+def query_functions():
+    return resource_string(__name__, 'osm2pgsql.py').decode('utf-8')
