@@ -5,12 +5,15 @@ class Functions:
     def list(self):
         return self.eval_functions
 
-    def print(self):
+    def print(self, indent=''):
         ret = ''
 
         for func, f in self.eval_functions.items():
             if 'src' in f:
                 ret += f['src']
+
+        # indent all lines
+        ret = indent + ret.replace('\n', '\n' + indent)
 
         return ret
 
