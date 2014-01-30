@@ -29,17 +29,60 @@ import re
 match_where = None
 {match_where}
 
+combined_objects = {{}}
 results = []
-for object in objects(match_where):
-    for result in check(object):
-        if type(result) != tuple or len(result) == 0:
-            plpy.notice('unknown check result: ', result)
-        elif result[0] == 'result':
-            results.append(result[1])
-        elif result[0] == 'combine':
-            pass
-        else:
-            plpy.notice('unknown check result: ', result)
+src = objects(match_where)
+
+def ST_Collect(geometries):
+    plan = plpy.prepare('select ST_Collect($1) as r', ['geometry[]'])
+    res = plpy.execute(plan, [geometries])
+    return res[0]['r']
+
+def dict_merge(dicts):
+    ret = {{}}
+
+    for d in dicts:
+        for k, v in d.items():
+            if k not in ret:
+                ret[k] = set()
+
+            ret[k].add(v)
+
+    for k, vs in ret.items():
+        ret[k] = ';'.join(vs)
+
+    return ret
+
+while src:
+    for object in src:
+        for result in check(object):
+            if type(result) != tuple or len(result) == 0:
+                plpy.notice('unknown check result: ', result)
+            elif result[0] == 'result':
+                results.append(result[1])
+            elif result[0] == 'combine':
+                if result[1] not in combined_objects:
+                    combined_objects[result[1]] = {{}}
+                if result[2] not in combined_objects[result[1]]:
+                    combined_objects[result[1]][result[2]] = []
+                combined_objects[result[1]][result[2]].append(result[3])
+            else:
+                plpy.notice('unknown check result: ', result)
+
+    src = None
+
+    if len(combined_objects):
+        src = []
+        for combine_type, items in combined_objects.items():
+            for combine_id, obs in items.items():
+                src.append({{
+                    'id': ';'.join([ ob['id'] for ob in obs ]),
+                    'types': [ combine_type ],
+                    'tags': dict_merge([ ob['tags'] for ob in obs ]),
+                    'geo': ST_Collect([ ob['geo'] for ob in obs ])
+                }})
+
+        combined_objects = []
 
 layers = sorted(set(
     x['properties'].get('layer', 0)
