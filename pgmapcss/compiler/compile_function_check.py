@@ -33,43 +33,39 @@ def compile_function_check(id, stat):
     }
 
     ret = '''\
-create or replace function {style_id}_check(
-  object\tpgmapcss_object,
-  render_context\tpgmapcss_render_context
-) returns setof pgmapcss_result as $body$
-import pghstore
-import re
 # eval-functions
-def to_float(v, default=None):
-    try:
-        return float(v)
-    except ValueError:
-        return default
-def float_to_str(v, default=None):
-    r = repr(v)
-    if r[-2:] == '.0':
-        r = r[:-2]
-    return r
+def check(object):
+    def to_float(v, default=None):
+        try:
+            return float(v)
+        except ValueError:
+            return default
+    def float_to_str(v, default=None):
+        r = repr(v)
+        if r[-2:] == '.0':
+            r = r[:-2]
+        return r
 '''.format(**replacement)
 
-    ret += pgmapcss.eval.functions().print()
+    ret += pgmapcss.eval.functions().print(indent='    ')
 
-    ret += '''\
+    ret += '''
+
 # initialize variables
-current = {{
-    'object': object,
-    'pseudo_elements': {pseudo_elements},
-    'tags': pghstore.loads(object['tags']),
-    'types': object['types'],
-    'properties': {{
-        pseudo_element: {{ 'geo': object['geo'] }}
-        for pseudo_element in {pseudo_elements}
-     }},
-    'has_pseudo_element': {{
-        pseudo_element: False
-        for pseudo_element in {pseudo_elements}
-     }},
-}}
+    current = {{
+        'object': object,
+        'pseudo_elements': {pseudo_elements},
+        'tags': object['tags'],
+        'types': object['types'],
+        'properties': {{
+            pseudo_element: {{ 'geo': object['geo'] }}
+            for pseudo_element in {pseudo_elements}
+         }},
+        'has_pseudo_element': {{
+            pseudo_element: False
+            for pseudo_element in {pseudo_elements}
+         }},
+    }}
 
 # All statements
 '''.format(**replacement)
@@ -79,25 +75,25 @@ current = {{
 
     ret += '''\
 # Finally build return value(s)
-ret = {{
-    'id': object['id'],
-    'types': object['types'],
-    'tags': pghstore.dumps(current['tags']),
-    'style-element': None,
-    'combine_type': None,
-    'combine_id': None,
-}}
+    ret = {{
+        'id': object['id'],
+        'types': object['types'],
+        'tags': current['tags'],
+        'style-element': None,
+        'combine_type': None,
+        'combine_id': None,
+    }}
 
-# iterate over all pseudo-elements, sorted by 'object-z-index' if available
-for pseudo_element in sorted({pseudo_elements}, key=lambda s: to_float(current['properties'][s]['object-z-index'], 0.0) if 'object-z-index' in current['properties'][s] else 0):
-    if current['has_pseudo_element'][pseudo_element]:
-        current['pseudo_element'] = pseudo_element # for eval functions
-        ret['pseudo_element'] = pseudo_element
+    # iterate over all pseudo-elements, sorted by 'object-z-index' if available
+    for pseudo_element in sorted({pseudo_elements}, key=lambda s: to_float(current['properties'][s]['object-z-index'], 0.0) if 'object-z-index' in current['properties'][s] else 0):
+        if current['has_pseudo_element'][pseudo_element]:
+            current['pseudo_element'] = pseudo_element # for eval functions
+            ret['pseudo_element'] = pseudo_element
 '''.format(**replacement)
 
     # handle @values, @default_other for all properties
     done_prop = []
-    indent = '        '
+    indent = '            '
     # start with props from @depend_property
     for main_prop, props in stat['defines']['depend_property'].items():
         props = props['value'].split(';')
@@ -123,12 +119,10 @@ for pseudo_element in sorted({pseudo_elements}, key=lambda s: to_float(current['
                "] = " + compile_eval(v['value']) + '\n'
 
     ret += '''\
-        # set geo as return value AND remove key from properties
-        ret['geo'] = current['properties'][pseudo_element].pop('geo');
-        ret['properties'] = pghstore.dumps(current['properties'][pseudo_element])
-        yield(ret)
-
-$body$ language 'plpython3u' immutable;
+            # set geo as return value AND remove key from properties
+            ret['geo'] = current['properties'][pseudo_element].pop('geo');
+            ret['properties'] = current['properties'][pseudo_element]
+            yield(ret)
 '''.format(**replacement)
 
     return ret

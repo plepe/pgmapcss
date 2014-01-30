@@ -43,8 +43,6 @@ def db_init(conn):
     db_update(conn)
 
 def install(style_id, style, conn):
-    conn.execute(style['function_check'])
-    conn.execute(style['function_get_where'])
     conn.execute(style['function_match'])
 
 def prepare(sql):

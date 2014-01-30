@@ -1,4 +1,7 @@
 import pgmapcss.db as db
+from .compile_function_get_where import compile_function_get_where
+from .compile_function_check import compile_function_check
+from pkg_resources import *
 
 def compile_function_match(id, stat):
     replacement = {
@@ -6,10 +9,63 @@ def compile_function_match(id, stat):
       'style_element_property': db.format({
           k: '{' + ','.join(v['value'].split(';')) + '}'
           for k, v in stat['defines']['style_element_property'].items()
-      })
+      }),
+      'match_where': compile_function_get_where(id, stat),
+      'db_query': db.query_functions(),
+      'function_check': compile_function_check(id, stat)
     }
 
     ret = '''\
+create or replace function {style_id}_match(
+  render_context\tpgmapcss_render_context,
+  all_style_elements\ttext[] default Array['default']
+) returns setof pgmapcss_result as $body$
+import pghstore
+import re
+#  t timestamp with time zone; -- profiling
+#  t := clock_timestamp(); -- profiling
+{db_query}
+{function_check}
+match_where = None
+{match_where}
+
+results = []
+for object in objects(match_where):
+    for result in check(object):
+        results.append(result)
+
+layers = sorted(set(
+    x['properties'].get('layer', 0)
+    for x in results
+), key=float)
+plpy.notice(layers)
+
+for layer in layers:
+    results_layer = sorted([
+        x
+        for x in results
+        if x['properties'].get('layer', 0) == layer
+    ],
+    key=lambda x: x['properties'].get('z-index', 0))
+
+    for style_element in all_style_elements:
+        for result in results_layer:
+            yield {{
+                'id': result['id'],
+                'types': result['types'],
+                'tags': pghstore.dumps(result['tags']),
+                'style-element': style_element,
+                'pseudo_element': result['pseudo_element'],
+                'combine_type': None,
+                'combine_id': None,
+                'geo': result['geo'],
+                'properties': pghstore.dumps(result['properties'])
+            }}
+
+$body$ language 'plpython3u' immutable;
+'''.format(**replacement);
+
+    ret1 = '''\
 create or replace function {style_id}_match(
   render_context\tpgmapcss_render_context,
   "all-style-elements"\ttext[] default Array['default']
@@ -17,9 +73,7 @@ create or replace function {style_id}_match(
 declare
   ret pgmapcss_result;
   "max-style-element" int;
-  t timestamp with time zone; -- profiling
 begin
-  t := clock_timestamp(); -- profiling
   "max-style-element" := array_upper("all-style-elements", 1);
   return query
     select * from (
@@ -53,4 +107,5 @@ end;
 $body$ language 'plpgsql' immutable;
 '''.format(**replacement);
 
+    print(ret)
     return ret

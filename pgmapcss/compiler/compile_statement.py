@@ -3,7 +3,7 @@ from .compile_link_selector import compile_link_selector
 from .compile_properties import compile_properties
 from .compile_conditions import compile_conditions
 
-def compile_statement(statement, stat, indent=''):
+def compile_statement(statement, stat, indent='    '):
     ret = ''
     object_selector = statement['selector']
 

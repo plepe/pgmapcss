@@ -114,20 +114,6 @@ def compile_function_get_where(id, stat):
 
         ret += \
             ' render_context[\'scale_denominator\'] >= ' + str(min_scale) + ':\n' +\
-            '    return pghstore.dumps(' + repr(conditions) + ')\n'
-
-    replacement = {
-      'style_id': id,
-      'content': ret
-    }
-
-    ret = '''\
-create or replace function {style_id}_get_where(
-  render_context\tpgmapcss_render_context
-) returns hstore as $body$
-import pghstore
-{content}
-$body$ language 'plpython3u' immutable;
-'''.format(**replacement)
+            '    match_where = ' + repr(conditions) + '\n'
 
     return ret
