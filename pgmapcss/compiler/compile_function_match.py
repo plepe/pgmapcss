@@ -6,8 +6,8 @@ from pkg_resources import *
 def compile_function_match(id, stat):
     replacement = {
       'style_id': id,
-      'style_element_property': db.format({
-          k: '{' + ','.join(v['value'].split(';')) + '}'
+      'style_element_property': repr({
+          k: v['value'].split(';')
           for k, v in stat['defines']['style_element_property'].items()
       }),
       'match_where': compile_function_get_where(id, stat),
@@ -32,13 +32,19 @@ match_where = None
 results = []
 for object in objects(match_where):
     for result in check(object):
-        results.append(result)
+        if type(result) != tuple or len(result) == 0:
+            plpy.notice('unknown check result: ', result)
+        elif result[0] == 'result':
+            results.append(result[1])
+        elif result[0] == 'combine':
+            pass
+        else:
+            plpy.notice('unknown check result: ', result)
 
 layers = sorted(set(
     x['properties'].get('layer', 0)
     for x in results
 ), key=float)
-plpy.notice(layers)
 
 for layer in layers:
     results_layer = sorted([
@@ -50,17 +56,24 @@ for layer in layers:
 
     for style_element in all_style_elements:
         for result in results_layer:
-            yield {{
-                'id': result['id'],
-                'types': result['types'],
-                'tags': pghstore.dumps(result['tags']),
-                'style-element': style_element,
-                'pseudo_element': result['pseudo_element'],
-                'combine_type': None,
-                'combine_id': None,
-                'geo': result['geo'],
-                'properties': pghstore.dumps(result['properties'])
-            }}
+            # check if any property for the current style element is set (or
+            # there is no entry for the current style element in
+            # @style_element_property
+            if {style_element_property}.get(style_element) == None or \
+                len(set(
+                True
+                for k in {style_element_property}.get(style_element)
+                if result['properties'].get(k)
+            )):
+                yield {{
+                    'id': result['id'],
+                    'types': result['types'],
+                    'tags': pghstore.dumps(result['tags']),
+                    'style-element': style_element,
+                    'pseudo_element': result['pseudo_element'],
+                    'geo': result['geo'],
+                    'properties': pghstore.dumps(result['properties'])
+                }}
 
 $body$ language 'plpython3u' immutable;
 '''.format(**replacement);
@@ -107,5 +120,4 @@ end;
 $body$ language 'plpgsql' immutable;
 '''.format(**replacement);
 
-    print(ret)
     return ret

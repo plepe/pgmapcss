@@ -41,7 +41,5 @@ create type pgmapcss_result as (
   types			text[],
   pseudo_element	text,
   properties		hstore,
-  "style-element"       text,
-  combine_type		text,
-  combine_id		text
+  "style-element"       text
 );

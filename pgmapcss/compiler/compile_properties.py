@@ -20,17 +20,14 @@ def compile_properties(statement, stat, indent=''):
             ret += indent + "current['tags'].pop(" + repr(prop['key']) + ')\n'
 
         elif prop['assignment_type'] == 'C':
-            ret += indent + '''yield({
+            ret += indent + '''yield(( 'combine', {
     'id': object['id'],
     'tags': pghstore.dumps(current['tags']),
     'geo': current['properties'][''' + statement['current_pseudo_element'] + ''']['geo'],
     'types': object['types'],
-    'pseudo_element': None,
-    'properties': None,
-    'style-element': None,
     'combine_type': ''' + repr(prop['key']) + ''',
     'combine_id': ''' + compile_value(prop, stat) + ''',
-})
+}))
 '''
 
     return ret

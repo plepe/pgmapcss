@@ -78,10 +78,7 @@ def check(object):
     ret = {{
         'id': object['id'],
         'types': object['types'],
-        'tags': current['tags'],
-        'style-element': None,
-        'combine_type': None,
-        'combine_id': None,
+        'tags': current['tags']
     }}
 
     # iterate over all pseudo-elements, sorted by 'object-z-index' if available
@@ -122,7 +119,7 @@ def check(object):
             # set geo as return value AND remove key from properties
             ret['geo'] = current['properties'][pseudo_element].pop('geo');
             ret['properties'] = current['properties'][pseudo_element]
-            yield(ret)
+            yield(( 'result', ret))
 '''.format(**replacement)
 
     return ret
