@@ -82,7 +82,7 @@ line[highway] {
 }
 /* test */
 
-way[highway=primary] > node[crossing] {
-    text: "X";
+way[highway=primary] >[sequence_id] node[crossing] {
+    text: eval(link_tag(sequence_id));
     text-color: #ffffff;
 }

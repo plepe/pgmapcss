@@ -130,7 +130,7 @@ def flatarray_to_members(arr):
         ret.append({
             'member_id': arr[i],
             'role': arr[i + 1],
-            'sequence_id': math.floor(i / 2)
+            'sequence_id': str(math.floor(i / 2))
         })
 
     return ret
@@ -165,7 +165,7 @@ def objects_member_of(member_id, parent_type, parent_conditions):
                         'geo': r['geo'],
                         'link_tags': {
                             'member_id': member_id,
-                            'sequence_id': i
+                            'sequence_id': str(i)
                         }
                     }
                     yield(t)

@@ -16,7 +16,7 @@ def compile_statement(statement, stat, indent='    '):
         indent += '    '
         ret += indent + "current['parent_object'] = parent_object\n"
         ret += indent + "current['link_object'] = { 'tags': parent_object['link_tags'] }\n"
-        ret += indent + "current['link_object']['tags']['index'] = parent_index\n"
+        ret += indent + "current['link_object']['tags']['index'] = str(parent_index)\n"
         ret += indent + 'if (' +\
           compile_conditions(statement['parent_selector']['conditions'], stat, "current['parent_object']['tags']") + ') and (' +\
           compile_conditions(statement['link_selector']['conditions'], stat, "current['link_object']['tags']") + '):\n'
