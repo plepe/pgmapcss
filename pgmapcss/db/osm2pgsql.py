@@ -117,6 +117,48 @@ where osm_id<0 and {bbox} ( {w} )
 #  -- Uncomment this line for profiling information
 #  -- raise notice 'querying db objects took %', clock_timestamp() - t;
 
+def objects_by_id(id_list):
+    _id_list = [ int(i[1:]) for i in id_list if i[0] == 'n' ]
+    plan = plpy.prepare('select * from planet_osm_point where osm_id=any($1)', ['bigint[]']);
+    res = plpy.execute(plan, [_id_list])
+    for r in res:
+        yield {
+            'id': 'n' + str(r['osm_id']),
+            'members': [],
+            'tags': pghstore.loads(r['tags']),
+            'geo': r['way'],
+            'types': ['node', 'point']
+        }
+
+    _id_list = [ int(i[1:]) for i in id_list if i[0] == 'w' ]
+    plan = plpy.prepare("select t.*, planet_osm_ways.nodes from (select osm_id, tags, way, 'line' as _type from planet_osm_line where osm_id=any($1) union select osm_id, tags, way, 'way' as _type from planet_osm_polygon where osm_id=any($1)) t left join planet_osm_ways on t.osm_id=planet_osm_ways.id", ['bigint[]']);
+    res = plpy.execute(plan, [_id_list])
+    for r in res:
+        yield {
+            'id': 'w' + str(r['osm_id']),
+            'members': [ {
+                    'member_id': 'n' + str(m),
+                    'sequence_id': str(i)
+                }
+                for i, m in enumerate(r['nodes'])
+            ],
+            'tags': pghstore.loads(r['tags']),
+            'geo': r['way'],
+            'types': ['way', r['_type']]
+        }
+
+    _id_list = [ int(i[1:]) for i in id_list if i[0] == 'r' ]
+    plan = plpy.prepare("select id, planet_osm_rels.tags, members, planet_osm_polygon.way from planet_osm_rels left join planet_osm_polygon on -planet_osm_rels.id=planet_osm_polygon.osm_id where id=any($1)", ['bigint[]'])
+    res = plpy.execute(plan, [_id_list])
+    for r in res:
+        yield {
+            'id': 'r' + str(r['id']),
+            'tags': flatarray_to_tags(r['tags']),
+            'members': flatarray_to_members(r['members']),
+            'geo': r['way'],
+            'types': ['relation'] if r['way'] is None else ['relation', 'area']
+        }
+
 def flatarray_to_tags(arr):
     ret = {}
     for i in range(0, len(arr), 2):
