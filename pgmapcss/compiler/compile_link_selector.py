@@ -14,16 +14,10 @@ def compile_link_selector(statement, stat):
             repr(statement['parent_selector']['type']) + ", " +\
             repr(parent_conditions) + ")"
 
-#        return 'select t_parent_object.* from ' +\
-#            'objects_' + statement['parent_selector']['type'] +\
-#            '_member_of(object.id) t_parent_object where ' +\
-#            compile_selector_part(statement['parent_selector'], stat, 't_parent_object.')
-
     elif statement['link_selector']['type'] == '<':
-        return 'select t_parent_object.* from ' +\
-            'objects_' + statement['parent_selector']['type'] +\
-            '_members(object.id) t_parent_object where ' +\
-            compile_selector_part(statement['parent_selector'], stat, 't_parent_object.')
+        return "objects_members(object['id'], " +\
+            repr(statement['parent_selector']['type']) + ", " +\
+            repr(parent_conditions) + ")"
 
     elif statement['link_selector']['type'] == 'near':
         distance = '100'

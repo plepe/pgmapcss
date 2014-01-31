@@ -211,6 +211,32 @@ def objects_member_of(member_id, parent_type, parent_conditions):
                         }
                     }
                     yield(t)
+
+def objects_members(relation_id, parent_type, parent_conditions):
+    ob = list(objects_by_id([relation_id]))
+
+    if not len(ob):
+        return
+
+    ob = ob[0]
+
+    link_obs_ids = [ i['member_id'] for i in ob['members'] ]
+    link_obs = {}
+    for o in objects_by_id(link_obs_ids):
+        link_obs[o['id']] = o
+
+    for member in ob['members']:
+        if not member['member_id'] in link_obs:
+            continue
+
+        ret = link_obs[member['member_id']]
+
+        if parent_type not in ret['types']:
+            continue
+
+        ret['link_tags'] = member
+        yield ret
+
 #end;
 #$$ language 'plpgsql' immutable;
 #
