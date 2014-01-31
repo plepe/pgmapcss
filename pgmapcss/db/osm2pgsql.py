@@ -135,20 +135,40 @@ def flatarray_to_members(arr):
 
     return ret
 
-def objects_relation_member_of(member_id, parent_conditions):
-    plan = plpy.prepare('select * from planet_osm_rels where members @> Array[$1]', ['text']);
-    res = plpy.execute(plan, [member_id])
-    for r in res:
-        for member in flatarray_to_members(r['members']):
-            if member['member_id'] == member_id:
-                t = {
-                    'id': 'r' + str(r['id']),
-                    'tags': flatarray_to_tags(r['tags']),
-                    'type': ['relation'],
-                    'geo': None,
-                    'link_tags': member
-                }
-                yield(t)
+def objects_member_of(member_id, parent_type, parent_conditions):
+    if parent_type == 'relation':
+        plan = plpy.prepare('select * from planet_osm_rels where members @> Array[$1]', ['text']);
+        res = plpy.execute(plan, [member_id])
+        for r in res:
+            for member in flatarray_to_members(r['members']):
+                if member['member_id'] == member_id:
+                    t = {
+                        'id': 'r' + str(r['id']),
+                        'tags': flatarray_to_tags(r['tags']),
+                        'type': ['relation'],
+                        'geo': None,
+                        'link_tags': member
+                    }
+                    yield(t)
+
+    if parent_type == 'way':
+        num_id = int(member_id[1:])
+        plan = plpy.prepare('select id, nodes, planet_osm_line.tags, way as geo from planet_osm_ways left join planet_osm_line on planet_osm_ways.id=planet_osm_line.osm_id where nodes @> Array[$1]', ['bigint']);
+        res = plpy.execute(plan, [num_id])
+        for r in res:
+            for i, member in enumerate(r['nodes']):
+                if member == num_id:
+                    t = {
+                        'id': 'w' + str(r['id']),
+                        'tags': pghstore.loads(r['tags']),
+                        'type': ['way'],
+                        'geo': r['geo'],
+                        'link_tags': {
+                            'member_id': member_id,
+                            'sequence_id': i
+                        }
+                    }
+                    yield(t)
 #end;
 #$$ language 'plpgsql' immutable;
 #

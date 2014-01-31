@@ -10,8 +10,8 @@ def compile_link_selector(statement, stat):
     ])
 
     if statement['link_selector']['type'] in ('>', ''):
-        return 'objects_' + statement['parent_selector']['type'] +\
-            "_member_of(object['id'], " +\
+        return "objects_member_of(object['id'], " +\
+            repr(statement['parent_selector']['type']) + ", " +\
             repr(parent_conditions) + ")"
 
 #        return 'select t_parent_object.* from ' +\
