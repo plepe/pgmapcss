@@ -18,7 +18,7 @@ def compile_function_match(id, stat):
     ret = '''\
 create or replace function {style_id}_match(
   render_context\tpgmapcss_render_context,
-  all_style_elements\ttext[] default Array['default']
+  _all_style_elements\ttext[] default Array['default']
 ) returns setof pgmapcss_result as $body$
 import pghstore
 import re
@@ -31,7 +31,18 @@ match_where = None
 
 combined_objects = {{}}
 results = []
-src = objects(match_where)
+all_style_elements = _all_style_elements
+# dirty hack - when render_context.bbox is null, pass type of object instead of style-element
+if render_context['bbox'] == None:
+    src = [{{
+        'types': all_style_elements,
+        'tags': {{}},
+        'id': '',
+        'geo': ''
+    }}]
+    all_style_elements = ['default']
+else:
+    src = objects(match_where)
 
 def ST_Collect(geometries):
     plan = plpy.prepare('select ST_Collect($1) as r', ['geometry[]'])
