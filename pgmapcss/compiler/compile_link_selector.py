@@ -1,13 +1,23 @@
 from .compile_selector_part import compile_selector_part
 from .compile_conditions import compile_conditions
+from .compile_condition_sql import compile_condition_sql
 import pgmapcss.db as db
 
 def compile_link_selector(statement, stat):
+    parent_conditions = ' and '.join([
+        compile_condition_sql(c, stat, prefix='') or 'true'
+        for c in statement['parent_selector']['conditions']
+    ])
+
     if statement['link_selector']['type'] in ('>', ''):
-        return 'select t_parent_object.* from ' +\
-            'objects_' + statement['parent_selector']['type'] +\
-            '_member_of(object.id) t_parent_object where ' +\
-            compile_selector_part(statement['parent_selector'], stat, 't_parent_object.')
+        return 'objects_' + statement['parent_selector']['type'] +\
+            "_member_of(object['id'], " +\
+            repr(parent_conditions) + ")"
+
+#        return 'select t_parent_object.* from ' +\
+#            'objects_' + statement['parent_selector']['type'] +\
+#            '_member_of(object.id) t_parent_object where ' +\
+#            compile_selector_part(statement['parent_selector'], stat, 't_parent_object.')
 
     elif statement['link_selector']['type'] == '<':
         return 'select t_parent_object.* from ' +\

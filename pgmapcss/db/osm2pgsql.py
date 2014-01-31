@@ -117,6 +117,38 @@ where osm_id<0 and {bbox} ( {w} )
 #  -- Uncomment this line for profiling information
 #  -- raise notice 'querying db objects took %', clock_timestamp() - t;
 
+def flatarray_to_tags(arr):
+    ret = {}
+    for i in range(0, len(arr), 2):
+        ret[arr[i]] = arr[i + 1]
+    return ret
+
+def flatarray_to_members(arr):
+    import math
+    ret = []
+    for i in range(0, len(arr), 2):
+        ret.append({
+            'member_id': arr[i],
+            'role': arr[i + 1],
+            'sequence_id': math.floor(i / 2)
+        })
+
+    return ret
+
+def objects_relation_member_of(member_id, parent_conditions):
+    plan = plpy.prepare('select * from planet_osm_rels where members @> Array[$1]', ['text']);
+    res = plpy.execute(plan, [member_id])
+    for r in res:
+        for member in flatarray_to_members(r['members']):
+            if member['member_id'] == member_id:
+                t = {
+                    'id': 'r' + str(r['id']),
+                    'tags': flatarray_to_tags(r['tags']),
+                    'type': ['relation'],
+                    'geo': None,
+                    'link_tags': member
+                }
+                yield(t)
 #end;
 #$$ language 'plpgsql' immutable;
 #
