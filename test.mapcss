@@ -81,3 +81,8 @@ line[highway] {
   shield-image: url('examples/highest_peaks_large.svg');
 }
 /* test */
+
+way[highway=primary] > node[crossing] {
+    text: "X";
+    text-color: #ffffff;
+}
