@@ -57,18 +57,19 @@ def check(object):
         ret += compile_statement(i, stat)
 
     ret += '''\
-# Finally build return value(s)
-    ret = {{
-        'id': object['id'],
-        'types': object['types'],
-        'tags': current['tags']
-    }}
-
     # iterate over all pseudo-elements, sorted by 'object-z-index' if available
     for pseudo_element in sorted({pseudo_elements}, key=lambda s: to_float(current['properties'][s]['object-z-index'], 0.0) if 'object-z-index' in current['properties'][s] else 0):
         if current['has_pseudo_element'][pseudo_element]:
             current['pseudo_element'] = pseudo_element # for eval functions
-            ret['pseudo_element'] = pseudo_element
+
+            # Finally build return value(s)
+            ret = {{
+                'id': object['id'],
+                'types': object['types'],
+                'tags': current['tags'],
+                'pseudo_element': pseudo_element
+            }}
+
 '''.format(**replacement)
 
     # handle @values, @default_other for all properties
