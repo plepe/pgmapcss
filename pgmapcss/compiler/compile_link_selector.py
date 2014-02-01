@@ -38,4 +38,3 @@ def compile_link_selector(statement, stat):
 
     else:
         raise Exception('Unknown link selector "{type}"'.format(**selector['link_selector']))
-        #return 'select null::text id, null::hstore tags, null::geometry geo, null::text[] types, null::hstore link_tags from generate_series(1, 0)';
