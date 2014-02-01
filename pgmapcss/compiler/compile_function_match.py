@@ -119,7 +119,7 @@ while src:
 layers = sorted(set(
     x['properties'].get('layer', 0)
     for x in results
-), key=float)
+), key=lambda x: to_float(x, 0))
 
 for layer in layers:
     results_layer = sorted([
@@ -127,7 +127,7 @@ for layer in layers:
         for x in results
         if x['properties'].get('layer', 0) == layer
     ],
-    key=lambda x: x['properties'].get('z-index', 0))
+    key=lambda x: to_float(x['properties'].get('z-index'), 0))
 
     for style_element in all_style_elements:
         for result in results_layer:
