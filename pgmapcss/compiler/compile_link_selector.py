@@ -21,7 +21,7 @@ def compile_link_selector(statement, stat):
             repr(parent_conditions) + ")"
 
     elif statement['link_selector']['type'] == 'near':
-        distance = '100'
+        distance = { 'value': '100' }
 
         for r in statement['link_selector']['conditions']:
             if r['key'] == 'distance' and r['op'] in ('<', '<='):
