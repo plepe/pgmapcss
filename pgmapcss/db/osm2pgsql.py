@@ -278,5 +278,5 @@ def objects_near(max_distance, ob, parent_selector, where_clause):
             }
             obs.append(ob)
 
-    sorted(obs, key=lambda ob: ob['__distance'] )
+    obs = sorted(obs, key=lambda ob: ob['__distance'] )
     return obs
