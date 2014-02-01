@@ -1,5 +1,6 @@
 from .parse_string import parse_string
 from .parse_eval import parse_eval
+from .parse_value import parse_value
 from .ParseError import *
 
 def parse_condition(current, to_parse):
@@ -42,6 +43,13 @@ def parse_condition(current, to_parse):
 
         condition['value'] = value
         condition['value_type'] = 'eval'
+
+    elif to_parse.match('([0-9\.]+)(px|m|u)\s*]'):
+        if to_parse.match_group(2) == 'px':
+            condition['value'] = to_parse.match_group(1)
+        else:
+            condition['value'] = [ 'f:metric', 'v:' + to_parse.match_group(1) + to_parse.match_group(2) ]
+            condition['value_type'] = 'eval'
 
     else:
         m = to_parse.match('([^\]]*)\]')
