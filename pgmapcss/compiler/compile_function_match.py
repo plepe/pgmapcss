@@ -60,7 +60,7 @@ if render_context['bbox'] == None:
     }}]
     all_style_elements = ['default']
 else:
-    src = objects(match_where)
+    src = objects(render_context.get('bbox'), match_where)
 
 def ST_Collect(geometries):
     plan = plpy.prepare('select ST_Collect($1) as r', ['geometry[]'])

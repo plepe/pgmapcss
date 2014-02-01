@@ -1,12 +1,12 @@
 # Use this functions only with a database based on an import with osm2pgsql
-def objects(where_clauses):
+def objects(_bbox, where_clauses):
     import pghstore
 #    t = clock_timestamp();
 
     qry = ''
 
     bbox = ''
-    if 'bbox' in render_context and render_context['bbox'] is not None:
+    if _bbox is not None:
         bbox = 'way && $1 and'
 
     # planet_osm_point
@@ -24,7 +24,7 @@ where {bbox} ( {w} )
 '''.format(bbox=bbox, w=' or '.join(w))
 
         plan = plpy.prepare(qry, [ 'geometry' ] )
-        res = plpy.execute(plan, [ render_context['bbox'] ])
+        res = plpy.execute(plan, [ _bbox ])
 
         for r in res:
             r['tags'] = pghstore.loads(r['tags'])
@@ -45,7 +45,7 @@ where osm_id>0 and {bbox} ( {w} )
 '''.format(bbox=bbox, w=' or '.join(w))
 
         plan = plpy.prepare(qry, [ 'geometry' ] )
-        res = plpy.execute(plan, [ render_context['bbox'] ])
+        res = plpy.execute(plan, [ _bbox ])
 
         for r in res:
             r['tags'] = pghstore.loads(r['tags'])
@@ -66,7 +66,7 @@ where osm_id<0 and {bbox} ( {w} )
 '''.format(bbox=bbox, w=' or '.join(w))
 
         plan = plpy.prepare(qry, [ 'geometry' ] )
-        res = plpy.execute(plan, [ render_context['bbox'] ])
+        res = plpy.execute(plan, [ _bbox ])
 
         for r in res:
             r['tags'] = pghstore.loads(r['tags'])
@@ -87,7 +87,7 @@ where osm_id>0 and {bbox} ( {w} )
 '''.format(bbox=bbox, w=' or '.join(w))
 
         plan = plpy.prepare(qry, [ 'geometry' ] )
-        res = plpy.execute(plan, [ render_context['bbox'] ])
+        res = plpy.execute(plan, [ _bbox ])
 
         for r in res:
             r['tags'] = pghstore.loads(r['tags'])
@@ -108,7 +108,7 @@ where osm_id<0 and {bbox} ( {w} )
 '''.format(bbox=bbox, w=' or '.join(w))
 
         plan = plpy.prepare(qry, [ 'geometry' ] )
-        res = plpy.execute(plan, [ render_context['bbox'] ])
+        res = plpy.execute(plan, [ _bbox ])
 
         for r in res:
             r['tags'] = pghstore.loads(r['tags'])
