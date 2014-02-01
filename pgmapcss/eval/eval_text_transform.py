@@ -1,27 +1,34 @@
 def eval_text_transform(param):
+    if len(param) == 0:
+        return ''
+
+    if len(param) == 1:
+        return param[0]
+
+    if param[1] == 'none':
+        return param[0]
+
+    elif param[1] == 'uppercase':
+        return param[0].upper()
+
+    elif param[1] == 'lowercase':
+        return param[0].lower()
+
+    elif param[1] == 'capitalize':
+        return param[0].title()
+
     return param[0]
-#create or replace function eval_text_transform(param text[],
-#  object pgmapcss_object, current pgmapcss_current, render_context pgmapcss_render_context)
-#returns text
-#as $$
-##variable_conflict use_variable
-#declare
-#begin
-#  if array_upper(param, 1) is null then
-#    return null;
-#  end if;
-#  
-#  if array_upper(param, 1) = 1 then
-#    return param[1];
-#  end if;
-#
-#  return (CASE
-#    WHEN param[2] = 'none' THEN param[1]
-#    WHEN param[2] = 'uppercase' THEN upper(param[1])
-#    WHEN param[2] = 'lowercase' THEN lower(param[1])
-#    WHEN param[2] = 'capitalize' THEN (select array_to_string(array_agg(v), ' ') from (select upper(substring(v, 1, 1)) || lower(substring(v, 2)) v from (select unnest(string_to_array('foo bar Test bLA', ' ')) v) t) t)
-#    ELSE param[1]
-#  END);
-#end;
-#$$ language 'plpgsql' immutable;
-#
+
+# TESTS
+# IN [ 'fOO bar Bla teST' ]
+# OUT 'fOO bar Bla teST'
+# IN [ 'fOO bar Bla teST', 'none' ]
+# OUT 'fOO bar Bla teST'
+# IN [ 'fOO bar Bla teST', 'uppercase' ]
+# OUT 'FOO BAR BLA TEST'
+# IN [ 'fOO bar Bla teST', 'lowercase' ]
+# OUT 'foo bar bla test'
+# IN [ 'fOO bar Bla teST', 'capitalize' ]
+# OUT 'Foo Bar Bla Test'
+# IN [ 'fOO bar Bla teST', 'foobar' ]
+# OUT 'fOO bar Bla teST'
