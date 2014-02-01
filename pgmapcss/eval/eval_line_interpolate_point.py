@@ -1,5 +1,5 @@
 def eval_line_interpolate_point(param):
-    if len(param) == 0:
+    if len(param) == 0 or not param[0]:
         return ''
 
     if len(param) == 1:
@@ -30,3 +30,5 @@ def eval_line_interpolate_point(param):
 # OUT '010100002031BF0D00EC51B8DE163A3A410AD7A36078B45641'
 # IN ['010200002031BF0D0002000000EC51B8DE163A3A410AD7A36078B45641295C8F826E393A4152B81E8573B45641', '5px']
 # OUT '010100002031BF0D0022BF50FF0A3A3A41F58FF20878B45641'
+# IN ['', '5px']
+# OUT ''
