@@ -2,6 +2,7 @@ import pgmapcss.db as db
 from .compile_function_get_where import compile_function_get_where
 from .compile_function_check import compile_function_check
 from pkg_resources import *
+import pgmapcss.eval
 
 def compile_function_match(id, stat):
     replacement = {
@@ -12,7 +13,21 @@ def compile_function_match(id, stat):
       }),
       'match_where': compile_function_get_where(id, stat),
       'db_query': db.query_functions(),
-      'function_check': compile_function_check(id, stat)
+      'function_check': compile_function_check(id, stat),
+      'eval_functions': '''\
+# eval-functions
+def to_float(v, default=None):
+    try:
+        return float(v)
+    except ValueError:
+        return default
+def float_to_str(v, default=None):
+    r = repr(v)
+    if r[-2:] == '.0':
+        r = r[:-2]
+    return r
+''' +\
+pgmapcss.eval.functions().print(indent='')
     }
 
     ret = '''\
@@ -24,7 +39,10 @@ import pghstore
 import re
 #  t timestamp with time zone; -- profiling
 #  t := clock_timestamp(); -- profiling
+global current
+current = None
 {db_query}
+{eval_functions}
 {function_check}
 match_where = None
 {match_where}

@@ -1,7 +1,6 @@
 from .compile_statement import compile_statement
 from .compile_eval import compile_eval
 from .stat import *
-import pgmapcss.eval
 
 def print_checks(prop, stat, main_prop=None, indent=''):
     ret = ''
@@ -32,26 +31,10 @@ def compile_function_check(id, stat):
       'pseudo_elements': repr(stat['pseudo_elements'])
     }
 
-    ret = '''\
-# eval-functions
+    ret = '''
 def check(object):
-    def to_float(v, default=None):
-        try:
-            return float(v)
-        except ValueError:
-            return default
-    def float_to_str(v, default=None):
-        r = repr(v)
-        if r[-2:] == '.0':
-            r = r[:-2]
-        return r
-'''.format(**replacement)
-
-    ret += pgmapcss.eval.functions().print(indent='    ')
-
-    ret += '''
-
 # initialize variables
+    global current
     current = {{
         'object': object,
         'pseudo_elements': {pseudo_elements},
