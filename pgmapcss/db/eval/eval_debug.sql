@@ -5,7 +5,11 @@ as $$
 #variable_conflict use_variable
 declare
 begin
-  raise notice '%', param[1];
+  if array_upper(param, 1) = 1 then
+    raise notice '%', param[1];
+  else
+    raise notice '%', param;
+  end if;
 
   return param[1];
 end;
