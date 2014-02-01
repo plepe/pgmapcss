@@ -1,3 +1,7 @@
 def eval_debug(param):
-    plpy.notice(param[0])
+    if len(param) == 1:
+        plpy.notice(param[0])
+    else:
+        plpy.notice(param)
+
     return param[0]
