@@ -20,14 +20,6 @@ def connect(args):
     return conn
 
 def db_update(conn):
-    files = [ 'pgmapcss_render_context.sql' ]
-
-    for f in files:
-        print('Installing', f)
-        c = resource_string(__name__, f)
-        c = c.decode('utf-8')
-        conn.execute(c)
-
     db_version_update()
 
 def db_init(conn):

@@ -32,7 +32,8 @@ pgmapcss.eval.functions().print(indent='')
 
     ret = '''\
 create or replace function {style_id}_match(
-  render_context\tpgmapcss_render_context,
+  IN bbox                geometry,
+  IN scale_denominator   float,
   _all_style_elements\ttext[] default Array['default']
 ) returns setof pgmapcss_result as $body$
 import pghstore
@@ -40,7 +41,9 @@ import re
 #  t timestamp with time zone; -- profiling
 #  t := clock_timestamp(); -- profiling
 global current
+global render_context
 current = None
+render_context = {{ 'bbox': bbox, 'scale_denominator': scale_denominator }}
 {db_query}
 {eval_functions}
 {function_check}
