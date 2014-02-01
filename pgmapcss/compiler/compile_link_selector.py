@@ -1,6 +1,7 @@
 from .compile_selector_part import compile_selector_part
 from .compile_conditions import compile_conditions
 from .compile_condition_sql import compile_condition_sql
+from .compile_eval import compile_eval
 import pgmapcss.db as db
 
 def compile_link_selector(statement, stat):
@@ -24,13 +25,16 @@ def compile_link_selector(statement, stat):
 
         for r in statement['link_selector']['conditions']:
             if r['key'] == 'distance' and r['op'] in ('<', '<='):
-                distance = r['value']
+                distance = r
 
-        return 'select * from ' +\
-            'objects_near(' + db.format(distance) + ', object, current, render_context, ' +\
-            db.format({
-                statement['parent_selector']['type']: compile_conditions(statement['parent_selector']['conditions'], stat)
-            }) + '::hstore)'
+        if distance.get('value_type') == 'eval':
+            distance = compile_eval(distance['value'])
+        else:
+            distance = repr(distance['value'])
+
+        return "objects_near(" + distance + ", None, "+\
+            repr(statement['parent_selector']['type']) + ", " +\
+            repr(parent_conditions) + ")"
 
     else:
         raise Exception('Unknown link selector "{type}"'.format(**selector['link_selector']))

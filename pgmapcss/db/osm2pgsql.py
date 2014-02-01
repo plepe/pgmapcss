@@ -1,5 +1,5 @@
 # Use this functions only with a database based on an import with osm2pgsql
-def objects(_bbox, where_clauses):
+def objects(_bbox, where_clauses, add_columns=[], add_param_type=[], add_param_value=[]):
     import pghstore
 #    t = clock_timestamp();
 
@@ -8,6 +8,14 @@ def objects(_bbox, where_clauses):
     bbox = ''
     if _bbox is not None:
         bbox = 'way && $1 and'
+
+    if len(add_columns):
+        add_columns = ', ' + ', '.join(add_columns)
+    else:
+        add_columns = ''
+
+    param_type = [ 'geometry' ] + add_param_type
+    param_value = [ _bbox ] + add_param_value
 
     # planet_osm_point
     w = []
@@ -19,12 +27,13 @@ def objects(_bbox, where_clauses):
         qry = '''
 select 'n' || cast(osm_id as text) as id,
        tags, way as geo, Array['point', 'node'] as types
+       {add_columns}
 from planet_osm_point
 where {bbox} ( {w} )
-'''.format(bbox=bbox, w=' or '.join(w))
+'''.format(bbox=bbox, w=' or '.join(w), add_columns=add_columns)
 
-        plan = plpy.prepare(qry, [ 'geometry' ] )
-        res = plpy.execute(plan, [ _bbox ])
+        plan = plpy.prepare(qry, param_type )
+        res = plpy.execute(plan, param_value )
 
         for r in res:
             r['tags'] = pghstore.loads(r['tags'])
@@ -40,12 +49,13 @@ where {bbox} ( {w} )
         qry = '''
 select 'w' || cast(osm_id as text) as id,
        tags, way as geo, Array['line', 'way'] as types
+       {add_columns}
 from planet_osm_line
 where osm_id>0 and {bbox} ( {w} )
-'''.format(bbox=bbox, w=' or '.join(w))
+'''.format(bbox=bbox, w=' or '.join(w), add_columns=add_columns)
 
-        plan = plpy.prepare(qry, [ 'geometry' ] )
-        res = plpy.execute(plan, [ _bbox ])
+        plan = plpy.prepare(qry, param_type )
+        res = plpy.execute(plan, param_value )
 
         for r in res:
             r['tags'] = pghstore.loads(r['tags'])
@@ -61,12 +71,13 @@ where osm_id>0 and {bbox} ( {w} )
         qry = '''
 select 'r' || cast(-osm_id as text) as id,
        tags, way as geo, Array['line', 'relation'] as types
+       {add_columns}
 from planet_osm_line
 where osm_id<0 and {bbox} ( {w} )
-'''.format(bbox=bbox, w=' or '.join(w))
+'''.format(bbox=bbox, w=' or '.join(w), add_columns=add_columns)
 
-        plan = plpy.prepare(qry, [ 'geometry' ] )
-        res = plpy.execute(plan, [ _bbox ])
+        plan = plpy.prepare(qry, param_type )
+        res = plpy.execute(plan, param_value )
 
         for r in res:
             r['tags'] = pghstore.loads(r['tags'])
@@ -82,12 +93,13 @@ where osm_id<0 and {bbox} ( {w} )
         qry = '''
 select 'w' || cast(osm_id as text) as id,
        tags, way as geo, Array['area', 'way'] as types
+       {add_columns}
 from planet_osm_polygon
 where osm_id>0 and {bbox} ( {w} )
-'''.format(bbox=bbox, w=' or '.join(w))
+'''.format(bbox=bbox, w=' or '.join(w), add_columns=add_columns)
 
-        plan = plpy.prepare(qry, [ 'geometry' ] )
-        res = plpy.execute(plan, [ _bbox ])
+        plan = plpy.prepare(qry, param_type )
+        res = plpy.execute(plan, param_value )
 
         for r in res:
             r['tags'] = pghstore.loads(r['tags'])
@@ -103,12 +115,13 @@ where osm_id>0 and {bbox} ( {w} )
         qry = '''
 select 'r' || cast(-osm_id as text) as id,
        tags, way as geo, Array['area', 'relation'] as types
+       {add_columns}
 from planet_osm_polygon
 where osm_id<0 and {bbox} ( {w} )
-'''.format(bbox=bbox, w=' or '.join(w))
+'''.format(bbox=bbox, w=' or '.join(w), add_columns=add_columns)
 
-        plan = plpy.prepare(qry, [ 'geometry' ] )
-        res = plpy.execute(plan, [ _bbox ])
+        plan = plpy.prepare(qry, param_type )
+        res = plpy.execute(plan, param_value )
 
         for r in res:
             r['tags'] = pghstore.loads(r['tags'])
@@ -237,14 +250,33 @@ def objects_members(relation_id, parent_type, parent_conditions):
         ret['link_tags'] = member
         yield ret
 
-#end;
-#$$ language 'plpgsql' immutable;
-#
-#def objects_near(max_distance, geom, where_clause):
-#    max_distance = to_float(eval_metric([ max_distance, 'u' ]))
-#    if max_distance is None:
-#        raise StopIteration
-#
-#    plan = plpy.prepare('select *, ST_Distance($1, way) as __distance from
-#
-#
+def objects_near(max_distance, ob, parent_selector, where_clause):
+    if ob:
+        geom = ob['geo']
+    else:
+        geom = current['properties'][current['pseudo_element']]['geo']
+
+    max_distance = to_float(eval_metric([ max_distance, 'u' ]))
+    if max_distance is None:
+        return []
+
+    plan = plpy.prepare('select ST_Buffer(ST_Envelope($1), $2) as r', ['geometry', 'float'])
+    res = plpy.execute(plan, [ geom, max_distance ])
+    bbox = res[0]['r']
+
+    obs = []
+    for ob in objects(
+        bbox,
+        { parent_selector: where_clause },
+        [ 'ST_Distance($2, way) as __distance' ],
+        [ 'geometry' ],
+        [ geom ]
+    ):
+        if ob['__distance'] <= max_distance:
+            ob['link_tags'] = {
+                'distance': eval_metric([ str(ob['__distance']) + 'u', 'px' ])
+            }
+            obs.append(ob)
+
+    sorted(obs, key=lambda ob: ob['__distance'] )
+    return obs
