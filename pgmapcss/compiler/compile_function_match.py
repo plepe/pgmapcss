@@ -38,8 +38,8 @@ create or replace function {style_id}_match(
 ) returns setof pgmapcss_result as $body$
 import pghstore
 import re
-#  t timestamp with time zone; -- profiling
-#  t := clock_timestamp(); -- profiling
+import datetime
+time_start = datetime.datetime.now() # profiling
 global current
 global render_context
 current = None
@@ -149,6 +149,9 @@ for layer in layers:
                     'geo': result['geo'],
                     'properties': pghstore.dumps(result['properties'])
                 }}
+
+time_stop = datetime.datetime.now() # profiling
+plpy.notice('total run of match() (incl. querying db objects) took %.2fs' % (time_stop - time_start).total_seconds())
 
 $body$ language 'plpython3u' immutable;
 '''.format(**replacement);
