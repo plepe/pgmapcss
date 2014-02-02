@@ -208,7 +208,7 @@ def objects_member_of(member_id, parent_type, parent_conditions):
 
     if parent_type == 'way':
         num_id = int(member_id[1:])
-        plan = plpy.prepare('select id, nodes, planet_osm_line.tags, way as geo from planet_osm_ways left join planet_osm_line on planet_osm_ways.id=planet_osm_line.osm_id where nodes @> Array[$1]', ['bigint']);
+        plan = plpy.prepare('select id, nodes, planet_osm_line.tags, way as geo from planet_osm_ways left join planet_osm_line on planet_osm_ways.id=planet_osm_line.osm_id where nodes::bigint[] @> Array[$1]', ['bigint']);
         res = plpy.execute(plan, [num_id])
         for r in res:
             for i, member in enumerate(r['nodes']):
