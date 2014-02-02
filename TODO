@@ -1,3 +1,16 @@
+IDEAS:
+* pre-defined icons, e.g. circle, square
+: e.g. icon-type: circle; icon-size: 5; icon-color: #ff0000;
+* defining colors with hsl() function + eval function hsl()
+* css3 color names
+* colors with 3(4) hex values, e.g. #f3c => #ff33cc
+* improve return structure of eval parser
+* eval-selector, e.g. node[eval(tag(foo) == 'bar')] { ... }
+* beautify and document test.mapcss
+* include osm data for tests
+* unit tests
+* improve profiling
+
 NEEDS WORK:
 * scaling icons
 * Eval: zmetric
@@ -6,6 +19,3 @@ NEEDS WORK:
 NOT POSSIBLE RIGHT NOW:
 * text-decoration
 * font-variant
-
-IDEAS:
-* extra functions for some object types (e.g. canvas, combined features, ...)
