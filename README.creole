@@ -24,4 +24,4 @@ Share this:
 * [[https://flattr.com/submit/auto?user_id=plepe&url=https://github.com/plepe/pgmapcss&title=PGMapCSS&language=&tags=github&category=software|Flattr this!]]
 * [[https://github.com/plepe/pgmapcss|Fork me on GitHub]]
 
-Find installation instructions in [[doc/install.md]].
+Find installation instructions in [[doc/Install pgmapcss with Mapnik_2.0 on Ubuntu_12.04.md]].
