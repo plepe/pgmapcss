@@ -83,10 +83,11 @@ line[highway] {
 }
 /* test */
 
-way[highway=primary] >[sequence_id] node[crossing] {
-    text: eval(link_tag(sequence_id));
-    text-color: #ffffff;
-}
+// very slow with 32bit osm2pgsql
+//way[highway=primary] >[sequence_id] node[crossing] {
+//    text: eval(link_tag(sequence_id));
+//    text-color: #ffffff;
+//}
 line[highway=secondary] near[distance<=50m] area[building] {
     fill-color: #a07f7f;
 }
