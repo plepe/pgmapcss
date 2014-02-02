@@ -23,7 +23,7 @@ def db_update(conn):
     db_version_update()
 
 def db_init(conn):
-    files = [ 'pgmapcss_types.sql' ]
+    files = [ 'pgmapcss_types.sql', 'osm2pgsql.sql' ]
 
     for f in files:
         print('Installing', f)
