@@ -8,7 +8,7 @@ pgmapcss compiles MapCSS styles into a database function. Mapnik just needs to c
 
 Features
 --------
-* Writing MapCSS styles is simple, e.g.:
+* **Writing MapCSS styles is simple, e.g.:**
 ```css
 line|z15-[highway=primary] {
   color: #ffff00;
@@ -21,7 +21,11 @@ line|z15-[highway=primary] {
 
   Every line with highway=primary should be displayed with a yellow 6px wide line with a 1.5px darkgrey casing (on both sides). Additional the value of the 'name'-tag should be shown on top of the line. This style is valid from zoom level 15 on.
 
-* Extensive eval-syntax: Using eval() values for properties can be calculated. Even geometric modifications are possible as many PostGIS functions are exposed. Examples:
+  See [MapCSS Documentation](doc/MapCSS.creole) for general documentation about pgmapcss' dialect of the MapCSS language and [the list of available properties (Mapnik 2.2)](doc/mapnik-2.2.creole) for possible style parameters (resp. [here for Mapnik 2.0](doc/mapnik-2.0.creole) and [here for the experimental "expr-v2" branch](doc/expr-v2.creole)).
+
+* **Extensive eval-syntax:**
+
+  Using eval(), values for properties can be calculated. Even geometric modifications are possible as many PostGIS functions are exposed. Examples:
 ```css
 line|z15-[highway=primary] {
   /* print "ref - name" as text, e.g. "B1 - Wienerstraße". */
@@ -40,11 +44,13 @@ line|z15-[highway=primary] {
 
   In fact you can write the last line as "width: 30m;" as pgmapcss supports other units than pixels. (Still it needs Mapnik >= 3.0, as older mapnik versions can't read the width of a line from a database column). (As of this writing in January 2014 there is only one [specific mapnik branch](https://github.com/mapnik/mapnik/tree/stroke-width-expr) which supports this feature, although the [expr-v2 branch](https://github.com/mapnik/mapnik/tree/expr-v2) is expected to support it soon).
 
-* Combine features:
+  See [the "eval" documentation](doc/eval.creole) for a complete list of functions.
+
+* **Combine features:**
 
   Often it makes sense to combine similar features, e.g. streets which are split into short parts due to changes in their street layout. This results in missing street names as the parts are too small. With pgmapcss you can combine those map features, so that the name can span the whole street.
 
-* Relate neighbouring map features:
+* **Relate neighbouring map features:**
 
   Set neighbouring map features into relation. Map features don't exist independent from their surroundings. This can be done using the "near" link syntax. This is a pgmapcss specific enhancement.
 
@@ -65,20 +71,19 @@ line[highway] near[index=0] point[amenity=restaurant] {
 }
 ```
 
-* pgmapcss is (mostly) fast:
+* **pgmapcss is (mostly) fast:**
 
   Optimized database queries: Only those map features which are visible in the current zoom level are requested from the database.
 
   The compiled database function uses PL/Python3 database language, which makes execution efficient and powerful.
 
-  As Mapnik 2.x can't read symbolizer values (like color, width, ...) from database columns, extensive pre-processing has to take place for complex stylesheets, which can take a long time. The coming-up Mapnik 3.0 should solve these issues.
+  As Mapnik 2.x can't read symbolizer values (like color, width, ...) from database columns, the mapnik pre-processor has to create style rules for all possible value combinations. The more complex the style sheet, the larger the mapnik style files and therefore rendering can take a long time. The up-coming Mapnik 3.0 should solve these issues.
 
-* Easy to install:
+* **Easy to install:**
 
-  Find installation instructions in [[doc/Install pgmapcss with Mapnik_2.0 on Ubuntu_12.04.md]].
+  Find installation instructions in [Install pgmapcss with Mapnik 2.2 on Ubuntu 12.04](doc/Install pgmapcss with Mapnik_2.2 on Ubuntu_12.04.md).
 
 Share this
 ----------
-* [[https://flattr.com/submit/auto?user_id=plepe&url=https://github.com/plepe/pgmapcss&title=PGMapCSS&language=&tags=github&category=software|Flattr this!]]
-* [[https://github.com/plepe/pgmapcss|Fork me on GitHub]]
-
+* [Flattr this!](https://flattr.com/submit/auto?user_id=plepe&url=https://github.com/plepe/pgmapcss&title=PGMapCSS&language=&tags=github&category=software)
+* [Fork me on GitHub](https://github.com/plepe/pgmapcss)
