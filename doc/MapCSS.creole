@@ -77,7 +77,7 @@ Matches are always case sensitive (except regexp). Valid characters for keys are
 
 The tag 'osm_id' will be set to the ID of the object.
 
-==== Comparision expressions ===
+==== Comparision expressions ====
 |= Operator |= Description |= Compatibility
 | = | Exact match of the value. E.g. {{{[highway=residential]}}}. | MapCSS 0.2
 | != | Value not equal. Negation of =. | MapCSS 0.2
@@ -92,6 +92,21 @@ The tag 'osm_id' will be set to the ID of the object.
 * As value you may use an eval-statement as in the properties (see below) (except 'Regular expression match). E.g. {{{node[place=city][population>eval(100*100)]}}}
 
 ¹ MapCSS 0.2 does not define case insensitive matches.
+
+==== Eval expression ====
+Additionally you can use an eval()-statement as selector, e.g.
+{{{
+line[eval(tag('name') == 'bar')] { ... }
+}}}
+
+For sure, this simple example can be written as line[name=bar], which also has the advantage, that an efficient database query can be constructed. The above selector would need to load all lines for the given bounding box and evaluate the statement for each. On the other hand, using eval() statements more powerful comparisions are possible, e.g. about the geometry of the object.
+
+Another example:
+{{{
+line[highway][eval(parent_tag('name') == tag('addr:streetname'))] near[index=0][distance<100m] point[addr:housenumber] { ... }
+}}}
+
+This makes sure that the highway's name matches the streetname of the address node.
 
 ==== Test of tag presence/absense ===
 |= Condition |= Description

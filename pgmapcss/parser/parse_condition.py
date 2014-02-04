@@ -13,6 +13,17 @@ def parse_condition(to_parse):
     if r:
         condition['key'] = r
 
+    elif to_parse.match('eval\s*\(\s*'):
+        value = parse_eval(to_parse)
+
+        if not to_parse.match('\s*\)\s*\]'):
+            raise ParseError(to_parse, 'Error parsing eval statement')
+
+        condition['op'] = 'eval'
+        condition['key'] = value
+
+        return condition
+
     elif to_parse.match('([a-zA-Z_0-9\\-\.:]+)'):
         condition['key'] = to_parse.match_group(1)
 

@@ -17,6 +17,10 @@ def compile_condition_sql(condition, stat, prefix='current.'):
         return None
 
     # eval() statements
+    if condition['op'] == 'eval':
+        return None
+
+    # value-eval() statements
     if condition['value_type'] == 'eval':
         # treat other conditions as has_key
         return prefix + 'tags ? ' + db.format(condition['key']);

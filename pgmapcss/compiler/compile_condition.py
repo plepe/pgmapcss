@@ -66,6 +66,10 @@ def compile_condition(condition, stat, var="current['tags']"):
 
         ret += '(' + key + ' in ' + var + ' and re.search(' + condition['value'] + ', ' + var + '[' + key + ']' + flags + '))'
 
+    # eval(...)
+    elif condition['op'] == 'eval':
+        ret += compile_eval(condition['key']) + " not in ('', 'false', 'no', '0', None)"
+
     # unknown operator?
     else:
       print('unknown condition operator: {op} (key: {key}, value: {value})'.format(**condition))
