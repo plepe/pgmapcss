@@ -44,7 +44,9 @@ def parse_selector_part(to_parse, object_class_selector='\*|[a-z_]+'):
 
 # parse conditions - TODO
     while to_parse.match('\['):
-        parse_condition(current, to_parse)
+        result = parse_condition(to_parse)
+        if result:
+            current['conditions'].append(result)
 
 # parse pseudo classes
     while to_parse.match(':([a-zA-Z0-9_]+)'):

@@ -3,7 +3,7 @@ from .parse_eval import parse_eval
 from .parse_value import parse_value
 from .ParseError import *
 
-def parse_condition(current, to_parse):
+def parse_condition(to_parse):
     condition = { 'op': '', 'value_type': 'value' }
 
     if to_parse.match('!'):
@@ -55,7 +55,4 @@ def parse_condition(current, to_parse):
         m = to_parse.match('([^\]]*)\]')
         condition['value'] = to_parse.match_group(1)
 
-    if not 'conditions' in current:
-        current['conditions'] = []
-
-    current['conditions'].append(condition)
+    return condition
