@@ -1,5 +1,7 @@
 Installation on a plain Ubuntu 12.04.3 Server:
 
+I recommend [installing Mapnik 2.2 instead](Install pgmapcss with Mapnik_2.2 on Ubuntu_12.04.md).
+
 Install additional packages:
 ```sh
 sudo apt-get install postgresql postgresql-contrib postgresql-9.1-postgis python-mapnik2 git osm2pgsql python3 python3-setuptools python3-postgresql python3-dev postgresql-plpython3
@@ -35,6 +37,8 @@ Download an OSM file and import to database (you must add --hstore-all on newer 
 ```sh
 osm2pgsql -dtest -Uuser -Hlocalhost -W -s -S /usr/share/osm2pgsql/default.style --hstore -G azores-latest.osm.bz2
 ```
+
+Warning! The osm2pgsql program packaged with Ubuntu 12.04 still uses 32bit ID space for OSM objects. Finally it will no longer be possible to store all objects; also some queries to the database assume 64bit and PostgreSQL can't use database indexes - expect slow behaviour. See [the installing Mapnik 2.2 guide](Install pgmapcss with Mapnik_2.2 on Ubuntu_12.04.md) how to install a new osm2pgsql.
 
 Clone pgmapcss:
 ```sh
