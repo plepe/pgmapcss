@@ -20,25 +20,10 @@ def connect(args):
     return conn
 
 def db_update(conn):
-    files = [ 'pgmapcss_object.sql', 'pgmapcss_render_context.sql', 'objects_osm2pgsql.sql', 'array_search.sql', 'natcasesort.sql', 'pgmapcss_to.sql', 'array_unique.sql', 'hstore_merge.sql' ]
-
-    for f in files:
-        print('Installing', f)
-        c = resource_string(__name__, f)
-        c = c.decode('utf-8')
-        conn.execute(c)
-
-    for f in resource_listdir(__name__, 'eval/'):
-        if f[-4:] == '.sql':
-            print('Installing', f)
-            c = resource_string(__name__, 'eval/' + f)
-            c = c.decode('utf-8')
-            conn.execute(c)
-
     db_version_update()
 
 def db_init(conn):
-    files = [ 'pgmapcss_types.sql' ]
+    files = [ 'pgmapcss_types.sql', 'osm2pgsql.sql' ]
 
     for f in files:
         print('Installing', f)
@@ -50,9 +35,10 @@ def db_init(conn):
     db_update(conn)
 
 def install(style_id, style, conn):
-    conn.execute(style['function_check'])
-    conn.execute(style['function_get_where'])
     conn.execute(style['function_match'])
 
 def prepare(sql):
     return conn.prepare(sql)
+
+def query_functions():
+    return resource_string(__name__, 'osm2pgsql.py').decode('utf-8')

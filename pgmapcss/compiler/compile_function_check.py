@@ -1,18 +1,15 @@
 from .compile_statement import compile_statement
 from .compile_eval import compile_eval
 from .stat import *
-import pgmapcss.db as db
 
-def print_checks(prop, stat, main_prop=None):
+def print_checks(prop, stat, main_prop=None, indent=''):
     ret = ''
 
     # @default_other
     if 'default_other' in stat['defines'] and prop in stat['defines']['default_other']:
         other = stat['defines']['default_other'][prop]['value']
-        ret += 'if (current.styles[r.i]->' + db.format(prop) + ') is null ' +\
-            'then current.styles[r.i] := current.styles[r.i] || hstore(' +\
-            db.format(prop) + ', current.styles[r.i]->' +\
-            db.format(other) + '); end if;\n'
+        ret += indent + 'if not ' + repr(prop) + " in current['properties'][pseudo_element] or current['properties'][pseudo_element][" + repr(prop) + "] is None:\n"
+        ret += indent + "    current['properties'][pseudo_element][" + repr(prop) + "] = current['properties'][pseudo_element][" + repr(other) + "] if " + repr(other) + " in current['properties'][pseudo_element] else None\n"
 
     # @values
     if 'values' in stat['defines'] and prop in stat['defines']['values']:
@@ -23,95 +20,90 @@ def print_checks(prop, stat, main_prop=None):
         # resulting value and - if not allowed - replace by the first
         # allowed value
         if len([ v for v in used_values if not v in values ]):
-            ret += 'if not (current.styles[r.i]->' +\
-                db.format(prop) + ') = any(' +\
-                db.format(values) + ') then ' +\
-                'current.styles[r.i] := current.styles[r.i] || hstore(' +\
-                db.format(prop) + ', ' +\
-                db.format(values[0]) + '); end if;\n';
+            ret += indent + 'if ' + repr(prop) + " not in current['properties'][pseudo_element] or current['properties'][pseudo_element][" + repr(prop) + "] not in " + repr(values) + ":\n"
+            ret += indent + "    current['properties'][pseudo_element][" + repr(prop) + "] = " + repr(values[0]) + '\n'
 
     return ret
 
 def compile_function_check(id, stat):
     replacement = {
       'style_id': id,
-      'pseudo_elements': db.format(stat['pseudo_elements']),
-      'count_pseudo_elements': len(stat['pseudo_elements'])
+      'pseudo_elements': repr(stat['pseudo_elements'])
     }
 
-    ret = '''\
-create or replace function {style_id}_check(
-  object\tpgmapcss_object,
-  render_context\tpgmapcss_render_context
-) returns setof pgmapcss_result as $body$
-declare
-  current pgmapcss_current;
-  ret pgmapcss_result;
-  r record;
-  parent_object record;
-  parent_index int;
-  o pgmapcss_object;
-  i int;
-begin
-  current.pseudo_elements := {pseudo_elements};
-  current.tags := object.tags || hstore('osm_id', object.id);
-  current.types := object.types;
-  -- initialize all styles with the 'geo' property
-  current.styles := array_fill(hstore('geo', object.geo), Array[{count_pseudo_elements}]);
-  current.has_pseudo_element := array_fill(false, Array[{count_pseudo_elements}]);
+    ret = '''
+def check(object):
+# initialize variables
+    global current
+    current = {{
+        'object': object,
+        'pseudo_elements': {pseudo_elements},
+        'tags': object['tags'],
+        'types': object['types'],
+        'properties': {{
+            pseudo_element: {{ 'geo': object['geo'] }}
+            for pseudo_element in {pseudo_elements}
+         }},
+        'has_pseudo_element': {{
+            pseudo_element: False
+            for pseudo_element in {pseudo_elements}
+         }},
+    }}
 
+# All statements
 '''.format(**replacement)
 
     for i in stat['statements']:
         ret += compile_statement(i, stat)
 
-    ret += '''
-  ret.id=object.id;
-  ret.types=object.types;
-  ret.tags=current.tags;
-  for r in select * from (select generate_series(1, {count_pseudo_elements}) i, unnest(current.styles) style) t order by coalesce(cast(style->'object-z-index' as float), 0) asc loop
-    if current.has_pseudo_element[r.i] then
-      current.pseudo_element_ind = r.i;
+    ret += '''\
+    # iterate over all pseudo-elements, sorted by 'object-z-index' if available
+    for pseudo_element in sorted({pseudo_elements}, key=lambda s: to_float(current['properties'][s]['object-z-index'], 0.0) if 'object-z-index' in current['properties'][s] else 0):
+        if current['has_pseudo_element'][pseudo_element]:
+            current['pseudo_element'] = pseudo_element # for eval functions
+
+            # Finally build return value(s)
+            ret = {{
+                'id': object['id'],
+                'types': object['types'],
+                'tags': current['tags'],
+                'pseudo_element': pseudo_element
+            }}
+
 '''.format(**replacement)
 
     # handle @values, @default_other for all properties
     done_prop = []
+    indent = '            '
     # start with props from @depend_property
     for main_prop, props in stat['defines']['depend_property'].items():
         props = props['value'].split(';')
         r = ''
 
-        r += print_checks(main_prop, stat)
+        r += print_checks(main_prop, stat, indent=indent + '    ')
         done_prop.append(main_prop)
 
         for prop in props:
-            r += print_checks(prop, stat, main_prop=main_prop)
+            r += print_checks(prop, stat, main_prop=main_prop, indent=indent + '    ')
             done_prop.append(prop)
 
         if r != '':
-            ret += '      if current.styles[r.i] ? ' + db.format(main_prop) + ' then\n'
+            ret += indent + 'if ' + repr(main_prop) + " in current['properties'][pseudo_element]:\n"
             ret += r
-            ret += '      end if;\n'
 
     for prop in [ prop for prop in stat_properties(stat) if not prop in done_prop ]:
-        ret += print_checks(prop, stat)
+        ret += print_checks(prop, stat, indent)
 
     # postprocess requested properties (see @postprocess)
     for k, v in stat['defines']['postprocess'].items():
-        ret += '      current.styles[r.i] := current.styles[r.i] || hstore(' + db.format(k) + ', ' + compile_eval(v['value']) + ');\n'
+        ret += indent + "current['properties'][pseudo_element][" + repr(k) +\
+               "] = " + compile_eval(v['value']) + '\n'
 
-    ret += '''
-      ret.geo=current.styles[r.i]->'geo';
-      current.styles[r.i] := current.styles[r.i] - 'geo'::text;
-      ret.properties=current.styles[r.i];
-      ret.pseudo_element=(current.pseudo_elements)[r.i];
-      return next ret;
-    end if;
-  end loop;
-
-  return;
-end;
-$body$ language 'plpgsql' immutable;
+    ret += '''\
+            # set geo as return value AND remove key from properties
+            ret['geo'] = current['properties'][pseudo_element].pop('geo');
+            ret['properties'] = current['properties'][pseudo_element]
+            yield(( 'result', ret))
 '''.format(**replacement)
 
     return ret

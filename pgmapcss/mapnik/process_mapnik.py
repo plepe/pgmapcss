@@ -90,7 +90,8 @@ def process_mapnik(style_id, args, stat, conn):
         for prop in stat_properties(stat)
     ])
 
-    res = db.prepare("select * from {style_id}_check(pgmapcss_object('', '', null, Array['canvas']), pgmapcss_render_context(null, null))".format(**replacement))
+    # dirty hack - when render_context.bbox is null, pass type 'canvas' instead of style-element
+    res = db.prepare("select * from {style_id}_match(null, 0, Array['canvas'])".format(**replacement))
     result = res()
     if len(result) > 0:
         canvas_properties = result[0][res.column_names.index('properties')]

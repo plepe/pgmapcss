@@ -64,7 +64,7 @@ If you read a number, unit conversion takes place. The following units are suppo
 | int | value | number | Returns the integer part of the input (e.g. '-5.6' => '-5', '8.9' => '8'). Does not accept units.
 | num | value | number | Checks if the input is a number. If not, none is returned. | MapCSS 0.2
 | round | v number, [s int] | Round the input value v to s decimal places (or 0). E.g. round(-50.6, 1) => -51 | no standard
-| debug | value | value | raise a postgresql notice with the value; returns value. E.g. width: eval(debug(5+4)); | no standard
+| debug | value | value | raise a postgresql notice with the value(s); returns first value. E.g. width: eval(debug(5+4)); => notice '9'; width: eval(debug(5+4, 'test')); => notice [ '9', 'test' ], returns '9'. | no standard
 | text_transform | string, "none" or "uppercase" or "lowercase" or "capitalize" | | no standard
 | osm_id | | text | ID of the object from OpenStreetMap, e.g. 'n1234' | no standard
 | zoom | | number | Returns current zoom level, e.g. '15' | no standard

@@ -2,7 +2,7 @@ import re
 import pgmapcss.db
 from .parse_string import parse_string
 from .ParseError import *
-import pgmapcss.db.eval
+import pgmapcss.eval
 
 eval_operators = None
 unary_operators = None
@@ -10,7 +10,7 @@ unary_operators = None
 def read_eval_operators():
     global eval_operators
     global unary_operators
-    eval_functions = pgmapcss.db.eval.load()
+    eval_functions = pgmapcss.eval.functions().list()
 
     eval_operators = {
         op: { 'op': op, 'math_level': v['math_level'] }

@@ -1,3 +1,8 @@
+0.6.0 release 2014-02-??
+* pgmapcss no longer compiles into PL/pgSQL functions, as this database language is really slow. From 0.6 on pgmapcss creates one big PL/Python3 function, allowing faster execution (many times faster - from about twice for simple styles, up to 20 times complex styles - not counting database queries and Mapnik rendering time) and more advanced features (which will be implemented in future versions). Right now the functionality is more or less equal to version 0.5.
+* Allow "way > node" and "node < way" relations.
+* support for the expr-v2 branch of Mapnik, allowing calculations on colors; the eval functions rgb(), rgba(), deluma() and lighten() were added.
+
 0.5.1 release 2014-01-28
 * Lot's of bugfixes, see Git log for details
 

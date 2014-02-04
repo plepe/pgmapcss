@@ -14,6 +14,7 @@ point[place] {
   text-opacity: 0.7;
 
   z-index: 10;
+  text-transform: uppercase;
 }
 
 area[building] {
@@ -81,3 +82,12 @@ line[highway] {
   shield-image: url('examples/highest_peaks_large.svg');
 }
 /* test */
+
+// very slow with 32bit osm2pgsql
+//way[highway=primary] >[sequence_id] node[crossing] {
+//    text: eval(link_tag(sequence_id));
+//    text-color: #ffffff;
+//}
+line[highway=secondary] near[distance<=50m] area[building] {
+    fill-color: #a07f7f;
+}

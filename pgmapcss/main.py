@@ -8,6 +8,7 @@ import pgmapcss.version
 import argparse
 import getpass
 import pgmapcss.db
+import pgmapcss.eval
 import os
 
 parser = argparse.ArgumentParser(description='Compiles a MapCSS style description into PostgreSQL functions and builds an accompanying Mapnik stylesheet.')
@@ -37,6 +38,10 @@ parser.add_argument('-H', '--host', dest='host',
 parser.add_argument('-t', '--template', dest='base_style',
     required=True,
     help='mapcss/mapnik base style for the correct mapnik version, e.g. "mapnik-2.0"')
+
+parser.add_argument('--eval-tests', dest='eval_tests', action='store_const',
+    const=True, default=False,
+    help='Test all eval functions.')
 
 parser.add_argument('-r', '--database-update', dest='database_update',
     default='auto',
@@ -80,6 +85,9 @@ def main():
 
         else:
             print('* Current DB version: {version}'.format(**db_version))
+
+    if args.eval_tests:
+        pgmapcss.eval.functions().test_all()
 
     stat = {}
 

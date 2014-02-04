@@ -1,6 +1,6 @@
 import pgmapcss.db as db
 from .stat import *
-from .compile_condition import compile_condition
+from .compile_condition_sql import compile_condition_sql
 
 def get_where_selectors(max_scale, min_scale, stat):
     # where_selectors contains indexes of all selectors which we need for match queries
@@ -79,7 +79,7 @@ def compile_function_get_where(id, stat):
                 ' and '.join(
                     [ 'true' ] +
                     [
-                        compile_condition(c, stat, prefix='', match_where=True) or 'true'
+                        compile_condition_sql(c, stat, prefix='') or 'true'
                         for c in stat['statements'][i]['selector']['conditions']
                     ]
                 )
@@ -108,30 +108,12 @@ def compile_function_get_where(id, stat):
         max_scale = min_scale
 
         if ret == '':
-            ret += '  if'
+            ret += 'if'
         else:
-            ret += '  elsif'
+            ret += 'elif'
 
         ret += \
-            ' render_context.scale_denominator >= ' + str(min_scale) + ' then\n' +\
-            '    return ' + db.format(conditions) + ';\n'
-
-    ret += '  end if;\n\n'
-
-    replacement = {
-      'style_id': id,
-      'content': ret
-    }
-
-    ret = '''\
-create or replace function {style_id}_get_where(
-  render_context\tpgmapcss_render_context
-) returns hstore as $body$
-declare
-begin
-{content}
-end;
-$body$ language 'plpgsql' immutable;
-'''.format(**replacement)
+            ' render_context[\'scale_denominator\'] >= ' + str(min_scale) + ':\n' +\
+            '    match_where = ' + repr(conditions) + '\n'
 
     return ret
