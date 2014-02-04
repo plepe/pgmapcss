@@ -35,7 +35,7 @@ psql -d "dbname=test user=user host=localhost password=PASSWORD" -f /usr/share/p
 psql -d "dbname=test user=user host=localhost password=PASSWORD" -f /usr/share/postgresql/9.1/contrib/postgis-1.5/spatial_ref_sys.sql
 ```
 
-Download an OSM file and import to database (you must add --hstore-all on newer osm2pgsql versions, as the meaning of the --hstore parameter has changed):
+Download an OSM file and import to database:
 ```sh
 osm2pgsql -dtest -Uuser -Hlocalhost -W -s -S /usr/share/osm2pgsql/default.style --hstore --hstore-all -G azores-latest.osm.bz2
 ```
