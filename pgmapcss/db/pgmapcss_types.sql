@@ -8,7 +8,7 @@ drop type if exists pgmapcss_result cascade;
 create type pgmapcss_result as (
   id			text,
   tags			hstore,
-  geo			text,
+  geo			geometry,
   types			text[],
   pseudo_element	text,
   properties		hstore,
