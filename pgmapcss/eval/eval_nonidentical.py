@@ -20,3 +20,9 @@ def eval_nonidentical(param):
 # OUT 'true'
 # IN []
 # OUT 'false'
+# IN ['foo', 'bar']
+# OUT 'true'
+# IN ['foo', '5']
+# OUT 'true'
+# IN ['foo', 'foo']
+# OUT 'false'

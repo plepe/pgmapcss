@@ -18,4 +18,9 @@ def eval_identical(param):
 # OUT 'false'
 # IN []
 # OUT 'true'
-
+# IN ['foo', 'bar']
+# OUT 'false'
+# IN ['foo', '5']
+# OUT 'false'
+# IN ['foo', 'foo']
+# OUT 'true'
