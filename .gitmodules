@@ -1,0 +1,3 @@
+[submodule "pgmapcss/icons/maki"]
+	path = pgmapcss/icons/maki
+	url = https://github.com/mapbox/maki.git
