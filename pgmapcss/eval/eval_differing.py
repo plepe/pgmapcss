@@ -8,7 +8,7 @@ def eval_differing(param):
         return 'false'
 
     # convert all values to numbers
-    values = [ eval_metric(v) for v in param ]
+    values = [ eval_metric([v]) for v in param ]
 
     if len(values) != len(set(values)):
         return 'false'
