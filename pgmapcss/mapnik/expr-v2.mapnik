@@ -110,7 +110,7 @@
 <!-- CASING LINES -->
 # FOR casing-linejoin casing-linecap casing-dashes
     <Rule>
-      <Filter>[style-element] = 'casing' and [final-casing-width] and '{casing-linejoin}' = [casing-linejoin] and '{casing-linecap}' = [casing-linecap] and '{casing-dashes}' = [casing-dashes]</Filter>
+      <Filter>[style-element] = 'casing' and [final-casing-width] and [casing-color] and '{casing-linejoin}' = [casing-linejoin] and '{casing-linecap}' = [casing-linecap] and '{casing-dashes}' = [casing-dashes]</Filter>
       <LineSymbolizer stroke="[casing-color]" stroke-width="[final-casing-width]" offset="[casing-offset]" stroke-opacity="[casing-opacity]" stroke-linejoin="{casing-linejoin}" stroke-linecap="{casing-linecap}" stroke-dasharray="{casing-dashes}" />
     </Rule>
 # END
@@ -118,7 +118,7 @@
 <!-- LINES -->
 # FOR linejoin linecap dashes
     <Rule>
-      <Filter>[style-element] = 'line' and [width] and '{linejoin}' = [linejoin] and '{linecap}' = [linecap] and '{dashes}' = [dashes]</Filter>
+      <Filter>[style-element] = 'line' and [width] and [color] and '{linejoin}' = [linejoin] and '{linecap}' = [linecap] and '{dashes}' = [dashes]</Filter>
       <LineSymbolizer stroke="[color]" stroke-width="[width]" offset="[offset]" stroke-opacity="[opacity]" stroke-linejoin="{linejoin}" stroke-linecap="{linecap}" stroke-dasharray="{dashes}" />
     </Rule>
 # END
