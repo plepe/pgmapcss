@@ -10,7 +10,7 @@ def eval_differing(param):
     # convert all values to numbers
     values = [ eval_metric([v]) for v in param ]
 
-    if len(values) != len(set(values)):
+    if not '' in values and len(values) != len(set(values)):
         return 'false'
 
     return 'true';
@@ -23,4 +23,10 @@ def eval_differing(param):
 # IN ['3', '5']
 # OUT 'true'
 # IN []
+# OUT 'false'
+# IN ['foo', 'bar']
+# OUT 'true'
+# IN ['foo', '5']
+# OUT 'true'
+# IN ['foo', 'foo']
 # OUT 'false'

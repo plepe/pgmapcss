@@ -10,7 +10,7 @@ def eval_equal(param):
     # convert all values to numbers
     values = [ eval_metric([v]) for v in param ]
 
-    if len(set(values)) == 1:
+    if not '' in values and len(set(values)) == 1:
         return 'true'
 
     return 'false';
@@ -23,4 +23,10 @@ def eval_equal(param):
 # IN ['5', '5']
 # OUT 'true'
 # IN []
+# OUT 'true'
+# IN ['foo', 'bar']
+# OUT 'false'
+# IN ['foo', '5.0']
+# OUT 'false'
+# IN ['foo', 'foo']
 # OUT 'true'
