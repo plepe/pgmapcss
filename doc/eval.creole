@@ -67,6 +67,7 @@ If you read a number, unit conversion takes place. The following units are suppo
 | debug | value | value | raise a postgresql notice with the value(s); returns first value. E.g. width: eval(debug(5+4)); => notice '9'; width: eval(debug(5+4, 'test')); => notice [ '9', 'test' ], returns '9'. | no standard
 | text_transform | string, "none" or "uppercase" or "lowercase" or "capitalize" | | no standard
 | osm_id | | text | ID of the object from OpenStreetMap, e.g. 'n1234' | no standard
+| style_id | | text | ID of the current style | no standard
 | zoom | | number | Returns current zoom level, e.g. '15' | no standard
 | scale_denominator | | number | Returns current scale denominator, e.g. '17061.8366708' (at zoom level 15) | no standard
 | and | value, [value, [value, ...]] | boolean | logical and | no standard

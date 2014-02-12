@@ -12,6 +12,9 @@ def compile_cond(func, param, eval_param, stat):
     ret += ')'
     return ret
 
+def compile_style_id(func, param, eval_param, stat):
+    return repr(stat['id']);
+
 def load():
     eval_functions = Functions()
 
@@ -33,6 +36,7 @@ def load():
     eval_functions.register('or', op='||', math_level=1)
     eval_functions.register('sub', op='-', math_level=1)
     eval_functions.register('cond', compiler=compile_cond)
+    eval_functions.register('style_id', compiler=compile_style_id)
 
     conn = pgmapcss.db.connection()
 
