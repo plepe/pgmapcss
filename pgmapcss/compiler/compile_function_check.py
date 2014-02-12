@@ -92,7 +92,7 @@ def check(object):
             ret += r
 
     for prop in [ prop for prop in stat_properties(stat) if not prop in done_prop ]:
-        ret += print_checks(prop, stat, indent)
+        ret += print_checks(prop, stat, indent=indent)
 
     # postprocess requested properties (see @postprocess)
     for k, v in stat['defines']['postprocess'].items():
