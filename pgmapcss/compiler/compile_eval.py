@@ -18,7 +18,11 @@ def compile_eval(value, stat):
         if value[0:2] == 'v:':
             return repr(value[2:])
         elif value[0:2] == 'f:':
-            return 'eval_' + valid_func_name(value[2:]) + '(\'[]\'' + eval_param + ')'
+            func = value[2:]
+            if func in eval_functions and 'compiler' in eval_functions[func]:
+                return eval_functions[func]['compiler'](func, [], eval_param, stat)
+            else:
+                return 'eval_' + valid_func_name(func) + '(\'[]\'' + eval_param + ')'
         else:
             raise Exception('compiling eval: ' + repr(value))
 
