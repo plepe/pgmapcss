@@ -3,7 +3,7 @@ from pkg_resources import *
 import pgmapcss.db
 import re
 
-def compile_cond(func, param, eval_param):
+def compile_cond(func, param, eval_param, stat):
     ret = '(' + param[1] + ' if eval_boolean([' + param[0] + ']' + eval_param + ') == \'true\''
     if len(param) > 2:
         ret += ' else ' + param[2]

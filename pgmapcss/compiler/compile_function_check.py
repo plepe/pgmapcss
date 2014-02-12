@@ -97,7 +97,7 @@ def check(object):
     # postprocess requested properties (see @postprocess)
     for k, v in stat['defines']['postprocess'].items():
         ret += indent + "current['properties'][pseudo_element][" + repr(k) +\
-               "] = " + compile_eval(v['value']) + '\n'
+               "] = " + compile_eval(v['value'], stat) + '\n'
 
     ret += '''\
             # set geo as return value AND remove key from properties
