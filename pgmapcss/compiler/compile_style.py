@@ -1,6 +1,6 @@
 from .compile_function_match import compile_function_match
 
-def compile_style(id, stat):
+def compile_style(stat):
     ret = {}
 
 # find list of pseudo elements
@@ -9,6 +9,6 @@ def compile_style(id, stat):
         for i in stat['statements']
         if i['selector']['pseudo_element'] != '*'
     })
-    ret['function_match'] = compile_function_match(id, stat)
+    ret['function_match'] = compile_function_match(stat)
 
     return ret

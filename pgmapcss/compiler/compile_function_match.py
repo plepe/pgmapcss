@@ -4,16 +4,16 @@ from .compile_function_check import compile_function_check
 from pkg_resources import *
 import pgmapcss.eval
 
-def compile_function_match(id, stat):
+def compile_function_match(stat):
     replacement = {
-      'style_id': id,
+      'style_id': stat['id'],
       'style_element_property': repr({
           k: v['value'].split(';')
           for k, v in stat['defines']['style_element_property'].items()
       }),
-      'match_where': compile_function_get_where(id, stat),
+      'match_where': compile_function_get_where(stat['id'], stat),
       'db_query': db.query_functions(),
-      'function_check': compile_function_check(id, stat),
+      'function_check': compile_function_check(stat['id'], stat),
       'eval_functions': '''\
 # eval-functions
 def to_float(v, default=None):

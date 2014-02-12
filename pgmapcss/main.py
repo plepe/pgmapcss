@@ -89,7 +89,7 @@ def main():
     if args.eval_tests:
         pgmapcss.eval.functions().test_all()
 
-    stat = {}
+    stat = { 'id': style_id }
 
     try:
         pgmapcss.parser.parse_file(stat, filename=file_name, base_style=args.base_style)
@@ -104,7 +104,7 @@ def main():
     debug.write("***** Structure of parsed MapCSS style *****\n")
     debug.write(pp.pformat(stat) + '\n')
 
-    style = pgmapcss.compiler.compile_style(style_id, stat)
+    style = pgmapcss.compiler.compile_style(stat)
 
     #pp.pprint(style)
     for i in style:
