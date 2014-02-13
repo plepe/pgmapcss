@@ -63,6 +63,11 @@ def stat_property_values(prop, stat, include_illegal_values=False, value_type=No
         if v != None
     }
 
+    if True in values:
+        if not 'unresolvable_properties' in stat:
+            stat['unresolvable_properties'] = set()
+        stat['unresolvable_properties'].add(key)
+
     return values
 
 def stat_properties_combinations(keys, stat, include_illegal_values=False, value_type=None, pseudo_element=None):
