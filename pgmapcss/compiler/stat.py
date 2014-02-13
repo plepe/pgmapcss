@@ -56,3 +56,19 @@ def stat_property_values(prop, stat, include_illegal_values=False, value_type=No
     }
 
     return values
+
+def stat_properties_combinations(keys, stat):
+    combinations_list = [{}]
+
+    for k in keys:
+        new_combinations_list = []
+
+        for combination in combinations_list:
+            for v in stat_property_values(k, stat):
+                c = combination.copy()
+                c[k] = v
+                new_combinations_list.append(c)
+
+        combinations_list = new_combinations_list
+
+    return combinations_list
