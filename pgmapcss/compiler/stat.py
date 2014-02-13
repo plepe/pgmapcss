@@ -18,7 +18,7 @@ def stat_properties(stat):
         if p['assignment_type'] == 'P'
     ]))
 
-def stat_property_values(prop, stat, include_illegal_values=False):
+def stat_property_values(prop, stat, include_illegal_values=False, value_type=None):
     """Returns set of all values used on this property in any statement.
     Returns boolean 'True' if property is result of an eval expression."""
     values = {
@@ -26,6 +26,7 @@ def stat_property_values(prop, stat, include_illegal_values=False):
         for v in stat['statements']
         for p in v['properties']
         if p['assignment_type'] == 'P' and p['key'] == prop
+        if value_type == None or value_type == p['value_type']
     }
 
     if 'default_other' in stat['defines'] and prop in stat['defines']['default_other']:
