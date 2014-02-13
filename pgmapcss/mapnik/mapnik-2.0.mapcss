@@ -1,6 +1,7 @@
 /* DEFAULT VALUES (and make sure that result columns are available) */
 @type text tag_value;
 @type shield-text tag_value;
+@type icon-image icon;
 
 // The follwing properties default to the final value of another property
 @default_other casing-linecap linecap;
@@ -29,6 +30,11 @@
 @postprocess text eval(text_transform(prop("text"), prop("text-transform")));
 @postprocess shield-text eval(text_transform(prop("shield-text"), prop("shield-text-transform")));
 @postprocess final-casing-width eval(prop("width") + prop("casing-width") * 2);
+@postprocess final-icon-image eval(cond(
+  prop('icon-image') && substr(prop('icon-image'), 0, 5) == 'icon:',
+    style_id() . '.icons/' . substr(prop('icon-image'), 5) . '-24.svg',
+    prop('icon-image')
+  ));
 
 // @depend_property: don't check values for e.g. 'text-position' if no 'text' is set
 @depend_property text "text-position;text-transform;font-family;font-weight;font-style";
@@ -52,6 +58,7 @@
 // PointSymbolizer
   icon-image: ;
   icon-opacity: 1;
+  final-icon-image: ; // used internally to add width and casing-width
 // PolygonSymbolizer
   fill-color: ;
   fill-opacity: 1;

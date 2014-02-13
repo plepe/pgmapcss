@@ -15,9 +15,15 @@ def compile_value(prop, stat):
     elif prop['value_type'] == 'value' and \
         prop['assignment_type'] == 'P' and \
         'type' in stat['defines'] and \
-        prop['key'] in stat['defines']['type'] and \
-        stat['defines']['type'][prop['key']]['value'] == "tag_value":
-        return "current['tags'].get(" + repr(prop['value']) + ")"
+        prop['key'] in stat['defines']['type']:
+        if stat['defines']['type'][prop['key']]['value'] == "tag_value":
+            return "current['tags'].get(" + repr(prop['value']) + ")"
+
+        if stat['defines']['type'][prop['key']]['value'] == "icon":
+            return repr("icon:" + prop['value'])
+
+        else:
+            return repr(prop['value'])
 
     else:
         return repr(prop['value'])

@@ -18,7 +18,7 @@ This is the list of properties when using Mapnik branch expr-v2 (as of Jan 10, 2
 
 === Point properties ===
 |= CSS parameter |= Description |= Mapnik parameter |= support Mapnik expr-v2 |= Compatibility MapCSS 0.2
-| icon-image | URL (absolute or relative) of an image to use as an icon. | file | yes | YES
+| icon-image | URL (absolute or relative) of an image to use as an icon, e.g. url('img/foo.svg'). Icons from [[https://www.mapbox.com/maki/|Mapbox Maki]] project can be included via their ID, e.g. parking-garage. | file | yes | YES
 | icon-opacity | Opacity of the icon image | opacity | no eval | YES
 | icon-width | Width of image. | - | automatic | IGNORED. scaling should be applied.
 | icon-height | Height of image. | - | automatic | IGNORED. scaling should be applied.

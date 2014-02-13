@@ -132,8 +132,8 @@
 <!-- POINTS -->
 # FOR icon-opacity
     <Rule>
-      <Filter>[style-element] = 'point' and [icon-image] and '{icon-opacity}' = [icon-opacity]</Filter>
-      <PointSymbolizer file="[icon-image]" opacity="{icon-opacity}" />
+      <Filter>[style-element] = 'point' and [final-icon-image] and '{icon-opacity}' = [icon-opacity]</Filter>
+      <PointSymbolizer file="[final-icon-image]" opacity="{icon-opacity}" />
     </Rule>
 # END
 

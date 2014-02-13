@@ -5,6 +5,7 @@ import pprint
 import pgmapcss.parser
 import pgmapcss.compiler
 import pgmapcss.version
+import pgmapcss.icons
 import argparse
 import getpass
 import pgmapcss.db
@@ -112,6 +113,7 @@ def main():
 
     pgmapcss.db.install(style_id, style, conn)
     pgmapcss.mapnik.process_mapnik(style_id, args, stat, conn)
+    pgmapcss.icons.process_icons(style_id, args, stat, conn)
 
     debug.close()
     print('Debug output wrote to ' + style_id + '.output')
