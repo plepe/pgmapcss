@@ -105,6 +105,8 @@ def main():
     debug.write("***** Structure of parsed MapCSS style *****\n")
     debug.write(pp.pformat(stat) + '\n')
 
+    pgmapcss.mapnik.init(stat)
+
     style = pgmapcss.compiler.compile_style(stat)
 
     #pp.pprint(style)

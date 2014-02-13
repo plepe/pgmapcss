@@ -5,6 +5,14 @@ from pkg_resources import *
 import pgmapcss.db as db
 unresolvable_properties = set()
 
+def init(stat):
+    stat_add_generated_property(
+        'final-casing-width',
+        { 'width', 'casing-width' },
+        lambda x: '%g' % (float(x['width'] or '0') + 2 * float(x['casing-width'] or '0')),
+        stat
+    )
+
 def properties_values(key, stat):
     if key == 'final-casing-width':
         # build unique list of all width / casing-width combinations
