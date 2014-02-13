@@ -2,6 +2,18 @@ import os
 from pgmapcss.compiler.stat import *
 from pkg_resources import *
 
+def init(stat):
+    stat_add_generated_property(
+        'final-icon-image',
+        { 'icon-image', 'icon-size', 'icon-color' },
+        lambda x: (
+            x['icon-image'] + '-' + x['icon-size'] + '.svg',
+            x['icon-image'] + '-' + x['icon-color'] + '-' + x['icon-size'] + '.svg',
+            x['icon-color']
+        ),
+        stat
+    )
+
 def process_icons(style_id, args, stat, conn):
     icons_dir = style_id + '.icons'
     try:
@@ -9,13 +21,7 @@ def process_icons(style_id, args, stat, conn):
     except OSError:
         pass
 
-    images = list(set([
-        (image + '-' + size + '.svg', image + '-' + color + '-' + size + '.svg', color)
-        for image in stat_property_values('icon-image', stat, value_type='value')
-        for color in stat_property_values('icon-color', stat)
-        for size in stat_property_values('icon-size', stat)
-    ]))
-    print(images)
+    images = stat_property_values('final-icon-image', stat)
 
     for image in images:
         f1 = resource_stream(__name__, 'maki/src/' + image[0])

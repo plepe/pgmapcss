@@ -106,6 +106,7 @@ def main():
     debug.write(pp.pformat(stat) + '\n')
 
     pgmapcss.mapnik.init(stat)
+    pgmapcss.icons.init(stat)
 
     style = pgmapcss.compiler.compile_style(stat)
 
