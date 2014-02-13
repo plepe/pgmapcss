@@ -24,7 +24,7 @@ def process_icons(style_id, args, stat, conn):
     images = stat_property_values('final-icon-image', stat)
 
     for image in images:
-        f1 = resource_stream(__name__, 'maki/src/' + image[0])
+        f1 = resource_stream(__name__, 'maki/' + image[0])
         f2 = open(icons_dir + '/' + image[1], 'w')
 
         content = f1.read().decode('utf-8')

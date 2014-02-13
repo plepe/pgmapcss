@@ -1,0 +1,14 @@
+mkdir -p pgmapcss/icons/maki
+rm pgmapcss/icons/maki/*
+
+if [ ! -d maki ] ; then
+    git clone https://github.com/mapbox/maki.git
+else
+    cd maki
+    git pull
+    cd ..
+fi
+
+cp -a maki/src/*svg pgmapcss/icons/maki/
+cp -a maki/_includes/maki.json pgmapcss/icons/maki
+git add pgmapcss/icons/maki

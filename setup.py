@@ -13,7 +13,7 @@ setup(
         'pgmapcss.db': [ '*.sql' ],
         'pgmapcss.db.eval': [ '*.sql' ],
         'pgmapcss.mapnik': [ '*.mapcss', '*.mapnik' ],
-        'pgmapcss.icons': [ 'maki/src/*.svg' ],
+        'pgmapcss.icons': [ 'maki/*' ],
     },
     scripts = [ 'bin/pgmapcss' ],
     install_requires = [
