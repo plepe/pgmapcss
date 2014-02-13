@@ -57,14 +57,14 @@ def stat_property_values(prop, stat, include_illegal_values=False, value_type=No
 
     return values
 
-def stat_properties_combinations(keys, stat):
+def stat_properties_combinations(keys, stat, include_illegal_values=False, value_type=None, pseudo_element=None):
     combinations_list = [{}]
 
     for k in keys:
         new_combinations_list = []
 
         for combination in combinations_list:
-            for v in stat_property_values(k, stat):
+            for v in stat_property_values(k, stat, include_illegal_values, value_type, pseudo_element):
                 c = combination.copy()
                 c[k] = v
                 new_combinations_list.append(c)
@@ -72,3 +72,19 @@ def stat_properties_combinations(keys, stat):
         combinations_list = new_combinations_list
 
     return combinations_list
+
+def stat_properties_combinations_smart(keys, stat, include_illegal_values=False, value_type=None, pseudo_elements=None):
+    combinations = []
+
+    if pseudo_elements is None:
+        pseudo_elements = stat['pseudo_elements']
+
+    for pseudo_element in pseudo_elements:
+        combinations += stat_properties_combinations(keys, stat, include_illegal_values, value_type, pseudo_element)
+
+    ret = []
+    for combination in combinations:
+        if not combination in ret:
+            ret += [ combination ]
+
+    return ret
