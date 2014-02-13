@@ -35,6 +35,14 @@ def stat_property_values(prop, stat, include_illegal_values=False, value_type=No
         other = stat_property_values(other, stat, include_illegal_values, value_type, pseudo_element)
         values = values.union(other)
 
+    if 'generated_properties' in stat and prop in stat['generated_properties']:
+        gen = stat['generated_properties'][prop]
+        combinations = stat_properties_combinations(gen[0], stat, include_illegal_values, value_type, pseudo_element)
+        values = values.union({
+            gen[1](combination)
+            for combination in combinations
+        })
+
     if include_illegal_values:
         return values
 
@@ -88,3 +96,10 @@ def stat_properties_combinations_smart(keys, stat, include_illegal_values=False,
             ret += [ combination ]
 
     return ret
+
+def stat_add_generated_property(key, keys, fun, stat):
+    if not 'generated_properties' in stat:
+        stat['generated_properties'] = {}
+
+    stat['generated_properties'][key] = ( keys, fun )
+    print(stat['generated_properties'])
