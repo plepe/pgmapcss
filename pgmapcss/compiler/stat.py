@@ -18,20 +18,21 @@ def stat_properties(stat):
         if p['assignment_type'] == 'P'
     ]))
 
-def stat_property_values(prop, stat, include_illegal_values=False, value_type=None):
+def stat_property_values(prop, stat, include_illegal_values=False, value_type=None, pseudo_element=None):
     """Returns set of all values used on this property in any statement.
     Returns boolean 'True' if property is result of an eval expression."""
     values = {
         True if p['value_type'] == 'eval' else p['value']
         for v in stat['statements']
         for p in v['properties']
+        if pseudo_element == None or v['selector']['pseudo_element'] in ('*', pseudo_element)
         if p['assignment_type'] == 'P' and p['key'] == prop
         if value_type == None or value_type == p['value_type']
     }
 
     if 'default_other' in stat['defines'] and prop in stat['defines']['default_other']:
         other = stat['defines']['default_other'][prop]['value']
-        other = stat_property_values(other, stat, include_illegal_values)
+        other = stat_property_values(other, stat, include_illegal_values, value_type, pseudo_element)
         values = values.union(other)
 
     if include_illegal_values:
