@@ -10,9 +10,10 @@ def process_icons(style_id, args, stat, conn):
         pass
 
     images = list(set([
-        (image + '-24.svg', image + '-' + color + '-24.svg', color)
+        (image + '-' + size + '.svg', image + '-' + color + '-' + size + '.svg', color)
         for image in stat_property_values('icon-image', stat, value_type='value')
         for color in stat_property_values('icon-color', stat)
+        for size in stat_property_values('icon-size', stat)
     ]))
     print(images)
 

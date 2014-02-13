@@ -25,6 +25,7 @@
 @values font-style "normal;italic";
 @values text-transform "none;uppercase;lowercase;capitalize";
 @values shield-text-transform "none;uppercase;lowercase;capitalize";
+@values icon-size "24;18;12";
 
 // @postprocess: To calculate final value of property X call
 // eval-function as specified.
@@ -33,7 +34,7 @@
 @postprocess final-casing-width eval(prop("width") + prop("casing-width") * 2);
 @postprocess final-icon-image eval(cond(
   prop('icon-image') && substr(prop('icon-image'), 0, 5) == 'icon:',
-    style_id() . '.icons/' . substr(prop('icon-image'), 5) . '-' . prop('icon-color') . '-24.svg',
+    style_id() . '.icons/' . substr(prop('icon-image'), 5) . '-' . prop('icon-color') . '-' . prop('icon-size'). '.svg',
     prop('icon-image')
   ));
 
@@ -60,6 +61,7 @@
   icon-image: ;
   icon-opacity: 1;
   icon-color: #444444;
+  icon-size: 24;
   final-icon-image: ; // used internally to add width and casing-width
 // PolygonSymbolizer
   fill-color: ;
