@@ -33,7 +33,7 @@
 @postprocess final-casing-width eval(prop("width") + prop("casing-width") * 2);
 @postprocess final-icon-image eval(cond(
   prop('icon-image') && substr(prop('icon-image'), 0, 5) == 'icon:',
-    style_id() . '.icons/' . substr(prop('icon-image'), 5) . '-24.svg',
+    style_id() . '.icons/' . substr(prop('icon-image'), 5) . '-' . prop('icon-color') . '-24.svg',
     prop('icon-image')
   ));
 
@@ -59,6 +59,7 @@
 // PointSymbolizer
   icon-image: ;
   icon-opacity: 1;
+  icon-color: #444444;
   final-icon-image: ; // used internally to add width and casing-width
 // PolygonSymbolizer
   fill-color: ;

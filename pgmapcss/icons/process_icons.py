@@ -10,16 +10,20 @@ def process_icons(style_id, args, stat, conn):
         pass
 
     images = list(set([
-        (image + '-24.svg', image + '-24.svg')
+        (image + '-24.svg', image + '-' + color + '-24.svg', color)
         for image in stat_property_values('icon-image', stat, value_type='value')
-#        for casing_width in properties_values('casing-width', stat)
+        for color in stat_property_values('icon-color', stat)
     ]))
+    print(images)
 
     for image in images:
         f1 = resource_stream(__name__, 'maki/src/' + image[0])
         f2 = open(icons_dir + '/' + image[1], 'w')
 
-        f2.write(f1.read().decode('utf-8'))
+        content = f1.read().decode('utf-8')
+        if image[2] != '#444444':
+            content = content.replace('#444444', image[2])
+        f2.write(content)
 
         f1.close()
         f2.close()

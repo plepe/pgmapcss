@@ -58,6 +58,7 @@
 // PointSymbolizer
   icon-image: ;
   icon-opacity: 1;
+  icon-color: #444444;
   final-icon-image: ; // used internally to add width and casing-width
 // PolygonSymbolizer
   fill-color: ;
