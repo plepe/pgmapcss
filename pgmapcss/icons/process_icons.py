@@ -9,7 +9,12 @@ def build_icon(x, stat):
     src = x['icon-image'] + '-' + x['icon-size'] + '.svg'
     dest = x['icon-image'] + '-' + x['icon-color'] + '-' + x['icon-size'] + '.svg'
 
-    f1 = resource_stream(__name__, 'maki/' + src)
+    try:
+        f1 = resource_stream(__name__, 'maki/' + src)
+    except IOError:
+        print('Warning: Can\'t read image {}'.format(src))
+        return dest
+
     f2 = open(stat['icons_dir'] + '/' + dest, 'w')
 
     content = f1.read().decode('utf-8')
