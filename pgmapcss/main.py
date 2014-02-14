@@ -121,6 +121,6 @@ def main():
     debug.close()
 
     if 'unresolvable_properties' in stat:
-        print('WARNING: Not all values for the following properties could be guessed (e.g. as they are the result of an eval-expression, and therefore some features in the resulting image(s) may be missing: ' + ', '.join(unresolvable_properties))
+        print('WARNING: Not all values for the following properties could be guessed (e.g. as they are the result of an eval-expression, and therefore some features in the resulting image(s) may be missing: ' + ', '.join(stat['unresolvable_properties']))
 
     print('Debug output wrote to ' + style_id + '.output')
