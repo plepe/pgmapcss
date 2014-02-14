@@ -39,7 +39,7 @@ def stat_property_values(prop, stat, pseudo_element=None, include_illegal_values
         gen = stat['generated_properties'][prop]
         combinations = stat_properties_combinations(gen[0], stat, pseudo_element, include_illegal_values, value_type)
         values = values.union({
-            gen[1](combination)
+            gen[1](combination, stat)
             for combination in combinations
         })
 

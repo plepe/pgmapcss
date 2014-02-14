@@ -8,7 +8,7 @@ def init(stat):
     stat_add_generated_property(
         'final-casing-width',
         { 'width', 'casing-width' },
-        lambda x: '%g' % (float(x['width'] or '0') + 2 * float(x['casing-width'] or '0')),
+        lambda x, stat: '%g' % (float(x['width'] or '0') + 2 * float(x['casing-width'] or '0')),
         stat
     )
 
