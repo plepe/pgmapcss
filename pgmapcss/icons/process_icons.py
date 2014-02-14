@@ -3,6 +3,9 @@ from pgmapcss.compiler.stat import *
 from pkg_resources import *
 
 def build_icon(x, stat):
+    if os.path.exists(x['icon-image']):
+        return x['icon-image']
+
     src = x['icon-image'] + '-' + x['icon-size'] + '.svg'
     dest = x['icon-image'] + '-' + x['icon-color'] + '-' + x['icon-size'] + '.svg'
 

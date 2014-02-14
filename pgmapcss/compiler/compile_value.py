@@ -1,5 +1,6 @@
 import pgmapcss.db as db
 from .compile_eval import compile_eval
+import os
 
 def compile_value(prop, stat):
     """returns two values, first a static value which can be put into the 'to_set' dictts, or False if the value is dynamic. The second value is the compiled version."""
@@ -20,7 +21,11 @@ def compile_value(prop, stat):
             return "current['tags'].get(" + repr(prop['value']) + ")"
 
         if stat['defines']['type'][prop['key']]['value'] == "icon":
-            return repr("icon:" + prop['value'])
+            if os.path.exists(prop['value']):
+                return repr(prop['value'])
+
+            else:
+                return repr("icon:" + prop['value'])
 
         else:
             return repr(prop['value'])
