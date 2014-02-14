@@ -1,14 +1,20 @@
-mkdir -p pgmapcss/icons/maki
-rm pgmapcss/icons/maki/*
+#!/usr/bin/env python3
+import os
+import shutil
+import subprocess
 
-if [ ! -d maki ] ; then
-    git clone https://github.com/mapbox/maki.git
-else
-    cd maki
-    git pull
-    cd ..
-fi
+if os.path.exists('pgmapcss/icons/maki'):
+    shutil.rmtree('pgmapcss/icons/maki/')
 
-cp -a maki/src/*svg pgmapcss/icons/maki/
-cp -a maki/_includes/maki.json pgmapcss/icons/maki
-git add pgmapcss/icons/maki
+if os.path.exists('maki'):
+    os.chdir('maki')
+    subprocess.call(["git", "pull"])
+    os.chdir('..')
+else:
+    subprocess.call(["git", "clone", "https://github.com/mapbox/maki.git"])
+
+shutil.copytree('maki/src/', 'pgmapcss/icons/maki', ignore=shutil.ignore_patterns('*ai'))
+shutil.copy('maki/_includes/maki.json', 'pgmapcss/icons/maki/')
+
+subprocess.call(["git", "add", "pgmapcss/icons/maki"])
+subprocess.call(["git", "status", "pgmapcss/icons/maki"])
