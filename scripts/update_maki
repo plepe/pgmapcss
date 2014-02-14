@@ -2,6 +2,7 @@
 import os
 import shutil
 import subprocess
+import json
 
 if os.path.exists('pgmapcss/icons/maki'):
     shutil.rmtree('pgmapcss/icons/maki/')
@@ -17,4 +18,17 @@ shutil.copytree('maki/src/', 'pgmapcss/icons/maki', ignore=shutil.ignore_pattern
 shutil.copy('maki/_includes/maki.json', 'pgmapcss/icons/maki/')
 
 subprocess.call(["git", "add", "pgmapcss/icons/maki"])
-subprocess.call(["git", "status", "pgmapcss/icons/maki"])
+
+file_list = json.loads(open('maki/_includes/maki.json').read())
+f = open('doc/Mapbox_Maki_icons.md', 'w')
+f.write('List of icons available from the [Mapbox Maki](https://www.mapbox.com/maki/) project:\n\n')
+f.write('| ID | Name |\n')
+f.write('|----|------|\n')
+
+for icon in file_list:
+    f.write('| {} | {} |\n'.format(icon['icon'], icon['name']))
+
+f.close()
+
+subprocess.call(["git", "add", "doc/Mapbox_Maki_icons.md"])
+subprocess.call(["git", "status", "pgmapcss/icons/maki", "doc/Mapbox_Maki_icons.md"])
