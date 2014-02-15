@@ -2,15 +2,11 @@ def eval_deluma(param):
     if len(param) < 2:
         return ''
 
-    # not a valid color
-    if not re.match('#[0-9a-fA-F]{6,8}', param[0]):
-        return ''
+    colors = color_values(param[0])
 
-    # get the color values for each channel
-    colors = [
-        int(param[0][i*2+1:i*2+3], 16)
-        for i in range(0, int((len(param[0]) - 1) / 2))
-    ]
+    # not a valid color
+    if colors is None:
+        return ''
 
     factor = to_float(param[1])
     if factor is None:
