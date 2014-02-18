@@ -27,6 +27,8 @@ def to_int(v, default=None):
         return int(v)
     except ValueError:
         return default
+def warning(text):
+    plpy.notice(text)
 def float_to_str(v, default=None):
     r = repr(v)
     if r[-2:] == '.0':
