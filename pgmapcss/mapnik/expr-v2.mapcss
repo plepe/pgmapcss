@@ -3,6 +3,14 @@
 @type shield-text tag_value;
 @type width int;
 @type icon-image icon;
+@type color color;
+@type casing-color color;
+@type icon-color color;
+@type fill-color color;
+@type text-color color;
+@type text-halo-color color;
+@type shield-text-color color;
+@type shield-text-halo-color color;
 
 // The follwing properties default to the final value of another property
 @default_other casing-offset offset;

@@ -108,7 +108,11 @@ def main():
     pgmapcss.mapnik.init(stat)
     pgmapcss.icons.init(stat)
 
-    style = pgmapcss.compiler.compile_style(stat)
+    try:
+        style = pgmapcss.compiler.compile_style(stat)
+    except pgmapcss.compiler.CompileError as e:
+        print(e)
+        sys.exit(1)
 
     #pp.pprint(style)
     for i in style:

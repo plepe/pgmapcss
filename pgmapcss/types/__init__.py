@@ -1,5 +1,6 @@
 from .default import default
 from .tag_value import tag_value
+from .color import color
 from .icon import icon
 
 global classes
@@ -7,6 +8,7 @@ classes = {
     'default': default,
     'tag_value': tag_value,
     'icon': icon,
+    'color': color,
 }
 
 properties = {
