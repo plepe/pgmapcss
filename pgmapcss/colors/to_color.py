@@ -9,6 +9,6 @@ def check_color(value):
     ret = to_color(value)
 
     if ret is None:
-        warning("Warning: Unknown color '{}'".format(value))
+        debug("Warning: Unknown color '{}'".format(value))
 
     return ret
