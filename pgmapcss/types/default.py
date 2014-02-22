@@ -14,9 +14,3 @@ class default:
 
     def stat_all_values(self):
         return {True}
-
-    def includes(self):
-        return {}
-
-#    def __str__(self):
-#        pass
