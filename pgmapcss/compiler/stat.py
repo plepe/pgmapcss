@@ -1,3 +1,5 @@
+import pgmapcss.types
+
 def stat_all_scale_denominators(stat):
     return sorted(list(set([
             v['selector']['min_scale']
@@ -28,14 +30,26 @@ def stat_property_values(prop, stat, pseudo_element=None, include_illegal_values
     value_type: Only values with value_type will be returned. Default None (all)
     eval_true: Return 'True' for values which result of an eval expression. Otherwise this value will be removed. Default: True.
     """
-    values = {
-        True if p['value_type'] == 'eval' else p['value']
-        for v in stat['statements']
-        for p in v['properties']
-        if pseudo_element == None or v['selector']['pseudo_element'] in ('*', pseudo_element)
-        if p['assignment_type'] == 'P' and p['key'] == prop
-        if value_type == None or value_type == p['value_type']
-    }
+    prop_type = pgmapcss.types.get(prop, stat)
+
+    if include_illegal_values:
+        values = {
+            True if p['value_type'] == 'eval' else p['value']
+            for v in stat['statements']
+            for p in v['properties']
+            if pseudo_element == None or v['selector']['pseudo_element'] in ('*', pseudo_element)
+            if p['assignment_type'] == 'P' and p['key'] == prop
+            if value_type == None or value_type == p['value_type']
+        }
+    else:
+        values = {
+            True if p['value_type'] == 'eval' else prop_type.stat_value(p)
+            for v in stat['statements']
+            for p in v['properties']
+            if pseudo_element == None or v['selector']['pseudo_element'] in ('*', pseudo_element)
+            if p['assignment_type'] == 'P' and p['key'] == prop
+            if value_type == None or value_type == p['value_type']
+        }
 
     if 'default_other' in stat['defines'] and prop in stat['defines']['default_other']:
         other = stat['defines']['default_other'][prop]['value']

@@ -9,6 +9,9 @@ class default:
     def compile(self, prop):
         return repr(prop['value'])
 
+    def stat_value(self, prop):
+        return prop['value']
+
     def includes(self):
         return {}
 

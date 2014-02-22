@@ -13,3 +13,9 @@ class color(default):
 
         return repr(ret)
 
+    def stat_value(self, prop):
+        if not prop.get('value'):
+            return None
+
+        return to_color(prop['value'])
+
