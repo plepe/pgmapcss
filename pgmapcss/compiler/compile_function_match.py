@@ -1,11 +1,16 @@
 import pgmapcss.db as db
 from .compile_function_get_where import compile_function_get_where
 from .compile_function_check import compile_function_check
-from pkg_resources import *
 import pgmapcss.eval
 import pgmapcss.colors
 
 def compile_function_match(stat):
+    includes = pgmapcss.colors.includes()
+    include_text = ''
+
+    for name, function in includes.items():
+        include_text += function
+
     replacement = {
       'style_id': stat['id'],
       'style_element_property': repr({
@@ -36,8 +41,7 @@ def float_to_str(v, default=None):
     return r
 ''' +\
 pgmapcss.eval.functions().print(indent='') +\
-resource_string(pgmapcss.colors.__name__, 'to_color.py').decode('utf-8') +\
-resource_string(pgmapcss.colors.__name__, 'color_values.py').decode('utf-8')
+include_text
     }
 
     ret = '''\

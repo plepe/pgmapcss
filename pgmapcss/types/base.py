@@ -9,5 +9,8 @@ class base:
     def compile(self):
         pass
 
+    def includes(self):
+        return {}
+
 #    def __str__(self):
 #        pass
