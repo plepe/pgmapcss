@@ -7,8 +7,9 @@ class color(base):
         return 'check_color(' + value + ')'
 
     def compile(self, prop):
-        if not to_color(prop['value']):
+        ret = to_color(prop['value'])
+        if not ret:
             raise CompileError("Error: Unknown color '{}'".format(prop['value']))
 
-        return repr(prop['value'])
+        return repr(ret)
 
