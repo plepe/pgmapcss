@@ -12,6 +12,9 @@ class default:
     def stat_value(self, prop):
         return prop['value']
 
+    def stat_all_values(self):
+        return {True}
+
     def includes(self):
         return {}
 

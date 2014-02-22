@@ -67,16 +67,9 @@ def stat_property_values(prop, stat, pseudo_element=None, include_illegal_values
     if include_illegal_values:
         return values
 
-    if 'values' in stat['defines'] and prop in stat['defines']['values']:
-        allowed_values = stat['defines']['values'][prop]['value'].split(';')
-
-        if True in values:
-            values = values.union(allowed_values)
-
-        values = {
-            v if v in allowed_values else allowed_values[0]
-            for v in values
-        }
+    if True in values:
+        values.remove(True)
+        values = values.union(prop_type.stat_all_values())
 
     values = {
         v

@@ -2,6 +2,7 @@ from .default import default
 from .tag_value import tag_value
 from .color import color
 from .icon import icon
+from .values import values
 
 global classes
 classes = {
@@ -9,6 +10,7 @@ classes = {
     'tag_value': tag_value,
     'icon': icon,
     'color': color,
+    'values': values,
 }
 
 properties = {
@@ -21,6 +23,9 @@ def get(key, stat):
     t = 'default'
     if 'type' in stat['defines']:
         t = stat['defines']['type'].get(key, { 'value': 'default' })['value']
+
+    if 'values' in stat['defines'] and key in stat['defines']['values']:
+        t = 'values'
 
     if not t in classes:
         print("Warning! Property type {} not defined.".format(t))
