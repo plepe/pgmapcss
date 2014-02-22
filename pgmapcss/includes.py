@@ -1,13 +1,18 @@
-includes = {}
+_includes = {}
 
 def register_includes(inc):
-    global includes
-    includes = dict(list(includes.items()) + list(inc.items()))
+    global _includes
+    _includes = dict(list(_includes.items()) + list(inc.items()))
 
 def include_text():
-    global includes
+    global _includes
     ret = ''
-    for name, function in includes.items():
+    for name, function in _includes.items():
         ret += function
 
     return ret
+
+def includes():
+    global _includes
+    print(_includes)
+    return _includes
