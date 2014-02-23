@@ -3,6 +3,7 @@ from .tag_value import tag_value
 from .color import color
 from .icon import icon
 from .values import values
+from .pixels import pixels
 
 global classes
 classes = {
@@ -11,6 +12,7 @@ classes = {
     'icon': icon,
     'color': color,
     'values': values,
+    'pixels': pixels,
 }
 
 properties = {

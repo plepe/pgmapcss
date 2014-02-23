@@ -13,9 +13,6 @@ def compile_value(prop, stat):
     if prop['value_type'] == 'eval':
         return prop_type.compile_check(compile_eval(prop['value'], stat))
 
-    elif 'unit' in prop and prop['unit'] in ('m', 'u'):
-        return prop_type.compile_check(compile_eval([ 'f:metric', 'v:' + prop['value'] + prop['unit'] ], stat))
-
     elif prop['value'] == None:
         return 'None'
 

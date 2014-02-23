@@ -227,7 +227,7 @@ See documentation for properties of styles based on the 'default' style definiti
 Depending on the type of property, special values are possible:
 
 * colors: You can specify colors as hex value (e.g. #ff0000, #f00) or as rgb(r, g, b). If the value is an integer values between 0..255 are accepted. Floats are accepted in the range 0.0..1.0. Percentage values 0%..100% may be specified too.
-* You may specify values with a unit, default: 'px' (Pixels on screen). Other supported unites: 'u' (Units in 900913 projection on the map), 'm' (Meters on the map; NOT IMPLEMENTED YET: currently 'u' is used instead).
+* pixels: You may specify values which take a pixel-dependend value (e.g. width, offset, ...) with a unit, default: 'px' (Pixels on screen). Other supported unites: 'u' (Units in 900913 projection on the map), 'm' (Meters on the map; NOT IMPLEMENTED YET: currently 'u' is used instead).
 * You may specify URLs without url()
 
 === Assignments ===

@@ -11,6 +11,11 @@
 @type text-halo-color color;
 @type shield-text-color color;
 @type shield-text-halo-color color;
+@type width pixels;
+@type offset pixels;
+@type casing-width pixels;
+@type casing-offset pixels;
+@type text-offset pixels;
 
 // The follwing properties default to the final value of another property
 @default_other casing-offset offset;
