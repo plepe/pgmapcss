@@ -134,4 +134,5 @@ line::(*) {
 }
 canvas {
   fill-color: #00000000;
+  buffer: 0;
 }

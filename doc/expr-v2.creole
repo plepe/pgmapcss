@@ -13,6 +13,7 @@ This is the list of properties when using Mapnik branch expr-v2 (as of Jan 10, 2
 |= CSS parameter |= Description |= support Mapnik expr-v2 |= Compatibility MapCSS 0.2
 | fill-color | The color of the background (default: fully transparent) | | YES
 | fill-image | use an image for the background instead of a color fill | no eval | YES
+| buffer | set the buffer-size of the Map (default: 0) | no eval | no standard
 
 * MapCSS 0.2 properties not (yet) supported: antialiasing (always fully antialiased), fill-opacity (use alpha-channel on fill-color instead)
 
