@@ -41,6 +41,7 @@ def process(f1, replacement, stat, rek=0):
                 while(True):
                     r = f1.readline()
                     r = r.decode('utf-8')
+
                     if re.match('# END', r):
                         break;
 
@@ -54,6 +55,14 @@ def process(f1, replacement, stat, rek=0):
         else:
             text += r.format(**replacement)
 
+        # check for columns which need to be added to the sql query
+        r1 = r
+        m = re.match('[^\[]+\[([a-zA-Z0-9\-_]+)\]', r1)
+        while m:
+            stat['mapnik_columns'].add(m.group(1))
+            r1 = r1[len(m.group(0)):]
+            m = re.match('[^\[]+\[([a-zA-Z0-9\-_]+)\]', r1)
+
     return text
 
 def process_mapnik(style_id, args, stat, conn):
@@ -65,13 +74,11 @@ def process_mapnik(style_id, args, stat, conn):
         'host': args.host,
         'password': args.password,
         'database': args.database,
-        'user': args.user
+        'user': args.user,
+        'columns': '{columns}'
     }
 
-    replacement['columns'] = ', '.join([
-        'properties->' + db.format(prop) + ' as ' + db.ident(prop)
-        for prop in stat_properties(stat)
-    ])
+    stat['mapnik_columns'] = set()
 
     # dirty hack - when render_context.bbox is null, pass type 'canvas' instead of style-element
     res = db.prepare("select * from {style_id}_match(null, 0, Array['canvas'])".format(**replacement))
@@ -83,7 +90,16 @@ def process_mapnik(style_id, args, stat, conn):
         for (k, v) in canvas_properties.items():
             replacement['canvas|' + k] = v or ''
 
-    f2.write(process(f1, replacement, stat))
+    text = process(f1, replacement, stat)
+
+    # finally replace 'columns'
+    replacement = {}
+    replacement['columns'] = ', '.join([
+        'properties->' + db.format(prop) + ' as ' + db.ident(prop)
+        for prop in stat_properties(stat)
+    ])
+
+    f2.write(text.format(**replacement))
 
     f1.close()
     f2.close()
