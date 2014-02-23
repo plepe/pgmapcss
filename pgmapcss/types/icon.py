@@ -1,4 +1,5 @@
 from .default import default
+import os
 
 class icon(default):
     def compile(self, prop):
