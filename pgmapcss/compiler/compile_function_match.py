@@ -59,7 +59,7 @@ if render_context['bbox'] == None:
         'types': all_style_elements,
         'tags': {{}},
         'id': '',
-        'geo': ''
+        'geo': None
     }}]
     all_style_elements = ['default']
 else:
