@@ -4,7 +4,7 @@ The crucial thing is, that the renderer can use a single database query of the
 follwing form as data source, where BBOX is replaced by the current bounding
 box and SCALE_DENOMINATOR by the current scale denominator:
 {{{
-select * from test_match(pgmapcss_render_context(BBOX, SCALE_DENOMINATOR))
+select * from pgmapcss_test(pgmapcss_render_context(BBOX, SCALE_DENOMINATOR))
 }}}
 
 The less crucial thing is, that the returned values can be read as symbolizer values, e.g.

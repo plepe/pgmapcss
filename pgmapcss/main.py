@@ -16,8 +16,8 @@ parser = argparse.ArgumentParser(description='Compiles a MapCSS style descriptio
 
 parser.add_argument('style_id', type=str, help='''\
   style_id is a required argument. The compiled functions will be prefixed
-  by 'style_id', e.g. 'style_id_match()'. Also the resulting mapnik style file
-  will be called style_id.mapnik.
+  by 'style_id', e.g. 'pgmapcss_style_id()'. Also the resulting mapnik style
+  file will be called style_id.mapnik.
 ''')
 
 parser.add_argument('-d', '--database', dest='database',

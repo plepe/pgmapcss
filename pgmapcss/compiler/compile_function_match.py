@@ -39,7 +39,7 @@ include_text()
     }
 
     ret = '''\
-create or replace function {style_id}_match(
+create or replace function pgmapcss_{style_id}(
   IN bbox                geometry,
   IN scale_denominator   float,
   _all_style_elements\ttext[] default Array['default']

@@ -179,7 +179,7 @@
   {columns},
   "style-element",
   geo as _geo
-from {style_id}_match(!bbox!, !scale_denominator!, Array['fill', 'casing', 'line', 'point', 'point-text', 'line-text', 'shield'])) t
+from pgmapcss_{style_id}(!bbox!, !scale_denominator!, Array['fill', 'casing', 'line', 'point', 'point-text', 'line-text', 'shield'])) t
       </Parameter>
     </Datasource>
     <StyleName>pgmapcss</StyleName>
