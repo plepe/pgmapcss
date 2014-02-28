@@ -53,7 +53,10 @@ def parse_condition(current, to_parse):
 
     else:
         m = to_parse.match('([^\]]*)\]')
-        condition['value'] = to_parse.match_group(1)
+        if m:
+            condition['value'] = to_parse.match_group(1)
+        else:
+            raise ParseError(to_parse, 'parse condition: expecting ]')
 
     if not 'conditions' in current:
         current['conditions'] = []
