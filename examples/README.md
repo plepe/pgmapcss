@@ -227,46 +227,57 @@ In this example features are merged by either major/minor road type and their na
 
 ![combined_roads](combined_roads.png)
 ```css
-line[highway=primary],
-line[highway=secondary],
-line[highway=tertiary] {
-  set street_type = major;
+line|z8-[highway=motorway],
+line|z10-[highway=motorway_link],
+line|z8-[highway=trunk],
+line|z10-[highway=trunk_link] {
+  set .street_type = motorway;
 }
-line[highway=unclassified],
-line[highway=residential] {
-  set street_type = minor;
+line|z10-[highway=primary],
+line|z10-[highway=primary_link],
+line|z11-[highway=secondary],
+line|z12-[highway=tertiary] {
+  set .street_type = major;
+}
+line|z13-[highway=unclassified],
+line|z15-[highway=residential] {
+  set .street_type = minor;
+}
+
+line.street_type {
+  casing-width: 1;
+  casing-color: #a0a0a0;
+}
+line[.street_type=motorway] {
+  width: 10;
+  color: #ff7f00;
+  z-index: 2;
+}
+line[.street_type=major] {
+  width: 8;
+  color: #ffff00;
+  z-index: 1;
+}
+line[.street_type=minor] {
+  width: 6;
+  color: #ffffff;
+  z-index: 0;
 }
 
 /* This is where the magic happens: At type 'street' is introduced
    which combines all lines with an equal 'street_type' tag (which
    is set in the statements above) and the same name. */
-line[street_type] {
+line.street_type[name] {
   combine street eval(concat(tag(street_type), '-', tag(name)));
 }
 
-street[street_type]::casing {
-  color: #a0a0a0;
-  z-index: -1;
-}
-street[street_type=major]::casing { width: 10; }
-street[street_type=minor]::casing { width: 8; }
-
-street[street_type=major] {
-  width: 8;
-  color: #ffff00;
-  z-index: 0.1;
-}
-street[street_type=minor] {
-  width: 6;
-  color: #ffffff;
-}
-
 /* merge lines if possible; print name */
-street::label {
+street {
   geo: eval(line_merge(prop(geo)));
   text: eval(tag(name));
   text-position: line;
   text-spacing: 256;
+  layer: 10;
   z-index: 1;
 }
 ```
