@@ -7,7 +7,7 @@ def compile_condition(condition, stat, var="current['tags']"):
     final_value = None
 
     if 'value_type' in condition and condition['value_type'] == 'eval':
-        final_value = compile_eval(condition['value'])
+        final_value = compile_eval(condition['value'], stat)
 
     elif 'value' in condition:
         final_value = repr(condition['value'])
@@ -68,7 +68,7 @@ def compile_condition(condition, stat, var="current['tags']"):
 
     # eval(...)
     elif condition['op'] == 'eval':
-        ret += compile_eval(condition['key']) + " not in ('', 'false', 'no', '0', None)"
+        ret += compile_eval(condition['key'], stat) + " not in ('', 'false', 'no', '0', None)"
 
     # unknown operator?
     else:
