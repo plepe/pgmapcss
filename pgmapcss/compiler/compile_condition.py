@@ -33,7 +33,8 @@ def compile_condition(condition, stat, var="current['tags']"):
 
     # < > <= >=
     elif condition['op'] in ('<', '>', '<=', '>='):
-        ret += '(' + key + ' in ' + var + ' and to_float(' + var + '[' + key + ']) ' + condition['op'] + ' to_float(' + final_value + '))';
+        cmp_map = { '<': 'lt', '>': 'gt', '<=': 'le', '>=': 'ge' }
+        ret += '(' + key + ' in ' + var + ' and eval_' + cmp_map[condition['op']] + '([ ' + var + '[' + key + '], ' + final_value + " ]) == 'true')"
 
     # ^=
     elif condition['op'] == '^=':
