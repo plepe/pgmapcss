@@ -7,6 +7,11 @@ def eval_max(param):
     values = [ eval_metric(v) for v in param ]
     values = [ float(v) for v in param if v != '' ]
 
+    while '' in values:
+        values.remove('')
+    if len(values) == 0:
+        return ''
+
     return float_to_str(max(values))
 
 # TESTS
@@ -17,4 +22,8 @@ def eval_max(param):
 # IN ['1;4;5']
 # OUT '5'
 # IN []
+# OUT ''
+# IN ['1;;5']
+# OUT '5'
+# IN ['']
 # OUT ''
