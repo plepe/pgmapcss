@@ -6,8 +6,8 @@ def build_icon(x, stat):
     if os.path.exists(x['icon-image']):
         return x['icon-image']
 
-    src = x['icon-image'] + '-' + x['icon-size'] + '.svg'
-    dest = x['icon-image'] + '-' + x['icon-color'] + '-' + x['icon-size'] + '.svg'
+    src = x['icon-image'] + '-' + x['icon-width'] + '.svg'
+    dest = x['icon-image'] + '-' + x['icon-color'] + '-' + x['icon-width'] + '.svg'
 
     try:
         f1 = resource_stream(__name__, 'maki/' + src)
@@ -30,7 +30,7 @@ def build_icon(x, stat):
 def init(stat):
     stat_add_generated_property(
         'final-icon-image',
-        { 'icon-image', 'icon-size', 'icon-color' },
+        { 'icon-image', 'icon-width', 'icon-color' },
         lambda x, stat: build_icon(x, stat),
         stat
     )

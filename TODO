@@ -1,6 +1,6 @@
 IDEAS:
 * pre-defined icons, e.g. circle, square
-: e.g. icon-type: circle; icon-size: 5; icon-color: #ff0000;
+: e.g. icon-type: circle; icon-width: 5; icon-color: #ff0000;
 * defining colors with hsl() function + eval function hsl()
 * css3 color names
 * colors with 3(4) hex values, e.g. #f3c => #ff33cc

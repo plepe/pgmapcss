@@ -21,10 +21,9 @@ This is the list of properties when using Mapnik 2.0 (use -t mapnik20 when loadi
 |= CSS parameter |= Description |= Mapnik parameter |= support Mapnik 2.0 |= Compatibility MapCSS 0.2
 | icon-image | URL (absolute or relative) of an image to use as an icon, e.g. url('img/foo.svg'). Icons from [[https://www.mapbox.com/maki/|Mapbox Maki]] project can be included via their ID, e.g. parking-garage. | file | yes | YES
 | icon-color | Only for icons from Mapbox Maki project! Change color of icon to given color. Default: #444444. | | no eval | no standard
-| icon-size | Only for icons from Mapbox Maki project! Valid values: 12, 18, 24. Default: 24. | | no eval | no standard
 | icon-opacity | Opacity of the icon image | opacity | no eval | YES
-| icon-width | Width of image. | - | automatic | IGNORED. scaling should be applied.
-| icon-height | Height of image. | - | automatic | IGNORED. scaling should be applied.
+| icon-width | Width of image. Ignored for custom images. For icons from Mapbox Maki project values 12, 18 or 24 (default) have to be used. | - | automatic | PARTLY
+| icon-height | Height of image. Ignored for custom images. | - | automatic | NO
 
 === Line properties ===
 |= CSS parameter |= Description |= Mapnik parameter |= support Mapnik 2.0 |= Compatibility MapCSS 0.2
