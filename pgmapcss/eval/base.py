@@ -28,3 +28,6 @@ class config_base:
             raise Exception('Illegal eval function name: ' + func)
 
         self.func = func
+
+    def compiler(self, param, eval_param, stat):
+        return 'eval_' + self.func + '([' + ', '.join(param) + ']' + eval_param + ')'

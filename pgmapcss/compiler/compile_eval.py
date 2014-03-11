@@ -19,10 +19,9 @@ def compile_eval(value, stat):
             return repr(value[2:])
         elif value[0:2] == 'f:':
             func = value[2:]
-            if func in eval_functions and 'compiler' in eval_functions[func]:
-                return eval_functions[func]['compiler'](func, [], eval_param, stat)
-            else:
-                return 'eval_' + valid_func_name(func) + '(\'[]\'' + eval_param + ')'
+            if not func in eval_functions:
+                raise Exception('Unknown eval function: ' + func)
+            return eval_functions[func]['config'].compiler([], eval_param, stat)
         else:
             raise Exception('compiling eval: ' + repr(value))
 
@@ -40,8 +39,6 @@ def compile_eval(value, stat):
     elif value[0][0:2] == 'f:':
         func = value[0][2:]
 
-    if func in eval_functions and 'compiler' in eval_functions[func]:
-        return eval_functions[func]['compiler'](func, param, eval_param, stat)
-
-    else:
-        return 'eval_' + valid_func_name(func) + '([' + ', '.join(param) + ']' + eval_param + ')'
+    if not func in eval_functions:
+        raise Exception('Unknown eval function: ' + func)
+    return eval_functions[func]['config'].compiler(param, eval_param, stat)
