@@ -1,11 +1,17 @@
 from pkg_resources import *
 from ..includes import *
+from .base import config_base
 
 class Functions:
     def __init__(self):
         self.eval_functions = {}
+        self.has_resolved_config = False
 
     def list(self):
+        if not self.has_resolved_config:
+            self.has_resolved_config = True
+            self.resolve_config()
+
         return self.eval_functions
 
     def print(self, indent=''):
@@ -20,6 +26,28 @@ class Functions:
 
         return ret
 
+
+    def resolve_config(self):
+        exec(
+            resource_string(__name__, 'base.py').decode('utf-8') +
+            self.print()
+        )
+
+        for func, f in self.eval_functions.items():
+            if 'config_eval_' + func in locals():
+                config = locals()['config_eval_' + func](func)
+            else:
+                config = config_base(func)
+
+            f['config'] = config
+
+            # compatibility
+            if not 'op' in f and config.op is not None:
+                f['op'] = config.op
+            if not 'math_level' in f and config.math_level is not None:
+                f['math_level'] = config.math_level
+            if not 'unary' in f and config.unary is not None:
+                f['unary'] = config.unary
 
     def register(self, func, op=None, math_level=None, compiler=None, src=None, unary=False):
         f = {}

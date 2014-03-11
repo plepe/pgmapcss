@@ -15,3 +15,11 @@ def float_to_str(v, default=None):
     return r
 def debug(text):
     plpy.notice(text)
+
+class config_base:
+    math_level = None
+    op = None
+    unary = False
+
+    def __init__(self, func):
+        self.func = func

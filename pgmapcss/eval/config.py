@@ -18,7 +18,6 @@ def compile_style_id(func, param, eval_param, stat):
 def load():
     eval_functions = Functions()
 
-    eval_functions.register('add', op='+', math_level=3)
     eval_functions.register('and', op='&&', math_level=1)
     eval_functions.register('concat', op='.', math_level=6)
     eval_functions.register('contains', op='~=', math_level=7)

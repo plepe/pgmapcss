@@ -1,3 +1,7 @@
+class config_eval_add(config_base):
+    math_level = 3
+    op = '+'
+
 def eval_add(params):
     ret = 0
 
