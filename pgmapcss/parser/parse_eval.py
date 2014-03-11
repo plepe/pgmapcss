@@ -13,17 +13,17 @@ def read_eval_operators():
     eval_functions = pgmapcss.eval.functions().list()
 
     eval_operators = {
-        op: { 'op': op, 'math_level': v['math_level'] }
+        op: { 'op': op, 'math_level': v.math_level }
         for k, v in eval_functions.items()
-        if 'op' in v and v['unary'] == False
-        for op in v['op']
+        if v.unary == False
+        for op in v.op
     }
 
     unary_operators = {
-        op: { 'op': op, 'math_level': v['math_level'] }
+        op: { 'op': op, 'math_level': v.math_level }
         for k, v in eval_functions.items()
-        if 'op' in v and v['unary'] == True
-        for op in v['op']
+        if v.unary == True
+        for op in v.op
     }
 
 def parse_eval(to_parse, math_level=0, current_op=None, rek=0):

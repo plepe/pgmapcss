@@ -21,7 +21,7 @@ def compile_eval(value, stat):
             func = value[2:]
             if not func in eval_functions:
                 raise Exception('Unknown eval function: ' + func)
-            return eval_functions[func]['config'].compiler([], eval_param, stat)
+            return eval_functions[func].compiler([], eval_param, stat)
         else:
             raise Exception('compiling eval: ' + repr(value))
 
@@ -34,11 +34,11 @@ def compile_eval(value, stat):
     param = [ compile_eval(i, stat) for i in value[1:] ]
 
     if value[0][0:2] == 'o:':
-        func = [ k for k, v in eval_functions.items() if 'op' in v and value[0][2:] in v['op'] ][0]
+        func = [ k for k, v in eval_functions.items() if value[0][2:] in v.op ][0]
 
     elif value[0][0:2] == 'f:':
         func = value[0][2:]
 
     if not func in eval_functions:
         raise Exception('Unknown eval function: ' + func)
-    return eval_functions[func]['config'].compiler(param, eval_param, stat)
+    return eval_functions[func].compiler(param, eval_param, stat)

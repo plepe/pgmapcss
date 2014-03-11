@@ -4,12 +4,11 @@ from .base import config_base
 
 class Functions:
     def __init__(self):
-        self.eval_functions = {}
-        self.has_resolved_config = False
+        self.eval_functions = None
+        self.eval_functions_source = {}
 
     def list(self):
-        if not self.has_resolved_config:
-            self.has_resolved_config = True
+        if not self.eval_functions:
             self.resolve_config()
 
         return self.eval_functions
@@ -17,9 +16,8 @@ class Functions:
     def print(self, indent=''):
         ret = ''
 
-        for func, f in self.eval_functions.items():
-            if 'src' in f:
-                ret += f['src']
+        for func, src in self.eval_functions_source.items():
+            ret += src
 
         # indent all lines
         ret = indent + ret.replace('\n', '\n' + indent)
@@ -33,51 +31,24 @@ class Functions:
             self.print()
         )
 
-        for func, f in self.eval_functions.items():
+        self.eval_functions = {}
+        for func, src in self.eval_functions_source.items():
             if 'config_eval_' + func in locals():
                 config = locals()['config_eval_' + func](func)
             else:
                 config = config_base(func)
 
-            f['config'] = config
-
-            # compatibility
-            if not 'op' in f and config.op is not None:
-                if type(config.op) == tuple:
-                    f['op'] = set( config.op )
-                else:
-                    f['op'] = { config.op }
-            if not 'math_level' in f and config.math_level is not None:
-                f['math_level'] = config.math_level
-            if not 'unary' in f and config.unary is not None:
-                f['unary'] = config.unary
-
-    def register(self, func, op=None, math_level=None, compiler=None, src=None, unary=False):
-        f = {}
-
-        if func in self.eval_functions:
-            f = self.eval_functions[func]
-
-        if op:
-            if type(op) == tuple:
-                f['op'] = set( op )
+            if config.op is None:
+                config.op = set()
+            elif type(config.op) == tuple:
+                config.op = set( config.op )
             else:
-                f['op'] = { op }
+                config.op = { config.op }
 
-        if math_level:
-            f['math_level'] = math_level
+            self.eval_functions[func] = config
 
-        if compiler:
-            f['compiler'] = compiler
-
-        # only change unary when operation has been passed
-        if op:
-            f['unary'] = unary
-
-        if src:
-            f['src'] = src
-
-        self.eval_functions[func] = f
+    def register(self, func, src):
+        self.eval_functions_source[func] = src
 
     def test(self, func, conf):
         print('* Testing %s' % func)
