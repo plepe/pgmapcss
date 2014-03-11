@@ -1,3 +1,7 @@
+class config_eval_lt(config_base):
+    math_level = 7
+    op = '<'
+
 def eval_lt(param):
     if len(param) < 2:
         return ''

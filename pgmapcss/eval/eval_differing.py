@@ -1,3 +1,7 @@
+class config_eval_differing(config_base):
+    math_level = 7
+    op = ('!=', '<>')
+
 def eval_differing(param):
     # empty parameter list -> all equal
     if len(param) == 0:

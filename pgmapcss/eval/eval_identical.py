@@ -1,3 +1,7 @@
+class config_eval_identical(config_base):
+    math_level = 7
+    op = ('===', 'eq')
+
 def eval_identical(param):
     # empty parameter list -> all equal
     if len(param) == 0:

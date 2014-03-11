@@ -1,3 +1,7 @@
+class config_eval_div(config_base):
+    math_level = 4
+    op = '/'
+
 def eval_div(param):
   ret = None
 

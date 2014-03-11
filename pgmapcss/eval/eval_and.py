@@ -1,3 +1,7 @@
+class config_eval_and(config_base):
+    math_level = 1
+    op = '&&'
+
 def eval_and(param):
   for p in param:
       if eval_boolean([p]) == 'false':

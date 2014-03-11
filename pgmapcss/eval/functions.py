@@ -43,7 +43,10 @@ class Functions:
 
             # compatibility
             if not 'op' in f and config.op is not None:
-                f['op'] = config.op
+                if type(config.op) == tuple:
+                    f['op'] = set( config.op )
+                else:
+                    f['op'] = { config.op }
             if not 'math_level' in f and config.math_level is not None:
                 f['math_level'] = config.math_level
             if not 'unary' in f and config.unary is not None:

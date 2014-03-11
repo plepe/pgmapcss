@@ -1,3 +1,8 @@
+class config_eval_not(config_base):
+    math_level = 10
+    op = '!'
+    unary = True
+
 def eval_not(param):
     if len(param) == 0:
         return ''

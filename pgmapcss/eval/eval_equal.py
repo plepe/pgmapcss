@@ -1,3 +1,7 @@
+class config_eval_equal(config_base):
+    math_level = 7
+    op = '=='
+
 def eval_equal(param):
     # empty parameter list -> all equal
     if len(param) == 0:
