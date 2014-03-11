@@ -50,15 +50,12 @@ class Functions:
     def register(self, func, src):
         self.eval_functions_source[func] = src
 
-    def test(self, func, conf):
+    def test(self, func, src):
         print('* Testing %s' % func)
-
-        if 'src' not in conf:
-            return
 
         import re
         import pgmapcss.db as db
-        rows = conf['src'].split('\n')
+        rows = src.split('\n')
 
         ret = '''
 create or replace function __eval_test__(param text[]) returns text
@@ -100,4 +97,4 @@ render_context = {'bbox': '010300002031BF0D000100000005000000DBF1839BB5DC3B41E70
                     raise Exception("eval-test failed!")
 
     def test_all(self):
-        [ self.test(func, conf) for func, conf in self.eval_functions.items() ]
+        [ self.test(func, src) for func, src in self.eval_functions_source.items() ]
