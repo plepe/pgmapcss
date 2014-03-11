@@ -22,4 +22,9 @@ class config_base:
     unary = False
 
     def __init__(self, func):
+        import re
+
+        if not re.match('[a-zA-Z_0-9]+$', func):
+            raise Exception('Illegal eval function name: ' + func)
+
         self.func = func
