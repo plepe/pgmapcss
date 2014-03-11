@@ -1,3 +1,4 @@
+from pkg_resources import *
 import pgmapcss.db as db
 from .compile_function_get_where import compile_function_get_where
 from .compile_function_check import compile_function_check
@@ -14,26 +15,8 @@ def compile_function_match(stat):
       'match_where': compile_function_get_where(stat['id'], stat),
       'db_query': db.query_functions(),
       'function_check': compile_function_check(stat['id'], stat),
-      'eval_functions': '''\
-# eval-functions
-def to_float(v, default=None):
-    try:
-        return float(v)
-    except ValueError:
-        return default
-def to_int(v, default=None):
-    try:
-        return int(v)
-    except ValueError:
-        return default
-def debug(text):
-    plpy.notice(text)
-def float_to_str(v, default=None):
-    r = repr(v)
-    if r[-2:] == '.0':
-        r = r[:-2]
-    return r
-''' +\
+      'eval_functions': \
+resource_string(pgmapcss.eval.__name__, 'base.py').decode('utf-8') +\
 pgmapcss.eval.functions().print(indent='') +\
 include_text()
     }

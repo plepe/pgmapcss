@@ -62,22 +62,8 @@ class Functions:
 create or replace function __eval_test__(param text[]) returns text
 as $body$
 import re
-def to_float(v, default=None):
-    try:
-        return float(v)
-    except ValueError:
-        return default
-def to_int(v, default=None):
-    try:
-        return int(v)
-    except ValueError:
-        return default
-def float_to_str(v, default=None):
-    r = repr(v)
-    if r[-2:] == '.0':
-        r = r[:-2]
-    return r
 ''' +\
+resource_string(__name__, 'base.py').decode('utf-8') +\
 include_text() +\
 '''
 current = { 'object': { 'id': 'n123', 'tags': { 'amenity': 'restaurant', 'name': 'Foobar', 'cuisine': 'pizza;kebab;noodles' }}, 'pseudo_element': 'default', 'pseudo_elements': ['default', 'test'], 'tags': { 'amenity': 'restaurant', 'name': 'Foobar', 'cuisine': 'pizza;kebab;noodles' }, 'properties': { 'default': { 'width': '2', 'color': '#ff0000' }, 'test': { 'fill-color': '#00ff00' } } }
