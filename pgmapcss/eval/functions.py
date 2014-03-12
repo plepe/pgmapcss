@@ -56,9 +56,10 @@ class Functions:
         import re
         import pgmapcss.db as db
         rows = src.split('\n')
+        config = self.eval_functions[func]
 
         ret = '''
-create or replace function __eval_test__(param text[]) returns text
+create or replace function __eval_test__() returns text
 as $body$
 import re
 ''' +\
@@ -69,12 +70,7 @@ current = { 'object': { 'id': 'n123', 'tags': { 'amenity': 'restaurant', 'name':
 render_context = {'bbox': '010300002031BF0D000100000005000000DBF1839BB5DC3B41E708549B2B705741DBF1839BB5DC3B41118E9739B171574182069214CCE23B41118E9739B171574182069214CCE23B41E708549B2B705741DBF1839BB5DC3B41E708549B2B705741', 'scale_denominator': 8536.77}
 '''
         ret += self.print()
-        ret += 'ret = eval_' + func + '(param)\n'
-        ret += 'if type(ret) != str:\n    return "not a string: " + repr(ret)\n'
-        ret += 'return ret\n'
-        ret += "$body$ language 'plpython3u' immutable;"
-        conn = db.connection()
-        conn.execute(ret)
+        ret += "result = ''\n"
 
         param_in = None
         for r in rows:
@@ -86,15 +82,30 @@ render_context = {'bbox': '010300002031BF0D000100000005000000DBF1839BB5DC3B41E70
             if m:
                 return_out = eval(m.group(1))
 
-                r = conn.prepare('select __eval_test__($1)');
-                res = r(param_in)
+                ret += 'ret = ' + config.compiler([ repr(p) for p in param_in ], '', {}) + '\n'
+                ret += 'result += "IN  %s\\n"\n' % repr(param_in)
+                ret += 'result += "EXP %s\\n"\n' % repr(return_out)
+                ret += 'result += "OUT %s\\n" % repr(ret)\n'
 
-                print(' IN  %s' % repr(param_in))
-                print(' EXP %s' % repr(return_out))
-                print(' OUT %s' % repr(res[0][0]))
+                ret += 'if type(ret) != str:\n    result += "ERROR not a string: " + repr(ret) + "\\n"\n'
+                ret += 'elif ret != %s:\n    result += "ERROR return value wrong!\\n"\n' % repr(return_out)
 
-                if repr(return_out) != repr(res[0][0]):
-                    raise Exception("eval-test failed!")
+        ret += 'return result\n'
+        ret += "$body$ language 'plpython3u' immutable;"
+        #print(ret)
+        conn = db.connection()
+        conn.execute(ret)
+
+        r = conn.prepare('select __eval_test__()');
+        res = r()[0][0]
+
+        print(res)
+
+        if(re.search("^ERROR", res, re.MULTILINE)):
+            raise Exception("eval-test failed!")
 
     def test_all(self):
+        if not self.eval_functions:
+            self.resolve_config()
+
         [ self.test(func, src) for func, src in self.eval_functions_source.items() ]
