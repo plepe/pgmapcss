@@ -31,3 +31,12 @@ class config_base:
 
     def compiler(self, param, eval_param, stat):
         return 'eval_' + self.func + '([' + ', '.join(param) + ']' + eval_param + ')'
+
+    def __call__(self, param, stat):
+        try:
+            current
+        except NameError:
+            import pgmapcss.eval
+            return pgmapcss.eval.eval_functions.call(self.func, param, stat)
+        else:
+            return eval(self.compiler(param, '', {}))

@@ -50,6 +50,33 @@ class Functions:
     def register(self, func, src):
         self.eval_functions_source[func] = src
 
+    def call(self, func, param, stat):
+        import re
+        import pgmapcss.db as db
+        config = self.eval_functions[func]
+
+        ret = '''
+create or replace function __eval_test__() returns text
+as $body$
+import re
+''' +\
+resource_string(__name__, 'base.py').decode('utf-8') +\
+include_text() +\
+'''
+render_context = {'bbox': None, 'scale_denominator': None }
+'''
+        ret += self.print()
+
+        ret += 'return ' + config.compiler([ repr(p) for p in param ], '', stat) + '\n'
+
+        ret += "$body$ language 'plpython3u' immutable;"
+        #print(ret)
+        conn = db.connection()
+        conn.execute(ret)
+
+        r = conn.prepare('select __eval_test__()');
+        return r()[0][0]
+
     def test(self, func, src):
         print('* Testing %s' % func)
 
