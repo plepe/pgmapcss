@@ -20,6 +20,13 @@ class config_base:
     math_level = None
     op = None
     unary = False
+    mutable = 0
+# 'mutable' says whether a function returns different output for the same set
+# of input parameters:
+# 0 .. volatile, may return different value on each call (e.g. random())
+# 1 .. always returns the same value for the current object (e.g. osm_id())
+# 2 .. always returns the same value for the current view (e.g. zoom())
+# 3 .. static, always returns the same value (e.g. 2+3 = 5)
 
     def __init__(self, func):
         import re
@@ -40,3 +47,15 @@ class config_base:
             return pgmapcss.eval.eval_functions.call(self.func, param, stat)
         else:
             return eval(self.compiler(param, '', {}))
+
+# list of possible values the function returns for the set of input parameters. # possible types of returns:
+# str .. the function always returns the given value (e.g. 2+3 = 5)
+# None .. the function always returns None
+# set .. the function may return the following values
+#        (e.g. zoom() => { 1, 2, 3, ..., 18 }
+# True .. it's not possible to predict the result of this function (e.g. random())
+    def possible_values(self, param_values, stat):
+        if self.mutable == 3:
+            return self(param_values, stat)
+
+        return True
