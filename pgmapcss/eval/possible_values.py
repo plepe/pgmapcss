@@ -35,4 +35,32 @@ def possible_values(value, stat):
     if not func in eval_functions:
         raise Exception('Unknown eval function: ' + func)
 
-    return eval_functions[func].possible_values(param, stat)
+    # make sure all elements are sets
+    param = [ {p} if type(p) == str else p for p in param ]
+    # build all possible combinations of input parameters
+    combinations = [[]]
+    for p in param:
+        new_combinations = []
+        for combination in combinations:
+            for v in p:
+                c = list(combination) # copy original list
+                c.append(v)
+                new_combinations.append(c)
+        combinations = new_combinations
+
+    # finally calculate possible results
+    result = {
+        eval_functions[func].possible_values(param, stat)
+        for param in combinations
+        if not True in param
+    }
+
+    # if any of the combinations contains a 'True' value, add True to the
+    # return values too
+    if True in [ True for param in combinations if True in param ]:
+        result.add(True)
+
+    if len(result) == 1:
+        result = result.pop()
+
+    return result
