@@ -17,8 +17,10 @@ def compile_eval(value, stat):
     possible_values = pgmapcss.eval.possible_values(value, stat)
     # if a the eval function returns only one possible value, we can just take
     # it for granted
-    if type(possible_values) == str:
-        return repr(possible_values)
+    if len(possible_values) == 1:
+        possible_values = possible_values.pop()
+        if type(possible_values) == str:
+            return repr(possible_values)
 
     if type(value) == str:
         if value[0:2] == 'v:':
