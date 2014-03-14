@@ -62,48 +62,27 @@ def parse_value(current, to_parse):
         current['value_type'] = 'eval'
         return
 
-    # rgb(R, G, B)
-    elif to_parse.match('rgb\s*\(([0-9\.,%\s]+)\)\s*;'):
-        values = to_parse.match_group(1).split(',')
-        if len(values) != 3:
-            raise ParseError(to_parse, 'Error parsing rgb() value: "' + v + '"')
-
-        for i, v in enumerate(values):
-            if re.match('\s*[0-9]+\s*$', v): # integer: 0..255
-                values[i] = int(v)
-                if values[i] < 0 or values[i] > 255:
-                    raise ParseError(to_parse, 'Error parsing rgb() value, value {} out of range (0..255)'.format(v))
-
-            elif re.match('\s*([0-9]+\.[0-9]+)\s*$', v): # float: 0.0..1.0
-                values[i] = float(v)
-                if values[i] < 0.0 or values[i] > 1.0:
-                    raise ParseError(to_parse, 'Error parsing rgb() value, value {} out of range (0.0..1.0)'.format(v))
-                values[i] = round(values[i] * 255)
-
-            elif re.match('\s*([0-9]+(\.[0-9]+)?)%\s*$', v): # percentage: 0%..100%
-                m = re.match('\s*([0-9]+(\.[0-9]+)?)%\s*$', v)
-                values[i] = float(m.group(1))
-                if values[i] < 0.0 or values[i] > 100.0:
-                    raise ParseError(to_parse, 'Error parsing rgb() value, value {} out of range (0%..100%)'.format(v))
-                values[i] = round(values[i] * 2.55)
-
-            else:
-                raise ParseError(to_parse, 'Error parsing rgb() value, number format not detected: {}'.format(v))
-
-        current['value'] = '#' + ''.join([ '%02x' % v for v in values ])
-        current['value_type'] = 'rgb'
-        return
-
     # url( ... )
     elif to_parse.match('url\s*\(', wind=None):
         return parse_url(current, to_parse)
 
-    # else
-    if to_parse.match('\s*([^;]*)\s*;'):
+    # it's a "value" (letters, digits, -, _, #)
+    elif to_parse.match('\s*([A-Za-z0-9\-_#]*)\s*;'):
         current['value_type'] = 'value';
         current['value'] = to_parse.match_group(1).strip()
 
         if current['value'] == '':
             current['value'] = None
+
+    # function call (handle like eval( ... ) but without eval() ;) )
+    else:
+        value = parse_eval(to_parse)
+
+        if not to_parse.match('\s*;'):
+            raise ParseError(to_parse, 'Error parsing eval statement')
+
+        current['value'] = value
+        current['value_type'] = 'eval'
+        return
 
     return
