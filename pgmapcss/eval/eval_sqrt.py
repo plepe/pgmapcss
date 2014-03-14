@@ -1,5 +1,9 @@
 class config_eval_sqrt(config_base):
-    mutable = 3
+    def mutable(self, param_values, stat):
+        import pgmapcss.eval
+        config_metric = pgmapcss.eval.eval_functions.list()['metric']
+        ret = [ config_metric.mutable([p], stat) for p in param_values ]
+        return min(ret)
 
 def eval_sqrt(param):
     import math

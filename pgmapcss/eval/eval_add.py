@@ -1,7 +1,11 @@
 class config_eval_add(config_base):
     math_level = 3
     op = '+'
-    mutable = 3
+    def mutable(self, param_values, stat):
+        import pgmapcss.eval
+        config_metric = pgmapcss.eval.eval_functions.list()['metric']
+        ret = [ config_metric.mutable([p], stat) for p in param_values ]
+        return min(ret)
 
 def eval_add(params):
     ret = 0
