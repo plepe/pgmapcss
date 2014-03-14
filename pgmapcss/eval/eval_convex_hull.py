@@ -1,3 +1,6 @@
+class config_eval_convex_hull(config_base):
+    mutable = 3
+
 def eval_convex_hull(param):
     if len(param) == 0:
         return ''

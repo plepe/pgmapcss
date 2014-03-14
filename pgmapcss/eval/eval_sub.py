@@ -1,6 +1,7 @@
 class config_eval_sub(config_base):
     math_level = 1
     op = '-'
+    mutable = 3
 
 def eval_sub(param):
   ret = None

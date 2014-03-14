@@ -1,6 +1,7 @@
 class config_eval_or(config_base):
     math_level = 1
     op = '||'
+    mutable = 3
 
 def eval_or(param):
     for p in param:

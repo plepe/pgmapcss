@@ -1,3 +1,6 @@
+class config_eval_line_interpolate_line(config_base):
+    mutable = 2
+
 def eval_line_interpolate_point(param):
     if len(param) == 0 or not param[0]:
         return ''

@@ -1,3 +1,6 @@
+class config_eval_natsort(config_base):
+    mutable = 3
+
 def eval_natsort(param):
     """ Sort the given list in the way that humans expect.
 from: http://www.codinghorror.com/blog/2007/12/sorting-for-humans-natural-sort-order.html

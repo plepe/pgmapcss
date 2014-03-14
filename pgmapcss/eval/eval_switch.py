@@ -1,3 +1,6 @@
+class config_eval_switch(config_base):
+    mutable = 3
+
 def eval_switch(param):
     if len(param) == 0:
         return ''

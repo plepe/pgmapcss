@@ -1,3 +1,6 @@
+class config_eval_rotate(config_base):
+    mutable = 3
+
 def eval_rotate(param):
     if len(param) == 0:
         return ''

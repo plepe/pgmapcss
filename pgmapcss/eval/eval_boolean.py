@@ -1,3 +1,6 @@
+class config_eval_boolean(config_base):
+    mutable = 3
+
 def eval_boolean(param):
     if len(param) == 0:
         return ''

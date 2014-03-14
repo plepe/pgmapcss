@@ -1,3 +1,6 @@
+class config_eval_text_transform(config_base):
+    mutable = 3
+
 def eval_text_transform(param):
     if len(param) == 0:
         return ''

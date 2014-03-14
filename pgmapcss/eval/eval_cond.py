@@ -1,4 +1,6 @@
 class config_eval_cond(config_base):
+    mutable = 3
+
     def compiler(self, param, eval_param, stat):
         ret = '(' + param[1] + ' if eval_boolean([' + param[0] + ']' + eval_param + ') == \'true\''
         if len(param) > 2:

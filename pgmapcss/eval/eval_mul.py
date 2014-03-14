@@ -1,6 +1,7 @@
 class config_eval_mul(config_base):
     math_level = 4
     op = '*'
+    mutable = 3
 
 def eval_mul(params):
     ret = 1

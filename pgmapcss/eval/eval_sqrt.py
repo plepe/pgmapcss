@@ -1,3 +1,6 @@
+class config_eval_sqrt(config_base):
+    mutable = 3
+
 def eval_sqrt(param):
     import math
     if len(param) == 0:

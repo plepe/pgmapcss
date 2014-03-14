@@ -1,3 +1,6 @@
+class config_eval_metric(config_base):
+    mutable = 2
+
 def eval_metric(param):
     if len(param) == 0 or param[0] is None:
         return ''

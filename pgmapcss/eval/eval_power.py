@@ -1,3 +1,6 @@
+class config_eval_power(config_base):
+    mutable = 3
+
 def eval_power(param):
     if len(param) < 2:
         return ''

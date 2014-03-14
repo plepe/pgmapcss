@@ -1,3 +1,6 @@
+class config_eval_max(config_base):
+    mutable = 3
+
 def eval_max(param):
     if len(param) == 0:
         return ''

@@ -1,3 +1,6 @@
+class config_eval_round(config_base):
+    mutable = 3
+
 def eval_round(param):
     if len(param) == 0:
         return ''

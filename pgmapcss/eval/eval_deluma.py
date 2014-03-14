@@ -1,3 +1,6 @@
+class config_eval_deluma(config_base):
+    mutable = 3
+
 def eval_deluma(param):
     if len(param) < 2:
         return ''

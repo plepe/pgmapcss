@@ -1,3 +1,6 @@
+class config_eval_get(config_base):
+    mutable = 3
+
 def eval_get(param):
   if len(param) < 2:
       return ''

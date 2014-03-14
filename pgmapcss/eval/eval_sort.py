@@ -1,3 +1,6 @@
+class config_eval_sort(config_base):
+    mutable = 3
+
 def eval_sort(param):
     if len(param) == 0:
         return ''

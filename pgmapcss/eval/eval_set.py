@@ -1,3 +1,6 @@
+class config_eval_set(config_base):
+    mutable = 3
+
 def eval_set(param):
     if len(param) < 3:
         return ''

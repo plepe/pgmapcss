@@ -1,3 +1,6 @@
+class config_eval_min(config_base):
+    mutable = 3
+
 def eval_min(param):
     if len(param) == 0:
         return ''
