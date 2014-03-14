@@ -55,7 +55,11 @@ class config_base:
 #        (e.g. zoom() => { 1, 2, 3, ..., 18 }
 # True .. it's not possible to predict the result of this function (e.g. random())
     def possible_values(self, param_values, stat):
-        if self.mutable == 3:
+        m = self.mutable
+        if callable(m):
+            m = self.mutable(param_values, stat)
+
+        if m == 3:
             return self(param_values, stat)
 
         return True
