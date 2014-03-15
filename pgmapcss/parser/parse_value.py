@@ -67,7 +67,7 @@ def parse_value(current, to_parse):
         return parse_url(current, to_parse)
 
     # it's a "value" (letters, digits, -, _, #)
-    elif to_parse.match('\s*([A-Za-z0-9\-_#]*)\s*;'):
+    elif to_parse.match('\s*([A-Za-z0-9\-_#,\.]*)\s*;'):
         current['value_type'] = 'value';
         current['value'] = to_parse.match_group(1).strip()
 
