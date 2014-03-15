@@ -31,6 +31,9 @@ class pixels(default):
         if v is None:
             return None
 
+        if v[0] == '':
+            return None
+
         if v[1] == 'px':
             return v[0]
 
