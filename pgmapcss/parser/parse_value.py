@@ -44,7 +44,9 @@ def parse_value(current, to_parse):
         fp = to_parse.pos()
         r = parse_string(to_parse)
         value = None
-        if r:
+
+        # if eval statement is of form eval("2 + 3")
+        if r != None and to_parse.match('\s*\)\s*;', wind=None):
             r = ParseFile(content=r)
             try:
                 value = parse_eval(r)
