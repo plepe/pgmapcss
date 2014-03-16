@@ -34,26 +34,18 @@ def stat_property_values(prop, stat, pseudo_element=None, include_illegal_values
     """
     prop_type = pgmapcss.types.get(prop, stat)
 
-    if include_illegal_values:
-        values = {
-            p['value']
-            for v in stat['statements']
-            for p in v['properties']
-            if pseudo_element == None or v['selector']['pseudo_element'] in ('*', pseudo_element)
-            if p['assignment_type'] == 'P' and p['key'] == prop
-            if value_type == None or value_type == p['value_type']
-            if p['value_type'] != 'eval'
-        }
-    else:
-        values = {
-            prop_type.stat_value(p)
-            for v in stat['statements']
-            for p in v['properties']
-            if pseudo_element == None or v['selector']['pseudo_element'] in ('*', pseudo_element)
-            if p['assignment_type'] == 'P' and p['key'] == prop
-            if value_type == None or value_type == p['value_type']
-            if p['value_type'] != 'eval'
-        }
+    # go over all statements and their properties and collect it's values. If
+    # include_illegal_values==False sanitize list. Do not include eval
+    # statements.
+    values = {
+        p['value'] if include_illegal_values else prop_type.stat_value(p)
+        for v in stat['statements']
+        for p in v['properties']
+        if pseudo_element == None or v['selector']['pseudo_element'] in ('*', pseudo_element)
+        if p['assignment_type'] == 'P' and p['key'] == prop
+        if value_type == None or value_type == p['value_type']
+        if p['value_type'] != 'eval'
+    }
 
     # resolve eval functions (as far as possible)
     if True:
