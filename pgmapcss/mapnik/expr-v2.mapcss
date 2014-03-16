@@ -16,6 +16,8 @@
 @type casing-width pixels;
 @type casing-offset pixels;
 @type text-offset pixels;
+@type font-size numeric;
+@type shield-font-size numeric;
 
 // The follwing properties default to the final value of another property
 @default_other casing-offset offset;

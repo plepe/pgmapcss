@@ -4,6 +4,7 @@ from .color import color
 from .icon import icon
 from .values import values
 from .pixels import pixels
+from .numeric import numeric
 
 global classes
 classes = {
@@ -13,6 +14,7 @@ classes = {
     'color': color,
     'values': values,
     'pixels': pixels,
+    'numeric': numeric,
 }
 
 properties = {

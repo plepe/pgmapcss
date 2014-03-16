@@ -13,6 +13,8 @@
 @type width pixels;
 @type casing-width pixels;
 @type text-offset pixels;
+@type font-size numeric;
+@type shield-font-size numeric;
 
 // The follwing properties default to the final value of another property
 @default_other casing-linecap linecap;
