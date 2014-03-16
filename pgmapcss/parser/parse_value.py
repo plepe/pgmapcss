@@ -55,6 +55,7 @@ def parse_value(current, to_parse):
                 pass
 
         if value == None:
+            to_parse.seek(fp)
             value = parse_eval(to_parse)
 
         if not to_parse.match('\s*\)\s*;'):
