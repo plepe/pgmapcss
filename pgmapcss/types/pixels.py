@@ -7,11 +7,15 @@ class pixels(default):
         if value is None:
             return None
 
-        m = re.match('(.*)(px|m|u)$', value)
+        m = re.match('(\-?[0-9]+(\.[0-9]+)?)(px|m|u)$', value)
         if m:
-            return ( m.group(1), m.group(2) )
+            return ( m.group(1), m.group(3) )
 
-        return ( value, 'px' )
+        m = re.match('(\-?[0-9]+(\.[0-9]+)?)$', value)
+        if m:
+            return ( m.group(1), 'px' )
+
+        return None
 
 
     def compile(self, prop):
