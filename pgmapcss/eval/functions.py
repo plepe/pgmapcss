@@ -6,6 +6,7 @@ class Functions:
     def __init__(self):
         self.eval_functions = None
         self.eval_functions_source = {}
+        self._eval = None
 
     def list(self):
         if not self.eval_functions:
@@ -24,6 +25,21 @@ class Functions:
 
         return ret
 
+
+    def eval(self, statement):
+        if not self._eval:
+            content = \
+                'def _eval(statement):\n' +\
+                '    import re\n' +\
+                '    ' + resource_string(__name__, 'base.py').decode('utf-8').replace('\n', '\n    ') +\
+                '\n' +\
+                self.print(indent='    ') + '\n'\
+                '    return eval(statement)'
+
+            exec(content)
+            self._eval = locals()['_eval']
+
+        return self._eval(statement)
 
     def resolve_config(self):
         exec(
@@ -55,27 +71,8 @@ class Functions:
         import pgmapcss.db as db
         config = self.eval_functions[func]
 
-        ret = '''
-create or replace function __eval_test__() returns text
-as $body$
-import re
-''' +\
-resource_string(__name__, 'base.py').decode('utf-8') +\
-include_text() +\
-'''
-render_context = {'bbox': None, 'scale_denominator': None }
-'''
-        ret += self.print()
-
-        ret += 'return ' + config.compiler([ repr(p) for p in param ], '', stat) + '\n'
-
-        ret += "$body$ language 'plpython3u' immutable;"
-        #print(ret)
-        conn = db.connection()
-        conn.execute(ret)
-
-        r = conn.prepare('select __eval_test__()');
-        return r()[0][0]
+        statement = config.compiler([ repr(p) for p in param ], '', stat)
+        return self.eval(statement)
 
     def test(self, func, src):
         print('* Testing %s' % func)
