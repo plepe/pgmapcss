@@ -47,10 +47,13 @@ def stat_property_values(prop, stat, pseudo_element=None, include_illegal_values
         if p['value_type'] != 'eval'
     }
 
-    # resolve eval functions (as far as possible)
+    # resolve eval functions (as far as possible) - also sanitize list.
     if True:
         values = values.union({
-            v1
+            v1 if v1 == True or include_illegal_values else prop_type.stat_value({
+                'value_type': 'eval',
+                'value': v1
+            })
             for v in stat['statements']
             for p in v['properties']
             if pseudo_element == None or v['selector']['pseudo_element'] in ('*', pseudo_element)
