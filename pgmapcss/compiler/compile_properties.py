@@ -1,6 +1,7 @@
 import pgmapcss.db as db
 from .compile_eval import compile_eval
 from .compile_value import compile_value
+from .CompileError import CompileError
 
 def compile_properties(statement, stat, indent=''):
     ret = ''
@@ -8,6 +9,10 @@ def compile_properties(statement, stat, indent=''):
     for prop in statement['properties']:
         if prop['assignment_type'] == 'P':
             c = compile_value(prop, stat)
+
+            if c == None:
+                raise CompileError('Illegal value for property "%s" found: "%s"' % ( prop['key'], prop['value'] ))
+
             ret += indent + "current['properties'][" + statement['current_pseudo_element'] + ']' +\
                 '[' + repr(prop['key']) + '] = ' + c + '\n'
 
