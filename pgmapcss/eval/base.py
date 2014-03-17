@@ -54,7 +54,7 @@ class config_base:
 # set .. the function may return the following values
 #        (e.g. zoom() => { 1, 2, 3, ..., 18 }
 # True .. it's not possible to predict the result of this function (e.g. random())
-    def possible_values(self, param_values, stat):
+    def possible_values(self, param_values, prop, stat):
         m = self.mutable
         if callable(m):
             m = self.mutable(param_values, stat)

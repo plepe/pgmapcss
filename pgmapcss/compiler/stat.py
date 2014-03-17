@@ -59,7 +59,7 @@ def stat_property_values(prop, stat, pseudo_element=None, include_illegal_values
             if pseudo_element == None or v['selector']['pseudo_element'] in ('*', pseudo_element)
             if p['assignment_type'] == 'P' and p['key'] == prop
             if p['value_type'] == 'eval'
-            for v1 in pgmapcss.eval.possible_values(p['value'], stat)
+            for v1 in pgmapcss.eval.possible_values(p['value'], p, stat)
         })
 
     if 'default_other' in stat['defines'] and prop in stat['defines']['default_other']:

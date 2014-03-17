@@ -27,7 +27,7 @@ class pixels(default):
         if v[1] == 'px':
             return repr(v[0])
 
-        return self.compile_check(compile_eval([ 'f:metric', 'v:' + v[0] + v[1] ], self.stat))
+        return self.compile_check(compile_eval([ 'f:metric', 'v:' + v[0] + v[1] ], prop, self.stat))
 
     def stat_value(self, prop):
         v = self._parse(prop['value'])

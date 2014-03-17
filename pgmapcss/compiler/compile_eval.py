@@ -9,12 +9,12 @@ def valid_func_name(func):
     else:
         raise Exception('Illegal eval function name: ' + func)
 
-def compile_eval(value, stat):
+def compile_eval(value, prop, stat):
     global eval_param
 
     eval_functions = pgmapcss.eval.functions().list()
 
-    possible_values = pgmapcss.eval.possible_values(value, stat)
+    possible_values = pgmapcss.eval.possible_values(value, prop, stat)
     # if a the eval function returns only one possible value, we can just take
     # it for granted
     if len(possible_values) == 1:
@@ -37,9 +37,9 @@ def compile_eval(value, stat):
         return ''
 
     if not value[0][0:2] in ('f:', 'o:'):
-        return compile_eval(value[0], stat)
+        return compile_eval(value[0], prop, stat)
 
-    param = [ compile_eval(i, stat) for i in value[1:] ]
+    param = [ compile_eval(i, prop, stat) for i in value[1:] ]
 
     if value[0][0:2] == 'o:':
         func = [ k for k, v in eval_functions.items() if value[0][2:] in v.op ][0]

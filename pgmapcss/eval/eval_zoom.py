@@ -1,7 +1,7 @@
 class config_eval_zoom(config_base):
     mutable = 3
 
-    def possible_values(self, param_values, stat):
+    def possible_values(self, param_values, prop, stat):
         return { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20' }
 
 def eval_zoom(param):
