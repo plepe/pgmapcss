@@ -1,5 +1,9 @@
 def to_color(value):
     import re
+
+    if value is None:
+        return None
+
     if re.match('#[a-fA-F0-9]{6,8}', value):
         return value
 
@@ -13,6 +17,9 @@ def to_color(value):
     return None
 
 def check_color(value):
+    if value is None:
+        return None
+
     ret = to_color(value)
 
     if ret is None:
