@@ -36,8 +36,10 @@ class Functions:
                 self.print(indent='    ') + '\n'\
                 '    return eval(statement)'
 
-            exec(content)
-            self._eval = locals()['_eval']
+            eval_code = compile(content, '<eval functions>', 'exec')
+            eval_ns = {}
+            exec(eval_code, eval_ns, eval_ns);
+            self._eval = eval_ns['_eval']
 
         return self._eval(statement)
 
