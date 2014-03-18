@@ -48,18 +48,19 @@ class config_base:
         else:
             return eval(self.compiler(param, '', {}))
 
-# list of possible values the function returns for the set of input parameters. # possible types of returns:
-# str .. the function always returns the given value (e.g. 2+3 = 5)
-# None .. the function always returns None
-# set .. the function may return the following values
-#        (e.g. zoom() => { 1, 2, 3, ..., 18 }
-# True .. it's not possible to predict the result of this function (e.g. random())
+# list of possible values the function returns for the set of input parameters. # possible types of returns a tuple with the first element being one of:
+#   str .. the function always returns the given value (e.g. 2+3 = 5)
+#   None .. the function always returns None
+#   set .. the function may return the following values
+#          (e.g. zoom() => { 1, 2, 3, ..., 18 }
+#   True .. it's not possible to predict the result of this function (e.g. random())
+# the second element is the mutability, see above
     def possible_values(self, param_values, prop, stat):
         m = self.mutable
         if callable(m):
             m = self.mutable(param_values, stat)
 
         if m == 3:
-            return self(param_values, stat)
+            return ( self(param_values, stat), m )
 
-        return True
+        return ( True, m )

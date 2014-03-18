@@ -14,7 +14,8 @@ def compile_eval(value, prop, stat):
 
     eval_functions = pgmapcss.eval.functions().list()
 
-    possible_values = pgmapcss.eval.possible_values(value, prop, stat)
+    possible_values, mutable = pgmapcss.eval.possible_values(value, prop, stat)
+
     # if a the eval function returns only one possible value, we can just take
     # it for granted
     if len(possible_values) == 1:

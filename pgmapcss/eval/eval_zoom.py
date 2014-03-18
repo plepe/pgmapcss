@@ -1,5 +1,5 @@
 class config_eval_zoom(config_base):
-    mutable = 3
+    mutable = 2
 
     def possible_values(self, param_values, prop, stat):
         import math
@@ -13,7 +13,7 @@ class config_eval_zoom(config_base):
             if 'max_scale' in prop['statement']['selector'] and prop['statement']['selector']['max_scale'] is not None:
                 min_zoom = int(math.ceil(math.log(3.93216e+08 / (prop['statement']['selector']['max_scale'] - 0.1), 2)))
 
-        return { str(i) for i in range(min_zoom, max_zoom + 1) }
+        return ( { str(i) for i in range(min_zoom, max_zoom + 1) }, self.mutable )
 
 def eval_zoom(param):
   import math
