@@ -33,6 +33,8 @@ class Functions:
                 '    import re\n' +\
                 '    ' + resource_string(__name__, 'base.py').decode('utf-8').replace('\n', '\n    ') +\
                 '\n' +\
+                '    ' + include_text().replace('\n', '\n    ') +\
+                '\n' +\
                 self.print(indent='    ') + '\n'\
                 '    return eval(statement)'
 
