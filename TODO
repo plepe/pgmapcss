@@ -4,7 +4,6 @@ IDEAS:
 * defining colors with hsl() function + eval function hsl()
 * improve return structure of eval parser
 * eval-selector, e.g. node[eval(tag(foo) == 'bar')] { ... }
-* beautify and document test.mapcss
 * include osm data for tests
 * unit tests
 * improve profiling
