@@ -14,6 +14,14 @@ def to_color(value):
 
         return r
 
+    try:
+        from .color_names import color_names
+    except ValueError:
+        global color_names
+
+    if value in color_names:
+        return color_names[value]
+
     return None
 
 def check_color(value):
