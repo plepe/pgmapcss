@@ -1,4 +1,5 @@
 import pgmapcss.eval
+cache = {}
 
 # returns a tuple:
 # 1st return value:
@@ -7,6 +8,12 @@ import pgmapcss.eval
 #   mutability of the return value
 def possible_values(value, prop, stat):
     global eval_param
+
+    # if we find the value in our cache, we don't need to calculate result
+    # only (mutable=3) are added to the cache, we can return 3 as mutability
+    # return copy() in case the set gets modified later-on
+    if repr(value) in cache:
+        return ( cache[repr(value)].copy(), 3 )
 
     eval_functions = pgmapcss.eval.functions().list()
 
@@ -71,5 +78,9 @@ def possible_values(value, prop, stat):
     # return values too
     if True in [ True for param in combinations if True in param ]:
         result.add(True)
+
+    # if result is static (mutable=3), add a copy of the set to cache
+    if mutable == 3:
+        cache[repr(value)] = result.copy()
 
     return ( result, mutable )
