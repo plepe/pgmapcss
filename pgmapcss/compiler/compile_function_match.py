@@ -107,39 +107,56 @@ while src:
 
         combined_objects = []
 
-layers = sorted(set(
-    x['properties'].get('layer', 0)
-    for x in results
-), key=lambda x: to_float(x, 0))
+layers = sorted(
+    set(
+        x['properties'].get('layer', 0)
+        for x in results
+    ).union(set(
+        x['properties'].get(style_element + '-layer')
+        for x in results
+        for style_element in all_style_elements
+        if style_element + '-layer' in x['properties']
+    )),
+    key=lambda x: to_float(x, 0)
+)
+if None in layers:
+    layers.remove(None)
 
 for layer in layers:
-    results_layer = sorted([
-        x
-        for x in results
-        if x['properties'].get('layer', 0) == layer
-    ],
-    key=lambda x: to_float(x['properties'].get('z-index'), 0))
-
     for style_element in all_style_elements:
-        for result in results_layer:
-            # check if any property for the current style element is set (or
-            # there is no entry for the current style element in
-            # @style_element_property
-            if {style_element_property}.get(style_element) == None or \
-                len(set(
-                True
-                for k in {style_element_property}.get(style_element)
-                if result['properties'].get(k)
-            )):
-                yield {{
-                    'id': result['id'],
-                    'types': result['types'],
-                    'tags': pghstore.dumps(result['tags']),
-                    'style-element': style_element,
-                    'pseudo_element': result['pseudo_element'],
-                    'geo': result['geo'],
-                    'properties': pghstore.dumps(result['properties'])
-                }}
+        result_list = []
+
+        for result in results:
+            result_layer = result['properties'].get(style_element + '-layer') or result['properties'].get('layer') or '0'
+            if result_layer == layer:
+                # check if any property for the current style element is set (or
+                # there is no entry for the current style element in
+                # @style_element_property
+                if {style_element_property}.get(style_element) == None or \
+                    len(set(
+                    True
+                    for k in {style_element_property}.get(style_element)
+                    if result['properties'].get(k)
+                )):
+                    result_list.append(result)
+
+        result_list = sorted(result_list,
+            key=lambda x: to_float(
+                x['properties'].get(style_element + '-z-index') or
+                x['properties'].get('z-index')
+                , 0))
+
+        for result in result_list:
+            x = {{
+                'id': result['id'],
+                'types': result['types'],
+                'tags': pghstore.dumps(result['tags']),
+                'style-element': style_element,
+                'pseudo_element': result['pseudo_element'],
+                'geo': result['geo'],
+                'properties': pghstore.dumps(result['properties'])
+            }}
+            yield x
 
 time_stop = datetime.datetime.now() # profiling
 plpy.notice('total run of match() (incl. querying db objects) took %.2fs' % (time_stop - time_start).total_seconds())
