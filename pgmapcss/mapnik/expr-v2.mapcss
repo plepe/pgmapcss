@@ -136,6 +136,10 @@
   shield-text-opacity: 1;
   shield-text-halo-radius: 0;
   shield-text-transform: ;
+// Show points, lines and shields after all other symbolizers
+  point-text-layer: 100;
+  line-text-layer: 101;
+  shield-layer: 102;
 }
 line::(*) {
   shield-placement: line;
