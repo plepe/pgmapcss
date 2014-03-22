@@ -1,3 +1,6 @@
+class config_eval_line_length(config_base):
+    mutable = 2
+
 def eval_line_length(param):
     if len(param) == 0:
         return ''

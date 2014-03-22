@@ -1,3 +1,6 @@
+class config_eval_line_locate_point(config_base):
+    mutable = 2
+
 def eval_line_locate_point(param):
     if len(param) < 2:
         return ''

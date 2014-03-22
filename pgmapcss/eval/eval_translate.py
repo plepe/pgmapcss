@@ -1,3 +1,6 @@
+class config_eval_translate(config_base):
+    mutable = 2
+
 def eval_translate(param):
     if len(param) == 0:
         return ''

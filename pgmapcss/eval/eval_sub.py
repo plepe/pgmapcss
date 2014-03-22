@@ -1,3 +1,12 @@
+class config_eval_sub(config_base):
+    math_level = 1
+    op = '-'
+    def mutable(self, param_values, stat):
+        import pgmapcss.eval
+        config_metric = pgmapcss.eval.eval_functions.list()['metric']
+        ret = [ config_metric.mutable([p], stat) for p in param_values ]
+        return min(ret)
+
 def eval_sub(param):
   ret = None
 

@@ -1,19 +1,24 @@
 from pkg_resources import *
 from ..includes import *
+from .base import config_base
 
 class Functions:
     def __init__(self):
-        self.eval_functions = {}
+        self.eval_functions = None
+        self.eval_functions_source = {}
+        self._eval = None
 
     def list(self):
+        if not self.eval_functions:
+            self.resolve_config()
+
         return self.eval_functions
 
     def print(self, indent=''):
         ret = ''
 
-        for func, f in self.eval_functions.items():
-            if 'src' in f:
-                ret += f['src']
+        for func, src in self.eval_functions_source.items():
+            ret += src
 
         # indent all lines
         ret = indent + ret.replace('\n', '\n' + indent)
@@ -21,75 +26,79 @@ class Functions:
         return ret
 
 
-    def register(self, func, op=None, math_level=None, compiler=None, src=None, unary=False):
-        f = {}
+    def eval(self, statement):
+        if not self._eval:
+            content = \
+                'def _eval(statement):\n' +\
+                '    import re\n' +\
+                '    ' + resource_string(__name__, 'base.py').decode('utf-8').replace('\n', '\n    ') +\
+                '\n' +\
+                '    ' + include_text().replace('\n', '\n    ') +\
+                '\n' +\
+                self.print(indent='    ') + '\n'\
+                '    return eval(statement)'
 
-        if func in self.eval_functions:
-            f = self.eval_functions[func]
+            eval_code = compile(content, '<eval functions>', 'exec')
+            eval_ns = {}
+            exec(eval_code, eval_ns, eval_ns);
+            self._eval = eval_ns['_eval']
 
-        if op:
-            if type(op) == tuple:
-                f['op'] = set( op )
+        return self._eval(statement)
+
+    def resolve_config(self):
+        exec(
+            resource_string(__name__, 'base.py').decode('utf-8') +
+            self.print()
+        )
+
+        self.eval_functions = {}
+        for func, src in self.eval_functions_source.items():
+            if 'config_eval_' + func in locals():
+                config = locals()['config_eval_' + func](func)
             else:
-                f['op'] = { op }
+                config = config_base(func)
 
-        if math_level:
-            f['math_level'] = math_level
+            if config.op is None:
+                config.op = set()
+            elif type(config.op) == tuple:
+                config.op = set( config.op )
+            else:
+                config.op = { config.op }
 
-        if compiler:
-            f['compiler'] = compiler
+            self.eval_functions[func] = config
 
-        # only change unary when operation has been passed
-        if op:
-            f['unary'] = unary
+    def register(self, func, src):
+        self.eval_functions_source[func] = src
 
-        if src:
-            f['src'] = src
+    def call(self, func, param, stat):
+        import re
+        import pgmapcss.db as db
+        config = self.eval_functions[func]
 
-        self.eval_functions[func] = f
+        statement = config.compiler([ repr(p) for p in param ], '', stat)
+        return self.eval(statement)
 
-    def test(self, func, conf):
+    def test(self, func, src):
         print('* Testing %s' % func)
-
-        if 'src' not in conf:
-            return
 
         import re
         import pgmapcss.db as db
-        rows = conf['src'].split('\n')
+        rows = src.split('\n')
+        config = self.eval_functions[func]
 
         ret = '''
-create or replace function __eval_test__(param text[]) returns text
+create or replace function __eval_test__() returns text
 as $body$
 import re
-def to_float(v, default=None):
-    try:
-        return float(v)
-    except ValueError:
-        return default
-def to_int(v, default=None):
-    try:
-        return int(v)
-    except ValueError:
-        return default
-def float_to_str(v, default=None):
-    r = repr(v)
-    if r[-2:] == '.0':
-        r = r[:-2]
-    return r
 ''' +\
+resource_string(__name__, 'base.py').decode('utf-8') +\
 include_text() +\
 '''
 current = { 'object': { 'id': 'n123', 'tags': { 'amenity': 'restaurant', 'name': 'Foobar', 'cuisine': 'pizza;kebab;noodles' }}, 'pseudo_element': 'default', 'pseudo_elements': ['default', 'test'], 'tags': { 'amenity': 'restaurant', 'name': 'Foobar', 'cuisine': 'pizza;kebab;noodles' }, 'properties': { 'default': { 'width': '2', 'color': '#ff0000' }, 'test': { 'fill-color': '#00ff00' } } }
 render_context = {'bbox': '010300002031BF0D000100000005000000DBF1839BB5DC3B41E708549B2B705741DBF1839BB5DC3B41118E9739B171574182069214CCE23B41118E9739B171574182069214CCE23B41E708549B2B705741DBF1839BB5DC3B41E708549B2B705741', 'scale_denominator': 8536.77}
 '''
         ret += self.print()
-        ret += 'ret = eval_' + func + '(param)\n'
-        ret += 'if type(ret) != str:\n    return "not a string: " + repr(ret)\n'
-        ret += 'return ret\n'
-        ret += "$body$ language 'plpython3u' immutable;"
-        conn = db.connection()
-        conn.execute(ret)
+        ret += "result = ''\n"
 
         param_in = None
         for r in rows:
@@ -101,15 +110,30 @@ render_context = {'bbox': '010300002031BF0D000100000005000000DBF1839BB5DC3B41E70
             if m:
                 return_out = eval(m.group(1))
 
-                r = conn.prepare('select __eval_test__($1)');
-                res = r(param_in)
+                ret += 'ret = ' + config.compiler([ repr(p) for p in param_in ], '', {}) + '\n'
+                ret += 'result += "IN  %s\\n"\n' % repr(param_in)
+                ret += 'result += "EXP %s\\n"\n' % repr(return_out)
+                ret += 'result += "OUT %s\\n" % repr(ret)\n'
 
-                print(' IN  %s' % repr(param_in))
-                print(' EXP %s' % repr(return_out))
-                print(' OUT %s' % repr(res[0][0]))
+                ret += 'if type(ret) != str:\n    result += "ERROR not a string: " + repr(ret) + "\\n"\n'
+                ret += 'elif ret != %s:\n    result += "ERROR return value wrong!\\n"\n' % repr(return_out)
 
-                if repr(return_out) != repr(res[0][0]):
-                    raise Exception("eval-test failed!")
+        ret += 'return result\n'
+        ret += "$body$ language 'plpython3u' immutable;"
+        #print(ret)
+        conn = db.connection()
+        conn.execute(ret)
+
+        r = conn.prepare('select __eval_test__()');
+        res = r()[0][0]
+
+        print(res)
+
+        if(re.search("^ERROR", res, re.MULTILINE)):
+            raise Exception("eval-test failed!")
 
     def test_all(self):
-        [ self.test(func, conf) for func, conf in self.eval_functions.items() ]
+        if not self.eval_functions:
+            self.resolve_config()
+
+        [ self.test(func, src) for func, src in self.eval_functions_source.items() ]

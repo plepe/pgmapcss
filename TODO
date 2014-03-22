@@ -1,8 +1,6 @@
 IDEAS:
 * defining colors with hsl() function + eval function hsl()
-* css3 color names
 * improve return structure of eval parser
-* beautify and document test.mapcss
 * include osm data for tests
 * unit tests
 * improve profiling

@@ -226,7 +226,7 @@ See documentation for properties of styles based on the 'default' style definiti
 ==== Types ====
 Depending on the type of property, special values are possible:
 
-* colors: You can specify colors as hex value (e.g. #ff0000, #f00) or as rgb(r, g, b). If the value is an integer values between 0..255 are accepted. Floats are accepted in the range 0.0..1.0. Percentage values 0%..100% may be specified too.
+* colors: You can specify colors as hex value (e.g. #ff0000, #f00) or as rgb(r, g, b) resp. rgbs(r, g, b, opacity) or as name (all named CSS3 colors supported). When using rgb() or rgba(), the following values are possible: If the value is an integer, values between 0..255 are accepted. Floats are accepted in the range 0.0..1.0. Percentage values 0%..100% may be specified too.
 * pixels: You may specify values which take a pixel-dependend value (e.g. width, offset, ...) with a unit, default: 'px' (Pixels on screen). Other supported unites: 'u' (Units in 900913 projection on the map), 'm' (Meters on the map; NOT IMPLEMENTED YET: currently 'u' is used instead).
 * You may specify URLs without url()
 
@@ -328,6 +328,7 @@ The type of a property is specified by:
 Currently supported types:
 * text: The value is used as is (default)
 * tag_name: The current value of the specified tag
+* numeric: Value may be a number
 
 == Possible values ==
 The following statement defines possible values for a specific property:

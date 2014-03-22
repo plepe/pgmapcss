@@ -4,6 +4,7 @@ from .parse_properties import parse_properties
 from .strip_comments import strip_comments
 from .ParseFile import *
 import pgmapcss.mapnik
+import copy
 
 def parse_file(stat, filename=None, base_style=None, content=None):
     if base_style:
@@ -37,5 +38,8 @@ def parse_file(stat, filename=None, base_style=None, content=None):
 
         for i in selectors:
             statement = i.copy()
-            statement['properties'] = properties
+            statement['properties'] = copy.deepcopy(properties)
             stat['statements'].append(statement)
+
+            for prop in statement['properties']:
+                prop['statement'] = statement

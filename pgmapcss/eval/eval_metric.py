@@ -1,3 +1,21 @@
+class config_eval_metric(config_base):
+    def mutable(self, param_values, stat):
+        import re
+
+        if len(param_values) == 0:
+            return 3
+
+        unit = 'px'
+        m = re.match('(.*)(px|u|m)$', param_values[0])
+        if m:
+            unit = m.group(2)
+
+        if len(param_values) >= 2 and unit == 'px' and param_values[1] == 'px':
+            return 3
+        if len(param_values) >= 1 and unit == 'px':
+            return 3
+        return 2
+
 def eval_metric(param):
     if len(param) == 0 or param[0] is None:
         return ''

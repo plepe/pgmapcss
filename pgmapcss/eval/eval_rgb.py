@@ -1,3 +1,6 @@
+class config_eval_rgb(config_base):
+    mutable = 3
+
 def eval_rgb(param):
     if len(param) < 3:
         return ''

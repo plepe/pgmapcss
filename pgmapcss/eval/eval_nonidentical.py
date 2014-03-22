@@ -1,3 +1,8 @@
+class config_eval_nonidentical(config_base):
+    math_level = 7
+    op = ('!==', 'ne')
+    mutable = 3
+
 def eval_nonidentical(param):
     # empty parameter list -> all equal
     if len(param) == 0:

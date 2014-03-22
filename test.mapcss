@@ -1,93 +1,148 @@
-meta {
-  title: "TEST";
-}
 canvas {
-  fill-color: #7f7f7f;
-  fill-image: url("background.png");
+  fill-color: #f2efd9;
+  buffer: 128;
 }
-point[place] {
-  text-halo-radius: 2;
+/* ROADS */
+line|z8-[highway=motorway]::highway,
+line|z10-[highway=motorway_link]::highway,
+line|z8-[highway=trunk]::highway,
+line|z10-[highway=trunk_link]::highway {
+  set .street_type = motorway;
+}
+line|z10-[highway=primary]::highway,
+line|z10-[highway=primary_link]::highway,
+line|z11-[highway=secondary]::highway,
+line|z12-[highway=tertiary]::highway {
+  set .street_type = major;
+}
+line|z13-[highway=unclassified]::highway,
+line|z15-[highway=residential]::highway,
+line|z15-[highway=pedestrian]::highway {
+  set .street_type = minor;
+}
+
+line.street_type::highway {
+  linecap: round;
+  casing-width: 1;
+  casing-color: #a0a0a0;
+  casing-linecap: butt;
+}
+line[.street_type=motorway]::highway {
+  width: 10;
+  color: #ff7f00;
+  z-index: 2;
+}
+line[.street_type=major]::highway {
+  width: 8;
+  color: #ffff00;
+  z-index: 1;
+}
+line[.street_type=minor]::highway {
+  width: 6;
+  color: #ffffff;
+  z-index: 0;
+}
+
+line.street_type[bridge]::highway {
+  casing-color: #000000;
+}
+
+/* Combine all lines with an equal '.street_type' tag (which
+   is set in the statements above) and the same name. */
+line.street_type[name]::highway {
+  combine street eval(concat(tag(street_type), '-', tag(name)));
+}
+
+/* merge lines if possible; print name */
+street::highway {
+  geo: eval(line_merge(prop(geo)));
+  text: eval(tag(name));
+  text-position: line;
+  text-spacing: 256;
+  text-halo-color: #ffffffaf;
+  text-halo-radius: 1;
+  layer: 10;
+  z-index: 1;
+}
+
+/* RAIL */
+line|z8-[railway=rail]::rail {
+  width: 2;
+  color: #707070;
+  z-index: 3;
+}
+line|z8-[railway=rail]::rail_dash {
+  color: #707070;
+  width: 6;
+  dashes: 0,2,1,2;
+  z-index: 3;
+}
+line|z8-[railway=rail][usage=main]::rail,
+line|z8-[railway=rail][usage=main]::rail {
+  color: #404040;
+  z-index: 4;
+}
+
+/* PLACES */
+node|z8-13[place=city]::place,
+node|z10-15[place=town]::place,
+node|z12-17[place=village]::place {
   text: name;
-  text-halo-fill: #ffffff;	// Mapnik >= version 3.0 or branch harfbuzz
-
-  character-spacing: 1;
-  text-opacity: 0.7;
-
-  z-index: 10;
-  text-transform: uppercase;
+  font-size: 12;
+  font-weight: bold;
+  layer: 10;
+  z-index: 0;
 }
 
-area[building] {
-  fill-color: #707070;		// Mapnik >= version 3.0
-  width: 1;			// Mapnik >= version 3.0 or branch stroke-width-expr
-  color: #000000;		// Mapnik >= version 3.0
-}
-
-way|z11-::casing
-{
-  z-index: -20;
-  object-z-index: -1;
-}
-way|z11-14[highway=primary]
-{
-  width: 2;
-  color: #ff0000;
-}
-way|z11-14[highway=primary]::casing
-{
-  width: 4;
-  color: rgb(0.5, 127, 50%);
-}
-
-way|z15-[highway=primary]
-{
-  width: 4;
-  color: #ff0000;
-}
-way|z15-[highway=primary]::casing
-{
-  width: 7;
-  color: rgb(0.5, 127, 50%);
-}
-way|z11-[bridge]::casing
-{
-  color: #000000;
-}
-
-way[highway=residential],
-way[highway=unclassified] {
-  set .minor_road;
-}
-way.minor_road {
-  width: 2;
-  color: #ff0000;
+/* BUILDINGS */
+area|z15-[building]::building {
+  fill-color: #b8b6a5;
   z-index: -1;
 }
 
-relation[route=tram] > line|z15-[railway] {
-  set ref_list = eval(push(tag(ref_list), parent_tag(ref)));
+/* NATURE */
+node|z10-[natural=peak]::natural {
+  icon-image: triangle;
+  icon-width: 12;
+  icon-color: brown;
+  text: tag(name) . "\n" . tag(ele);
+  text-color: brown;
+  text-offset: 8;
+  layer: 10;
+  z-index: 1;
 }
-line[railway] {
-  text: eval(join(natsort(unique(tag(ref_list))), ", "));
+area|z10-[landuse=forest]::natural {
+  fill-color: #72c063;
+  text: name;
+  text-color: lighten('#72c063', -1);
+  text-halo-color: #72c063af;
+}
+area|z10-[waterway=riverbank]::natural {
+  fill-color: #7eb9e3;
+}
+area|z10-[natural=water]::natural {
+  fill-color: #7eb9e3;
+  text: name;
+  text-color: lighten('#7eb9e3', -1);
+  text-halo-color: #7eb9e3;
+}
+line|z10-[waterway=river]::natural,
+line|z15-[waterway=stream]::natural {
   width: 2;
-  color: #000000;
-  text-color: #ff0000;
+  color: #7eb9e3;
+  text-color: lighten('#7eb9e3', -1);
+  text-halo-color: #7eb9e3;
+  text: name;
   text-position: line;
-  text-halo-color: #000000;
+  text-spacing: 256;
+}
+line|z15-[waterway=river]::natural {
+  width: 4;
+}
+line|z17-[waterway=river]::natural {
+  width: 8;
+}
+*::natural {
+  font-style: italic;
   text-halo-radius: 1;
-}
-
-line[highway] {
-  shield-text: ref;
-  shield-image: url('examples/highest_peaks_large.svg');
-}
-/* test */
-
-// very slow with 32bit osm2pgsql
-//way[highway=primary] >[sequence_id] node[crossing] {
-//    text: eval(link_tag(sequence_id));
-//    text-color: #ffffff;
-//}
-line[highway=secondary] near[distance<=50m] area[building] {
-    fill-color: #a07f7f;
 }

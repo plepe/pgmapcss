@@ -1,3 +1,6 @@
+class config_eval_centroid(config_base):
+    mutable = 3
+
 def eval_centroid(param):
     if not len(param):
         return ''

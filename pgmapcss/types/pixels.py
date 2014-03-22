@@ -7,11 +7,15 @@ class pixels(default):
         if value is None:
             return None
 
-        m = re.match('(.*)(px|m|u)$', value)
+        m = re.match('(\-?[0-9]+(\.[0-9]+)?)(px|m|u)$', value)
         if m:
-            return ( m.group(1), m.group(2) )
+            return ( m.group(1), m.group(3) )
 
-        return ( value, 'px' )
+        m = re.match('(\-?[0-9]+(\.[0-9]+)?)$', value)
+        if m:
+            return ( m.group(1), 'px' )
+
+        return None
 
 
     def compile(self, prop):
@@ -23,12 +27,15 @@ class pixels(default):
         if v[1] == 'px':
             return repr(v[0])
 
-        return self.compile_check(compile_eval([ 'f:metric', 'v:' + v[0] + v[1] ], self.stat))
+        return self.compile_check(compile_eval([ 'f:metric', 'v:' + v[0] + v[1] ], prop, self.stat))
 
     def stat_value(self, prop):
         v = self._parse(prop['value'])
 
         if v is None:
+            return None
+
+        if v[0] == '':
             return None
 
         if v[1] == 'px':

@@ -1,3 +1,6 @@
+class config_eval_line_part(config_base):
+    mutable = 2
+
 def eval_line_part(param):
     if len(param) == 0:
         return ''

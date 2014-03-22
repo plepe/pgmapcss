@@ -1,3 +1,6 @@
+class config_eval_area(config_base):
+    mutable = 2
+
 def eval_area(param):
     if len(param) == 0:
         return ''

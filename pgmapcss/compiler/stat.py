@@ -1,4 +1,5 @@
 import pgmapcss.types
+import pgmapcss.eval
 
 def stat_all_scale_denominators(stat):
     return sorted(list(set([
@@ -22,34 +23,44 @@ def stat_properties(stat):
 
 def stat_property_values(prop, stat, pseudo_element=None, include_illegal_values=False, value_type=None, eval_true=True):
     """Returns set of all values used on this property in any statement.
-    Returns boolean 'True' if property is result of an eval expression.
+    Returns boolean 'True' if property is result of an unresolveable eval
+    expression.
 
     Parameters:
     pseudo_element: limit returned values to given pseudo_element (default: None which means all)
     include_illegal_values: If True all values as given in MapCSS are returned, if False the list is sanitized (see @values). Default: False
     value_type: Only values with value_type will be returned. Default None (all)
-    eval_true: Return 'True' for values which result of an eval expression. Otherwise this value will be removed. Default: True.
+    eval_true: Return 'True' for values which result of an unresolvable eval expression. Otherwise this value will be removed. Default: True.
     """
     prop_type = pgmapcss.types.get(prop, stat)
 
-    if include_illegal_values:
-        values = {
-            True if p['value_type'] == 'eval' else p['value']
+    # go over all statements and their properties and collect it's values. If
+    # include_illegal_values==False sanitize list. Do not include eval
+    # statements.
+    values = {
+        p['value'] if include_illegal_values else prop_type.stat_value(p)
+        for v in stat['statements']
+        for p in v['properties']
+        if pseudo_element == None or v['selector']['pseudo_element'] in ('*', pseudo_element)
+        if p['assignment_type'] == 'P' and p['key'] == prop
+        if value_type == None or value_type == p['value_type']
+        if p['value_type'] != 'eval'
+    }
+
+    # resolve eval functions (as far as possible) - also sanitize list.
+    if True:
+        values = values.union({
+            v1 if v1 == True or include_illegal_values else prop_type.stat_value({
+                'value_type': 'eval',
+                'value': v1
+            })
             for v in stat['statements']
             for p in v['properties']
             if pseudo_element == None or v['selector']['pseudo_element'] in ('*', pseudo_element)
             if p['assignment_type'] == 'P' and p['key'] == prop
-            if value_type == None or value_type == p['value_type']
-        }
-    else:
-        values = {
-            True if p['value_type'] == 'eval' else prop_type.stat_value(p)
-            for v in stat['statements']
-            for p in v['properties']
-            if pseudo_element == None or v['selector']['pseudo_element'] in ('*', pseudo_element)
-            if p['assignment_type'] == 'P' and p['key'] == prop
-            if value_type == None or value_type == p['value_type']
-        }
+            if p['value_type'] == 'eval'
+            for v1 in pgmapcss.eval.possible_values(p['value'], p, stat)[0]
+        })
 
     if 'default_other' in stat['defines'] and prop in stat['defines']['default_other']:
         other = stat['defines']['default_other'][prop]['value']
@@ -105,7 +116,6 @@ def stat_properties_combinations_pseudo_element(keys, stat, pseudo_element, incl
 
 def stat_properties_combinations(keys, stat, pseudo_elements=None, include_illegal_values=False, value_type=None, eval_true=True):
     combinations = []
-
     if type(pseudo_elements) == str:
         pseudo_elements = [ pseudo_elements ]
     if pseudo_elements is None:

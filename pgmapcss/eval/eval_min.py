@@ -1,3 +1,10 @@
+class config_eval_min(config_base):
+    def mutable(self, param_values, stat):
+        import pgmapcss.eval
+        config_metric = pgmapcss.eval.eval_functions.list()['metric']
+        ret = [ config_metric.mutable([p], stat) for p in param_values ]
+        return min(ret)
+
 def eval_min(param):
     if len(param) == 0:
         return ''

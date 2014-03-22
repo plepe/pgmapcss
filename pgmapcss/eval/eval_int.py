@@ -1,3 +1,6 @@
+class config_eval_int(config_base):
+    mutable = 3
+
 def eval_int(param):
     if len(param) == 0:
         return ''

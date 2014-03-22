@@ -1,3 +1,12 @@
+class config_eval_lt(config_base):
+    math_level = 7
+    op = '<'
+    def mutable(self, param_values, stat):
+        import pgmapcss.eval
+        config_metric = pgmapcss.eval.eval_functions.list()['metric']
+        ret = [ config_metric.mutable([p], stat) for p in param_values ]
+        return min(ret)
+
 def eval_lt(param):
     if len(param) < 2:
         return ''

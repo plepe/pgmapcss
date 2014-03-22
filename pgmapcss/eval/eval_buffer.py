@@ -1,3 +1,6 @@
+class config_eval_buffer(config_base):
+    mutable = 2
+
 def eval_buffer(param):
     if len(param) < 2:
         return ''

@@ -1,3 +1,6 @@
+class config_eval_count(config_base):
+    mutable = 3
+
 def eval_count(param):
     if len(param) == 0:
         return ''

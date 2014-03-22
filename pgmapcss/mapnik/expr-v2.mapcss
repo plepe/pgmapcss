@@ -16,6 +16,8 @@
 @type casing-width pixels;
 @type casing-offset pixels;
 @type text-offset pixels;
+@type font-size numeric;
+@type shield-font-size numeric;
 
 // The follwing properties default to the final value of another property
 @default_other casing-offset offset;
@@ -134,6 +136,11 @@
   shield-text-opacity: 1;
   shield-text-halo-radius: 0;
   shield-text-transform: ;
+// Show points, lines and shields after all other symbolizers
+  point-layer: 100;
+  point-text-layer: 101;
+  line-text-layer: 102;
+  shield-layer: 103;
 }
 line::(*) {
   shield-placement: line;
