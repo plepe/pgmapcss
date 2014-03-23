@@ -25,14 +25,16 @@ def print_checks(prop, stat, main_prop=None, indent=''):
 
     return ret
 
-def compile_function_check(id, stat):
+def compile_function_check(min_scale, statements, stat):
     replacement = {
-      'style_id': id,
+      'style_id': stat['id'],
+      'min_scale': min_scale,
+      'min_scale_esc': str(min_scale).replace('.', '_'),
       'pseudo_elements': repr(stat['pseudo_elements'])
     }
 
     ret = '''
-def check(object):
+def check_{min_scale_esc}(object):
 # initialize variables
     global current
     current = {{
@@ -53,7 +55,7 @@ def check(object):
 # All statements
 '''.format(**replacement)
 
-    for i in stat['statements']:
+    for i in statements:
         ret += compile_statement(i, stat)
 
     ret += '''\

@@ -4,17 +4,40 @@ from .compile_function_get_where import compile_function_get_where
 from .compile_function_check import compile_function_check
 from ..includes import include_text
 import pgmapcss.eval
+from .stat import *
 
 def compile_function_match(stat):
+    scale_denominators = stat_all_scale_denominators(stat)
+    sorted(scale_denominators, reverse=True)
+
+    check_functions = [
+        compile_function_check(s, [
+            v
+            for v in stat['statements']
+            if v['selector']['min_scale'] <= s and
+                (v['selector']['max_scale'] == None or v['selector']['max_scale'] >= s)
+        ], stat)
+        for s in scale_denominators
+    ]
+
+    check_chooser  = "if render_context['scale_denominator'] is None:\n"
+    check_chooser += "    check = check_0\n"
+
+    for i in scale_denominators:
+        check_chooser += "elif render_context['scale_denominator'] >= %i:\n" % i
+        check_chooser += "    check = check_%s\n" % str(i).replace('.', '_')
+
     replacement = {
       'style_id': stat['id'],
       'style_element_property': repr({
           k: v['value'].split(';')
           for k, v in stat['defines']['style_element_property'].items()
       }),
+      'scale_denominators': repr(scale_denominators),
       'match_where': compile_function_get_where(stat['id'], stat),
       'db_query': db.query_functions(),
-      'function_check': compile_function_check(stat['id'], stat),
+      'function_check': '\n'.join(check_functions),
+      'check_chooser': check_chooser,
       'eval_functions': \
 resource_string(pgmapcss.eval.__name__, 'base.py').decode('utf-8') +\
 pgmapcss.eval.functions().print(indent='') +\
@@ -41,6 +64,7 @@ render_context = {{ 'bbox': bbox, 'scale_denominator': scale_denominator }}
 match_where = None
 {match_where}
 
+{check_chooser}
 combined_objects = {{}}
 results = []
 all_style_elements = _all_style_elements
