@@ -7,18 +7,20 @@ import pgmapcss.eval
 from .stat import *
 
 def compile_function_match(stat):
-    scale_denominators = stat_all_scale_denominators(stat)
-    sorted(scale_denominators, reverse=True)
+    scale_denominators = sorted(stat_all_scale_denominators(stat), reverse=True)
 
-    check_functions = [
-        compile_function_check(s, [
+    check_functions = ''
+    max_scale = scale_denominators[0]
+    for min_scale in scale_denominators[1:]:
+        print(min_scale, max_scale)
+        check_functions += compile_function_check(min_scale, [
             v
             for v in stat['statements']
-            if v['selector']['min_scale'] <= s and
-                (v['selector']['max_scale'] == None or v['selector']['max_scale'] >= s)
+            if v['selector']['min_scale'] <= min_scale and
+                (v['selector']['max_scale'] == None or v['selector']['max_scale'] >= max_scale)
         ], stat)
-        for s in scale_denominators
-    ]
+        check_functions += '\n'
+        max_scale = min_scale
 
     check_chooser  = "if render_context['scale_denominator'] is None:\n"
     check_chooser += "    check = check_0\n"
@@ -36,7 +38,7 @@ def compile_function_match(stat):
       'scale_denominators': repr(scale_denominators),
       'match_where': compile_function_get_where(stat['id'], stat),
       'db_query': db.query_functions(),
-      'function_check': '\n'.join(check_functions),
+      'function_check': check_functions,
       'check_chooser': check_chooser,
       'eval_functions': \
 resource_string(pgmapcss.eval.__name__, 'base.py').decode('utf-8') +\
