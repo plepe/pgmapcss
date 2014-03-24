@@ -16,10 +16,11 @@ line|z15-[highway=primary] {
   casing-color: #303030;
   casing-width: 1.5;
   text: name;
+  text-color: blue;
 }
 ```
 
-  Every line with highway=primary should be displayed with a yellow 6px wide line with a 1.5px darkgrey casing (on both sides). Additional the value of the 'name'-tag should be shown on top of the line. This style is valid from zoom level 15 on.
+  Every line with highway=primary should be displayed with a yellow 6px wide line with a 1.5px darkgrey casing (on both sides). Additional the value of the 'name'-tag should be shown on top of the line in the CSS3 color blue. This style is valid from zoom level 15 on.
 
   See [MapCSS Documentation](doc/MapCSS.creole) for general documentation about pgmapcss' dialect of the MapCSS language and [the list of available properties (Mapnik 2.2)](doc/mapnik-2.2.creole) for possible style parameters (resp. [here for Mapnik 2.0](doc/mapnik-2.0.creole) and [here for the experimental "expr-v2" branch](doc/expr-v2.creole)).
 
@@ -43,6 +44,8 @@ line|z15-[highway=primary] {
 ```
 
   In fact you can write the last line as "width: 30m;" as pgmapcss supports other units than pixels. (Still it needs Mapnik >= 3.0, as older mapnik versions can't read the width of a line from a database column). (As of this writing in January 2014 there is only one [specific mapnik branch](https://github.com/mapnik/mapnik/tree/stroke-width-expr) which supports this feature, although the [expr-v2 branch](https://github.com/mapnik/mapnik/tree/expr-v2) is expected to support it soon).
+
+  Starting with version 0.7, pgmapcss does not require eval(...) to be wrapped around expressions, but for compatibility with other MapCSS implementations you should write it out.
 
   See [the "eval" documentation](doc/eval.creole) for a complete list of functions.
 
@@ -70,6 +73,20 @@ line[highway] near[index=0] point[amenity=restaurant] {
   );
 }
 ```
+
+* **Included Icon set:**
+  pgmapcss includes the [Mapbox Maki Icon Set](https://www.mapbox.com/maki/). So for simple styles you don't need to create own icons.
+
+  Example:
+```css
+icon-image: bicycle;
+icon-width: 18;      /* default: 24; valid values: 12, 18, 24 */
+icon-color: #ff0000; /* default #404040 */
+```
+
+  Current limitations: Only the widths 12, 18 and 24 are supported right now, which are the sizes of the icon set. Scaling for icons (also custom icons) is not implemented right now.
+
+  [List of currently available icons](doc/Mapbox_Maki_icons.md). If an icon is missing, Mapbox Maki is Open Source; you can [contribute icons](https://github.com/mapbox/maki), they will be included in the next pgmapcss release.
 
 * **pgmapcss is (mostly) fast:**
 
