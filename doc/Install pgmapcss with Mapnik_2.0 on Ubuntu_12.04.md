@@ -44,8 +44,6 @@ Clone pgmapcss:
 ```sh
 git clone https://github.com/plepe/pgmapcss.git
 cd pgmapcss
-git submodule init
-git submodule update
 python3 setup.py build
 sudo python3 setup.py install
 ```

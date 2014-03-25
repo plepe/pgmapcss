@@ -44,15 +44,13 @@ Clone pgmapcss:
 ```sh
 git clone https://github.com/plepe/pgmapcss.git
 cd pgmapcss
-git submodule init
-git submodule update
 python3 setup.py build
 sudo python3 setup.py install
 ```
 
 Compile 'test.mapcss' file and install database functions:
 ```
-pgmapcss -dtest -uuser -pPASSWORD -tmapnik-2.0 test
+pgmapcss -dtest -uuser -pPASSWORD -tmapnik-2.2 test
 ```
 
 You have a file test.mapnik which you can use in your preferred render front-end (e.g. renderd/mod_tile) OR generate an image with generate_image.py (if the Azores where not used as data, change "bounds" in file accordingly):
