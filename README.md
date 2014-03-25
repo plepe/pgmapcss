@@ -8,7 +8,7 @@ pgmapcss compiles MapCSS styles into a database function. Mapnik just needs to c
 
 Features
 --------
-* **Writing MapCSS styles is simple, e.g.:**
+### Writing MapCSS styles is simple, e.g.: ###
 ```css
 line|z15-[highway=primary] {
   color: #ffff00;
@@ -20,13 +20,13 @@ line|z15-[highway=primary] {
 }
 ```
 
-  Every line with highway=primary should be displayed with a yellow 6px wide line with a 1.5px darkgrey casing (on both sides). Additional the value of the 'name'-tag should be shown on top of the line in the CSS3 color blue. This style is valid from zoom level 15 on.
+Every line with highway=primary should be displayed with a yellow 6px wide line with a 1.5px darkgrey casing (on both sides). Additional the value of the 'name'-tag should be shown on top of the line in the CSS3 color blue. This style is valid from zoom level 15 on.
 
-  See [MapCSS Documentation](doc/MapCSS.creole) for general documentation about pgmapcss' dialect of the MapCSS language and [the list of available properties (Mapnik 2.2)](doc/mapnik-2.2.creole) for possible style parameters (resp. [here for Mapnik 2.0](doc/mapnik-2.0.creole) and [here for the experimental "expr-v2" branch](doc/expr-v2.creole)).
+See [MapCSS Documentation](doc/MapCSS.creole) for general documentation about pgmapcss' dialect of the MapCSS language and [the list of available properties (Mapnik 2.2)](doc/mapnik-2.2.creole) for possible style parameters (resp. [here for Mapnik 2.0](doc/mapnik-2.0.creole) and [here for the experimental "expr-v2" branch](doc/expr-v2.creole)).
 
-* **Extensive eval-syntax:**
+### Extensive eval-syntax: ###
 
-  Using eval(), values for properties can be calculated. Even geometric modifications are possible as many PostGIS functions are exposed. Examples:
+Using eval(), values for properties can be calculated. Even geometric modifications are possible as many PostGIS functions are exposed. Examples:
 ```css
 line|z15-[highway=primary] {
   /* print "ref - name" as text, e.g. "B1 - Wienerstraße". */
@@ -49,11 +49,11 @@ line|z15-[highway=primary] {
 
   See [the "eval" documentation](doc/eval.creole) for a complete list of functions.
 
-* **Combine features:**
+### Combine features: ###
 
   Often it makes sense to combine similar features, e.g. streets which are split into short parts due to changes in their street layout. This results in missing street names as the parts are too small. With pgmapcss you can combine those map features, so that the name can span the whole street.
 
-* **Relate neighbouring map features:**
+### Relate neighbouring map features: ###
 
   Set neighbouring map features into relation. Map features don't exist independent from their surroundings. This can be done using the "near" link syntax. This is a pgmapcss specific enhancement.
 
@@ -74,29 +74,29 @@ line[highway] near[index=0] point[amenity=restaurant] {
 }
 ```
 
-* **Included Icon set:**
-  pgmapcss includes the [Mapbox Maki Icon Set](https://www.mapbox.com/maki/). So for simple styles you don't need to create own icons.
+### Included Icon set: ###
+pgmapcss includes the [Mapbox Maki Icon Set](https://www.mapbox.com/maki/). So for simple styles you don't need to create own icons.
 
-  Example:
+Example:
 ```css
 icon-image: bicycle;
 icon-width: 18;      /* default: 24; valid values: 12, 18, 24 */
 icon-color: #ff0000; /* default #404040 */
 ```
 
-  Current limitations: Only the widths 12, 18 and 24 are supported right now, which are the sizes of the icon set. Scaling for icons (also custom icons) is not implemented right now.
+Current limitations: Only the widths 12, 18 and 24 are supported right now, which are the sizes of the icon set. Scaling for icons (also custom icons) is not implemented right now.
 
-  [List of currently available icons](doc/Mapbox_Maki_icons.md). If an icon is missing, Mapbox Maki is Open Source; you can [contribute icons](https://github.com/mapbox/maki), they will be included in the next pgmapcss release.
+[List of currently available icons](doc/Mapbox_Maki_icons.md). If an icon is missing, Mapbox Maki is Open Source; you can [contribute icons](https://github.com/mapbox/maki), they will be included in the next pgmapcss release.
 
-* **pgmapcss is (mostly) fast:**
+### pgmapcss is (mostly) fast: ###
 
-  Optimized database queries: Only those map features which are visible in the current zoom level are requested from the database.
+Optimized database queries: Only those map features which are visible in the current zoom level are requested from the database.
 
-  The compiled database function uses PL/Python3 database language, which makes execution efficient and powerful.
+The compiled database function uses PL/Python3 database language, which makes execution efficient and powerful.
 
-  As Mapnik 2.x can't read symbolizer values (like color, width, ...) from database columns, the mapnik pre-processor has to create style rules for all possible value combinations. The more complex the style sheet, the larger the mapnik style files and therefore rendering can take a long time. The up-coming Mapnik 3.0 should solve these issues.
+As Mapnik 2.x can't read symbolizer values (like color, width, ...) from database columns, the mapnik pre-processor has to create style rules for all possible value combinations. The more complex the style sheet, the larger the mapnik style files and therefore rendering can take a long time. The up-coming Mapnik 3.0 should solve these issues.
 
-* **Easy to install:**
+### Easy to install: ###
 
   Find installation instructions in [Install pgmapcss with Mapnik 2.2 on Ubuntu 12.04](doc/Install pgmapcss with Mapnik_2.2 on Ubuntu_12.04.md).
 
