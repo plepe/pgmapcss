@@ -1,6 +1,7 @@
 from .compile_statement import compile_statement
 from .compile_eval import compile_eval
 from .stat import *
+import copy
 
 def print_checks(prop, stat, main_prop=None, indent=''):
     ret = ''
@@ -25,10 +26,11 @@ def print_checks(prop, stat, main_prop=None, indent=''):
 
     return ret
 
-def compile_function_check(min_scale, statements, stat):
+def compile_function_check(statements, min_scale, max_scale, stat):
     replacement = {
       'style_id': stat['id'],
       'min_scale': min_scale,
+      'max_scale': max_scale,
       'min_scale_esc': str(min_scale).replace('.', '_'),
       'pseudo_elements': repr(stat['pseudo_elements'])
     }
@@ -56,6 +58,11 @@ def check_{min_scale_esc}(object):
 '''.format(**replacement)
 
     for i in statements:
+        # create a copy of the statement and modify min/max scale
+        i = copy.deepcopy(i)
+        i['selector']['min_scale'] = min_scale
+        i['selector']['max_scale'] = max_scale
+
         ret += compile_statement(i, stat)
 
     ret += '''\
