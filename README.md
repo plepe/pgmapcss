@@ -79,10 +79,13 @@ pgmapcss includes the [Mapbox Maki Icon Set](https://www.mapbox.com/maki/). So f
 
 Example:
 ```css
-icon-image: bicycle;
-icon-width: 18;      /* default: 24; valid values: 12, 18, 24 */
-icon-color: #ff0000; /* default #404040 */
+node|z14-[amenity=bicycle_parking] {
+  icon-image: bicycle;
+  icon-width: 18;      /* default: 24; valid values: 12, 18, 24 */
+  icon-color: #ff0000; /* default #404040 */
+}
 ```
+* [Try it online!](http://pgmapcss.openstreetbrowser.org/?style=e8110&zoom=14&lat=48.2098&lon=16.3725)
 
 Current limitations: Only the widths 12, 18 and 24 are supported right now, which are the sizes of the icon set. Scaling for icons (also custom icons) is not implemented right now.
 
@@ -98,7 +101,9 @@ As Mapnik 2.x can't read symbolizer values (like color, width, ...) from databas
 
 ### Easy to install: ###
 
-  Find installation instructions in [Install pgmapcss with Mapnik 2.2 on Ubuntu 12.04](doc/Install pgmapcss with Mapnik_2.2 on Ubuntu_12.04.md).
+Find installation instructions in [Install pgmapcss with Mapnik 2.2 on Ubuntu 12.04](doc/Install pgmapcss with Mapnik_2.2 on Ubuntu_12.04.md).
+
+There's a file [test.mapcss](./test.mapcss) which you can use to build upon. You can [try it online!](http://pgmapcss.openstreetbrowser.org/?style=d9c30&zoom=14&lat=48.2098&lon=16.3725)
 
 Share this
 ----------
