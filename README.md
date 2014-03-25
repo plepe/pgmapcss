@@ -43,21 +43,21 @@ line|z15-[highway=primary] {
 }
 ```
 
-  In fact you can write the last line as "width: 30m;" as pgmapcss supports other units than pixels. (Still it needs Mapnik >= 3.0, as older mapnik versions can't read the width of a line from a database column). (As of this writing in January 2014 there is only one [specific mapnik branch](https://github.com/mapnik/mapnik/tree/stroke-width-expr) which supports this feature, although the [expr-v2 branch](https://github.com/mapnik/mapnik/tree/expr-v2) is expected to support it soon).
+In fact you can write the last line as "width: 30m;" as pgmapcss supports other units than pixels. (Still it needs Mapnik >= 3.0, as older mapnik versions can't read the width of a line from a database column). (As of this writing in January 2014 there is only one [specific mapnik branch](https://github.com/mapnik/mapnik/tree/stroke-width-expr) which supports this feature, although the [expr-v2 branch](https://github.com/mapnik/mapnik/tree/expr-v2) is expected to support it soon).
 
-  Starting with version 0.7, pgmapcss does not require eval(...) to be wrapped around expressions, but for compatibility with other MapCSS implementations you should write it out.
+Starting with version 0.7, pgmapcss does not require eval(...) to be wrapped around expressions, but for compatibility with other MapCSS implementations you should write it out.
 
-  See [the "eval" documentation](doc/eval.creole) for a complete list of functions.
+See [the "eval" documentation](doc/eval.creole) for a complete list of functions.
 
 ### Combine features: ###
 
-  Often it makes sense to combine similar features, e.g. streets which are split into short parts due to changes in their street layout. This results in missing street names as the parts are too small. With pgmapcss you can combine those map features, so that the name can span the whole street.
+Often it makes sense to combine similar features, e.g. streets which are split into short parts due to changes in their street layout. This results in missing street names as the parts are too small. With pgmapcss you can combine those map features, so that the name can span the whole street.
 
 ### Relate neighbouring map features: ###
 
-  Set neighbouring map features into relation. Map features don't exist independent from their surroundings. This can be done using the "near" link syntax. This is a pgmapcss specific enhancement.
+Set neighbouring map features into relation. Map features don't exist independent from their surroundings. This can be done using the "near" link syntax. This is a pgmapcss specific enhancement.
 
-  Example:
+Example (&rarr; [Try it online!](http://pgmapcss.openstreetbrowser.org/?style=df790&zoom=15&lat=48.2098&lon=16.3725)):
 ```css
 /* This selector selects the closest highway for each restaurant. These
 selectors always need the be read from right to left, as the last object is the
@@ -69,7 +69,7 @@ line[highway] near[index=0] point[amenity=restaurant] {
   text: eval(
     tag("name") .  " near " .
     parent_tag("name") .
-    " (" . metric(link_tag("distance", "m")) . "m)"
+    "\n" . metric(link_tag("distance"), "m") . "m"
   );
 }
 ```
@@ -77,7 +77,7 @@ line[highway] near[index=0] point[amenity=restaurant] {
 ### Included Icon set: ###
 pgmapcss includes the [Mapbox Maki Icon Set](https://www.mapbox.com/maki/). So for simple styles you don't need to create own icons.
 
-Example:
+Example (&rarr; [Try it online!](http://pgmapcss.openstreetbrowser.org/?style=e8110&zoom=14&lat=48.2098&lon=16.3725)):
 ```css
 node|z14-[amenity=bicycle_parking] {
   icon-image: bicycle;
@@ -85,7 +85,6 @@ node|z14-[amenity=bicycle_parking] {
   icon-color: #ff0000; /* default #404040 */
 }
 ```
-* [Try it online!](http://pgmapcss.openstreetbrowser.org/?style=e8110&zoom=14&lat=48.2098&lon=16.3725)
 
 Current limitations: Only the widths 12, 18 and 24 are supported right now, which are the sizes of the icon set. Scaling for icons (also custom icons) is not implemented right now.
 
