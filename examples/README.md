@@ -2,6 +2,8 @@ Major roads and parks
 =====================
 For starters a simple example will be shown: Major roads and parks.
 
+&rarr; [Try it online!](http://pgmapcss.openstreetbrowser.org/?style=86f2f&zoom=15&lat=48.1993&lon=16.3374)
+
 ![roads_parks](roads_parks.png)
 ```css
 /* draw a green polygon for all parks */
@@ -38,6 +40,8 @@ Layering roads of a motorway junction
 =====================================
 pgmapcss automatically layers objects by its 'layer' tag, therefore the roads and bridges in the image automatically get layered correctly. You may force a specific layer by setting a property 'layer', e.g. area[landuse] { layer: -10; }.
 
+&rarr; [Try it online!](http://pgmapcss.openstreetbrowser.org/?style=5a6da&zoom=15&lat=48.1207&lon=16.3241)
+
 ![motorway_junction](motorway_junction.png)
 ```css
 line[highway=motorway],
@@ -62,7 +66,7 @@ line.major_road[bridge] {
 }
 line.major_road[tunnel] {
   color: #ff7f7f;
-  casing-dashes: 3, 3;
+  casing-dashes: 3,3;
 }
 ```
 
@@ -70,6 +74,8 @@ Place nodes and their population
 ================================
 In the 3rd example we see the places names of some villages and a simple
 diagram with the population size. Also the administrative boundaries are shown.
+
+&rarr; [Try it online!](http://pgmapcss.openstreetbrowser.org/?style=fc3ee&zoom=13&lat=46.8685&lon=15.7199)
 
 ![places_population](places_population.png)
 ```css
@@ -104,6 +110,7 @@ The following map shows how to build relationships to "nearby" objects. Every
 (mountain?) peak is compared to the surrounding peaks (with a distance of up to
 128px) and if the peak is the highest it is highlighted.
 
+&rarr; [Try it online!](http://pgmapcss.openstreetbrowser.org/?style=2956e&zoom=12&lat=48.2618&lon=16.2635)
 
 ![highest_peaks](highest_peaks.png)
 ```css
@@ -232,6 +239,8 @@ Streets in OpenStreetMap are usually split into short junks to reflect changes i
 
 In this example features are merged by either major/minor road type and their name. In the left image features are not merged. The change in the right image is clearly visible, much more roads can be labeled.
 
+&rarr; Try it online: [original solution](http://pgmapcss.openstreetbrowser.org/?style=330ca&zoom=15&lat=48.1983&lon=16.3471), [combined roads](http://pgmapcss.openstreetbrowser.org/?style=a51b7&zoom=15&lat=48.1983&lon=16.3471)
+
 ![combined_roads](combined_roads.png)
 ```css
 line|z8-[highway=motorway],
@@ -297,6 +306,8 @@ Also most stations consist of many individual stops for all the busses and trams
 
 This is something that usually needs quite some database magic, but can be achieved with some pgmapcss magic.
 
+&rarr; [Try it online!](http://pgmapcss.openstreetbrowser.org/?style=dc018&zoom=15&lat=47.0691&lon=15.4468)
+
 ![tramway_network](tramway_network.png)
 ```css
 /* Draw all tram routes in red */
@@ -328,7 +339,7 @@ tram_routes::label {
   text-halo-color: #ffffff;
   text-halo-radius: 1;
   text-position: line;
-  text-spacing: 128px;
+  text-spacing: 128;
   z-index: 3;
 }
 

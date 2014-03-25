@@ -20,5 +20,5 @@ line.major_road[bridge] {
 }
 line.major_road[tunnel] {
   color: #ff7f7f;
-  casing-dashes: 3, 3;
+  casing-dashes: 3,3;
 }

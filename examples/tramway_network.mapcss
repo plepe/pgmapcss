@@ -27,7 +27,7 @@ tram_routes::label {
   text-halo-color: #ffffff;
   text-halo-radius: 1;
   text-position: line;
-  text-spacing: 128px;
+  text-spacing: 128;
   z-index: 3;
 }
 
