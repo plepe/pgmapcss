@@ -1,118 +1,118 @@
 List of icons available from the [Mapbox Maki](https://www.mapbox.com/maki/) project:
 
-| ID | Name |
-|----|------|
-| circle-stroked | Circle stroked |
-| circle | Circle solid |
-| square-stroked | Square stroked |
-| square | Square solid |
-| triangle-stroked | Triangle stroked |
-| triangle | Triangle solid |
-| star-stroked | Star stroked |
-| star | Star solid |
-| cross | Cross |
-| marker-stroked | Marker Stroke |
-| marker | Marker Solid |
-| religious-jewish | Religious Jewish |
-| religious-christian | Religious Christian |
-| religious-muslim | Religious Muslim |
-| cemetery | Cemetery |
-| rocket | Rocket |
-| airport | Airport |
-| heliport | Heliport |
-| rail | Rail |
-| rail-metro | Rail Metro |
-| rail-light | Rail Light |
-| bus | Bus |
-| fuel | Fuel |
-| parking | Parking |
-| parking-garage | Parking Garage |
-| airfield | Airfield |
-| roadblock | Roadblock |
-| ferry | Ferry |
-| harbor | Harbor |
-| bicycle | Bicycle |
-| park | Park |
-| park2 | Park 2 |
-| museum | Museum |
-| lodging | Lodging |
-| monument | Monument |
-| zoo | Zoo |
-| garden | Garden |
-| campsite | Campsite |
-| theatre | Theatre |
-| art-gallery | Art gallery |
-| pitch | Pitch |
-| soccer | Soccer |
-| america-football | American Football |
-| tennis | Tennis |
-| basketball | Basketball |
-| baseball | Baseball |
-| golf | Golf |
-| swimming | Swimming |
-| cricket | Cricket |
-| skiing | Skiing |
-| school | School |
-| college | College |
-| library | Library |
-| post | Post |
-| fire-station | Fire station |
-| town-hall | Town hall |
-| police | Police |
-| prison | Prison |
-| embassy | Embassy |
-| beer | Beer |
-| restaurant | Restaurant |
-| cafe | Cafe |
-| shop | Shop |
-| fast-food | Fast Food |
-| bar | Bar |
-| bank | Bank |
-| grocery | Grocery |
-| cinema | Cinema |
-| pharmacy | Pharmacy |
-| hospital | Hospital |
-| danger | Danger |
-| industrial | Industrial |
-| warehouse | Warehouse |
-| commercial | Commercial |
-| building | Building |
-| place-of-worship | Place of worship |
-| alcohol-shop | Alcohol shop |
-| logging | Logging |
-| oil-well | Oil well |
-| slaughterhouse | Slaughterhouse |
-| dam | Dam |
-| water | Water |
-| wetland | Wetland |
-| disability | Disability |
-| telephone | Telephone |
-| emergency-telephone | Emergency Telephone |
-| toilets | Toilets |
-| waste-basket | Waste Basket |
-| music | Music |
-| land-use | Land Use |
-| city | City |
-| town | Town |
-| village | Village |
-| farm | Farm |
-| bakery | Bakery |
-| dog-park | Dog Park |
-| lighthouse | Lighthouse |
-| clothing-store | Clothing Store |
-| polling-place | Polling Place |
-| playground | Playground |
-| entrance | Entrance |
-| heart | Heart |
-| london-underground | London Underground |
-| minefield | Minefield |
-| rail-underground | Rail Underground |
-| rail-above | Rail Above |
-| camera | Camera |
-| laundry | Laundry |
-| car | Car |
-| suitcase | Suitcase |
-| hairdresser | Hairdresser |
-| chemist | Chemist |
-| mobilephone | Mobile phone |
-| scooter | Scooter |
+| ID | Name | Icon (24px) |
+|----|------|-------------|
+| circle-stroked | Circle stroked | ![Circle stroked](../pgmapcss/icons/maki/circle-stroked-24.png)
+| circle | Circle solid | ![Circle solid](../pgmapcss/icons/maki/circle-24.png)
+| square-stroked | Square stroked | ![Square stroked](../pgmapcss/icons/maki/square-stroked-24.png)
+| square | Square solid | ![Square solid](../pgmapcss/icons/maki/square-24.png)
+| triangle-stroked | Triangle stroked | ![Triangle stroked](../pgmapcss/icons/maki/triangle-stroked-24.png)
+| triangle | Triangle solid | ![Triangle solid](../pgmapcss/icons/maki/triangle-24.png)
+| star-stroked | Star stroked | ![Star stroked](../pgmapcss/icons/maki/star-stroked-24.png)
+| star | Star solid | ![Star solid](../pgmapcss/icons/maki/star-24.png)
+| cross | Cross | ![Cross](../pgmapcss/icons/maki/cross-24.png)
+| marker-stroked | Marker Stroke | ![Marker Stroke](../pgmapcss/icons/maki/marker-stroked-24.png)
+| marker | Marker Solid | ![Marker Solid](../pgmapcss/icons/maki/marker-24.png)
+| religious-jewish | Religious Jewish | ![Religious Jewish](../pgmapcss/icons/maki/religious-jewish-24.png)
+| religious-christian | Religious Christian | ![Religious Christian](../pgmapcss/icons/maki/religious-christian-24.png)
+| religious-muslim | Religious Muslim | ![Religious Muslim](../pgmapcss/icons/maki/religious-muslim-24.png)
+| cemetery | Cemetery | ![Cemetery](../pgmapcss/icons/maki/cemetery-24.png)
+| rocket | Rocket | ![Rocket](../pgmapcss/icons/maki/rocket-24.png)
+| airport | Airport | ![Airport](../pgmapcss/icons/maki/airport-24.png)
+| heliport | Heliport | ![Heliport](../pgmapcss/icons/maki/heliport-24.png)
+| rail | Rail | ![Rail](../pgmapcss/icons/maki/rail-24.png)
+| rail-metro | Rail Metro | ![Rail Metro](../pgmapcss/icons/maki/rail-metro-24.png)
+| rail-light | Rail Light | ![Rail Light](../pgmapcss/icons/maki/rail-light-24.png)
+| bus | Bus | ![Bus](../pgmapcss/icons/maki/bus-24.png)
+| fuel | Fuel | ![Fuel](../pgmapcss/icons/maki/fuel-24.png)
+| parking | Parking | ![Parking](../pgmapcss/icons/maki/parking-24.png)
+| parking-garage | Parking Garage | ![Parking Garage](../pgmapcss/icons/maki/parking-garage-24.png)
+| airfield | Airfield | ![Airfield](../pgmapcss/icons/maki/airfield-24.png)
+| roadblock | Roadblock | ![Roadblock](../pgmapcss/icons/maki/roadblock-24.png)
+| ferry | Ferry | ![Ferry](../pgmapcss/icons/maki/ferry-24.png)
+| harbor | Harbor | ![Harbor](../pgmapcss/icons/maki/harbor-24.png)
+| bicycle | Bicycle | ![Bicycle](../pgmapcss/icons/maki/bicycle-24.png)
+| park | Park | ![Park](../pgmapcss/icons/maki/park-24.png)
+| park2 | Park 2 | ![Park 2](../pgmapcss/icons/maki/park2-24.png)
+| museum | Museum | ![Museum](../pgmapcss/icons/maki/museum-24.png)
+| lodging | Lodging | ![Lodging](../pgmapcss/icons/maki/lodging-24.png)
+| monument | Monument | ![Monument](../pgmapcss/icons/maki/monument-24.png)
+| zoo | Zoo | ![Zoo](../pgmapcss/icons/maki/zoo-24.png)
+| garden | Garden | ![Garden](../pgmapcss/icons/maki/garden-24.png)
+| campsite | Campsite | ![Campsite](../pgmapcss/icons/maki/campsite-24.png)
+| theatre | Theatre | ![Theatre](../pgmapcss/icons/maki/theatre-24.png)
+| art-gallery | Art gallery | ![Art gallery](../pgmapcss/icons/maki/art-gallery-24.png)
+| pitch | Pitch | ![Pitch](../pgmapcss/icons/maki/pitch-24.png)
+| soccer | Soccer | ![Soccer](../pgmapcss/icons/maki/soccer-24.png)
+| america-football | American Football | ![American Football](../pgmapcss/icons/maki/america-football-24.png)
+| tennis | Tennis | ![Tennis](../pgmapcss/icons/maki/tennis-24.png)
+| basketball | Basketball | ![Basketball](../pgmapcss/icons/maki/basketball-24.png)
+| baseball | Baseball | ![Baseball](../pgmapcss/icons/maki/baseball-24.png)
+| golf | Golf | ![Golf](../pgmapcss/icons/maki/golf-24.png)
+| swimming | Swimming | ![Swimming](../pgmapcss/icons/maki/swimming-24.png)
+| cricket | Cricket | ![Cricket](../pgmapcss/icons/maki/cricket-24.png)
+| skiing | Skiing | ![Skiing](../pgmapcss/icons/maki/skiing-24.png)
+| school | School | ![School](../pgmapcss/icons/maki/school-24.png)
+| college | College | ![College](../pgmapcss/icons/maki/college-24.png)
+| library | Library | ![Library](../pgmapcss/icons/maki/library-24.png)
+| post | Post | ![Post](../pgmapcss/icons/maki/post-24.png)
+| fire-station | Fire station | ![Fire station](../pgmapcss/icons/maki/fire-station-24.png)
+| town-hall | Town hall | ![Town hall](../pgmapcss/icons/maki/town-hall-24.png)
+| police | Police | ![Police](../pgmapcss/icons/maki/police-24.png)
+| prison | Prison | ![Prison](../pgmapcss/icons/maki/prison-24.png)
+| embassy | Embassy | ![Embassy](../pgmapcss/icons/maki/embassy-24.png)
+| beer | Beer | ![Beer](../pgmapcss/icons/maki/beer-24.png)
+| restaurant | Restaurant | ![Restaurant](../pgmapcss/icons/maki/restaurant-24.png)
+| cafe | Cafe | ![Cafe](../pgmapcss/icons/maki/cafe-24.png)
+| shop | Shop | ![Shop](../pgmapcss/icons/maki/shop-24.png)
+| fast-food | Fast Food | ![Fast Food](../pgmapcss/icons/maki/fast-food-24.png)
+| bar | Bar | ![Bar](../pgmapcss/icons/maki/bar-24.png)
+| bank | Bank | ![Bank](../pgmapcss/icons/maki/bank-24.png)
+| grocery | Grocery | ![Grocery](../pgmapcss/icons/maki/grocery-24.png)
+| cinema | Cinema | ![Cinema](../pgmapcss/icons/maki/cinema-24.png)
+| pharmacy | Pharmacy | ![Pharmacy](../pgmapcss/icons/maki/pharmacy-24.png)
+| hospital | Hospital | ![Hospital](../pgmapcss/icons/maki/hospital-24.png)
+| danger | Danger | ![Danger](../pgmapcss/icons/maki/danger-24.png)
+| industrial | Industrial | ![Industrial](../pgmapcss/icons/maki/industrial-24.png)
+| warehouse | Warehouse | ![Warehouse](../pgmapcss/icons/maki/warehouse-24.png)
+| commercial | Commercial | ![Commercial](../pgmapcss/icons/maki/commercial-24.png)
+| building | Building | ![Building](../pgmapcss/icons/maki/building-24.png)
+| place-of-worship | Place of worship | ![Place of worship](../pgmapcss/icons/maki/place-of-worship-24.png)
+| alcohol-shop | Alcohol shop | ![Alcohol shop](../pgmapcss/icons/maki/alcohol-shop-24.png)
+| logging | Logging | ![Logging](../pgmapcss/icons/maki/logging-24.png)
+| oil-well | Oil well | ![Oil well](../pgmapcss/icons/maki/oil-well-24.png)
+| slaughterhouse | Slaughterhouse | ![Slaughterhouse](../pgmapcss/icons/maki/slaughterhouse-24.png)
+| dam | Dam | ![Dam](../pgmapcss/icons/maki/dam-24.png)
+| water | Water | ![Water](../pgmapcss/icons/maki/water-24.png)
+| wetland | Wetland | ![Wetland](../pgmapcss/icons/maki/wetland-24.png)
+| disability | Disability | ![Disability](../pgmapcss/icons/maki/disability-24.png)
+| telephone | Telephone | ![Telephone](../pgmapcss/icons/maki/telephone-24.png)
+| emergency-telephone | Emergency Telephone | ![Emergency Telephone](../pgmapcss/icons/maki/emergency-telephone-24.png)
+| toilets | Toilets | ![Toilets](../pgmapcss/icons/maki/toilets-24.png)
+| waste-basket | Waste Basket | ![Waste Basket](../pgmapcss/icons/maki/waste-basket-24.png)
+| music | Music | ![Music](../pgmapcss/icons/maki/music-24.png)
+| land-use | Land Use | ![Land Use](../pgmapcss/icons/maki/land-use-24.png)
+| city | City | ![City](../pgmapcss/icons/maki/city-24.png)
+| town | Town | ![Town](../pgmapcss/icons/maki/town-24.png)
+| village | Village | ![Village](../pgmapcss/icons/maki/village-24.png)
+| farm | Farm | ![Farm](../pgmapcss/icons/maki/farm-24.png)
+| bakery | Bakery | ![Bakery](../pgmapcss/icons/maki/bakery-24.png)
+| dog-park | Dog Park | ![Dog Park](../pgmapcss/icons/maki/dog-park-24.png)
+| lighthouse | Lighthouse | ![Lighthouse](../pgmapcss/icons/maki/lighthouse-24.png)
+| clothing-store | Clothing Store | ![Clothing Store](../pgmapcss/icons/maki/clothing-store-24.png)
+| polling-place | Polling Place | ![Polling Place](../pgmapcss/icons/maki/polling-place-24.png)
+| playground | Playground | ![Playground](../pgmapcss/icons/maki/playground-24.png)
+| entrance | Entrance | ![Entrance](../pgmapcss/icons/maki/entrance-24.png)
+| heart | Heart | ![Heart](../pgmapcss/icons/maki/heart-24.png)
+| london-underground | London Underground | ![London Underground](../pgmapcss/icons/maki/london-underground-24.png)
+| minefield | Minefield | ![Minefield](../pgmapcss/icons/maki/minefield-24.png)
+| rail-underground | Rail Underground | ![Rail Underground](../pgmapcss/icons/maki/rail-underground-24.png)
+| rail-above | Rail Above | ![Rail Above](../pgmapcss/icons/maki/rail-above-24.png)
+| camera | Camera | ![Camera](../pgmapcss/icons/maki/camera-24.png)
+| laundry | Laundry | ![Laundry](../pgmapcss/icons/maki/laundry-24.png)
+| car | Car | ![Car](../pgmapcss/icons/maki/car-24.png)
+| suitcase | Suitcase | ![Suitcase](../pgmapcss/icons/maki/suitcase-24.png)
+| hairdresser | Hairdresser | ![Hairdresser](../pgmapcss/icons/maki/hairdresser-24.png)
+| chemist | Chemist | ![Chemist](../pgmapcss/icons/maki/chemist-24.png)
+| mobilephone | Mobile phone | ![Mobile phone](../pgmapcss/icons/maki/mobilephone-24.png)
+| scooter | Scooter | ![Scooter](../pgmapcss/icons/maki/scooter-24.png)

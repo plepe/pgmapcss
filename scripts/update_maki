@@ -17,16 +17,19 @@ else:
 shutil.copytree('maki/src/', 'pgmapcss/icons/maki', ignore=shutil.ignore_patterns('*ai'))
 shutil.copy('maki/_includes/maki.json', 'pgmapcss/icons/maki/')
 
+# TODO: convert using Python libraries
+subprocess.getoutput("for i in pgmapcss/icons/maki/*24.svg ; do convert $i `echo $i | cut -d. -f1`.png ; done")
+
 subprocess.call(["git", "add", "pgmapcss/icons/maki"])
 
 file_list = json.loads(open('maki/_includes/maki.json').read())
 f = open('doc/Mapbox_Maki_icons.md', 'w')
 f.write('List of icons available from the [Mapbox Maki](https://www.mapbox.com/maki/) project:\n\n')
-f.write('| ID | Name |\n')
-f.write('|----|------|\n')
+f.write('| ID | Name | Icon (24px) |\n')
+f.write('|----|------|-------------|\n')
 
 for icon in file_list:
-    f.write('| {} | {} |\n'.format(icon['icon'], icon['name']))
+    f.write('| {icon} | {name} | ![{name}](../pgmapcss/icons/maki/{icon}-24.png)\n'.format(**icon))
 
 f.close()
 
