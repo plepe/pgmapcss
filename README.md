@@ -17,8 +17,12 @@ line|z15-[highway=primary] {
   casing-width: 1.5;
   text: name;
   text-color: blue;
+  text-halo-color: rgb(1.0, 1.0, 0);
+  text-halo-radius: 1;
+  text-position: line;
 }
 ```
+&rarr; [Try it online!](http://pgmapcss.openstreetbrowser.org/?style=585f5&zoom=16&lat=48.2001&lon=16.3704)
 
 Every line with highway=primary should be displayed with a yellow 6px wide line with a 1.5px darkgrey casing (on both sides). Additional the value of the 'name'-tag should be shown on top of the line in the CSS3 color blue. This style is valid from zoom level 15 on.
 
@@ -57,7 +61,7 @@ Often it makes sense to combine similar features, e.g. streets which are split i
 
 Set neighbouring map features into relation. Map features don't exist independent from their surroundings. This can be done using the "near" link syntax. This is a pgmapcss specific enhancement.
 
-Example (&rarr; [Try it online!](http://pgmapcss.openstreetbrowser.org/?style=df790&zoom=15&lat=48.2098&lon=16.3725)):
+Example &rarr; [Try it online!](http://pgmapcss.openstreetbrowser.org/?style=df790&zoom=16&lat=48.1995&lon=16.3559):
 ```css
 /* This selector selects the closest highway for each restaurant. These
 selectors always need the be read from right to left, as the last object is the
@@ -77,7 +81,7 @@ line[highway] near[index=0] point[amenity=restaurant] {
 ### Included Icon set: ###
 pgmapcss includes the [Mapbox Maki Icon Set](https://www.mapbox.com/maki/). So for simple styles you don't need to create own icons.
 
-Example (&rarr; [Try it online!](http://pgmapcss.openstreetbrowser.org/?style=e8110&zoom=14&lat=48.2098&lon=16.3725)):
+Example &rarr; [Try it online!](http://pgmapcss.openstreetbrowser.org/?style=e8110&zoom=14&lat=48.2098&lon=16.3725):
 ```css
 node|z14-[amenity=bicycle_parking] {
   icon-image: bicycle;
