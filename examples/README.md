@@ -124,8 +124,11 @@ node[natural=peak] {
 // text: eval(concat(tag(name), ' ', tag(ele), '\n(', join(tag(near_ele), ', '), ')'));
   z-index: 4;
 
-  icon-image: highest_peaks_small.svg;
-  text-offset: 7;
+  icon-image: triangle;
+  icon-width: 12;
+  text-offset: 8;
+  point-text-layer: 3;
+  icon-layer: 2;
 }
 
 /* if this is the highest peak of all neighbouring peaks OR the only peak,
@@ -137,8 +140,12 @@ node[natural=peak][!near_ele] {
   text-color: red;
   z-index: 3;
 
-  icon-image: highest_peaks_large.svg;
-  text-offset: 8;
+  icon-image: triangle;
+  icon-width: 18;
+  icon-color: red;
+  text-offset: 10;
+  point-text-layer: 1;
+  icon-layer: 0;
 }
 ```
 
