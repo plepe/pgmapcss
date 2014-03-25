@@ -10,14 +10,13 @@ def compile_function_match(stat):
     scale_denominators = sorted(stat_all_scale_denominators(stat), reverse=True)
 
     check_functions = ''
-    max_scale = scale_denominators[0]
-    for min_scale in scale_denominators[1:]:
-        print(min_scale, max_scale)
+    max_scale = None
+    for min_scale in scale_denominators:
         check_functions += compile_function_check(min_scale, [
             v
             for v in stat['statements']
             if v['selector']['min_scale'] <= min_scale and
-                (v['selector']['max_scale'] == None or v['selector']['max_scale'] >= max_scale)
+                (v['selector']['max_scale'] == None or v['selector']['max_scale'] >= (max_scale or 10E+10))
         ], stat)
         check_functions += '\n'
         max_scale = min_scale
