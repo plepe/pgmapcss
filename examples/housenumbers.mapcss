@@ -1,10 +1,18 @@
 /* Housenumbers get the value of tag 'addr:housenumber' printed on them */
-point|z16-[addr:housenumber] {
+point|z16-[addr:housenumber],
+area|z16-[addr:housenumber] {
   text-color: #000000;
   text-halo-color: #ffffffaf;
   text-halo-radius: 1;
   text: eval(tag(addr:housenumber));
   z-index: 4;
+}
+
+/* Show buildings */
+area[building]::building {
+  fill-color: #a0a0a0;
+  width: 1;
+  color: #707070;
 }
 
 /* Highways will be shown with a black line */
@@ -26,44 +34,50 @@ line[highway=service] {
 /* Magic: all housenumbers in the vicinity (50px) of a highway get a class
    'has_highway' and the closest point on the highway near that housenumber
    will be calculated (as property 'geo' of pseudo element 'on_highway') */
-line[highway] near[index=1][distance<50] point|z16-[addr:housenumber]::on_highway {
-  geo: eval(line_interpolate_point(parent_geo(), line_locate_point(parent_geo(), prop(geo))));
+/* Use the centroid of the housenumber - the use GIS functions only accept points */
+line[highway][name][eval(parent_tag('name') == tag('addr:street'))] near[index=0][distance<50] point|z16-[addr:housenumber]::on_highway,
+line[highway][name][eval(parent_tag('name') == tag('addr:street'))] near[index=0][distance<50] area|z16-[addr:housenumber]::on_highway {
+  geo: eval(line_interpolate_point(parent_geo(), line_locate_point(parent_geo(), centroid(prop(geo)))));
   set .has_highway;
-}
-
-/* DEBUG: draw a red line between the housenumber and the 'on_highway' point */
-point.has_highway|z16-::housenumber_to_on_highway {
-  geo: eval(line(prop(geo, default), prop(geo, on_highway)));
-  width: 1px;
-  color: #ff7f7f;
-  z-index: 1;
 }
 
 /* For housenumbers with class 'has_highway' a perpendicular vector to the line
    between the housenumber point and the 'on_highway' point with a length of
    30px is constructed. The housenumber is print on the line (text-position).
    */
-point.has_highway|z16-[addr:housenumber] {
+point.has_highway|z16-[addr:housenumber],
+area.has_highway|z16-[addr:housenumber] {
   geo: eval(rotate(line(
-	translate(prop(geo), '15px', 0),
-	translate(prop(geo), '-15px', 0)
+    translate(centroid(prop(geo)), '15px', 0),
+    translate(centroid(prop(geo)), '-15px', 0)
       ),
-      0-azimuth(prop(geo), prop(geo, on_highway))
+      0-azimuth(centroid(prop(geo)), prop(geo, on_highway))
     ));
   text-position: line;
 }
 
+/* DEBUG: draw a red line between the housenumber and the 'on_highway' point */
+point.has_highway|z16-::housenumber_to_on_highway,
+area.has_highway|z16-::housenumber_to_on_highway {
+  geo: eval(line(centroid(prop(geo, default)), prop(geo, on_highway)));
+  width: 1px;
+  color: red;
+  z-index: 1;
+}
+
 /* DEBUG: draw a line where the housenumber gets printed on */
-point.has_highway|z16-[addr:housenumber]::housenumber_line {
+point.has_highway|z16-[addr:housenumber]::housenumber_line,
+area.has_highway|z16-[addr:housenumber]::housenumber_line {
   geo: eval(prop(geo, default));
-  color: #7f7fff;
+  color: blue;
   width: 1px;
   z-index: 2;
 }
 
 /* DEBUG: show a big dot on the 'on_highway' point */
-point.has_highway|z16-::on_highway {
+point.has_highway|z16-::on_highway,
+area.has_highway|z16-::on_highway {
   geo: eval(buffer(prop(geo), 2px));
-  fill-color: #af3f3f;
-  z-index: 3;
+  fill-color: red;
+  layer: 10;
 }
