@@ -53,7 +53,8 @@ Compile 'test.mapcss' file and install database functions:
 pgmapcss -dtest -uuser -pPASSWORD -tmapnik-2.0 test
 ```
 
-You have a file test.mapnik which you can use in your preferred render front-end (e.g. renderd/mod_tile) OR generate an image with generate_image.py (if the Azores where not used as data, change "bounds" in file accordingly):
-```sh
-./generate_image.py
-```
+You get a file `test.mapnik` which you can use with your preferred render front-end (these are just examples):
+* [Render an image](https://github.com/plepe/mapnik-render-image)
+* [Run as WMS (Web Map Service)](https://github.com/mapbox/landspeed.js)
+* [Run as TMS (Tile Map Service) with Apache2 and mod_tile](https://github.com/openstreetmap/mod_tile)
+* [View in GUI](https://github.com/mapnik/mapnik/wiki/MapnikViewer)
