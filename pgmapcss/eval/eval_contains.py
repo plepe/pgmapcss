@@ -3,6 +3,15 @@ class config_eval_contains(config_base):
     op = '~='
     mutable = 3
 
+    def possible_values(self, param_values, prop, stat):
+        if len(param_values) < 2:
+            return ( '', 3 )
+
+        if True in param_values:
+            return ( { 'true', 'false' }, 3 )
+        else:
+            return config_base.possible_values(self, param_values, prop, stat)
+
 def eval_contains(param):
     if len(param) < 2:
         return ''

@@ -3,6 +3,15 @@ class config_eval_identical(config_base):
     op = ('===', 'eq')
     mutable = 3
 
+    def possible_values(self, param_values, prop, stat):
+        if len(param_values) == 0:
+            return ( '', 3 )
+
+        if True in param_values:
+            return ( { 'true', 'false' }, 3 )
+        else:
+            return config_base.possible_values(self, param_values, prop, stat)
+
 def eval_identical(param):
     # empty parameter list -> all equal
     if len(param) == 0:

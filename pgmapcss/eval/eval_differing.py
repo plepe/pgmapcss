@@ -1,13 +1,21 @@
 class config_eval_differing(config_base):
+    math_level = 7
+    op = ('!=', '<>')
+
     def mutable(self, param_values, stat):
         import pgmapcss.eval
         config_metric = pgmapcss.eval.eval_functions.list()['metric']
         ret = [ config_metric.mutable([p], stat) for p in param_values ]
         return min(ret)
 
-class config_eval_differing(config_base):
-    math_level = 7
-    op = ('!=', '<>')
+    def possible_values(self, param_values, prop, stat):
+        if len(param_values) == 0:
+            return ( 'false', self.mutable(param_values, stat) )
+
+        if True in param_values:
+            return ( { 'true', 'false' }, 3 )
+        else:
+            return config_base.possible_values(self, param_values, prop, stat)
 
 def eval_differing(param):
     # empty parameter list -> all equal

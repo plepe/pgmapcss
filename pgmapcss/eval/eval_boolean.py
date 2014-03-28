@@ -1,6 +1,15 @@
 class config_eval_boolean(config_base):
     mutable = 3
 
+    def possible_values(self, param_values, prop, stat):
+        if len(param_values) == 0:
+            return ( '', 3 )
+
+        if param_values[0] is True:
+            return ( { 'true', 'false' }, 3 )
+        else:
+            return config_base.possible_values(self, param_values, prop, stat)
+
 def eval_boolean(param):
     if len(param) == 0:
         return ''

@@ -3,6 +3,12 @@ class config_eval_or(config_base):
     op = '||'
     mutable = 3
 
+    def possible_values(self, param_values, prop, stat):
+        if True in param_values:
+            return ( { 'true', 'false' }, 3 )
+        else:
+            return config_base.possible_values(self, param_values, prop, stat)
+
 def eval_or(param):
     for p in param:
         if eval_boolean([p]) == 'true':

@@ -7,6 +7,15 @@ class config_eval_ge(config_base):
         ret = [ config_metric.mutable([p], stat) for p in param_values ]
         return min(ret)
 
+    def possible_values(self, param_values, prop, stat):
+        if len(param_values) < 2:
+            return ( '', self.mutable(param_values, stat) )
+
+        if True in param_values:
+            return ( { 'true', 'false' }, 3 )
+        else:
+            return config_base.possible_values(self, param_values, prop, stat)
+
 def eval_ge(param):
     if len(param) < 2:
         return ''
