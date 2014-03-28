@@ -7,6 +7,9 @@ import pgmapcss.mapnik
 import copy
 
 def parse_file(stat, filename=None, base_style=None, content=None):
+    if not 'max_prop_id' in stat:
+        stat['max_prop_id'] = 0
+
     if base_style:
         parse_file(stat, content=pgmapcss.mapnik.get_base_style(base_style))
 
@@ -43,3 +46,5 @@ def parse_file(stat, filename=None, base_style=None, content=None):
 
             for prop in statement['properties']:
                 prop['statement'] = statement
+                prop['id'] = stat['max_prop_id']
+                stat['max_prop_id'] = stat['max_prop_id'] + 1
