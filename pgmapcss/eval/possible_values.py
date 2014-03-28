@@ -65,22 +65,20 @@ def possible_values(value, prop, stat):
         combinations = new_combinations
 
     # finally calculate possible results
-    result = {
+    result = [
         eval_functions[func].possible_values(param, prop, stat)
         for param in combinations
-        if not True in param
-    }
+    ]
     if(len(result)):
         mutable = min(mutable, min([ r[1] for r in result ]))
-    result = { r[0] for r in result }
 
-    # if any of the combinations contains a 'True' value, add True to the
-    # return values too
-    if True in [ True for param in combinations if True in param ]:
-        result.add(True)
+    # build a set of all result values
+    values = set()
+    for r in result:
+        values = values.union(r[0] if type(r[0]) == set else { r[0] })
 
     # if result is static (mutable=3), add a copy of the set to cache
     if mutable == 3:
-        cache[repr(value)] = result.copy()
+        cache[repr(value)] = values.copy()
 
-    return ( result, mutable )
+    return ( values, mutable )

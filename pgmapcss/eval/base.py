@@ -61,6 +61,10 @@ class config_base:
 # the second element is the mutability, see above
     def possible_values(self, param_values, prop, stat):
         m = self.mutable
+
+        if True in param_values:
+            return ( True, 0 )
+
         if callable(m):
             m = self.mutable(param_values, stat)
 
