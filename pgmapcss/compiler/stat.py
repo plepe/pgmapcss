@@ -21,7 +21,7 @@ def stat_properties(stat):
         if p['assignment_type'] == 'P'
     ]))
 
-def stat_property_values(prop, stat, pseudo_element=None, include_illegal_values=False, value_type=None, eval_true=True):
+def stat_property_values(prop, stat, pseudo_element=None, include_illegal_values=False, value_type=None, eval_true=True, max_prop_id=None):
     """Returns set of all values used on this property in any statement.
     Returns boolean 'True' if property is result of an unresolveable eval
     expression.
@@ -31,6 +31,7 @@ def stat_property_values(prop, stat, pseudo_element=None, include_illegal_values
     include_illegal_values: If True all values as given in MapCSS are returned, if False the list is sanitized (see @values). Default: False
     value_type: Only values with value_type will be returned. Default None (all)
     eval_true: Return 'True' for values which result of an unresolvable eval expression. Otherwise this value will be removed. Default: True.
+    max_prop_id: evaluate only properties with an id <= max_prop_id
     """
     prop_type = pgmapcss.types.get(prop, stat)
 
@@ -45,6 +46,7 @@ def stat_property_values(prop, stat, pseudo_element=None, include_illegal_values
         if p['assignment_type'] == 'P' and p['key'] == prop
         if value_type == None or value_type == p['value_type']
         if p['value_type'] != 'eval'
+        if max_prop_id is None or p['id'] <= max_prop_id
     }
 
     # resolve eval functions (as far as possible) - also sanitize list.
@@ -59,17 +61,18 @@ def stat_property_values(prop, stat, pseudo_element=None, include_illegal_values
             if pseudo_element == None or v['selector']['pseudo_element'] in ('*', pseudo_element)
             if p['assignment_type'] == 'P' and p['key'] == prop
             if p['value_type'] == 'eval'
+            if max_prop_id is None or p['id'] <= max_prop_id
             for v1 in pgmapcss.eval.possible_values(p['value'], p, stat)[0]
         })
 
     if 'default_other' in stat['defines'] and prop in stat['defines']['default_other']:
         other = stat['defines']['default_other'][prop]['value']
-        other = stat_property_values(other, stat, pseudo_element, include_illegal_values, value_type, eval_true)
+        other = stat_property_values(other, stat, pseudo_element, include_illegal_values, value_type, eval_true, max_prop_id)
         values = values.union(other)
 
     if 'generated_properties' in stat and prop in stat['generated_properties']:
         gen = stat['generated_properties'][prop]
-        combinations = stat_properties_combinations(gen[0], stat, pseudo_element, include_illegal_values, value_type, eval_true)
+        combinations = stat_properties_combinations(gen[0], stat, pseudo_element, include_illegal_values, value_type, eval_true, max_prop_id)
         values = values.union({
             gen[1](combination, stat)
             for combination in combinations
@@ -98,14 +101,14 @@ def stat_property_values(prop, stat, pseudo_element=None, include_illegal_values
 
     return values
 
-def stat_properties_combinations_pseudo_element(keys, stat, pseudo_element, include_illegal_values=False, value_type=None, eval_true=True):
+def stat_properties_combinations_pseudo_element(keys, stat, pseudo_element, include_illegal_values=False, value_type=None, eval_true=True, max_prop_id=None):
     combinations_list = [{}]
 
     for k in keys:
         new_combinations_list = []
 
         for combination in combinations_list:
-            for v in stat_property_values(k, stat, pseudo_element, include_illegal_values, value_type, eval_true):
+            for v in stat_property_values(k, stat, pseudo_element, include_illegal_values, value_type, eval_true, max_prop_id):
                 c = combination.copy()
                 c[k] = v
                 new_combinations_list.append(c)
@@ -114,7 +117,7 @@ def stat_properties_combinations_pseudo_element(keys, stat, pseudo_element, incl
 
     return combinations_list
 
-def stat_properties_combinations(keys, stat, pseudo_elements=None, include_illegal_values=False, value_type=None, eval_true=True):
+def stat_properties_combinations(keys, stat, pseudo_elements=None, include_illegal_values=False, value_type=None, eval_true=True, max_prop_id=None):
     combinations = []
     if type(pseudo_elements) == str:
         pseudo_elements = [ pseudo_elements ]
@@ -122,7 +125,7 @@ def stat_properties_combinations(keys, stat, pseudo_elements=None, include_illeg
         pseudo_elements = stat['pseudo_elements']
 
     for pseudo_element in pseudo_elements:
-        combinations += stat_properties_combinations_pseudo_element(keys, stat, pseudo_element, include_illegal_values, value_type, eval_true)
+        combinations += stat_properties_combinations_pseudo_element(keys, stat, pseudo_element, include_illegal_values, value_type, eval_true, max_prop_id)
 
     ret = []
     for combination in combinations:
