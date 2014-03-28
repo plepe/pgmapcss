@@ -1,5 +1,6 @@
 import pgmapcss.types
 import pgmapcss.eval
+property_values_cache = {}
 
 def stat_all_scale_denominators(stat):
     return sorted(list(set([
@@ -33,6 +34,10 @@ def stat_property_values(prop, stat, pseudo_element=None, include_illegal_values
     eval_true: Return 'True' for values which result of an unresolvable eval expression. Otherwise this value will be removed. Default: True.
     max_prop_id: evaluate only properties with an id <= max_prop_id
     """
+    cache_id = prop + '-' + repr(pseudo_element) + '-' + repr(include_illegal_values) + '-' + repr(value_type) + '-' + repr(eval_true) + '-' + repr(max_prop_id)
+    if cache_id in property_values_cache:
+        return property_values_cache[cache_id]
+
     prop_type = pgmapcss.types.get(prop, stat)
 
     # go over all statements and their properties and collect it's values. If
@@ -79,6 +84,7 @@ def stat_property_values(prop, stat, pseudo_element=None, include_illegal_values
         })
 
     if include_illegal_values:
+        property_values_cache[cache_id] = values
         return values
 
     if True in values:
@@ -99,6 +105,7 @@ def stat_property_values(prop, stat, pseudo_element=None, include_illegal_values
     if not eval_true and True in values:
         values.remove(True)
 
+    property_values_cache[cache_id] = values
     return values
 
 def stat_properties_combinations_pseudo_element(keys, stat, pseudo_element, include_illegal_values=False, value_type=None, eval_true=True, max_prop_id=None):
