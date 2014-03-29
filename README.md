@@ -28,6 +28,8 @@ Every line with highway=primary should be displayed with a yellow 6px wide line 
 
 See [MapCSS Documentation](doc/MapCSS.creole) for general documentation about pgmapcss' dialect of the MapCSS language and [the list of available properties (Mapnik 2.2)](doc/mapnik-2.2.creole) for possible style parameters (resp. [here for Mapnik 2.0](doc/mapnik-2.0.creole) and [here for the experimental "expr-v2" branch](doc/expr-v2.creole)).
 
+You can embed MapCSS syntax in a Mapnik file with `<style type='text/mapcss'>`. See [basemap_example.mapcss](./basemap_example.mapcss).
+
 ### Extensive eval-syntax: ###
 
 Using eval(), values for properties can be calculated. Even geometric modifications are possible as many PostGIS functions are exposed. Examples:

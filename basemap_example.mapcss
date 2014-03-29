@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<!DOCTYPE Map>
+<Map srs="+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +no_defs +over" background-color="#0055ff">
+
+<!-- Coastlines -->
+<!-- Download Land Polygons (Large polygons split, Simplified not split) from http://openstreetmapdata.com/data in Mercator projection and unzipped in data/. -->
+  <Style name="coastpoly">
+    <Rule>
+      <PolygonSymbolizer fill="#f2efd9" />
+    </Rule>
+  </Style>
+
+  <Layer
+    srs="+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +no_defs +over"
+    maxzoom="1500001"
+  >
+    <StyleName>coastpoly</StyleName>
+    <Datasource>
+      <Parameter name="type">shape</Parameter>
+      <Parameter name="file">data/land-polygons-split-3857/land_polygons.shp</Parameter>
+    </Datasource>
+  </Layer>
+
+<!-- MapCSS style definition -->
+  <style type='text/mapcss'>
+node|z5-[place=city] {
+  text: name;
+}
+node|z10-[place=town] {
+  text: name;
+}
+node|z13[place=village] {
+  text: name;
+}
+  </style>
+</Map>
