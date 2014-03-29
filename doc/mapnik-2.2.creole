@@ -1,4 +1,4 @@
-This is the list of properties when using Mapnik 2.2 (use -t mapnik22 when loading mapcss file). 
+This is the list of properties when using Mapnik 2.2 (use -t mapnik-2.2 when loading mapcss file). 
 
 * properties marked in the "support Mapnik 2.0" with "no eval" can't be evaluated by an eval statement. A warning will be issued when compiling.
 
