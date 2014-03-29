@@ -64,6 +64,7 @@ render_context = {{ 'bbox': bbox, 'scale_denominator': scale_denominator }}
 {function_check}
 match_where = None
 {match_where}
+counter = {{ 'rendered': 0, 'total': 0 }}
 
 {check_chooser}
 combined_objects = {{}}
@@ -103,12 +104,16 @@ def dict_merge(dicts):
 
 while src:
     for object in src:
+        shown = False
+        counter['total'] += 1
         for result in check(object):
             if type(result) != tuple or len(result) == 0:
                 plpy.notice('unknown check result: ', result)
             elif result[0] == 'result':
+                shown = True
                 results.append(result[1])
             elif result[0] == 'combine':
+                shown = True
                 if result[1] not in combined_objects:
                     combined_objects[result[1]] = {{}}
                 if result[2] not in combined_objects[result[1]]:
@@ -116,6 +121,11 @@ while src:
                 combined_objects[result[1]][result[2]].append(result[3])
             else:
                 plpy.notice('unknown check result: ', result)
+
+        if shown:
+            counter['rendered'] += 1
+#        else:
+#            plpy.notice('not rendered: ' + object['id'] + ' ' + repr(object['tags']))
 
     src = None
 
@@ -185,6 +195,11 @@ for layer in layers:
 
 time_stop = datetime.datetime.now() # profiling
 plpy.notice('total run of match() (incl. querying db objects) took %.2fs' % (time_stop - time_start).total_seconds())
+if counter['total'] == 0:
+    counter['perc'] = 100.0
+else:
+    counter['perc'] = counter['rendered'] / counter['total'] * 100.0
+plpy.notice('rendered map features: {{rendered}} / {{total}}, {{perc:.2f}}%'.format(**counter))
 
 $body$ language 'plpython3u' immutable;
 '''.format(**replacement);
