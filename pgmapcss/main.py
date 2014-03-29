@@ -92,8 +92,23 @@ def main():
 
     stat = { 'id': style_id }
 
+    content = open(file_name).read()
+
+# check if file is XML -> extract MapCSS code
+    tree = None
+    if re.match('<\?xml', content):
+        import xml.dom.minidom as dom
+        tree = dom.parse(file_name)
+        mapcss = tree.getElementsByTagName("style")
+        if mapcss.length != 1:
+            print("Require exactly one <style type='text/mapcss'> node")
+            sys.exit(1)
+
+        mapcss = mapcss.item(0)
+        content = mapcss.firstChild.nodeValue
+
     try:
-        pgmapcss.parser.parse_file(stat, filename=file_name, base_style=args.base_style)
+        pgmapcss.parser.parse_file(stat, filename=file_name, content=content, base_style=args.base_style)
     except pgmapcss.parser.ParseError as e:
         print(e)
         sys.exit(1)
@@ -126,5 +141,20 @@ def main():
 
     if 'unresolvable_properties' in stat:
         print('WARNING: Not all values for the following properties could be guessed (e.g. as they are the result of an eval-expression, and therefore some features in the resulting image(s) may be missing: ' + ', '.join(stat['unresolvable_properties']))
+
+    # copy result xml to original dom
+    if tree:
+        result_tree = dom.parse(style_id + '.mapnik')
+        current = result_tree.getElementsByTagName("Map").item(0).firstChild
+
+        while current:
+            if re.search('[^\s]', current.toxml()):
+                if not re.match('<!\-\-', current.toxml()):
+                    copy = dom.parseString(current.toxml())
+                    mapcss.parentNode.insertBefore(copy.firstChild, mapcss)
+            current = current.nextSibling
+
+        mapcss.parentNode.removeChild(mapcss)
+        open(style_id + '.mapnik', 'w').write(tree.toxml())
 
     print('Debug output wrote to ' + style_id + '.output')
