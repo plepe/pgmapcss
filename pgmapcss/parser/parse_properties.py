@@ -32,14 +32,14 @@ def parse_properties(properties, to_parse):
             current['assignment_type'] = 'C'
             current['key'] = to_parse.match_group(1)
 
+        elif to_parse.match('\s*\}'):
+            return
+
         else:
             raise ParseError(to_parse, 'Error parsing properties, expecing property or set statement')
 
         parse_value(current, to_parse)
 
         properties.append(current)
-
-        if to_parse.match('\s*\}'):
-            return
 
     return
