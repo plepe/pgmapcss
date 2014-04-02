@@ -1,14 +1,30 @@
 class config_eval_cond(config_base):
     mutable = 3
 
-    def possible_values(self, param_values, prop, stat):
-        if param_values[0] is not True:
-            return config_base.possible_values(self, param_values, prop, stat)
+    def possible_values_all(self, param_values_sets, prop, stat):
+        import pgmapcss.eval
+        has = { 'false': False, 'true': False }
 
-        if len(param_values) > 2:
-            return ({ param_values[1], param_values[2] }, 3)
+        if True in param_values_sets[0]:
+            has['false'] = True
+            has['true'] = True
+
         else:
-            return ({ param_values[1], '' }, 3)
+            config_boolean = pgmapcss.eval.eval_functions.list()['boolean']
+            for p in param_values_sets[0]:
+                has[config_boolean([p], stat)] = True
+
+        ret = set()
+
+        if has['true']:
+            ret = ret.union(param_values_sets[1])
+        if has['false']:
+            if len(param_values_sets) > 2:
+                ret = ret.union(param_values_sets[2])
+            else:
+                ret.add('')
+
+        return ( ret, 3 )
 
     def compiler(self, param, eval_param, stat):
         ret = '(' + param[1] + ' if eval_boolean([' + param[0] + ']' + eval_param + ') == \'true\''
