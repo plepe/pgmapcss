@@ -1,4 +1,5 @@
 import pgmapcss.eval
+import pgmapcss
 cache = {}
 
 # returns a tuple:
@@ -53,21 +54,11 @@ def possible_values(value, prop, stat):
 
     # make sure all elements are sets
     param = [ {p} if type(p) == str else p for p in param ]
-    # build all possible combinations of input parameters
-    combinations = [[]]
-    for p in param:
-        new_combinations = []
-        for combination in combinations:
-            for v in p:
-                c = list(combination) # copy original list
-                c.append(v)
-                new_combinations.append(c)
-        combinations = new_combinations
 
     # finally calculate possible results
     result = [
-        eval_functions[func].possible_values(param, prop, stat)
-        for param in combinations
+        eval_functions[func].possible_values(p, prop, stat)
+        for p in pgmapcss.combinations(param)
     ]
     if(len(result)):
         mutable = min(mutable, min([ r[1] for r in result ]))
