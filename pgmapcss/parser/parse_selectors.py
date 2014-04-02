@@ -58,7 +58,7 @@ def parse_selector_part(to_parse, object_class_selector='\*|[a-z_]+'):
         current['pseudo_classes'].append(to_parse.match_group(1))
 
 # parse pseudo element
-    while to_parse.match('::(\(?)([a-zA-Z0-9_\*]+)(\)?)'):
+    while to_parse.match('::(\(?)([a-zA-Z0-9_\*\-]+)(\)?)'):
         if to_parse.match_group(1) and to_parse.match_group(3):
             current['create_pseudo_element'] = False
 
