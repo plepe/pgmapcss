@@ -55,10 +55,12 @@ def possible_values(value, prop, stat):
     # make sure all elements are sets
     param = [ {p} if type(p) == str else p for p in param ]
 
-    if hasattr(eval_functions[func], 'possible_values_all'):
+    # some eval functions have a 'possible_values_all' function
+    try:
         values, mutable = eval_functions[func].possible_values_all(param, prop, stat)
 
-    else:
+    # if not, calculate possible values for all combinations of input parameters
+    except AttributeError:
         # finally calculate possible results
         result = [
             eval_functions[func].possible_values(p, prop, stat)
