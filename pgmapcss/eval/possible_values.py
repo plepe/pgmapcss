@@ -55,18 +55,22 @@ def possible_values(value, prop, stat):
     # make sure all elements are sets
     param = [ {p} if type(p) == str else p for p in param ]
 
-    # finally calculate possible results
-    result = [
-        eval_functions[func].possible_values(p, prop, stat)
-        for p in pgmapcss.combinations(param)
-    ]
-    if(len(result)):
-        mutable = min(mutable, min([ r[1] for r in result ]))
+    if hasattr(eval_functions[func], 'possible_values_all'):
+        values, mutable = eval_functions[func].possible_values_all(param, prop, stat)
 
-    # build a set of all result values
-    values = set()
-    for r in result:
-        values = values.union(r[0] if type(r[0]) == set else { r[0] })
+    else:
+        # finally calculate possible results
+        result = [
+            eval_functions[func].possible_values(p, prop, stat)
+            for p in pgmapcss.combinations(param)
+        ]
+        if(len(result)):
+            mutable = min(mutable, min([ r[1] for r in result ]))
+
+        # build a set of all result values
+        values = set()
+        for r in result:
+            values = values.union(r[0] if type(r[0]) == set else { r[0] })
 
     # if result is static (mutable=3), add a copy of the set to cache
     if mutable == 3:
