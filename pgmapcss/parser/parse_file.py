@@ -43,6 +43,8 @@ def parse_file(stat, filename=None, base_style=None, content=None):
             statement = i.copy()
             statement['properties'] = copy.deepcopy(properties)
             stat['statements'].append(statement)
+            statement['id'] = stat['max_prop_id']
+            stat['max_prop_id'] = stat['max_prop_id'] + 1
 
             for prop in statement['properties']:
                 prop['statement'] = statement
