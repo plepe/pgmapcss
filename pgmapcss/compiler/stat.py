@@ -146,3 +146,20 @@ def stat_add_generated_property(key, keys, fun, stat):
         stat['generated_properties'] = {}
 
     stat['generated_properties'][key] = ( keys, fun )
+
+def _has_set_tag(statement, key):
+    for prop in statement['properties']:
+        if prop['assignment_type'] == 'T' and prop['key'] == key:
+            return True
+
+    return False
+
+def stat_filter_statements(stat, filter):
+    return [
+        statement
+        for statement in stat['statements']
+        if not 'min_scale' in filter or statement['selector']['min_scale'] <= filter['min_scale']
+        if not 'max_scale' in filter or filter['max_scale'] == None or statement['selector']['max_scale'] == None or statement['selector']['max_scale'] >= filter['max_scale']
+        if not 'max_id' in filter or statement['id'] <= filter['max_id']
+        if not 'has_set_tag' in filter or _has_set_tag(statement, filter['has_set_tag'])
+    ]
