@@ -141,7 +141,7 @@
 # FOR font-family font-weight font-style text-offset max-width
     <Rule>
       <Filter>[text] and [style-element] = 'point-text' and [text-position] = 'center' and '{font-family}' = [font-family] and '{font-weight}' = [font-weight] and '{font-style}' = [font-style] and [text-color] and '{text-offset}' = [text-offset] and '{max-width}' = [max-width]</Filter>
-      <TextSymbolizer placement="point" fontset-name="{font-family} - {font-weight} - {font-style}" dy="{text-offset}" wrap-width="{max-width}"><ExpressionFormat size="[font-size]" halo-radius="[text-halo-radius]" character-spacing="[character-spacing]" opacity="[text-opacity]" wrap-character="[wrap-character]" fill="[text-color]" halo-fill="[text-halo-color]">[text]</ExpressionFormat></TextSymbolizer>
+      <TextSymbolizer placement="interior" fontset-name="{font-family} - {font-weight} - {font-style}" dy="{text-offset}" wrap-width="{max-width}"><ExpressionFormat size="[font-size]" halo-radius="[text-halo-radius]" character-spacing="[character-spacing]" opacity="[text-opacity]" wrap-character="[wrap-character]" fill="[text-color]" halo-fill="[text-halo-color]">[text]</ExpressionFormat></TextSymbolizer>
     </Rule>
 # END
 
