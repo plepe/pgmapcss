@@ -2,7 +2,7 @@ import pgmapcss.db as db
 from .stat import *
 from .compile_sql import *
 
-def get_where_selectors(max_scale, min_scale, stat):
+def get_where_selectors(filter, stat):
     # where_selectors contains indexes of all selectors which we need for match queries
     where_selectors = []
 
@@ -21,8 +21,8 @@ def get_where_selectors(max_scale, min_scale, stat):
         for w in v['properties']
         if ((w['key'] in style_element_properties and w['assignment_type'] == 'P') or
             w['assignment_type'] == 'C') and
-            v['selector']['min_scale'] <= min_scale and
-            (v['selector']['max_scale'] == None or v['selector']['max_scale'] >= max_scale) and
+            v['selector']['min_scale'] <= filter['min_scale'] and
+            (v['selector']['max_scale'] == None or v['selector']['max_scale'] >= filter['max_scale']) and
             not 'create_pseudo_element' in v['selector']
     ]
 
@@ -38,8 +38,8 @@ def get_where_selectors(max_scale, min_scale, stat):
         )
         for i, v in enumerate(stat['statements'])
         for p in v['properties'] if p['assignment_type'] == 'T'
-        if v['selector']['min_scale'] <= min_scale and
-            (v['selector']['max_scale'] == None or v['selector']['max_scale'] >= max_scale)
+        if v['selector']['min_scale'] <= filter['min_scale'] and
+            (v['selector']['max_scale'] == None or v['selector']['max_scale'] >= filter['max_scale'])
     ]
 
     # assignments: map conditions which are based on a (possible) set-statement
@@ -55,8 +55,8 @@ def get_where_selectors(max_scale, min_scale, stat):
             w['assignment_type'] == 'C') and
             j[2] < i and s['key'] == j[0] and
             (j[1] == True or not 'value' in s or s['value'] == j[1]) and
-            v['selector']['min_scale'] <= min_scale and
-            (v['selector']['max_scale'] == None or v['selector']['max_scale'] >= max_scale) and
+            v['selector']['min_scale'] <= filter['min_scale'] and
+            (v['selector']['max_scale'] == None or v['selector']['max_scale'] >= filter['max_scale']) and
             not 'create_pseudo_element' in v['selector']
     ]
 
@@ -70,13 +70,14 @@ def compile_function_get_where(id, stat):
 
     max_scale = None
     for min_scale in scale_denominators:
-        where_selectors = get_where_selectors(max_scale or 10E+10, min_scale, stat)
+        filter = { 'min_scale': min_scale, 'max_scale': max_scale or 10E+10}
+        where_selectors = get_where_selectors(filter, stat)
 
         # compile all selectors
         conditions = [
             (
                 stat['statements'][i]['selector']['type'],
-                compile_selector_sql(stat['statements'][i], stat, prefix='')
+                compile_selector_sql(stat['statements'][i], stat, prefix='', filter=filter)
             )
             for i in where_selectors
         ]
