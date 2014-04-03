@@ -1,8 +1,6 @@
 import pgmapcss.db as db
-import re
-from .compile_eval import compile_eval
 
-def compile_condition_sql(condition, stat, prefix='current.'):
+def compile_condition_sql(condition, statement, stat, prefix='current.'):
     ret = ''
     final_value = None
 
@@ -33,3 +31,11 @@ def compile_condition_sql(condition, stat, prefix='current.'):
         return prefix + 'tags ? ' + db.format(condition['key']);
 
     return ret;
+
+def compile_selector_sql(statement, stat, prefix='current.'):
+    ret = [
+        compile_condition_sql(c, statement, stat, prefix=prefix) or 'true'
+        for c in statement['selector']['conditions']
+    ]
+
+    return ' and '.join(ret)
