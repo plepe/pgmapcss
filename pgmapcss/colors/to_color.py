@@ -25,7 +25,7 @@ def to_color(value):
     return None
 
 def check_color(value):
-    if value is None:
+    if value is None or value == '':
         return None
 
     ret = to_color(value)
