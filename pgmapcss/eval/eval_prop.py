@@ -14,7 +14,14 @@ class config_eval_prop(config_base):
         if not 'id' in prop:
             return ( True, 0 )
 
-        values = pgmapcss.compiler.stat.stat_property_values(param_values[0], stat, pseudo_element=pseudo_element, max_prop_id=prop['id'] - 1)
+        values = pgmapcss.compiler.stat.stat_property_values(param_values[0], stat, pseudo_element=pseudo_element, max_prop_id=prop['id'] - 1, include_none=True)
+
+        # convert None to ''
+        values = {
+            '' if v is None else v
+            for v in values
+        }
+
         return ( values, 0 )
 
 def eval_prop(param):
@@ -30,7 +37,10 @@ def eval_prop(param):
         return ''
 
     if param[0] in current['properties'][pseudo_element]:
-        return current['properties'][pseudo_element][param[0]]
+        v = current['properties'][pseudo_element][param[0]]
+        if v is None:
+            return ''
+        return v
     else:
         return ''
 
