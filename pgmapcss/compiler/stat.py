@@ -22,19 +22,20 @@ def stat_properties(stat):
         if p['assignment_type'] == 'P'
     ]))
 
-def stat_property_values(prop, stat, pseudo_element=None, include_illegal_values=False, value_type=None, eval_true=True, max_prop_id=None):
+def stat_property_values(prop, stat, pseudo_element=None, include_illegal_values=False, value_type=None, eval_true=True, max_prop_id=None, include_none=False):
     """Returns set of all values used on this property in any statement.
     Returns boolean 'True' if property is result of an unresolveable eval
     expression.
 
     Parameters:
     pseudo_element: limit returned values to given pseudo_element (default: None which means all)
-    include_illegal_values: If True all values as given in MapCSS are returned, if False the list is sanitized (see @values). Default: False
+    include_illegal_values: If True all values as given in MapCSS are returned, if False the list is sanitized (see @values). (Forces include_none=True) Default: False
+    include_none: If True, None is a possible value (if used). Default: False
     value_type: Only values with value_type will be returned. Default None (all)
     eval_true: Return 'True' for values which result of an unresolvable eval expression. Otherwise this value will be removed. Default: True.
     max_prop_id: evaluate only properties with an id <= max_prop_id
     """
-    cache_id = prop + '-' + repr(pseudo_element) + '-' + repr(include_illegal_values) + '-' + repr(value_type) + '-' + repr(eval_true) + '-' + repr(max_prop_id)
+    cache_id = prop + '-' + repr(pseudo_element) + '-' + repr(include_illegal_values) + '-' + '-' + repr(value_type) + '-' + repr(eval_true) + '-' + repr(max_prop_id) + repr(include_none)
     if cache_id in property_values_cache:
         return property_values_cache[cache_id]
 
@@ -91,11 +92,12 @@ def stat_property_values(prop, stat, pseudo_element=None, include_illegal_values
         values.remove(True)
         values = values.union(prop_type.stat_all_values())
 
-    values = {
-        v
-        for v in values
-        if v != None
-    }
+    if not include_none:
+        values = {
+            v
+            for v in values
+            if v != None
+        }
 
     if True in values:
         if not 'unresolvable_properties' in stat:
@@ -108,14 +110,14 @@ def stat_property_values(prop, stat, pseudo_element=None, include_illegal_values
     property_values_cache[cache_id] = values
     return values
 
-def stat_properties_combinations_pseudo_element(keys, stat, pseudo_element, include_illegal_values=False, value_type=None, eval_true=True, max_prop_id=None):
+def stat_properties_combinations_pseudo_element(keys, stat, pseudo_element, include_illegal_values=False, value_type=None, eval_true=True, max_prop_id=None, include_none=False):
     combinations_list = [{}]
 
     for k in keys:
         new_combinations_list = []
 
         for combination in combinations_list:
-            for v in stat_property_values(k, stat, pseudo_element, include_illegal_values, value_type, eval_true, max_prop_id):
+            for v in stat_property_values(k, stat, pseudo_element, include_illegal_values, value_type, eval_true, max_prop_id, include_none):
                 c = combination.copy()
                 c[k] = v
                 new_combinations_list.append(c)
@@ -124,7 +126,7 @@ def stat_properties_combinations_pseudo_element(keys, stat, pseudo_element, incl
 
     return combinations_list
 
-def stat_properties_combinations(keys, stat, pseudo_elements=None, include_illegal_values=False, value_type=None, eval_true=True, max_prop_id=None):
+def stat_properties_combinations(keys, stat, pseudo_elements=None, include_illegal_values=False, value_type=None, eval_true=True, max_prop_id=None, include_none=False):
     combinations = []
     if type(pseudo_elements) == str:
         pseudo_elements = [ pseudo_elements ]
@@ -132,7 +134,7 @@ def stat_properties_combinations(keys, stat, pseudo_elements=None, include_illeg
         pseudo_elements = stat['pseudo_elements']
 
     for pseudo_element in pseudo_elements:
-        combinations += stat_properties_combinations_pseudo_element(keys, stat, pseudo_element, include_illegal_values, value_type, eval_true, max_prop_id)
+        combinations += stat_properties_combinations_pseudo_element(keys, stat, pseudo_element, include_illegal_values, value_type, eval_true, max_prop_id, include_none)
 
     ret = []
     for combination in combinations:
