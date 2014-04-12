@@ -57,7 +57,8 @@ def possible_values(value, prop, stat):
 
     # some eval functions have a 'possible_values_all' function
     try:
-        values, mutable = eval_functions[func].possible_values_all(param, prop, stat)
+        values, m = eval_functions[func].possible_values_all(param, prop, stat)
+        mutable = min(mutable, m)
 
     # if not, calculate possible values for all combinations of input parameters
     except AttributeError:
