@@ -35,7 +35,7 @@ def stat_property_values(prop, stat, pseudo_element=None, include_illegal_values
     eval_true: Return 'True' for values which result of an unresolvable eval expression. Otherwise this value will be removed. Default: True.
     max_prop_id: evaluate only properties with an id <= max_prop_id
     """
-    cache_id = prop + '-' + repr(pseudo_element) + '-' + repr(include_illegal_values) + '-' + '-' + repr(value_type) + '-' + repr(eval_true) + '-' + repr(max_prop_id) + repr(include_none)
+    cache_id = prop + '-' + repr(pseudo_element) + '-' + repr(include_illegal_values) + '-' + repr(value_type) + '-' + repr(eval_true) + '-' + repr(max_prop_id) + '-' + repr(include_none)
     if cache_id in property_values_cache:
         return property_values_cache[cache_id]
 
