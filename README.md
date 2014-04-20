@@ -49,7 +49,9 @@ line|z15-[highway=primary] {
 }
 ```
 
-In fact you can write the last line as "width: 30m;" as pgmapcss supports other units than pixels. (Still it needs Mapnik >= 3.0, as older mapnik versions can't read the width of a line from a database column). (As of this writing in January 2014 there is only one [specific mapnik branch](https://github.com/mapnik/mapnik/tree/stroke-width-expr) which supports this feature, although the [expr-v2 branch](https://github.com/mapnik/mapnik/tree/expr-v2) is expected to support it soon).
+In fact you can write the last line as "width: 30m;" as pgmapcss supports other units than pixels. On the other hand this does not work, as pgmapcss needs to figure out most Mapnik parameters at compile-time (for Mapnik versions &lt; 3.0). As 30m depends not only on the zoom level but also the geographic location, any value would be possible. pgmapcss will raise a warning when compiling the stylesheet.
+
+Mapnik 3.0 is still far from available (as of April 2014), there's a development branch which you can try: [expr-v2 branch](https://github.com/mapnik/mapnik/tree/expr-v2). pgmapcss brings it's own template for this branch, use `pgmapcss -texpr-v2 style.mapcss`.
 
 Starting with version 0.7, pgmapcss does not require eval(...) to be wrapped around expressions, but for compatibility with other MapCSS implementations you should write it out.
 
