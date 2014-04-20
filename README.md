@@ -53,7 +53,7 @@ In fact you can write the last line as "width: 30m;" as pgmapcss supports other 
 
 Mapnik 3.0 is still far from available (as of April 2014), there's a development branch which you can try: [expr-v2 branch](https://github.com/mapnik/mapnik/tree/expr-v2). pgmapcss brings it's own template for this branch, use `pgmapcss -texpr-v2 style.mapcss`.
 
-Starting with version 0.7, pgmapcss does not require eval(...) to be wrapped around expressions, but for compatibility with other MapCSS implementations you should write it out.
+Starting with version 0.7, pgmapcss does not require eval(...) to be wrapped around expressions, but for compatibility with other MapCSS implementations you should write it out. Also, pgmapcss tries to figure out possible results of an eval()-statement (which is important for Mapnik version &lt; 3.0, see above), e.g. '2 * 3' => always 6; 'zoom() / 2' => zoom() may be a value between 0 and 20, divided by 2: 0, 0.5, 1, 1.5, ... 10; 'cond(something, "red", "blue")' => either "red" or "blue".
 
 See [the "eval" documentation](doc/eval.creole) for a complete list of functions.
 
