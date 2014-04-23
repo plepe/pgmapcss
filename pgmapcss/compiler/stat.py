@@ -1,7 +1,5 @@
 import pgmapcss.types
 import pgmapcss.eval
-import pgmapcss.combinations
-import copy
 property_values_cache = {}
 
 def stat_all_scale_denominators(stat):
@@ -112,61 +110,21 @@ def stat_property_values(prop, stat, pseudo_element=None, include_illegal_values
     property_values_cache[cache_id] = values
     return values
 
-def stat_statement_property_values(statement, keys, stat):
-    '''\
-return list of possible value combinations, for the given statement. e.g.:
-
-line {
-    width: eval(cond(..., 2, 3));
-    color: #ff0000;
-    text: name;
-}
-
-where keys = [ 'width', 'color', 'opacity' ]:
-
-[{ 'width': 2, 'color': '#ff0000' }, { 'width': 3, 'color': '#ff0000' }]
-'''
-    values = {}
-
-    for prop in statement['properties']:
-        if prop['key'] in keys and prop['assignment_type'] == 'P':
-            prop_type = pgmapcss.types.get(prop, stat)
-
-            if prop['value_type'] == 'eval':
-                values[prop['key']] = pgmapcss.eval.possible_values(prop['value'], prop, stat)[0]
-            else:
-                values[prop['key']] = { prop['value'] }
-
-    return pgmapcss.combinations(values)
-
 def stat_properties_combinations_pseudo_element(keys, stat, pseudo_element, include_illegal_values=False, value_type=None, eval_true=True, max_prop_id=None, include_none=False):
-    combinations_list = [{ k: None for k in keys }]
+    combinations_list = [{}]
 
-    for s in stat['statements']:
-        if s['selector']['pseudo_element'] in (pseudo_element, '*'):
-            combs = stat_statement_property_values(s, keys, stat)
+    for k in keys:
+        new_combinations_list = []
 
-            new_combinations = copy.deepcopy(combinations_list)
-            for comb in combs:
-                for combination in combinations_list:
-                    c = dict(combination)
-                    c = dict(list(c.items()) + list(comb.items()))
+        for combination in combinations_list:
+            for v in stat_property_values(k, stat, pseudo_element, include_illegal_values, value_type, eval_true, max_prop_id, include_none):
+                c = combination.copy()
+                c[k] = v
+                new_combinations_list.append(c)
 
-                    if not c in new_combinations:
-                        new_combinations.append(c)
+        combinations_list = new_combinations_list
 
-            combinations_list = new_combinations
-
-            for k in keys:
-                pass
-
-
-    new_combinations = []
-    for c in combinations_list:
-        if not None in c.values():
-            new_combinations.append(c)
-
-    return new_combinations
+    return combinations_list
 
 def stat_properties_combinations(keys, stat, pseudo_elements=None, include_illegal_values=False, value_type=None, eval_true=True, max_prop_id=None, include_none=False):
     combinations = []
