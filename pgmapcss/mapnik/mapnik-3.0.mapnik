@@ -65,11 +65,11 @@
     <Font face-name="unifont Medium" />
   </FontSet>
   <FontSet name="DejaVu Serif - normal - italic">
-    <Font face-name="DejaVu Serif Oblique" />
+    <Font face-name="DejaVu Serif Italic" />
     <Font face-name="unifont Medium" />
   </FontSet>
   <FontSet name="DejaVu Serif - bold - italic">
-    <Font face-name="DejaVu Serif Bold Oblique" />
+    <Font face-name="DejaVu Serif Bold Italic" />
     <Font face-name="unifont Medium" />
   </FontSet>
 
@@ -83,11 +83,11 @@
     <Font face-name="unifont Medium" />
   </FontSet>
   <FontSet name="DejaVu Serif Condensed - normal - italic">
-    <Font face-name="DejaVu Serif Condensed Oblique" />
+    <Font face-name="DejaVu Serif Condensed Italic" />
     <Font face-name="unifont Medium" />
   </FontSet>
   <FontSet name="DejaVu Serif Condensed - bold - italic">
-    <Font face-name="DejaVu Serif Condensed Bold Oblique" />
+    <Font face-name="DejaVu Serif Condensed Bold Italic" />
     <Font face-name="unifont Medium" />
   </FontSet>
 
