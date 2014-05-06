@@ -1,6 +1,6 @@
-This is the list of properties when using Mapnik branch expr-v2 (as of Jan 10, 2014) (use -t expr-v2 when loading mapcss file). 
+This is the list of properties when using Mapnik 3.0 (or the master development version as of May 6, 2014) (use -t mapnik-3.0 when loading mapcss file). 
 
-* properties marked in the "support Mapnik expr-v2" with "no eval" can't be evaluated by an eval statement. A warning will be issued when compiling.
+* properties marked in the "support Mapnik 3.0" with "no eval" can't be evaluated by an eval statement. A warning will be issued when compiling.
 
 === Rendering order ===
 In contrast to the [[https://wiki.openstreetmap.org/wiki/MapCSS/0.2#Rendering_Order|MapCSS 0.2 specification]] the following rendering order is used:
@@ -25,7 +25,7 @@ Finally:
 * Property 'layer': MapCSS 0.2 does define the rendering order dependend on the layer-tag of the objects, but does not define a way to change that order from the stylesheet.
 
 === Canvas properties ===
-|= CSS parameter |= Description |= support Mapnik expr-v2 |= Compatibility MapCSS 0.2
+|= CSS parameter |= Description |= support Mapnik 3.0 |= Compatibility MapCSS 0.2
 | fill-color | The color of the background (default: fully transparent) | | YES
 | fill-image | use an image for the background instead of a color fill | no eval | YES
 | buffer | set the buffer-size of the Map (default: 0) | no eval | no standard
@@ -33,7 +33,7 @@ Finally:
 * MapCSS 0.2 properties not (yet) supported: antialiasing (always fully antialiased), fill-opacity (use alpha-channel on fill-color instead)
 
 === Point properties ===
-|= CSS parameter |= Description |= Mapnik parameter |= support Mapnik expr-v2 |= Compatibility MapCSS 0.2
+|= CSS parameter |= Description |= Mapnik parameter |= support Mapnik 3.0 |= Compatibility MapCSS 0.2
 | icon-image | URL (absolute or relative) of an image to use as an icon, e.g. url('img/foo.svg'). Icons from [[https://www.mapbox.com/maki/|Mapbox Maki]] project can be included via their ID, e.g. parking-garage. | file | yes | YES
 | icon-color | Only for icons from Mapbox Maki project! Change color of icon to given color. Default: #444444. | | no eval | no standard
 | icon-opacity | Opacity of the icon image | opacity | no eval | YES
@@ -41,7 +41,7 @@ Finally:
 | icon-height | Height of image. Ignored for custom images. | - | automatic | NO
 
 === Line properties ===
-|= CSS parameter |= Description |= Mapnik parameter |= support Mapnik expr-v2 |= Compatibility MapCSS 0.2
+|= CSS parameter |= Description |= Mapnik parameter |= support Mapnik 3.0 |= Compatibility MapCSS 0.2
 | color | Colour of the line. | stroke | | YES
 | width | The line width in pixels. | stroke-width | no eval | YES
 | offset | Pixels to offset the line to the left or right (default: 0). | offset | no eval | no standard
@@ -61,13 +61,13 @@ Finally:
 * MapCSS 0.2 properties not (yet) supported: extrude, extrude-*
 
 === Area properties ===
-|= CSS parameter |= Description |= Mapnik parameter |= support Mapnik expr-v2 |= Compatibility MapCSS 0.2
+|= CSS parameter |= Description |= Mapnik parameter |= support Mapnik 3.0 |= Compatibility MapCSS 0.2
 | fill-color | Colour in which to fill the area. | fill | | YES
 | fill-opacity | How transparent the fill is, from 0 (transparent) to 1 (opaque) | fill-opacity | no eval | YES
 | fill-image |  The URL of an image to use for filling the area | | yes | YES
 
 === Label properties ===
-|= CSS parameter |= Description |= Mapnik parameter |= support Mapnik expr-v2 |= Compatibility MapCSS 0.2
+|= CSS parameter |= Description |= Mapnik parameter |= support Mapnik 3.0 |= Compatibility MapCSS 0.2
 | max-width | The maximum width of a text label for a point, after which it should wrap onto the next line. | wrap-width | no eval | YES
 | text-offset | The vertical offset from the centre of the way or point. | dy | no eval | YES
 | text-position | Whether the text follows the path of the way ('line') or is centred on the area ('center', default) | placement | | YES
@@ -93,7 +93,7 @@ There's a fontset for each font-family / font-weight / font-style combination, d
 Also all possible font-families are defined in default.mapcss in the @values font-family clause.
 
 === Shields ===
-|= CSS parameter |= Description |= Note Mapnik expr-v2 |= Compatibility MapCSS 0.2
+|= CSS parameter |= Description |= Note Mapnik 3.0 |= Compatibility MapCSS 0.2
 | shield-placement | Whether the shields follows the path of the way ('line', default for lines) or is centred on the area ('point', default for other features) | | no standard
 | shield-font-family | Name of the font to use (default: same as font-family) | no eval | no standard
 | shield-font-weight |  'bold' or 'normal' (default: same as font-weight) | no eval | no standard

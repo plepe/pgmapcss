@@ -26,7 +26,7 @@ line|z15-[highway=primary] {
 
 Every line with highway=primary should be displayed with a yellow 6px wide line with a 1.5px darkgrey casing (on both sides). Additional the value of the 'name'-tag should be shown on top of the line in the CSS3 color blue. This style is valid from zoom level 15 on.
 
-See [MapCSS Documentation](doc/MapCSS.creole) for general documentation about pgmapcss' dialect of the MapCSS language and [the list of available properties (Mapnik 2.2)](doc/mapnik-2.2.creole) for possible style parameters (resp. [here for Mapnik 2.0](doc/mapnik-2.0.creole) and [here for the experimental "expr-v2" branch](doc/expr-v2.creole)).
+See [MapCSS Documentation](doc/MapCSS.creole) for general documentation about pgmapcss' dialect of the MapCSS language and [the list of available properties (Mapnik 2.2)](doc/mapnik-2.2.creole) for possible style parameters (resp. [here for Mapnik 2.0](doc/mapnik-2.0.creole) and [here for the upcoming mapnik 3.0 release](doc/mapnik-3.0.creole)).
 
 You can embed MapCSS syntax in a Mapnik file with `<style type='text/mapcss'>`. See [basemap_example.mapcss](./basemap_example.mapcss).
 
@@ -50,8 +50,6 @@ line|z15-[highway=primary] {
 ```
 
 In fact you can write the last line as "width: 30m;" as pgmapcss supports other units than pixels. On the other hand this does not work, as pgmapcss needs to figure out most Mapnik parameters at compile-time (for Mapnik versions &lt; 3.0). As 30m depends not only on the zoom level but also the geographic location, any value would be possible. pgmapcss will raise a warning when compiling the stylesheet.
-
-Mapnik 3.0 is still far from available (as of April 2014), there's a development branch which you can try: [expr-v2 branch](https://github.com/mapnik/mapnik/tree/expr-v2). pgmapcss brings it's own template for this branch, use `pgmapcss -texpr-v2 style.mapcss`.
 
 Starting with version 0.7, pgmapcss does not require eval(...) to be wrapped around expressions, but for compatibility with other MapCSS implementations you should write it out. Also, pgmapcss tries to figure out possible results of an eval()-statement (which is important for Mapnik version &lt; 3.0, see above), e.g. '2 * 3' => always 6; 'zoom() / 2' => zoom() may be a value between 0 and 20, divided by 2: 0, 0.5, 1, 1.5, ... 10; 'cond(something, "red", "blue")' => either "red" or "blue".
 
