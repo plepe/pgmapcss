@@ -1,3 +1,17 @@
+0.7.0 release ?
+* Until 0.6 eval() expressions could not be used with many properties (e.g. width, color, ...). Now possible return values have to be predictable, therefore you can use e.g. width: eval(cond(zoom() > 6; zoom() * 2; 15)); or color: eval(lighten(rgb(0.5, 30, 20), 1)).
+* Support for eval()-Selectors, e.g. line[eval(....)] - matches if result is not 'false', 'no' '0' or ''
+* Included icon set (Mapbox Maki), used with e.g. "icon-image: bicycle"
+* The rendering order has changed; icons, shields and labels are rendered last (by default)
+* no need to wrap eval functions by eval(...), you can use e.g.: width: 2*5;
+* Most properties are now typed, values will be checked for validity when assigning
+* Colors: support for CSS3 color names (e.g. "red") and short notation (e.g. #f00)
+* The compiled mapnik stylesheet contains less generated rules (they will be generated per pseudo element), reducing rendering time
+* An improved example stylesheet (test.mapcss)
+* Improve support for Mapnik 3.0 (rename expr-v2 -> mapnik-3.0)
+* Support for Postgis 2.x
+* new eval functions: style_id(), substr()
+
 0.6.0 release 2014-02-04
 * pgmapcss no longer compiles into PL/pgSQL functions, as this database language is really slow. From 0.6 on pgmapcss creates one big PL/Python3 function, allowing faster execution (many times faster - from about twice for simple styles, up to 20 times complex styles - not counting database queries and Mapnik rendering time) and more advanced features (which will be implemented in future versions). Right now the functionality is more or less equal to version 0.5.
 * Allow "way > node" and "node < way" relations.
