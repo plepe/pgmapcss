@@ -1,7 +1,8 @@
-0.7.0 release ?
+0.7.0 release 2014-05-20
 * Until 0.6 eval() expressions could not be used with many properties (e.g. width, color, ...). Now possible return values have to be predictable, therefore you can use e.g. width: eval(cond(zoom() > 6; zoom() * 2; 15)); or color: eval(lighten(rgb(0.5, 30, 20), 1)).
-* Support for eval()-Selectors, e.g. line[eval(....)] - matches if result is not 'false', 'no' '0' or ''
+* The possiblity to mix MapCSS code with normal Mapnik layers, see file [[./basemap_example.mapcss|basemap_example.mapcss]].
 * Included icon set (Mapbox Maki), used with e.g. "icon-image: bicycle"
+* Support for eval()-Selectors, e.g. line[eval(....)] - matches if result is not 'false', 'no' '0' or ''
 * The rendering order has changed; icons, shields and labels are rendered last (by default)
 * no need to wrap eval functions by eval(...), you can use e.g.: width: 2*5;
 * Most properties are now typed, values will be checked for validity when assigning
