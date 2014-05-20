@@ -31,6 +31,7 @@ psql -d "dbname=test user=user host=localhost password=PASSWORD" -c "create lang
 
 Fix Mapnik fonts:
 ```sh
+sudo mkdir /usr/lib/mapnik/fonts
 for i in /usr/share/fonts/truetype/dejavu/* ; do sudo ln -s $i /usr/lib/mapnik/fonts/ ; done
 sudo ln -s /usr/share/fonts/truetype/unifont/unifont.ttf /usr/lib/mapnik/fonts/
 ```
