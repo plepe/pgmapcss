@@ -5,7 +5,7 @@ This is the list of properties when using Mapnik 3.0 (or the master development 
 Rendering order
 ---------------
 
-In contrast to the [[https://wiki.openstreetmap.org/wiki/MapCSS/0.2#Rendering_Order|MapCSS 0.2 specification]] the following rendering order is used:
+In contrast to the [MapCSS 0.2 specification](https://wiki.openstreetmap.org/wiki/MapCSS/0.2#Rendering_Order) the following rendering order is used:
 
 1. Objects with lower layer (see below) should always be rendered first.
 2. Within a layer, first all fills are rendered, then all casings, then all strokes.
@@ -45,7 +45,7 @@ Point properties
 
 | CSS parameter | Description | Default value | Compatibility MapCSS 0.2 |
 |---------------|-------------|---------------|--------------------------|
-| icon-image | URL (absolute or relative) of an image to use as an icon, e.g. url('img/foo.svg'). Icons from [[https://www.mapbox.com/maki/|Mapbox Maki]] project can be included via their ID, e.g. parking-garage. | | YES
+| icon-image | URL (absolute or relative) of an image to use as an icon, e.g. url('img/foo.svg'). Icons from [Mapbox Maki](https://www.mapbox.com/maki/) project can be included via their ID, e.g. parking-garage. | | YES
 | icon-color | Only for icons from Mapbox Maki project! Change color of icon to given color. | #444444. | no standard(*)
 | icon-opacity | Opacity of the icon image | 100% (opaque) | YES(*)
 | icon-width | Width of image. Ignored for custom images. For icons from Mapbox Maki project values 12, 18 or 24 have to be used. | 24 | PARTLY
