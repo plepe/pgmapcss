@@ -7,16 +7,16 @@ Rendering order
 
 In contrast to the [[https://wiki.openstreetmap.org/wiki/MapCSS/0.2#Rendering_Order|MapCSS 0.2 specification]] the following rendering order is used:
 
-# Objects with lower layer (see below) should always be rendered first.
-# Within a layer, first all fills are rendered, then all casings, then all strokes.
-# Within each of those categories, objects are ordered according to z-index.
-# If all of the above are equal, the order is undefined.
+1. Objects with lower layer (see below) should always be rendered first.
+2. Within a layer, first all fills are rendered, then all casings, then all strokes.
+3. Within each of those categories, objects are ordered according to z-index.
+4. If all of the above are equal, the order is undefined.
 
 Finally:
-# By default, all icons are rendered as if they are on layer 100 (defined by property 'point-layer')
-# By default, all labels with text-position!=line are rendered as if they are on layer 101 (defined by property 'point-text-layer')
-# By default, all labels with text-position=line are rendered as if they are on layer 102 (defined by property 'line-text-layer')
-# By default, all shields are rendered as if they are on layer 103 (defined by property 'shield-layer')
+* By default, all icons are rendered as if they are on layer 100 (defined by property 'point-layer')
+* By default, all labels with text-position!=line are rendered as if they are on layer 101 (defined by property 'point-text-layer')
+* By default, all labels with text-position=line are rendered as if they are on layer 102 (defined by property 'line-text-layer')
+* By default, all shields are rendered as if they are on layer 103 (defined by property 'shield-layer')
 
 General properties
 ------------------
