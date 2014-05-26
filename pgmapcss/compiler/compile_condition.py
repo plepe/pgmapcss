@@ -52,6 +52,13 @@ def compile_condition(condition, stat, var="current['tags']"):
     elif condition['op'] == '~=':
         ret += final_value + ' in ' + var + '.get(' + key + ", '').split(';')"
 
+    # @=
+    elif condition['op'] == '@=':
+        if condition['value_type'] == 'value':
+            ret += var + '.get(' + key + ") in " + repr(set(condition['value'].split(';')))
+        else:
+            ret += var + '.get(' + key + ") in " + final_value + '.split(";")'
+
     # =~
     elif condition['op'] == '=~':
         flags = ''

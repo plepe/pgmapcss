@@ -39,6 +39,13 @@ def compile_condition_sql(condition, statement, stat, prefix='current.', filter=
     if condition['op'] == '=':
         ret += prefix + 'tags @> ' + db.format({ condition['key']: condition['value'] })
 
+    # @=
+    if condition['op'] == '@=' and condition['value_type'] == 'value':
+        ret += '(' + ' or '.join([
+            prefix + 'tags @> ' + db.format({ condition['key']: v })
+            for v in condition['value'].split(';')
+            ]) + ')'
+
     else:
         return prefix + 'tags ? ' + db.format(condition['key']);
 
