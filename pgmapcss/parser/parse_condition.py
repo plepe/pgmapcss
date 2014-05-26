@@ -33,6 +33,16 @@ def parse_condition(to_parse):
     if to_parse.match('(=~|!=|<=|>=|<|>|\^=|\$=|\*=|~=|@=|=)'):
         condition['op'] += to_parse.match_group(1)
 
+    elif to_parse.match('\?\]'):
+        condition['value'] = 'yes;true;1'
+        condition['op'] += '@='
+        return condition
+
+    elif to_parse.match('\?\!\]'):
+        condition['value'] = 'no;false;0;'
+        condition['op'] += '@='
+        return condition
+
     else:
         condition['op'] += 'has_tag'
 

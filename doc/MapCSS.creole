@@ -94,6 +94,14 @@ The tag 'osm_id' will be set to the ID of the object.
 
 ¹ MapCSS 0.2 does not define case insensitive matches.
 
+You can test whether the value of a tag is logical truth value ("yes", "true", "1") or logical falsehood value ("no", "false", "0", ""). You can also prefix the condition by {{{!}}} to invert match; this will also match if the tag is not set, therefore you might want to combine conditions with tag existance match, e.g. {{{[bridge][!bridge?!]}}} will match all map features which have a bridge tag but not a falsehood value.
+
+|= Condition |= Description |= Example |= Compatibility
+| {{{[tag?]}}} | Testing for truth value | {{{[building?]}}} | no standard, JOSM
+| {{{[tag?!]}}} | Testing for falsehood value | {{{[wheelchair?!]}}}| no standard, JOSM
+| {{{[!tag?]}}} | Testing for any value which is not truth value (not really useful?) || no standard, JOSM
+| {{{[!tag?!]}}} | Testing for any value which is not falsehood value (very useful, as many tags in OSM allow either 'yes' or a custom value like 'bridge=swing' | {{{[!bridge?!]}}}| no standard, JOSM
+
 ==== Eval expression ====
 Additionally you can use an eval()-statement as selector, e.g.
 {{{
