@@ -96,7 +96,7 @@
 
 # FOR fill-color fill-opacity
     <Rule>
-      <Filter>[style-element] = 'fill' and '{fill-color}' = [fill-color] and '{fill-opacity}' = [fill-opacity]</Filter>
+      <Filter>[style-element] = 'fill' and '{fill-color} {fill-opacity}' = [fill-color fill-opacity]</Filter>
       <PolygonSymbolizer fill="{fill-color}" fill-opacity="{fill-opacity}" />
     </Rule>
 # END
@@ -110,7 +110,7 @@
 <!-- CASING LINES -->
 # FOR casing-color final-casing-width casing-offset casing-opacity casing-linejoin casing-linecap casing-dashes
     <Rule>
-      <Filter>[style-element] = 'casing' and '{final-casing-width}' = [final-casing-width] and '{casing-offset}' = [casing-offset] and '{casing-color}' = [casing-color] and '{casing-opacity}' = [casing-opacity] and '{casing-linejoin}' = [casing-linejoin] and '{casing-linecap}' = [casing-linecap] and '{casing-dashes}' = [casing-dashes]</Filter>
+        <Filter>[style-element] = 'casing' and '{casing-color} {final-casing-width} {casing-offset} {casing-opacity} {casing-linejoin} {casing-linecap} {casing-dashes}' = [casing-color final-casing-width casing-offset casing-opacity casing-linejoin casing-linecap casing-dashes]</Filter>
       <LineSymbolizer stroke="{casing-color}" stroke-width="{final-casing-width}" offset="{casing-offset}" stroke-opacity="{casing-opacity}" stroke-linejoin="{casing-linejoin}" stroke-linecap="{casing-linecap}" stroke-dasharray="{casing-dashes}" />
     </Rule>
 # END
@@ -118,7 +118,7 @@
 <!-- LINES -->
 # FOR color width offset opacity linejoin linecap dashes
     <Rule>
-      <Filter>[style-element] = 'line' and '{width}' = [width] and '{offset}' = [offset] and '{color}' = [color] and '{opacity}' = [opacity] and '{linejoin}' = [linejoin] and '{linecap}' = [linecap] and '{dashes}' = [dashes]</Filter>
+        <Filter>[style-element] = 'line' and '{color} {width} {offset} {opacity} {linejoin} {linecap} {dashes}' = [color width offset opacity linejoin linecap dashes]</Filter>
       <LineSymbolizer stroke="{color}" stroke-width="{width}" offset="{offset}" stroke-opacity="{opacity}" stroke-linejoin="{linejoin}" stroke-linecap="{linecap}" stroke-dasharray="{dashes}" />
     </Rule>
 # END
@@ -140,7 +140,7 @@
 <!-- TEXTS on Points -->
 # FOR font-family font-weight font-style text-color text-halo-color text-offset max-width
     <Rule>
-      <Filter>[text] and [style-element] = 'point-text' and [text-position] = 'center' and '{font-family}' = [font-family] and '{font-weight}' = [font-weight] and '{font-style}' = [font-style] and '{text-color}' = [text-color] and '{text-halo-color}' = [text-halo-color] and '{text-offset}' = [text-offset] and '{max-width}' = [max-width]</Filter>
+        <Filter>[text] and [style-element] = 'point-text' and [text-position] = 'center' and '{font-family} {font-weight} {font-style} {text-color} {text-halo-color} {text-offset} {max-width}' = [font-family font-weight font-style text-color text-halo-color text-offset max-width]</Filter>
       <TextSymbolizer placement="interior" fontset-name="{font-family} - {font-weight} - {font-style}" fill="{text-color}" halo-fill="{text-halo-color}" dy="{text-offset}" wrap-width="{max-width}" avoid-edges="false"><ExpressionFormat size="[font-size]" halo-radius="[text-halo-radius]" character-spacing="[character-spacing]" opacity="[text-opacity]" wrap-character="[wrap-character]">[text]</ExpressionFormat></TextSymbolizer>
     </Rule>
 # END
@@ -148,7 +148,7 @@
 <!-- TEXTS on Lines -->
 # FOR font-family font-weight font-style text-color text-halo-color text-offset max-width text-spacing
     <Rule>
-      <Filter>[text] and [style-element] = 'line-text' and [text-position] = 'line' and '{font-family}' = [font-family] and '{font-weight}' = [font-weight] and '{font-style}' = [font-style] and '{text-color}' = [text-color] and '{text-halo-color}' = [text-halo-color] and '{text-offset}' = [text-offset] and '{max-width}' = [max-width] and '{text-spacing}' = [text-spacing]</Filter>
+        <Filter>[text] and [style-element] = 'line-text' and [text-position] = 'line' and '{font-family} {font-weight} {font-style} {text-color} {text-halo-color} {text-offset} {max-width} {text-spacing}' = [font-family font-weight font-style text-color text-halo-color text-offset max-width text-spacing]</Filter>
       <TextSymbolizer placement="line" fontset-name="{font-family} - {font-weight} - {font-style}" fill="{text-color}" halo-fill="{text-halo-color}" dy="{text-offset}" wrap-width="{max-width}" spacing="{text-spacing}"><ExpressionFormat size="[font-size]" halo-radius="[text-halo-radius]" character-spacing="[character-spacing]" opacity="[text-opacity]" wrap-character="[wrap-character]">[text]</ExpressionFormat></TextSymbolizer>
     </Rule>
 # END
@@ -156,7 +156,7 @@
   <!-- SHIELDS -->
 # FOR shield-font-family shield-font-weight shield-font-style shield-font-size shield-text-color shield-text-halo-color shield-spacing shield-opacity shield-placement shield-text-halo-radius
     <Rule>
-      <Filter>[shield-text] and [style-element] = 'shield' and '{shield-placement}' = [shield-placement] and '{shield-font-family}' = [shield-font-family] and '{shield-font-weight}' = [shield-font-weight] and '{shield-font-style}' = [shield-font-style] and '{shield-text-color}' = [shield-text-color] and '{shield-text-halo-color}' = [shield-text-halo-color] and '{shield-spacing}' = [shield-spacing] and '{shield-font-size}' = [shield-font-size] and '{shield-opacity}' = [shield-opacity] and '{shield-text-halo-radius}' = [shield-text-halo-radius]</Filter>
+        <Filter>[shield-text] and [style-element] = 'shield' and '{shield-font-family} {shield-font-weight} {shield-font-style} {shield-font-size} {shield-text-color} {shield-text-halo-color} {shield-spacing} {shield-opacity} {shield-placement} {shield-text-halo-radius}' = [shield-font-family shield-font-weight shield-font-style shield-font-size shield-text-color shield-text-halo-color shield-spacing shield-opacity shield-placement shield-text-halo-radius]</Filter>
       <ShieldSymbolizer placement="{shield-placement}" fontset-name="{shield-font-family} - {shield-font-weight} - {shield-font-style}" fill="{shield-text-color}" halo-fill="{shield-text-halo-color}" spacing="{shield-spacing}" size="{shield-font-size}" halo-radius="{shield-text-halo-radius}" opacity="{shield-opacity}" file="[shield-image]">[shield-text]</ShieldSymbolizer>
     </Rule>
 # END

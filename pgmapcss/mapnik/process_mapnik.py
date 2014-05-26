@@ -3,6 +3,16 @@ import re
 from pgmapcss.compiler.stat import *
 from pkg_resources import *
 import pgmapcss.db as db
+import hashlib
+
+# Postgresql only supports columns names with a length of up to 64 chars
+# When column names get concatenated, this could lead to problems
+# For longer names replace name by its md5 sum
+def shorten_column(s):
+    if len(s) < 64:
+        return s
+
+    return hashlib.md5(s.encode('UTF-8')).hexdigest()
 
 def init(stat):
     stat_add_generated_property(
@@ -33,6 +43,7 @@ def process(f1, replacement, stat, rek=0):
         elif re.match('# FOR\s', r):
             m = re.match('# FOR\s*(.*)', r)
             k = m.group(1).split(' ')
+
             combinations_list = combinations_combine(replacement, stat_properties_combinations(k, stat, eval_true=False))
             f1_pos = f1.tell()
 
@@ -53,15 +64,26 @@ def process(f1, replacement, stat, rek=0):
             break;
 
         else:
-            text += r.format(**replacement)
+            t = r
+            if re.search('<Filter>', r):
+                # find all matches for columns which occur in <Filter>. if the column name is longer than 63 chars, shorten column.
+                col_match = re.findall('([^\[]*)(\[([^\]]+)\])?', r)
+                t = ''
+                for m in col_match:
+                    if m[2] == '':
+                        t += m[0]
+                    else:
+                        t += m[0] + '[' + shorten_column(m[2]) + ']'
+
+            text += t.format(**replacement)
 
         # check for columns which need to be added to the sql query
         r1 = r
-        m = re.match('[^\[]+\[([a-zA-Z0-9\-_]+)\]', r1)
+        m = re.match('[^\[]+\[([a-zA-Z0-9\-_ ]+)\]', r1)
         while m:
             stat['mapnik_columns'].add(m.group(1))
             r1 = r1[len(m.group(0)):]
-            m = re.match('[^\[]+\[([a-zA-Z0-9\-_]+)\]', r1)
+            m = re.match('[^\[]+\[([a-zA-Z0-9\-_ ]+)\]', r1)
 
     return text
 
@@ -97,9 +119,12 @@ def process_mapnik(style_id, args, stat, conn):
 
     # finally replace 'columns'
     replacement = {}
-    replacement['columns'] = ', '.join([
-        'properties->' + db.format(prop) + ' as ' + db.ident(prop)
-        for prop in stat['mapnik_columns']
+    replacement['columns'] = ',\n  '.join([
+        ' || \' \' || '.join([
+            '(properties->' + db.format(p) + ')'
+            for p in props.split(' ')
+        ]) + ' as "' + shorten_column(props) + '"'
+        for props in stat['mapnik_columns']
     ])
 
     f2.write(text.format(**replacement))
