@@ -92,11 +92,14 @@ def process_mapnik(style_id, args, stat, conn):
 
     text = process(f1, replacement, stat)
 
+    # style-element is an extra column in result set
+    stat['mapnik_columns'].remove('style-element')
+
     # finally replace 'columns'
     replacement = {}
     replacement['columns'] = ', '.join([
         'properties->' + db.format(prop) + ' as ' + db.ident(prop)
-        for prop in stat_properties(stat)
+        for prop in stat['mapnik_columns']
     ])
 
     f2.write(text.format(**replacement))
