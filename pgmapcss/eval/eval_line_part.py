@@ -23,6 +23,9 @@ def eval_line_part(param):
     if pos0 < 0.0:
         pos0 = 0.0
 
+    if pos0 > length:
+        pos0 = length
+
     # end position
     if len(param) >= 3:
         pos1 = eval_metric([ param[2], 'px' ])
@@ -42,6 +45,9 @@ def eval_line_part(param):
 
     if pos1 < pos0:
         return ''
+
+    if pos1 > length:
+        pos1 = length
 
     plan = plpy.prepare('select ST_Line_Substring($1, $2, $3) as r', ['geometry', 'float', 'float' ])
     res = plpy.execute(plan, [ param[0], pos0 / length, pos1 / length ])
