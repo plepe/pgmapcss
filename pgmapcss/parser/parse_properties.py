@@ -16,17 +16,17 @@ def parse_properties(properties, to_parse):
             current['assignment_type'] = 'T'
             current['key'] = to_parse.match_group(1)
 
-        elif to_parse.match('\s*set\s+([a-zA-Z0-9_\-\.]+)\s*;'):
+        elif to_parse.match('\s*set\s+([a-zA-Z0-9_\-\.]+)\s*(;|})'):
             current['assignment_type'] = 'T'
             current['key'] = to_parse.match_group(1)
 
-            to_parse.rewind('yes;')
+            to_parse.rewind('yes' + to_parse.match_group(2))
 
-        elif to_parse.match('\s*unset\s+([a-zA-Z0-9_\-\.]+)\s*;'):
+        elif to_parse.match('\s*unset\s+([a-zA-Z0-9_\-\.]+)\s*(;|})'):
             current['assignment_type'] = 'U'
             current['key'] = to_parse.match_group(1)
 
-            to_parse.rewind(';')
+            to_parse.rewind(to_parse.match_group(2))
 
         elif to_parse.match('\s*combine\s+([a-zA-Z0-9_\-\.]+)\s+'):
             current['assignment_type'] = 'C'
@@ -41,5 +41,13 @@ def parse_properties(properties, to_parse):
         parse_value(current, to_parse)
 
         properties.append(current)
+
+        if to_parse.match('\s*(;|})', wind=None):
+            if to_parse.match_group(1) == ';':
+                to_parse.wind(len(to_parse.match_group(0)))
+
+        else:
+            raise ParseError(to_parse, 'Error parsing properties, expecing ; or }')
+
 
     return

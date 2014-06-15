@@ -9,18 +9,18 @@ def parse_url(current, to_parse):
         s = parse_string(to_parse)
 
         if s:
-            if to_parse.match('\s*\)\s*;'):
+            if to_parse.match('\s*\)\s*'):
                 current['value'] = s
                 current['value_type'] = 'url'
                 return
 
         else:
-            if to_parse.match('([^\)]*)\);'):
+            if to_parse.match('([^\)]*)\)'):
                 current['value'] = to_parse.match_group(1)
                 current['value_type'] = 'url'
                 return
     else:
-        if to_parse.match('\s*([^;]*);'):
+        if to_parse.match('\s*([^;]*)'):
             current['value'] = to_parse.match_group(1)
             current['value_type'] = 'url'
             return to_parse
@@ -34,7 +34,7 @@ def parse_value(current, to_parse):
     # "..." or '...'
     s = parse_string(to_parse)
     if s is not None:
-        if to_parse.match('\s*;'):
+        if to_parse.match('\s*'):
             current['value'] = s
             current['value_type'] = 'string'
             return
@@ -46,7 +46,7 @@ def parse_value(current, to_parse):
         value = None
 
         # if eval statement is of form eval("2 + 3")
-        if r != None and to_parse.match('\s*\)\s*;', wind=None):
+        if r != None and to_parse.match('\s*\)\s*', wind=None):
             r = ParseFile(content=r)
             try:
                 value = parse_eval(r)
@@ -58,7 +58,7 @@ def parse_value(current, to_parse):
             to_parse.seek(fp)
             value = parse_eval(to_parse)
 
-        if not to_parse.match('\s*\)\s*;'):
+        if not to_parse.match('\s*\)\s*'):
             raise ParseError(to_parse, 'Error parsing eval statement')
 
         current['value'] = value
@@ -70,18 +70,20 @@ def parse_value(current, to_parse):
         return parse_url(current, to_parse)
 
     # it's a "value" (letters, digits, -, _, #)
-    elif to_parse.match('\s*([A-Za-z0-9\-_#,\.]*)\s*;'):
+    elif to_parse.match('\s*([A-Za-z0-9\-_#,\.\+]*)\s*(;|})'):
         current['value_type'] = 'value';
         current['value'] = to_parse.match_group(1).strip()
 
         if current['value'] == '':
             current['value'] = None
 
+        to_parse.rewind(to_parse.match_group(2))
+
     # function call (handle like eval( ... ) but without eval() ;) )
     else:
         value = parse_eval(to_parse)
 
-        if not to_parse.match('\s*;'):
+        if not to_parse.match('\s*'):
             raise ParseError(to_parse, 'Error parsing eval statement')
 
         current['value'] = value
