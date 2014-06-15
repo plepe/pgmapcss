@@ -26,15 +26,23 @@ def parse_selector_part(to_parse, object_class_selector='\*|[a-z_]+'):
         last_pos = to_parse.pos()
 
 # parse classes
-        if to_parse.match('\.([a-zA-Z0-9_]+)'):
+        if to_parse.match('(!?)\.([a-zA-Z0-9_]+)'):
             if 'classes' in current:
                 pass
             else:
                 current['classes'] = []
 
-            current['classes'].append(to_parse.match_group(1))
+            condition = {
+                'op': 'has_tag',
+                'key': '.' + to_parse.match_group(2)
+            }
 
-            current['conditions'].append({ 'op': 'has_tag', 'key': '.' + to_parse.match_group(1) })
+            if to_parse.match_group(1) == '!':
+                condition['op'] = '! has_tag'
+            else:
+                current['classes'].append(to_parse.match_group(2))
+
+            current['conditions'].append(condition)
 
 # parse zoom level
         if to_parse.match('\|z([0-9]*)(-?)([0-9]*)'):

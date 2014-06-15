@@ -42,11 +42,14 @@ The type of an object is retrieved from the 'types'-array in object-value (see [
 * Compatibility MapCSS 0.2: YES
 
 === Class selector ===
-After the type selector, separated by '.'. Optional.
+After the type selector, separated by '.'. Optional. Can be negated by prepending with '!'.
 
 Example:
 {{{
 way.minor_road {
+  ...
+}
+way!.minor_road {
   ...
 }
 }}}
