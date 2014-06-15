@@ -9,12 +9,19 @@ def connection():
 
 def connect(args):
     global conn
+
+    if not args.database_type in ('osm2pgsql'):
+        print('* Database type "{}" not supported right now'.format(args.database_type))
+        exit(1)
+
     conn = postgresql.open(
         host=args.host,
         password=args.password,
         database=args.database,
         user=args.user
     )
+
+    conn.database_type=args.database_type
 
     db_version_check()
 
@@ -24,7 +31,7 @@ def db_update(conn):
     db_version_update()
 
 def db_init(conn):
-    files = [ 'pgmapcss_types.sql', 'osm2pgsql.sql' ]
+    files = [ 'pgmapcss_types.sql', conn.database_type + '.sql' ]
 
     for f in files:
         print('Installing', f)
@@ -53,4 +60,4 @@ def prepare(sql):
     return conn.prepare(sql)
 
 def query_functions():
-    return resource_string(__name__, 'osm2pgsql.py').decode('utf-8')
+    return resource_string(__name__, conn.database_type + '.py').decode('utf-8')
