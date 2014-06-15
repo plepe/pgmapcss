@@ -128,9 +128,14 @@ This makes sure that the highway's name matches the streetname of the address no
 * Compatibility MapCSS 0.2: PARTLY, no check for 'no/false' yet
 
 === Pseudo classes ===
-After the condition selector(s), separated by ':'. Several pseudo classes may be specified. Optional.
+After the condition selector(s), separated by ':'. Several pseudo classes may be specified. They can also be negated by prepending by '!', e.g. '!:closed'. Optional.
 
 Pseudo classes will be parsed, but as no pseudo classes are supported yet, the concerened rules will be simply disabled.
+
+The following pseudo classes are supported:
+|= pseudo class |= Description
+| :active | supported for compatibility with MapCSS 0.2; always treated as 'false'
+| :hover | supported for compatibility with MapCSS 0.2; always treated as 'false'
 
 === Pseudo elements ===
 After the pseudo class(es), separated by '::'. Optional.

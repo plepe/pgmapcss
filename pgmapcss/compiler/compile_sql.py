@@ -30,6 +30,10 @@ def compile_condition_sql(condition, statement, stat, prefix='current.', filter=
     if condition['op'] == 'eval':
         return None
 
+    # ignore pseudo classes
+    if condition['op'] == 'pseudo_class':
+        return None
+
     # value-eval() statements
     if condition['value_type'] == 'eval':
         # treat other conditions as has_key

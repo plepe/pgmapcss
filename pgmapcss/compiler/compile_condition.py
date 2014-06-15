@@ -1,6 +1,7 @@
 import pgmapcss.db as db
 import re
 from .compile_eval import compile_eval
+from .compile_pseudo_class_condition import compile_pseudo_class_condition
 
 def compile_condition(condition, stat, var="current['tags']"):
     ret = ''
@@ -77,6 +78,9 @@ def compile_condition(condition, stat, var="current['tags']"):
     # eval(...)
     elif condition['op'] == 'eval':
         ret += compile_eval(condition['key'], condition, stat) + " not in ('', 'false', 'no', '0', None)"
+
+    elif condition['op'] == 'pseudo_class':
+        ret += compile_pseudo_class_condition(condition, stat)
 
     # unknown operator?
     else:
