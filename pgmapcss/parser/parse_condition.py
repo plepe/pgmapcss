@@ -1,6 +1,5 @@
 from .parse_string import parse_string
 from .parse_eval import parse_eval
-from .parse_value import parse_value
 from .ParseError import *
 
 def parse_condition(to_parse):

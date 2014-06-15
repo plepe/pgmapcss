@@ -27,3 +27,6 @@ def parse_defines(stat, to_parse):
             parse_value(current, to_parse)
 
             stat['defines'][define_type][key] = current
+
+            if not to_parse.match('\s*;'):
+                raise ParseError(to_parse, 'Error parsing define, expecing ;')

@@ -70,6 +70,7 @@ If you read a number, unit conversion takes place. The following units are suppo
 | style_id | | text | ID of the current style | no standard
 | zoom | | number | Returns current zoom level, e.g. '15' | no standard
 | scale_denominator | | number | Returns current scale denominator, e.g. '17061.8366708' (at zoom level 15) | no standard
+| viewport | | geometry | Returns the bounding box of the current viewport | no standard
 | and | value, [value, [value, ...]] | boolean | logical and | no standard
 | or | value, [value, [value, ...]] | boolean | logical or | no standard
 | not | value | boolean | logical not | no standard
@@ -122,3 +123,4 @@ Mapnik < 3.0 can't read dynamic color values. Therefore pgmapcss has to know all
 | rotate | geometry, angle number, [center geometry] | geometry | Rotates the geometry around the center geometry (or the centroid of the input geometry) by angle degrees.
 | area | geometry | number | returns area of polygon in square pixels
 | centroid | geometry | geometry | returns the centroid of the input geometry
+| intersection | geometry A, geometry B | geometry | Returns a geometry that represents the shared portion of A and B (see [[http://postgis.net/docs/manual-2.0/ST_Intersection.html|Postgis: ST_Intersection]])
