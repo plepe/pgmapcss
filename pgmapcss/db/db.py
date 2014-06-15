@@ -10,7 +10,7 @@ def connection():
 def connect(args):
     global conn
 
-    if not args.database_type in ('osm2pgsql'):
+    if not args.database_type in ('osm2pgsql', 'osmosis'):
         print('* Database type "{}" not supported right now'.format(args.database_type))
         exit(1)
 
