@@ -124,3 +124,4 @@ Mapnik < 3.0 can't read dynamic color values. Therefore pgmapcss has to know all
 | area | geometry | number | returns area of polygon in square pixels
 | centroid | geometry | geometry | returns the centroid of the input geometry
 | intersection | geometry A, geometry B | geometry | Returns a geometry that represents the shared portion of A and B (see [[http://postgis.net/docs/manual-2.0/ST_Intersection.html|Postgis: ST_Intersection]])
+| is_closed | [geometry] | checks (return 'true' or 'false') whether the given geometry is a polygon or multipolygon, or a line whose start equals the end. if no parameter is passed, will use the current property 'geo' in the current pseudo element.
