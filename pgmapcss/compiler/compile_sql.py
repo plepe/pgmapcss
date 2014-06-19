@@ -50,4 +50,7 @@ def compile_selector_sql(statement, stat, prefix='current.', filter={}):
         for c in statement['selector']['conditions']
     ]
 
+    if len(ret) == 0:
+        return 'true'
+
     return ' and '.join(ret)
