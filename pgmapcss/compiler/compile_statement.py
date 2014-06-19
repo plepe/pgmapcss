@@ -2,12 +2,17 @@ from .compile_selector_part import compile_selector_part
 from .compile_link_selector import compile_link_selector
 from .compile_properties import compile_properties
 from .compile_conditions import compile_conditions
+from .compile_media_query import compile_media_query
 
 def compile_statement(statement, stat, indent='    '):
     ret = ''
     object_selector = statement['selector']
 
-    ret += indent + 'if (' + compile_selector_part(object_selector, stat) + '):\n'
+    media_selector = 'True'
+    if 'media' in object_selector:
+        media_selector = compile_media_query(object_selector['media'], stat)
+
+    ret += indent + 'if ' + media_selector + ' and (' + compile_selector_part(object_selector, stat) + '):\n'
     indent += '    '
 
     if 'link_selector' in statement:
