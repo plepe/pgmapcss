@@ -65,7 +65,7 @@ def compile_condition(condition, stat, var="current['tags']"):
             condition['value'] = m.group(1)
             flags = ', re.IGNORECASE'
 
-        ret += '(' + key + ' in ' + var + ' and re.search(' + condition['value'] + ', ' + var + '[' + key + ']' + flags + '))'
+        ret += '(' + key + ' in ' + var + ' and re.search(' + repr('(' + condition['value'] + ')') + ', ' + var + '[' + key + ']' + flags + '))'
 
     # eval(...)
     elif condition['op'] == 'eval':
