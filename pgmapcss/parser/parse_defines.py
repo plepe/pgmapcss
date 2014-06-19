@@ -14,6 +14,31 @@ def parse_defines(stat, to_parse):
             parse_url(current, to_parse)
             return ( 'import', current['value'] )
 
+        elif define_type == 'media':
+            query = [ [] ]
+
+            last_to_parse = None
+            while True:
+                if to_parse.pos() == last_to_parse:
+                    raise ParseError(to_parse, 'Error parsing @media query at')
+
+                last_to_parse = to_parse.pos()
+
+                if to_parse.match('\s*{'):
+                    return ( 'media', query )
+
+                elif to_parse.match('\s*(not)?\s*\(\s*([a-zA-Z\-0-9]+)\s*(:\s*(\w+))?\s*\)'):
+                    query[-1].append((
+                        to_parse.match_group(2),
+                        to_parse.match_group(4),
+                        to_parse.match_group(1))
+                    )
+
+                    if to_parse.match('\s*and\s*'):
+                        pass
+                    elif to_parse.match('\s*,\s*'):
+                        query.append([])
+
         else:
             if not to_parse.match('\s*([A-Za-z0-9_\-]*)\s+'):
                 # TODO: error
