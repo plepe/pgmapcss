@@ -1,5 +1,6 @@
 from .parse_value import *
 from .strip_comments import strip_comments
+from .check_media_query import *
 import re
 
 def parse_defines(stat, to_parse):
@@ -25,7 +26,7 @@ def parse_defines(stat, to_parse):
                 last_to_parse = to_parse.pos()
 
                 if to_parse.match('\s*{'):
-                    return ( 'media', query )
+                    return check_media_query(stat, to_parse, query)
 
                 elif to_parse.match('\s*(not)?\s*\(\s*([a-zA-Z\-0-9]+)\s*(:\s*(\w+))?\s*\)'):
                     query[-1].append((
