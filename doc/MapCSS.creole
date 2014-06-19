@@ -320,6 +320,23 @@ street {
 }
 }}}
 
+== Media queries ==
+Media queries are used to skip a section of the style under certain conditions. The syntax closely matches the official css syntax. The following conditions are supported:
+
+|= Media condition |= Description
+| {{{(user-agent: <string>)}}} | Only include @media section when the name of the editor / renderer matches the given string. The only accepted value is {{{pgmapcss}}}.
+| {{{(min-pgmapcss-version: <version>)}}} | Only include @media section when the current version of pgmapcss is greater than or equal to the specified version, e.g. 0.8.
+| {{{(max-pgmapcss-version: <version>)}}} | Only include @media section when the current version of pgmapcss is lower than or equal to the specified version, e.g. 0.8.
+
+Conditions can be combined with {{{and}}}, chained with a comma (logical or) and negated (e.g. {{{not (user-agent: pgmapcss)}}}).
+
+Examples:
+{{{
+@media (user-agent: pgmapcss), (user-agent: josm) and (min-josm-version: 7000) {
+    /* something */
+}
+}}}
+
 == Define Type of property ==
 The type of a property is specified by:
 {{{
