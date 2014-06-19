@@ -8,11 +8,14 @@ def compile_statement(statement, stat, indent='    '):
     ret = ''
     object_selector = statement['selector']
 
-    media_selector = 'True'
+    media_selector = None
     if 'media' in statement:
         media_selector = compile_media_query(statement['media'], stat)
 
-    ret += indent + 'if ' + media_selector + ' and (' + compile_selector_part(object_selector, stat) + '):\n'
+    ret += indent + 'if '
+    if media_selector:
+        ret += media_selector + ' and '
+    ret += '(' + compile_selector_part(object_selector, stat) + '):\n'
     indent += '    '
 
     if 'link_selector' in statement:
