@@ -13,6 +13,8 @@ def check_media_query(stat, to_parse, query):
             m1 = False
 
 # add here all queries that are (or might be) True
+            if q[0] == 'user-agent' and q[1] == 'pgmapcss':
+                m1 = True
 
             if q[2] and q[2] == 'not':
                 m1 = not m1
