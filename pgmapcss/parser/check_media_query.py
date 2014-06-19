@@ -1,4 +1,5 @@
 from .ParseError import *
+from ..version import *
 
 # returns
 # * the media query to include in statement (might be simplified)
@@ -15,6 +16,18 @@ def check_media_query(stat, to_parse, query):
 # add here all queries that are (or might be) True
             if q[0] == 'user-agent' and q[1] == 'pgmapcss':
                 m1 = True
+            elif q[0] == 'min-pgmapcss-version':
+                m1 = True
+                check_version = q[1].split('.')
+                for i, v in enumerate(check_version):
+                    if len(VERSION_INFO) < i or (type(VERSION_INFO[i]) == int and VERSION_INFO[i] < int(v)):
+                        m1 = False
+            elif q[0] == 'max-pgmapcss-version':
+                m1 = True
+                check_version = q[1].split('.')
+                for i, v in enumerate(check_version):
+                    if len(VERSION_INFO) < i or (type(VERSION_INFO[i]) == int and VERSION_INFO[i] > int(v)):
+                        m1 = False
 
             if q[2] and q[2] == 'not':
                 m1 = not m1
