@@ -28,7 +28,7 @@ def parse_defines(stat, to_parse):
                 if to_parse.match('\s*{'):
                     return check_media_query(stat, to_parse, query)
 
-                elif to_parse.match('\s*(not)?\s*\(\s*([a-zA-Z\-0-9]+)\s*(:\s*(\w+))?\s*\)'):
+                elif to_parse.match('\s*(not)?\s*\(\s*([a-zA-Z\-0-9]+)\s*(:\s*([^\)]+))?\s*\)'):
                     query[-1].append((
                         to_parse.match_group(2),
                         to_parse.match_group(4),
