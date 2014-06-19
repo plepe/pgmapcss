@@ -326,7 +326,7 @@ Media queries are used to skip a section of the style under certain conditions. 
 |= Media condition |= Description
 | {{{(user-agent: <string>)}}} | Only include @media section when the name of the editor / renderer matches the given string. The only accepted value is {{{pgmapcss}}}.
 
-Conditions can be combined with {{{and}}, chained with a comma (logical or) and negated (e.g. {{{not (user-agent: pgmapcss)}}}.
+Conditions can be combined with {{{and}}}, chained with a comma (logical or) and negated (e.g. {{{not (user-agent: pgmapcss)}}}.
 
 Examples:
 {{{
