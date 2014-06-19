@@ -346,7 +346,7 @@ The type of a property is specified by:
 Currently supported types:
 * text: The value is used as is (default)
 * tag_name: The current value of the specified tag
-* numeric: Value may be a number
+* numeric: Value may be a number. if a relative number (e.g. '+4') is specified, the value will be added to the value from the default pseudo element.
 
 == Possible values ==
 The following statement defines possible values for a specific property:
