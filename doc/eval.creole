@@ -124,3 +124,7 @@ Mapnik < 3.0 can't read dynamic color values. Therefore pgmapcss has to know all
 | area | geometry | number | returns area of polygon in square pixels
 | centroid | geometry | geometry | returns the centroid of the input geometry
 | intersection | geometry A, geometry B | geometry | Returns a geometry that represents the shared portion of A and B (see [[http://postgis.net/docs/manual-2.0/ST_Intersection.html|Postgis: ST_Intersection]])
+
+== Internal functions ==
+|= Function |= Parameters |= Return value |= Description
+| to_dashes | string | a valid dashes string or 'none' | Checks the validity of a dashes definition
