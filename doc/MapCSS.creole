@@ -222,7 +222,7 @@ E.g.
 See documentation for properties of styles based on the 'default' style definition:
 * [[mapnik-2.0.md]] for Mapnik 2.0
 * [[mapnik-2.2.md]] for Mapnik 2.2
-* [[mapnik-2.2.md]] for Mapnik 2.2
+* [[mapnik-3.0.md]] for Mapnik 3.0
 
 ==== Types ====
 Depending on the type of property, special values are possible:
