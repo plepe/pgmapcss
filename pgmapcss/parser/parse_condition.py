@@ -1,6 +1,7 @@
 from .parse_string import parse_string
 from .parse_eval import parse_eval
 from .ParseError import *
+import re
 
 def parse_condition(to_parse):
     condition = { 'op': '', 'value_type': 'value' }
@@ -78,5 +79,10 @@ def parse_condition(to_parse):
             condition['value'] = to_parse.match_group(1)
         else:
             raise ParseError(to_parse, 'parse condition: expecting ]')
+
+    # JOSM compatibility, case insensitive regex match
+    if condition['op'] in ( '=~', '!~') and re.match('^\(\?i\)', condition['value']):
+        condition['value'] = condition['value'][4:] + 'i'
+        print(condition)
 
     return condition

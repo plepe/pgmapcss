@@ -89,7 +89,7 @@ The tag 'osm_id' will be set to the ID of the object.
 | $= | Suffix match. Value ends with 'string', e.g. {{{[name$=dorf]}}} matches "Enzersdorf". | no standard
 | *= | Substring match. Value contains 'string', e.g. {{{[name*=ob]}}} matches "Foobar". | no standard
 | ~~= | List membership. Tag value consits of a list of ;-separated values. E.g. {{{[amenity~=atm]}}} matches {{{amenity=atm;bank}}}. | no standard
-| =~ | Regular expression match. Value matches given regular expression, e.g. {{{[highway=~/.*ary/]}}} matches primary. Use {{{[highway=~/.*ary/i]}}} for case insensitive matches. | MapCSS 0.2¹
+| =~ | Regular expression match. Value matches given regular expression, e.g. {{{[highway=~/.*ary/]}}} matches primary. Use {{{[highway=~/.*ary/i]}}} for case insensitive matches. For compatibility with JOSM also accepts {{{[highway=~/(?i).*ary/]}}} for case insensitive matches. | MapCSS 0.2¹
 | !~ | Negated regular expression match. Value matches all but given regular expression, e.g. {{{[highway!~/.*ary/]}}} matches residential but not primary. Use {{{[highway!~/.*ary/i]}}} for case insensitive matches. | JOSM
 | @= | List match. Tag value must exactly match one of the values of the specified list, e.g. {{{[highway@=primary;secondary;tertiary]}}}. | no standard
 
