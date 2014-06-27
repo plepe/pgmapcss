@@ -83,6 +83,5 @@ def parse_condition(to_parse):
     # JOSM compatibility, case insensitive regex match
     if condition['op'] in ( '=~', '!~') and re.match('^\(\?i\)', condition['value']):
         condition['value'] = condition['value'][4:] + 'i'
-        print(condition)
 
     return condition
