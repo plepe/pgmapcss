@@ -75,6 +75,21 @@ def compile_condition(condition, stat, var="current['tags']"):
 
         ret += '(' + key + ' in ' + var + ' and re.search(' + condition['value'] + ', ' + var + '[' + key + ']' + flags + '))'
 
+    # !~
+    elif condition['op'] == '!~':
+        flags = ''
+
+        m = re.match('/(.*)/$', condition['value'])
+        if m:
+            condition['value'] = m.group(1)
+
+        m = re.match('/(.*)/i$', condition['value'])
+        if m:
+            condition['value'] = m.group(1)
+            flags = ', re.IGNORECASE'
+
+        ret += '(not ' + key + ' in ' + var + ' or not re.search(' + repr('(' + condition['value'] + ')') + ', ' + var + '[' + key + ']' + flags + '))'
+
     # eval(...)
     elif condition['op'] == 'eval':
         ret += compile_eval(condition['key'], condition, stat) + " not in ('', 'false', 'no', '0', None)"
