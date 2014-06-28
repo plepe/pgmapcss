@@ -13,6 +13,10 @@ def parse_defines(stat, to_parse):
         if define_type == 'import':
             current = {}
             parse_url(current, to_parse)
+
+            if not to_parse.match('\s*;'):
+                raise ParseError(to_parse, 'Error parsing @import statement, expecing ";" or "}"')
+
             return ( 'import', current['value'] )
 
         elif define_type == 'media':
