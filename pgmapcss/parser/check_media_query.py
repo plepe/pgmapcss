@@ -9,8 +9,12 @@ def check_media_query(stat, to_parse, query):
     match = False
     for q1 in query:
         match1 = True
+        negated1 = False
 
-        for q in q1:
+        if q1[0] == 'NOT':
+            negated1 = True
+
+        for q in q1[1:]:
             m1 = False
 
 # add here all queries that are (or might be) True
@@ -29,13 +33,12 @@ def check_media_query(stat, to_parse, query):
                     if len(VERSION_INFO) < i or (type(VERSION_INFO[i]) == int and VERSION_INFO[i] > int(v)):
                         m1 = False
 
-            if q[2] and q[2] == 'not':
-                m1 = not m1
-
             if not m1:
                 match1 = False
 
-        if match1:
+        if match1 and not negated1:
+            match = True
+        if not match1 and negated1:
             match = True
 
     if match:
