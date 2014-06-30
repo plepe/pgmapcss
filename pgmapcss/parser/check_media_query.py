@@ -33,6 +33,9 @@ def check_media_query(stat, to_parse, query):
                     if len(VERSION_INFO) < i or (type(VERSION_INFO[i]) == int and VERSION_INFO[i] > int(v)):
                         m1 = False
 
+            elif q[0] == 'type':
+                m1 = True
+
             if not m1:
                 match1 = False
 

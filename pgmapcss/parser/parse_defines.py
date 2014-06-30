@@ -37,7 +37,14 @@ def parse_defines(stat, to_parse):
                     parse_mode = 1
 
                 if parse_mode == 1:
-                    if to_parse.match('\s*\(\s*([a-zA-Z\-0-9]+)\s*(:\s*([^\)]+))?\s*\)'):
+                    if to_parse.match('\s*([a-zA-Z\-0-9]+)'):
+                        query[-1].append((
+                            'type',
+                            to_parse.match_group(1)
+                        ))
+                        parse_mode = 2
+
+                    elif to_parse.match('\s*\(\s*([a-zA-Z\-0-9]+)\s*(:\s*([^\)]+))?\s*\)'):
                         query[-1].append((
                             to_parse.match_group(1),
                             to_parse.match_group(3)
@@ -45,7 +52,7 @@ def parse_defines(stat, to_parse):
                         parse_mode = 2
 
                     else:
-                        raise ParseError(to_parse, 'Error parsing @media query, expecting feature query')
+                        raise ParseError(to_parse, 'Error parsing @media query, expecting feature or type query')
 
                 if parse_mode == 2:
                     if to_parse.match('\s*({|and|,)'):
