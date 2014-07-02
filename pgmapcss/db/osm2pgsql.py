@@ -250,7 +250,7 @@ def objects_members(relation_id, parent_type, parent_conditions):
         ret['link_tags'] = member
         yield ret
 
-def objects_near(max_distance, ob, parent_selector, where_clause):
+def objects_near(max_distance, ob, parent_selector, where_clause, check_geo=None):
     if ob:
         geom = ob['geo']
     else:
@@ -259,10 +259,19 @@ def objects_near(max_distance, ob, parent_selector, where_clause):
     max_distance = to_float(eval_metric([ max_distance, 'u' ]))
     if max_distance is None:
         return []
+    elif max_distance == 0:
+        bbox = geom
+    else:
+        plan = plpy.prepare('select ST_Buffer(ST_Envelope($1), $2) as r', ['geometry', 'float'])
+        res = plpy.execute(plan, [ geom, max_distance ])
+        bbox = res[0]['r']
 
-    plan = plpy.prepare('select ST_Buffer(ST_Envelope($1), $2) as r', ['geometry', 'float'])
-    res = plpy.execute(plan, [ geom, max_distance ])
-    bbox = res[0]['r']
+    if check_geo == 'within':
+        where_clause += " and ST_DWithin(way, $2, 0.0)"
+    elif check_geo == 'surrounds':
+        where_clause += " and ST_DWithin($2, way, 0.0)"
+    elif check_geo == 'overlaps':
+        where_clause += " and ST_Overlaps($2, way)"
 
     obs = []
     for ob in objects(

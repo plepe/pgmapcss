@@ -30,6 +30,14 @@ def compile_condition_sql(condition, statement, stat, prefix='current.', filter=
     if condition['op'] == 'eval':
         return None
 
+    # ignore pseudo classes
+    if condition['op'] == 'pseudo_class':
+        return None
+
+    # eval() statements
+    if condition['op'] in ('key_regexp', 'key_regexp_case'):
+        return None
+
     # value-eval() statements
     if condition['value_type'] == 'eval':
         # treat other conditions as has_key
@@ -38,6 +46,13 @@ def compile_condition_sql(condition, statement, stat, prefix='current.', filter=
     # =
     if condition['op'] == '=':
         ret += prefix + 'tags @> ' + db.format({ condition['key']: condition['value'] })
+
+    # @=
+    if condition['op'] == '@=' and condition['value_type'] == 'value':
+        ret += '(' + ' or '.join([
+            prefix + 'tags @> ' + db.format({ condition['key']: v })
+            for v in condition['value'].split(';')
+            ]) + ')'
 
     else:
         return prefix + 'tags ? ' + db.format(condition['key']);

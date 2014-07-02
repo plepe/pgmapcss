@@ -26,15 +26,23 @@ def parse_selector_part(to_parse, object_class_selector='\*|[a-z_]+'):
         last_pos = to_parse.pos()
 
 # parse classes
-        if to_parse.match('\.([a-zA-Z0-9_]+)'):
+        if to_parse.match('(!?)\.([a-zA-Z0-9_]+)'):
             if 'classes' in current:
                 pass
             else:
                 current['classes'] = []
 
-            current['classes'].append(to_parse.match_group(1))
+            condition = {
+                'op': 'has_tag',
+                'key': '.' + to_parse.match_group(2)
+            }
 
-            current['conditions'].append({ 'op': 'has_tag', 'key': '.' + to_parse.match_group(1) })
+            if to_parse.match_group(1) == '!':
+                condition['op'] = '! has_tag'
+            else:
+                current['classes'].append(to_parse.match_group(2))
+
+            current['conditions'].append(condition)
 
 # parse zoom level
         if to_parse.match('\|z([0-9]*)(-?)([0-9]*)'):
@@ -54,13 +62,16 @@ def parse_selector_part(to_parse, object_class_selector='\*|[a-z_]+'):
                 current['conditions'].append(result)
 
 # parse pseudo classes
-        if to_parse.match(':([a-zA-Z0-9_]+)'):
-            if 'pseudo_classes' in current:
-                pass
-            else:
-                current['pseudo_classes'] = []
+        if to_parse.match('(!?):([a-zA-Z0-9_]+)'):
+            condition = {
+                'op': 'pseudo_class',
+                'key': to_parse.match_group(2)
+            }
 
-            current['pseudo_classes'].append(to_parse.match_group(1))
+            if to_parse.match_group(1) == '!':
+                condition['op'] = '! pseudo_class'
+
+            current['conditions'].append(condition)
 
 # parse pseudo element
         if to_parse.match('::(\(?)([a-zA-Z0-9_\*\-]+)(\)?)'):
@@ -81,7 +92,9 @@ def parse_selectors(selectors, to_parse):
         sel3 = None
 
         try:
-            sel2 = parse_selector_part(to_parse, '>|<|near')
+            sel2 = parse_selector_part(to_parse, '>|<|near|∈|within|∋|surrounds|⧉|overlaps')
+            if sel2['type'] in ('∈', '⧉', '∋'):
+                sel2['type'] = { '∈': 'within', '⧉': 'overlaps', '∋': 'surrounds' }[sel2['type']]
         except ParseError:
             pass
 

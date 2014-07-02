@@ -1,6 +1,7 @@
 import pgmapcss.db as db
 import re
 from .compile_eval import compile_eval
+from .compile_pseudo_class_condition import compile_pseudo_class_condition
 
 def compile_condition(condition, stat, var="current['tags']"):
     ret = ''
@@ -52,6 +53,13 @@ def compile_condition(condition, stat, var="current['tags']"):
     elif condition['op'] == '~=':
         ret += final_value + ' in ' + var + '.get(' + key + ", '').split(';')"
 
+    # @=
+    elif condition['op'] == '@=':
+        if condition['value_type'] == 'value':
+            ret += var + '.get(' + key + ") in " + repr(set(condition['value'].split(';')))
+        else:
+            ret += var + '.get(' + key + ") in " + final_value + '.split(";")'
+
     # =~
     elif condition['op'] == '=~':
         flags = ''
@@ -67,9 +75,34 @@ def compile_condition(condition, stat, var="current['tags']"):
 
         ret += '(' + key + ' in ' + var + ' and re.search(' + repr('(' + condition['value'] + ')') + ', ' + var + '[' + key + ']' + flags + '))'
 
+    # !~
+    elif condition['op'] == '!~':
+        flags = ''
+
+        m = re.match('/(.*)/$', condition['value'])
+        if m:
+            condition['value'] = m.group(1)
+
+        m = re.match('/(.*)/i$', condition['value'])
+        if m:
+            condition['value'] = m.group(1)
+            flags = ', re.IGNORECASE'
+
+        ret += '(not ' + key + ' in ' + var + ' or not re.search(' + repr('(' + condition['value'] + ')') + ', ' + var + '[' + key + ']' + flags + '))'
+
     # eval(...)
     elif condition['op'] == 'eval':
         ret += compile_eval(condition['key'], condition, stat) + " not in ('', 'false', 'no', '0', None)"
+
+    elif condition['op'] == 'pseudo_class':
+        ret += compile_pseudo_class_condition(condition, stat)
+
+    elif condition['op'] in ('key_regexp', 'key_regexp_case'):
+        flags = ''
+        if condition['op'] == 'key_regexp_case':
+            flags = ', re.IGNORECASE'
+
+        ret += 'len([ k for k, v in ' + var + '.items() if re.search(' + repr(condition['key']) + ', k' + flags + ') ])'
 
     # unknown operator?
     else:

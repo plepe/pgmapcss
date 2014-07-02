@@ -42,11 +42,14 @@ The type of an object is retrieved from the 'types'-array in object-value (see [
 * Compatibility MapCSS 0.2: YES
 
 === Class selector ===
-After the type selector, separated by '.'. Optional.
+After the type selector, separated by '.'. Optional. Can be negated by prepending with '!'.
 
 Example:
 {{{
 way.minor_road {
+  ...
+}
+way!.minor_road {
   ...
 }
 }}}
@@ -86,12 +89,22 @@ The tag 'osm_id' will be set to the ID of the object.
 | $= | Suffix match. Value ends with 'string', e.g. {{{[name$=dorf]}}} matches "Enzersdorf". | no standard
 | *= | Substring match. Value contains 'string', e.g. {{{[name*=ob]}}} matches "Foobar". | no standard
 | ~~= | List membership. Tag value consits of a list of ;-separated values. E.g. {{{[amenity~=atm]}}} matches {{{amenity=atm;bank}}}. | no standard
-| =~ | Regular expression match. Value matches given regular expression, e.g. {{{[highway=~/.*ary/]}}} matches primary. Use {{{[highway=~/.*ary/i]}}} for case insensitive matches. | MapCSS 0.2¹
+| =~ | Regular expression match. Value matches given regular expression, e.g. {{{[highway=~/.*ary/]}}} matches primary. Use {{{[highway=~/.*ary/i]}}} for case insensitive matches. For compatibility with JOSM also accepts {{{[highway=~/(?i).*ary/]}}} for case insensitive matches. | MapCSS 0.2¹
+| !~ | Negated regular expression match. Value matches all but given regular expression, e.g. {{{[highway!~/.*ary/]}}} matches residential but not primary. Use {{{[highway!~/.*ary/i]}}} for case insensitive matches. | JOSM
+| @= | List match. Tag value must exactly match one of the values of the specified list, e.g. {{{[highway@=primary;secondary;tertiary]}}}. | no standard
 
 * You can prepend any of the expressions with ! to negate match, e.g. {{{[amenity*=bank][!amenity*=atm]}}} matches amenity=bank, amenity=bank;post_office but not amenity=bank;atm.
 * As value you may use an eval-statement as in the properties (see below) (except 'Regular expression match). E.g. {{{node[place=city][population>eval(100*100)]}}}
 
 ¹ MapCSS 0.2 does not define case insensitive matches.
+
+You can test whether the value of a tag is logical truth value ("yes", "true", "1") or logical falsehood value ("no", "false", "0", ""). You can also prefix the condition by {{{!}}} to invert match; this will also match if the tag is not set, therefore you might want to combine conditions with tag existance match, e.g. {{{[bridge][!bridge?!]}}} will match all map features which have a bridge tag but not a falsehood value.
+
+|= Condition |= Description |= Example |= Compatibility
+| {{{[tag?]}}} | Testing for truth value | {{{[building?]}}} | no standard, JOSM
+| {{{[tag?!]}}} | Testing for falsehood value | {{{[wheelchair?!]}}}| no standard, JOSM
+| {{{[!tag?]}}} | Testing for any value which is not truth value (not really useful?) || no standard, JOSM
+| {{{[!tag?!]}}} | Testing for any value which is not falsehood value (very useful, as many tags in OSM allow either 'yes' or a custom value like 'bridge=swing' | {{{[!bridge?!]}}}| no standard, JOSM
 
 ==== Eval expression ====
 Additionally you can use an eval()-statement as selector, e.g.
@@ -112,13 +125,19 @@ This makes sure that the highway's name matches the streetname of the address no
 |= Condition |= Description
 | [key] | Tests whether object has tag 'key'.
 | [!key] | Tests whether no 'key' is present.
+| [/^addr:/] | Presence of tag by regular expression (can be negated; add 'i' after regular expression for case insensitivity)
 
 * Compatibility MapCSS 0.2: PARTLY, no check for 'no/false' yet
 
 === Pseudo classes ===
-After the condition selector(s), separated by ':'. Several pseudo classes may be specified. Optional.
+After the condition selector(s), separated by ':'. Several pseudo classes may be specified. They can also be negated by prepending by '!', e.g. '!:closed'. Optional.
 
 Pseudo classes will be parsed, but as no pseudo classes are supported yet, the concerened rules will be simply disabled.
+
+The following pseudo classes are supported:
+|= pseudo class |= Description
+| :active | supported for compatibility with MapCSS 0.2; always treated as 'false'
+| :hover | supported for compatibility with MapCSS 0.2; always treated as 'false'
 
 === Pseudo elements ===
 After the pseudo class(es), separated by '::'. Optional.
@@ -195,7 +214,37 @@ The following link tags will be set:
 * index: the nth parent object near the current feature (starting with 1, the closest parent object).
 * distance: distance between the objects in pixels.
 
-Note: If no condition on link tag 'distance' with '<' or "<=' is used (e.g. {{{distance<50}}}), features intersecting a bounding box of 100px around the child object will be found.
+Note: If no condition on link tag 'distance' with '<' or '<=' or '=' is used (e.g. {{{distance<50}}}), features intersecting a bounding box of 100px around the child object will be found.
+
+==== '∈' or 'within' ====
+Objects which are within another object.
+
+Example (which will colorize all buildings which have a housenumber node inside):
+{{{
+node[addr:housenumber] ∈ area[building] {
+  fill-color: red;
+}
+}}}
+
+==== '∋' or 'surrounds' ====
+Objects which surround another object.
+
+Example (which will label all housenumber inside buildings):
+{{{
+area[building] ∋ node[addr:housenumber] {
+  text: eval(tag('addr:housenumber'));
+}
+}}}
+
+==== '⧉' or 'overlaps' ====
+Objects which overlap (share space, but are not completely contained by each other).
+
+Example (highlight highway areas, e.g. pedestrian, which overlap parks):
+{{{
+area[leisure=park] overlaps area[highway] {
+    fill-color: red;
+}
+}}}
 
 == Properties ==
 You may specify arbitrary properties. They will be treated as text values. Declarations are written by enclosing a set of style specifiers in curly braces.

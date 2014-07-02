@@ -1,6 +1,7 @@
 from .parse_string import parse_string
 from .parse_eval import parse_eval
 from .ParseError import *
+import re
 
 def parse_condition(to_parse):
     condition = { 'op': '', 'value_type': 'value' }
@@ -26,11 +27,31 @@ def parse_condition(to_parse):
     elif to_parse.match('([a-zA-Z_0-9\\-\.:]+)'):
         condition['key'] = to_parse.match_group(1)
 
+    elif to_parse.match('\/([^\]]*)\/(i?)\]'):
+        condition['op'] += 'key_regexp'
+        condition['key'] = to_parse.match_group(1)
+
+        if to_parse.match_group(2) == 'i':
+            condition['op'] += '_case'
+
+        return condition
+
     else:
         raise ParseError(to_parse, 'parse condition: Can\'t parse condition key')
 
-    if to_parse.match('(=~|!=|<=|>=|<|>|\^=|\$=|\*=|~=|=)'):
+    if to_parse.match('(=~|!=|!~|<=|>=|<|>|\^=|\$=|\*=|~=|@=|=)'):
         condition['op'] += to_parse.match_group(1)
+
+    elif to_parse.match('\?\]'):
+        condition['value'] = 'yes;true;1'
+        condition['op'] += '@='
+        return condition
+
+    elif to_parse.match('\?\!\]'):
+        condition['value'] = 'no;false;0;'
+        condition['op'] += '@='
+        return condition
+
     else:
         condition['op'] += 'has_tag'
 
