@@ -92,7 +92,9 @@ def parse_selectors(selectors, to_parse):
         sel3 = None
 
         try:
-            sel2 = parse_selector_part(to_parse, '>|<|near')
+            sel2 = parse_selector_part(to_parse, '>|<|near|∈|within|∋|surrounds|⧉|overlaps')
+            if sel2['type'] in ('∈', '⧉', '∋'):
+                sel2['type'] = { '∈': 'within', '⧉': 'overlaps', '∋': 'surrounds' }[sel2['type']]
         except ParseError:
             pass
 

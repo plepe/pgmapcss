@@ -215,6 +215,36 @@ The following link tags will be set:
 
 Note: If no condition on link tag 'distance' with '<' or '<=' or '=' is used (e.g. {{{distance<50}}}), features intersecting a bounding box of 100px around the child object will be found.
 
+==== '∈' or 'within' ====
+Objects which are within another object.
+
+Example (which will colorize all buildings which have a housenumber node inside):
+{{{
+node[addr:housenumber] ∈ area[building] {
+  fill-color: red;
+}
+}}}
+
+==== '∋' or 'surrounds' ====
+Objects which surround another object.
+
+Example (which will label all housenumber inside buildings):
+{{{
+area[building] ∋ node[addr:housenumber] {
+  text: eval(tag('addr:housenumber'));
+}
+}}}
+
+==== '⧉' or 'overlaps' ====
+Objects which overlap (share space, but are not completely contained by each other).
+
+Example (highlight highway areas, e.g. pedestrian, which overlap parks):
+{{{
+area[leisure=park] overlaps area[highway] {
+    fill-color: red;
+}
+}}}
+
 == Properties ==
 You may specify arbitrary properties. They will be treated as text values. Declarations are written by enclosing a set of style specifiers in curly braces.
 
