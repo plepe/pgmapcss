@@ -24,7 +24,7 @@ def compile_link_selector(statement, stat):
         distance = { 'value': '100' }
 
         for r in statement['link_selector']['conditions']:
-            if r['key'] == 'distance' and r['op'] in ('<', '<='):
+            if r['key'] == 'distance' and r['op'] in ('<', '<=', '='):
                 distance = r
 
         if distance.get('value_type') == 'eval':

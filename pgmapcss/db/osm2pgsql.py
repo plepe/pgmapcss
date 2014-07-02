@@ -259,10 +259,12 @@ def objects_near(max_distance, ob, parent_selector, where_clause):
     max_distance = to_float(eval_metric([ max_distance, 'u' ]))
     if max_distance is None:
         return []
-
-    plan = plpy.prepare('select ST_Buffer(ST_Envelope($1), $2) as r', ['geometry', 'float'])
-    res = plpy.execute(plan, [ geom, max_distance ])
-    bbox = res[0]['r']
+    elif max_distance == 0:
+        bbox = geom
+    else:
+        plan = plpy.prepare('select ST_Buffer(ST_Envelope($1), $2) as r', ['geometry', 'float'])
+        res = plpy.execute(plan, [ geom, max_distance ])
+        bbox = res[0]['r']
 
     obs = []
     for ob in objects(

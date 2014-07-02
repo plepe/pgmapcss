@@ -213,7 +213,7 @@ The following link tags will be set:
 * index: the nth parent object near the current feature (starting with 1, the closest parent object).
 * distance: distance between the objects in pixels.
 
-Note: If no condition on link tag 'distance' with '<' or "<=' is used (e.g. {{{distance<50}}}), features intersecting a bounding box of 100px around the child object will be found.
+Note: If no condition on link tag 'distance' with '<' or '<=' or '=' is used (e.g. {{{distance<50}}}), features intersecting a bounding box of 100px around the child object will be found.
 
 == Properties ==
 You may specify arbitrary properties. They will be treated as text values. Declarations are written by enclosing a set of style specifiers in curly braces.
