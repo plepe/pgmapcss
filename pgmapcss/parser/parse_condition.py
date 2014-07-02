@@ -27,6 +27,15 @@ def parse_condition(to_parse):
     elif to_parse.match('([a-zA-Z_0-9\\-\.:]+)'):
         condition['key'] = to_parse.match_group(1)
 
+    elif to_parse.match('\/([^\]]*)\/(i?)\]'):
+        condition['op'] += 'key_regexp'
+        condition['key'] = to_parse.match_group(1)
+
+        if to_parse.match_group(2) == 'i':
+            condition['op'] += '_case'
+
+        return condition
+
     else:
         raise ParseError(to_parse, 'parse condition: Can\'t parse condition key')
 

@@ -34,6 +34,10 @@ def compile_condition_sql(condition, statement, stat, prefix='current.', filter=
     if condition['op'] == 'pseudo_class':
         return None
 
+    # eval() statements
+    if condition['op'] in ('key_regexp', 'key_regexp_case'):
+        return None
+
     # value-eval() statements
     if condition['value_type'] == 'eval':
         # treat other conditions as has_key

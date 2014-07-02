@@ -125,6 +125,7 @@ This makes sure that the highway's name matches the streetname of the address no
 |= Condition |= Description
 | [key] | Tests whether object has tag 'key'.
 | [!key] | Tests whether no 'key' is present.
+| [/^addr:/] | Presence of tag by regular expression (can be negated; add 'i' after regular expression for case insensitivity)
 
 * Compatibility MapCSS 0.2: PARTLY, no check for 'no/false' yet
 

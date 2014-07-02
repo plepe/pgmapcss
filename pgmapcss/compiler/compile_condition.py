@@ -97,6 +97,13 @@ def compile_condition(condition, stat, var="current['tags']"):
     elif condition['op'] == 'pseudo_class':
         ret += compile_pseudo_class_condition(condition, stat)
 
+    elif condition['op'] in ('key_regexp', 'key_regexp_case'):
+        flags = ''
+        if condition['op'] == 'key_regexp_case':
+            flags = ', re.IGNORECASE'
+
+        ret += 'len([ k for k, v in ' + var + '.items() if re.search(' + repr(condition['key']) + ', k' + flags + ') ])'
+
     # unknown operator?
     else:
       print('unknown condition operator: {op} (key: {key}, value: {value})'.format(**condition))
