@@ -95,6 +95,8 @@ If you read a number, unit conversion takes place. The following units are suppo
 | natsort | list | list | Orders list by a 'natural' sort order.
 | min | list | number | Returns lowest of the input values.
 | max | list | number | Returns highest of the input values.
+| reverse | list | list | returns the list in reverse order
+| range | start:number, end:number[, stop:number] | list | returns a list of numbers, starting with start and ending with end increased by step (default: 1)
 
 == Color functions ==
 Mapnik < 3.0 can't read dynamic color values. Therefore pgmapcss has to know all possible colors during preprocessing and create styles. pgmapcss can't guess the results of eval()-functions, therefore those should not be used.
