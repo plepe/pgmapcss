@@ -386,6 +386,12 @@ Examples:
 }
 }}}
 
+== Config option ==
+Config options can be set by using {{{@config config_option config_value;}}}. The following config options are supported:
+
+|= Config option |= Description |= Possible values
+| josm_classes | when 'true', a {{{set foo;}}} statement will also set the class foo (synonymous to {{{set .foo;}}}) | 'true' or 'false' (default)
+
 == Define Type of property ==
 The type of a property is specified by:
 {{{

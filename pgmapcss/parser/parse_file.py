@@ -17,6 +17,7 @@ def parse_file(stat, filename=None, base_style=None, content=None):
     if not 'statements' in stat:
         stat['statements'] = []
         stat['defines'] = {}
+        stat['config'] = {}
 
     media = None # !None while in a media query
 

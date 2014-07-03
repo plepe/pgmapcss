@@ -149,9 +149,19 @@ def stat_add_generated_property(key, keys, fun, stat):
 
     stat['generated_properties'][key] = ( keys, fun )
 
-def _has_set_tag(statement, key):
+def _has_set_tag(statement, key, stat):
+    # JOSM classes ("set foo" => set ".foo" too)
+    key_no_dot = False
+    if stat['config'].get('josm_classes', '') == 'true' \
+      and key[0] == '.':
+        key_no_dot = key[1:]
+
     for prop in statement['properties']:
         if prop['assignment_type'] == 'T' and prop['key'] == key:
+            return True
+
+        # JOSM classes ("set foo" => set ".foo" too)
+        if key_no_dot and prop['assignment_type'] == 'T' and prop['key'] == key_no_dot:
             return True
 
     return False
@@ -163,5 +173,5 @@ def stat_filter_statements(stat, filter):
         if not 'min_scale' in filter or statement['selector']['min_scale'] <= filter['min_scale']
         if not 'max_scale' in filter or filter['max_scale'] == None or statement['selector']['max_scale'] == None or statement['selector']['max_scale'] >= filter['max_scale']
         if not 'max_id' in filter or statement['id'] <= filter['max_id']
-        if not 'has_set_tag' in filter or _has_set_tag(statement, filter['has_set_tag'])
+        if not 'has_set_tag' in filter or _has_set_tag(statement, filter['has_set_tag'], stat)
     ]

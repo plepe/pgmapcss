@@ -18,10 +18,23 @@ def compile_properties(statement, stat, indent=''):
 
         elif prop['assignment_type'] == 'T':
             c = compile_value(prop, stat)
-            ret += indent + "current['tags']" +\
+            ret += indent
+
+            # JOSM classes ("set foo" => set ".foo" too)
+            if stat['config'].get('josm_classes', '') == 'true' \
+              and prop['key'][0] != '.':
+                ret += "current['tags']" +\
+                    '[' + repr('.' + prop['key']) + '] = '
+
+            ret += "current['tags']" +\
                 '[' + repr(prop['key']) + '] = ' + c + '\n'
 
         elif prop['assignment_type'] == 'U':
+            # JOSM classes ("set foo" => set ".foo" too)
+            if stat['config'].get('josm_classes', '') == 'true' \
+              and prop['key'][0] != '.':
+                ret += indent + "current['tags'].pop(" + repr('.' + prop['key']) + ', None)\n'
+
             ret += indent + "current['tags'].pop(" + repr(prop['key']) + ', None)\n'
 
         elif prop['assignment_type'] == 'C':
