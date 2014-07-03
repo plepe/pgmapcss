@@ -84,8 +84,8 @@ If you read a number, unit conversion takes place. The following units are suppo
 | get | list, int | value | Returns the n-th element of the list (counting starts at 0)
 | set | list, int , value | list | Sets the n-th element of the list to value
 | push | list, value | list | Appends value to list
-| split | string, string | list | Split the 1st string at occurences of the separator string (2nd string), e.g. split("Alice and Bob", " ") -> "Alice;and;Bob"
-| join | list, string | string | Join the list by the string, e.g. join("Alice;Bob", " and ") -> "Alice and Bob"
+| split | string, string | list | Split the 2nd string at occurences of the separator string (1nd string), e.g. split(" ", "Alice and Bob") -> "Alice;and;Bob". WARNING: order of parameters has changed from version 0.7 and below.
+| join | string, list | string | Join the list by the string, e.g. join(" and ", "Alice;Bob") -> "Alice and Bob". WARNING: order of parameters has changed from version 0.7 and below.
 | count | list | number | Returns count of elements in the list
 | contains | list, value | boolean | Check if list contains value.
 | search | list, value | number/boolean | Returns (first) index of value in list or //none// if not found.
