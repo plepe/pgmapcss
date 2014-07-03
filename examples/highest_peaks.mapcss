@@ -1,7 +1,7 @@
 /* For every peak find all other peaks in a distance of max. 128px and
    build a list of the other peak's elevation in tag 'near_ele' */
 node[natural=peak] near[distance<128] node[natural=peak] {
-  set near_ele = eval(push(tag(near_ele), parent_tag(ele)));
+  set near_ele = eval(append(tag(near_ele), parent_tag(ele)));
 }
 
 /* For every peak calculate the max elevation of the nearby peaks and save in
@@ -12,7 +12,7 @@ node[natural=peak] {
 
 /* For debugging you could uncomment the following row. It print the elevation
    of nearby peaks into a second second row. */
-// text: eval(concat(tag(name), ' ', tag(ele), '\n(', join(tag(near_ele), ', '), ')'));
+// text: eval(concat(tag(name), ' ', tag(ele), '\n(', join(', ', tag(near_ele)), ')'));
   z-index: 4;
 
   icon-image: triangle;

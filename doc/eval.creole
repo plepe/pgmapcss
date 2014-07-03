@@ -75,25 +75,28 @@ If you read a number, unit conversion takes place. The following units are suppo
 | or | value, [value, [value, ...]] | boolean | logical or | no standard
 | not | value | boolean | logical not | no standard
 | substr | text string, int start, [int length] | text | Return part of a string. The string will start at the start'th position (counting from zero). If start is negative, the returned string will start at the start'th charactor from the end of the string. If length is given and is positive, the string returned will contain at most length characters, beginning from start. If length is given and negative, the returned string will stop at the length'th character from the end of the string. Example: substr('abcde', 2, 2) => 'cd'; substr('abcde', -4, -2) => 'bc'; substr('abcde', 1) => 'bcde' | no standard
+| join | string, string, string[, ...] | string | Join the list of strings (starting at the 2nd string) by the 1st string (the separator), e.g. join(" and ", "Alice", "Bob") -> "Alice and Bob".
 
 === List functions ===
-* List functions are not part of the MapCSS 0.2 standard
+* List functions are not part of the MapCSS 0.2 standard, but follow the [[http://wiki.openstreetmap.org/wiki/MapCSS/0.2/Proposal_lists|proposal for lists]]
 
 |= Function |= Parameters |= Return value |= Description
 | list | value, [value, [value, ...]] | list | Returns a list from all input values. E.g. list("Alice", "Bob") -> "Alice;Bob"
 | get | list, int | value | Returns the n-th element of the list (counting starts at 0)
 | set | list, int , value | list | Sets the n-th element of the list to value
-| push | list, value | list | Appends value to list
-| split | string, string | list | Split the 1st string at occurences of the separator string (2nd string), e.g. split("Alice and Bob", " ") -> "Alice;and;Bob"
-| join | list, string | string | Join the list by the string, e.g. join("Alice;Bob", " and ") -> "Alice and Bob"
+| append | list, value | list | Appends value to list
+| split | string, string | list | Split the 2nd string at occurences of the separator string (1nd string), e.g. split(" ", "Alice and Bob") -> "Alice;and;Bob". WARNING: order of parameters has changed from version 0.7 and below.
+| join | string, list | string | Join the list by the string, e.g. join(" and ", "Alice;Bob") -> "Alice and Bob". WARNING: order of parameters has changed from version 0.7 and below.
 | count | list | number | Returns count of elements in the list
 | contains | list, value | boolean | Check if list contains value.
-| search | list, value | number/boolean | Returns (first) index of value in list or 'false' if not found.
+| search | list, value | number/boolean | Returns (first) index of value in list or //none// if not found.
 | unique | list | list | Removes duplicate values from a list.
 | sort | list | list | Orders list alphabetically ascending.
 | natsort | list | list | Orders list by a 'natural' sort order.
 | min | list | number | Returns lowest of the input values.
 | max | list | number | Returns highest of the input values.
+| reverse | list | list | returns the list in reverse order
+| range | start:number, end:number[, stop:number] | list | returns a list of numbers, starting with start and ending with end increased by step (default: 1)
 
 == Color functions ==
 Mapnik < 3.0 can't read dynamic color values. Therefore pgmapcss has to know all possible colors during preprocessing and create styles. pgmapcss can't guess the results of eval()-functions, therefore those should not be used.

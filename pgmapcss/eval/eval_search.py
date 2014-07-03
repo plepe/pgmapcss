@@ -10,7 +10,7 @@ def eval_search(param):
     try:
         return str(l.index(param[1]))
     except ValueError:
-        return 'false'
+        return ''
 
 # TESTS
 # IN ['pizza;kebab;noodles', 'pizza']
@@ -18,4 +18,4 @@ def eval_search(param):
 # IN ['pizza;kebab;noodles', 'noodles']
 # OUT '2'
 # IN ['pizza;kebab;noodles', 'burger']
-# OUT 'false'
+# OUT ''
