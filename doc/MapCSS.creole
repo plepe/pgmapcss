@@ -386,6 +386,11 @@ Examples:
 }
 }}}
 
+== Config option ==
+Config options can be set by using {{{@config config_option config_value;}}}. The following config options are supported:
+
+|= Config option |= Description |= Possible values
+
 == Define Type of property ==
 The type of a property is specified by:
 {{{

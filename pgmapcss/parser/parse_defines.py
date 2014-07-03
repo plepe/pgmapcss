@@ -44,6 +44,20 @@ def parse_defines(stat, to_parse):
                     elif to_parse.match('\s*,\s*'):
                         query.append([])
 
+        elif define_type == 'config':
+            if not to_parse.match('\s*([A-Za-z0-9_\-]*)\s+'):
+                # TODO: error
+                return
+
+            key = to_parse.match_group(1)
+            current = {}
+            parse_value(current, to_parse)
+
+            stat['config'][key] = current['value']
+
+            if not to_parse.match('\s*;'):
+                raise ParseError(to_parse, 'Error parsing config option, expecing ;')
+
         else:
             if not to_parse.match('\s*([A-Za-z0-9_\-]*)\s+'):
                 # TODO: error
