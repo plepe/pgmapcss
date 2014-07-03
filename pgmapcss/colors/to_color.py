@@ -1,13 +1,17 @@
+# Note: JOSM accepted "named" colors, e.g. "building#004400" -> ignore string before color hash
 def to_color(value):
     import re
 
     if value is None:
         return None
 
-    if re.match('#[a-fA-F0-9]{6,8}', value):
-        return value
+    m = re.match('[\w_]*(#[a-fA-F0-9]{6,8})', value)
+    if m:
+        return m.group(1)
 
-    if re.match('#[a-fA-F0-9]{3,4}', value):
+    m = re.match('[\w_]*(#[a-fA-F0-9]{3,4})', value)
+    if m:
+        value = m.group(1)
         r = '#'
         for i in range(1, len(value)):
             r += value[i] + value[i]

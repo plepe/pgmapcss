@@ -5,6 +5,7 @@ from .icon import icon
 from .values import values
 from .pixels import pixels
 from .numeric import numeric
+from .dashes import dashes
 
 global classes
 classes = {
@@ -15,6 +16,7 @@ classes = {
     'values': values,
     'pixels': pixels,
     'numeric': numeric,
+    'dashes': dashes,
 }
 
 properties = {

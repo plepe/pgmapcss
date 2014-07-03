@@ -7,11 +7,11 @@ class pixels(default):
         if value is None:
             return None
 
-        m = re.match('(\-?[0-9]+(\.[0-9]+)?)(px|m|u)$', value)
+        m = re.match('([\-\+]?[0-9]+(\.[0-9]+)?)(px|m|u)$', value)
         if m:
             return ( m.group(1), m.group(3) )
 
-        m = re.match('(\-?[0-9]+(\.[0-9]+)?)$', value)
+        m = re.match('([\-\+]?[0-9]+(\.[0-9]+)?)$', value)
         if m:
             return ( m.group(1), 'px' )
 
@@ -23,6 +23,13 @@ class pixels(default):
 
         if v is None:
             return None
+
+        # relative value add/sub from value on default layer
+        if v[0][0] in ('-', '+'):
+            if v[1] == 'px':
+                return self.compile_check(compile_eval([ 'o:+', [ 'f:prop', 'v:' + prop['key'], 'v:default' ], 'v:' + v[0] ], prop, self.stat))
+            else:
+                return self.compile_check(compile_eval([ 'o:+', [ 'f:prop', 'v:' + prop['key'], 'v:default' ], [ 'f:metric', 'v:' + v[0] + v[1] ] ], prop, self.stat))
 
         if v[1] == 'px':
             return repr(v[0])
