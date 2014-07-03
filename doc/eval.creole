@@ -75,6 +75,7 @@ If you read a number, unit conversion takes place. The following units are suppo
 | or | value, [value, [value, ...]] | boolean | logical or | no standard
 | not | value | boolean | logical not | no standard
 | substr | text string, int start, [int length] | text | Return part of a string. The string will start at the start'th position (counting from zero). If start is negative, the returned string will start at the start'th charactor from the end of the string. If length is given and is positive, the string returned will contain at most length characters, beginning from start. If length is given and negative, the returned string will stop at the length'th character from the end of the string. Example: substr('abcde', 2, 2) => 'cd'; substr('abcde', -4, -2) => 'bc'; substr('abcde', 1) => 'bcde' | no standard
+| join | string, string, string[, ...] | string | Join the list of strings (starting at the 2nd string) by the 1st string (the separator), e.g. join(" and ", "Alice", "Bob") -> "Alice and Bob".
 
 === List functions ===
 * List functions are not part of the MapCSS 0.2 standard
