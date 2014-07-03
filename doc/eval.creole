@@ -78,7 +78,7 @@ If you read a number, unit conversion takes place. The following units are suppo
 | join | string, string, string[, ...] | string | Join the list of strings (starting at the 2nd string) by the 1st string (the separator), e.g. join(" and ", "Alice", "Bob") -> "Alice and Bob".
 
 === List functions ===
-* List functions are not part of the MapCSS 0.2 standard
+* List functions are not part of the MapCSS 0.2 standard, but follow the [[http://wiki.openstreetmap.org/wiki/MapCSS/0.2/Proposal_lists|proposal for lists]]
 
 |= Function |= Parameters |= Return value |= Description
 | list | value, [value, [value, ...]] | list | Returns a list from all input values. E.g. list("Alice", "Bob") -> "Alice;Bob"
