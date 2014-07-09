@@ -2,6 +2,7 @@ from .compile_statement import compile_statement
 from .compile_eval import compile_eval
 from .stat import *
 import copy
+import textwrap
 
 def print_checks(prop, stat, main_prop=None, indent=''):
     ret = ''
@@ -57,13 +58,23 @@ def check_{min_scale_esc}(object):
 # All statements
 '''.format(**replacement)
 
+    compiled_statements = []
     for i in statements:
         # create a copy of the statement and modify min/max scale
         i = copy.deepcopy(i)
         i['selector']['min_scale'] = min_scale
         i['selector']['max_scale'] = max_scale
 
-        ret += compile_statement(i, stat)
+        compiled_statements.append(compile_statement(i, stat))
+
+    for i in compiled_statements:
+        indent = '    '
+        if len(i['check']) > 0:
+            ret += indent + 'if ' + ' and '.join(i['check']) + ":\n"
+            indent += '    '
+
+        ret += textwrap.indent(i['body'], indent)
+        ret += "\n"
 
     ret += '''\
     # iterate over all pseudo-elements, sorted by 'object-z-index' if available

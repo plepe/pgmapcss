@@ -10,62 +10,58 @@ def and_join(lst):
 
     return ' and '.join(lst)
 
-def compile_statement(statement, stat, indent='    '):
-    ret = ''
-    check = []
+# returns
+# {
+#   'check': Check as list, e.g. ['highway=foo', '...'],
+#   'body': tags['foo'] = 'bar'
+# }
+def compile_statement(statement, stat, indent=''):
+    ret = { 'check': [], 'body': '' }
     object_selector = statement['selector']
 
-    media_selector = None
     if 'media' in statement:
-        media_selector = compile_media_query(statement['media'], stat)
+        ret['check'].append(compile_media_query(statement['media'], stat))
 
-    ret += indent + 'if '
-    if media_selector:
-        ret += media_selector + ' and '
-    check = compile_selector_part(object_selector, stat)
-    ret += '(' + and_join(check) + '):\n'
-    indent += '    '
+    ret['check'] += compile_selector_part(object_selector, stat)
 
     if 'link_selector' in statement:
-        ret += indent + 'for parent_index, parent_object in enumerate(' + compile_link_selector(statement, stat) + '):\n'
+        ret['body'] += indent + 'for parent_index, parent_object in enumerate(' + compile_link_selector(statement, stat) + '):\n'
 
         indent += '    '
-        ret += indent + "current['parent_object'] = parent_object\n"
-        ret += indent + "current['link_object'] = { 'tags': parent_object['link_tags'] }\n"
-        ret += indent + "current['link_object']['tags']['index'] = str(parent_index)\n"
-        ret += indent + 'if (' +\
+        ret['body'] += indent + "current['parent_object'] = parent_object\n"
+        ret['body'] += indent + "current['link_object'] = { 'tags': parent_object['link_tags'] }\n"
+        ret['body'] += indent + "current['link_object']['tags']['index'] = str(parent_index)\n"
+        ret['body'] += indent + 'if (' +\
           and_join(compile_conditions(statement['parent_selector']['conditions'], stat, "current['parent_object']['tags']")) +\
           ') and (' +\
           and_join(compile_conditions(statement['link_selector']['conditions'], stat, "current['link_object']['tags']")) + '):\n'
 
         indent += '    '
-        ret += indent + 'current[\'parent_object\'] = parent_object\n'
+        ret['body'] += indent + 'current[\'parent_object\'] = parent_object\n'
 
     # set current.pseudo_element_ind
     if object_selector['pseudo_element'] == '*':
         statement['current_pseudo_element'] = 'pseudo_element'
-        ret += indent + "for pseudo_element in current['pseudo_elements']:\n"
+        ret['body'] += indent + "for pseudo_element in current['pseudo_elements']:\n"
         indent += '    '
-        ret += indent + "current['pseudo_element'] = pseudo_element\n"
+        ret['body'] += indent + "current['pseudo_element'] = pseudo_element\n"
     else:
         statement['current_pseudo_element'] = repr(object_selector['pseudo_element'])
-        ret += indent + "current['pseudo_element'] = " + statement['current_pseudo_element'] + '\n'
+        ret['body'] += indent + "current['pseudo_element'] = " + statement['current_pseudo_element'] + '\n'
 
 # TODO: prop_type
-    ret += compile_properties(statement, stat, indent)
+    ret['body'] += compile_properties(statement, stat, indent)
 
     if object_selector['pseudo_element'] == '*':
         indent = indent[4:]
 
     if 'link_selector' in statement:
-        ret += indent + "current['parent_object'] = None\n"
+        ret['body'] += indent + "current['parent_object'] = None\n"
         indent = indent[8:]
 
 # create_pseudo_element
     if not 'create_pseudo_element' in object_selector or \
         object_selector['create_pseudo_element']:
-        ret += indent + "current['has_pseudo_element'][" + statement['current_pseudo_element'] + '] = True\n'
-
-    ret += '\n'
+        ret['body'] += indent + "current['has_pseudo_element'][" + statement['current_pseudo_element'] + '] = True\n'
 
     return ret
