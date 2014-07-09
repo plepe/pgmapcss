@@ -3,6 +3,7 @@ from .compile_eval import compile_eval
 from .stat import *
 import copy
 import textwrap
+from collections import Counter
 
 def print_checks(prop, stat, main_prop=None, indent=''):
     ret = ''
@@ -67,11 +68,38 @@ def check_{min_scale_esc}(object):
 
         compiled_statements.append(compile_statement(i, stat))
 
+    check_count = dict(Counter([
+        check
+        for c in compiled_statements
+        for check in c['check']
+    ]))
+
+    def sort_check_count(c):
+        return check_count[c]
+
+    indent = '    '
+    current_checks = []
     for i in compiled_statements:
-        indent = '    '
-        if len(i['check']) > 0:
-            ret += indent + 'if ' + ' and '.join(i['check']) + ":\n"
-            indent += '    '
+        checks = i['check']
+        checks.sort(key=sort_check_count, reverse=True)
+        combinable = True
+        for c in reversed(current_checks):
+            if not c in checks:
+                if combinable:
+                    indent = indent[4:]
+                    current_checks = current_checks[:-1]
+                else:
+                    indent = '    '
+                    current_checks = []
+                    break
+            else:
+                combinable = False
+
+        for c in checks:
+            if not c in current_checks:
+                current_checks += [ c ]
+                ret += indent + 'if ' + c + ":\n"
+                indent += '    '
 
         ret += textwrap.indent(i['body'], indent)
         ret += "\n"
