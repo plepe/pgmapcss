@@ -6,9 +6,6 @@ def compile_conditions(conditions, stat, var=''):
     for i in conditions:
         c = compile_condition(i, stat, var=var)
         if c:
-            ret.append(c)
+            ret += c
 
-    if len(ret) == 0:
-        return 'True'
-
-    return ' and '.join(ret)
+    return ret

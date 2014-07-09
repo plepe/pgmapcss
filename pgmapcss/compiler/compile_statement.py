@@ -4,8 +4,15 @@ from .compile_properties import compile_properties
 from .compile_conditions import compile_conditions
 from .compile_media_query import compile_media_query
 
+def and_join(lst):
+    if len(lst) == 0:
+        return 'True'
+
+    return ' and '.join(lst)
+
 def compile_statement(statement, stat, indent='    '):
     ret = ''
+    check = []
     object_selector = statement['selector']
 
     media_selector = None
@@ -15,7 +22,8 @@ def compile_statement(statement, stat, indent='    '):
     ret += indent + 'if '
     if media_selector:
         ret += media_selector + ' and '
-    ret += '(' + compile_selector_part(object_selector, stat) + '):\n'
+    check = compile_selector_part(object_selector, stat)
+    ret += '(' + and_join(check) + '):\n'
     indent += '    '
 
     if 'link_selector' in statement:
@@ -26,8 +34,9 @@ def compile_statement(statement, stat, indent='    '):
         ret += indent + "current['link_object'] = { 'tags': parent_object['link_tags'] }\n"
         ret += indent + "current['link_object']['tags']['index'] = str(parent_index)\n"
         ret += indent + 'if (' +\
-          compile_conditions(statement['parent_selector']['conditions'], stat, "current['parent_object']['tags']") + ') and (' +\
-          compile_conditions(statement['link_selector']['conditions'], stat, "current['link_object']['tags']") + '):\n'
+          and_join(compile_conditions(statement['parent_selector']['conditions'], stat, "current['parent_object']['tags']")) +\
+          ') and (' +\
+          and_join(compile_conditions(statement['link_selector']['conditions'], stat, "current['link_object']['tags']")) + '):\n'
 
         indent += '    '
         ret += indent + 'current[\'parent_object\'] = parent_object\n'
