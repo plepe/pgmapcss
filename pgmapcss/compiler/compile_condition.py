@@ -6,6 +6,7 @@ from .compile_pseudo_class_condition import compile_pseudo_class_condition
 def compile_condition(condition, stat, var="current['tags']"):
     ret = ''
     final_value = None
+    negate = False
 
     if 'value_type' in condition and condition['value_type'] == 'eval':
         final_value = compile_eval(condition['value'], condition, stat)
@@ -17,7 +18,7 @@ def compile_condition(condition, stat, var="current['tags']"):
 
     # !
     if condition['op'][0:2] == '! ':
-        ret += 'not '
+        negate = True
         condition['op'] = condition['op'][2:]
 
     # has_tag
@@ -26,11 +27,11 @@ def compile_condition(condition, stat, var="current['tags']"):
 
     # =
     elif condition['op'] == '=':
-        ret += var + '.get(' + key + ") == " + final_value
+        ret += key + ' in ' + var + ' and ' + var + '[' + key + '] == ' + final_value
 
     # !=
     elif condition['op'] == '!=':
-        ret += var + '.get(' + key + ") != " + final_value
+        ret += '(not ' + key + ' in ' + var + ' or ' + var + '[' + key + '] != ' + final_value + ')'
 
     # < > <= >=
     elif condition['op'] in ('<', '>', '<=', '>='):
@@ -39,26 +40,26 @@ def compile_condition(condition, stat, var="current['tags']"):
 
     # ^=
     elif condition['op'] == '^=':
-        ret += var + '.get(' + key + ", '').startswith(" + final_value + ')'
+        ret += key + ' in ' + var + ' and ' + var + '[' + key + '].startswith(' + final_value + ')'
 
     # $=
     elif condition['op'] == '$=':
-        ret += var + '.get(' + key + ", '').endswith(" + final_value + ')'
+        ret += key + ' in ' + var + ' and ' + var + '[' + key + '].endswith(' + final_value + ')'
 
     # *=
     elif condition['op'] == '*=':
-        ret += final_value + ' in ' + var + '.get(' + key + ", '')"
+        ret += key + ' in ' + var + ' and ' + final_value + ' in ' + var + '[' + key + ']'
 
     # ~=
     elif condition['op'] == '~=':
-        ret += final_value + ' in ' + var + '.get(' + key + ", '').split(';')"
+        ret += key + ' in ' + var + ' and ' + final_value + ' in ' + var + '[' + key + "].split(';')"
 
     # @=
     elif condition['op'] == '@=':
         if condition['value_type'] == 'value':
-            ret += var + '.get(' + key + ") in " + repr(set(condition['value'].split(';')))
+            ret += key + ' in ' + var + ' and ' + var + '[' + key + '] in ' + repr(set(condition['value'].split(';')))
         else:
-            ret += var + '.get(' + key + ") in " + final_value + '.split(";")'
+            ret += key + ' in ' + var + ' and ' + var + '[' + key + '] in ' + final_value + '.split(";")'
 
     # =~
     elif condition['op'] == '=~':
@@ -111,5 +112,8 @@ def compile_condition(condition, stat, var="current['tags']"):
 
     if ret == '':
       return None
+
+    if negate:
+        ret = 'not (' + ret + ')'
 
     return ret;
