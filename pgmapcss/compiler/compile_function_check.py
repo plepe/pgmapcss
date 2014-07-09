@@ -5,6 +5,17 @@ import copy
 import textwrap
 from collections import Counter
 
+def print_postprocess(prop, stat, indent=''):
+    ret = ''
+
+    # postprocess requested properties (see @postprocess)
+    if prop in stat['defines']['postprocess']:
+        v = stat['defines']['postprocess'][prop]
+        ret += indent + "current['properties'][pseudo_element][" + repr(prop) +\
+           "] = " + compile_eval(v['value'], v, stat) + '\n'
+
+    return ret
+
 def print_checks(prop, stat, main_prop=None, indent=''):
     ret = ''
 
@@ -129,11 +140,16 @@ def check_{min_scale_esc}(object):
         r = ''
 
         r += print_checks(main_prop, stat, indent=indent + '    ')
+        r += print_postprocess(main_prop, stat, indent=indent + '    ')
+
         done_prop.append(main_prop)
 
         for prop in props:
             r += print_checks(prop, stat, main_prop=main_prop, indent=indent + '    ')
+            r += print_postprocess(prop, stat, indent=indent + '    ')
+
             done_prop.append(prop)
+
 
         if r != '':
             ret += indent + 'if ' + repr(main_prop) + " in current['properties'][pseudo_element]:\n"
@@ -141,11 +157,7 @@ def check_{min_scale_esc}(object):
 
     for prop in [ prop for prop in stat_properties(stat) if not prop in done_prop ]:
         ret += print_checks(prop, stat, indent=indent)
-
-    # postprocess requested properties (see @postprocess)
-    for k, v in stat['defines']['postprocess'].items():
-        ret += indent + "current['properties'][pseudo_element][" + repr(k) +\
-               "] = " + compile_eval(v['value'], v, stat) + '\n'
+        ret += print_postprocess(prop, stat, indent=indent)
 
     ret += '''\
             # set geo as return value AND remove key from properties
