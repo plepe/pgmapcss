@@ -412,6 +412,17 @@ The following statement defines possible values for a specific property:
 
 Other values will be accepted in the MapCSS file, but will finally be replaced by the default value (the first value).
 
+== Default values ==
+Define default values for properties like:
+{{{
+@default_value property_name value;
+}}}
+
+E.g.
+{{{
+@default_value offset 0;
+}}}
+
 == Define default values to other properties ==
 If the value of a property defaults to the value of another property, this is specified by:
 {{{

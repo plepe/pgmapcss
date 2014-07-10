@@ -25,6 +25,11 @@ def print_checks(prop, stat, main_prop=None, indent=''):
         ret += indent + 'if not ' + repr(prop) + " in current['properties'][pseudo_element] or current['properties'][pseudo_element][" + repr(prop) + "] is None:\n"
         ret += indent + "    current['properties'][pseudo_element][" + repr(prop) + "] = current['properties'][pseudo_element][" + repr(other) + "] if " + repr(other) + " in current['properties'][pseudo_element] else None\n"
 
+    # @default_value
+    if 'default_value' in stat['defines'] and prop in stat['defines']['default_value'] and stat['defines']['default_value'][prop]['value'] is not None:
+        ret += indent + 'if ' + repr(prop) + " not in current['properties'][pseudo_element]:\n" # or current['properties'][pseudo_element][" + repr(prop) + "] in (None, ''):\n"
+        ret += indent + "    current['properties'][pseudo_element][" + repr(prop) + "] = " + repr(stat['defines']['default_value'][prop]['value']) + "\n"
+
     # @values
     if 'values' in stat['defines'] and prop in stat['defines']['values']:
         values = stat['defines']['values'][prop]['value'].split(';')

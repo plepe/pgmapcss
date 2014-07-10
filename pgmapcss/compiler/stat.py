@@ -14,15 +14,22 @@ def stat_all_scale_denominators(stat):
         ])),
         reverse=True)
 
-def stat_properties(stat):
-    return list(set([
+def stat_properties(stat, object_type=None):
+    ret = set([
         p['key']
         for v in stat['statements']
+        if object_type is None or v['selector']['type'] == object_type
         for p in v['properties']
         if p['assignment_type'] == 'P'
-    ]))
+    ])
 
-def stat_property_values(prop, stat, pseudo_element=None, include_illegal_values=False, value_type=None, eval_true=True, max_prop_id=None, include_none=False):
+    if 'default_value' in stat['defines']:
+        for k in stat['defines']['default_value']:
+            ret.add(k)
+
+    return ret
+
+def stat_property_values(prop, stat, pseudo_element=None, include_illegal_values=False, value_type=None, eval_true=True, max_prop_id=None, include_none=False, object_type=None):
     """Returns set of all values used on this property in any statement.
     Returns boolean 'True' if property is result of an unresolveable eval
     expression.
@@ -34,6 +41,7 @@ def stat_property_values(prop, stat, pseudo_element=None, include_illegal_values
     value_type: Only values with value_type will be returned. Default None (all)
     eval_true: Return 'True' for values which result of an unresolvable eval expression. Otherwise this value will be removed. Default: True.
     max_prop_id: evaluate only properties with an id <= max_prop_id
+    object_type: return values only for given object type (e.g. 'canvas')
     """
     cache_id = prop + '-' + repr(pseudo_element) + '-' + repr(include_illegal_values) + '-' + repr(value_type) + '-' + repr(eval_true) + '-' + repr(max_prop_id) + '-' + repr(include_none)
     if cache_id in property_values_cache:
@@ -48,6 +56,7 @@ def stat_property_values(prop, stat, pseudo_element=None, include_illegal_values
         p['value'] if include_illegal_values else prop_type.stat_value(p)
         for v in stat['statements']
         for p in v['properties']
+        if object_type is None or v['selector']['type'] == object_type
         if pseudo_element == None or v['selector']['pseudo_element'] in ('*', pseudo_element)
         if p['assignment_type'] == 'P' and p['key'] == prop
         if value_type == None or value_type == p['value_type']
@@ -70,6 +79,11 @@ def stat_property_values(prop, stat, pseudo_element=None, include_illegal_values
             if max_prop_id is None or p['id'] <= max_prop_id
             for v1 in pgmapcss.eval.possible_values(p['value'], p, stat)[0]
         })
+
+    if 'default_value' in stat['defines'] and prop in stat['defines']['default_value']:
+        v = stat['defines']['default_value'][prop]['value']
+        if include_illegal_values or v is not None:
+            values.add(v)
 
     if 'default_other' in stat['defines'] and prop in stat['defines']['default_other']:
         other = stat['defines']['default_other'][prop]['value']
