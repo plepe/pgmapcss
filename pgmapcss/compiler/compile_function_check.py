@@ -136,22 +136,29 @@ def check_{min_scale_esc}(object):
     indent = '            '
     # start with props from @depend_property
     for main_prop, props in stat['defines']['depend_property'].items():
+        include_main_prop = False
+        if main_prop in stat_properties(stat):
+            include_main_prop = True
+
         props = props['value'].split(';')
         r = ''
 
-        r += print_checks(main_prop, stat, indent=indent + '    ')
-        r += print_postprocess(main_prop, stat, indent=indent + '    ')
+        # main_prop never been used -> skip
+        if include_main_prop:
+            r += print_checks(main_prop, stat, indent=indent + '    ')
+            r += print_postprocess(main_prop, stat, indent=indent + '    ')
 
         done_prop.append(main_prop)
 
         for prop in props:
-            r += print_checks(prop, stat, main_prop=main_prop, indent=indent + '    ')
-            r += print_postprocess(prop, stat, indent=indent + '    ')
+            if include_main_prop:
+                r += print_checks(prop, stat, main_prop=main_prop, indent=indent + '    ')
+                r += print_postprocess(prop, stat, indent=indent + '    ')
 
             done_prop.append(prop)
 
 
-        if r != '':
+        if include_main_prop and r != '':
             ret += indent + 'if ' + repr(main_prop) + " in current['properties'][pseudo_element]:\n"
             ret += r
 

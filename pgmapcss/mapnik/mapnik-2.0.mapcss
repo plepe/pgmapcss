@@ -59,6 +59,8 @@
 @depend_property casing-width "casing-linecap;casing-linejoin;final-casing-width";
 @depend_property shield-text "shield-font-family;shield-font-weight;shield-font-style;shield-font-size;shield-text-transform";
 @depend_property icon-image "final-icon-image;icon-opacity;icon-color;icon-width";
+@depend_property fill-color "fill-opacity";
+@depend_property fill-image "fill-opacity";
 
 // @style_element_property
 @style_element_property fill "fill-color;fill-image";
@@ -74,25 +76,20 @@
   z-index: 0;
   layer: eval(any(int(tag('layer')), 0));
 // PointSymbolizer
-  icon-image: ;
   icon-opacity: 1;
   icon-color: #444444;
   icon-width: 24;
   final-icon-image: ; // used internally to add width and casing-width
 // PolygonSymbolizer
-  fill-color: ;
   fill-opacity: 1;
 // PolygonPatternSymbolizer
-  fill-image: ;
 // LineSymbolizer
-  width: ;
   color: ;
   opacity: 1;
   linejoin: round;
   linecap: none;
   dashes: "";
 // Casing LineSymbolizer
-  casing-width: ;
   casing-color: ;
   casing-opacity: 1;
   casing-linejoin: ;
@@ -100,9 +97,7 @@
   casing-dashes: "";
   final-casing-width: ; // used internally to add width and casing-width
 // LinePatternSymbolizer
-  image: ;
 // TextSymbolizer
-  text: ;
   font-family: "DejaVu Sans";
   font-weight: normal;
   font-style: normal;
@@ -120,7 +115,6 @@
   text-spacing: 0;
   text-transform: none;
 // ShieldSymbolizer
-  shield-text: ;
   shield-spacing: 196;
   shield-image: ;
   shield-opacity: 1;
@@ -145,5 +139,6 @@ line::(*) {
 }
 canvas {
   fill-color: #00000000;
+  fill-image: ;
   buffer: 0;
 }
