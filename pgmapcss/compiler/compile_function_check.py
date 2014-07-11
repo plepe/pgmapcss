@@ -158,10 +158,14 @@ def check_{min_scale_esc}(object):
         for prop in props:
             if include_main_prop:
                 r += print_checks(prop, stat, main_prop=main_prop, indent=indent + '    ')
-                r += print_postprocess(prop, stat, indent=indent + '    ')
 
             done_prop.append(prop)
 
+        # finally, post process values
+        if include_main_prop:
+            for prop in props:
+                r += print_postprocess(prop, stat, indent=indent + '    ')
+            r += print_postprocess(main_prop, stat, indent=indent + '    ')
 
         if include_main_prop and r != '':
             ret += indent + 'if ' + repr(main_prop) + " in current['properties'][pseudo_element]:\n"
