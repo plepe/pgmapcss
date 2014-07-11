@@ -54,15 +54,14 @@
   ));
 
 // @depend_property: don't check values for e.g. 'text-position' if no 'text' is set
-@depend_property text "text-position;text-transform;font-family;font-weight;font-style";
-@depend_property width "linecap;linejoin";
+@depend_property text "text-color;text-halo-color;text-opacity;text-halo-radius;text-offset;max-width;text-position;text-transform;font-family;font-weight;font-style;font-size;character-spacing;wrap-character;text-position;text-spacing;text-transform";
+@depend_property width "offset;color;opacity;linejoin;linecap;dashes";
 @depend_property image "";
-@depend_property casing-width "casing-linecap;casing-linejoin;final-casing-width";
-@depend_property shield-text "shield-font-family;shield-font-weight;shield-font-style;shield-font-size;shield-text-transform";
+@depend_property casing-width "casing-offset;casing-color;casing-opacity;casing-linejoin;casing-linecap;casing-dashes;final-casing-width";
+@depend_property shield-text "shield-spacing;shield-image;shield-opacity;shield-placement;shield-text-color;shield-text-halo-color;shield-text-opacity;shield-text-halo-radius;shield-font-family;shield-font-weight;shield-font-style;shield-font-size;shield-text-transform";
 @depend_property icon-image "final-icon-image;icon-opacity;icon-color;icon-width";
 @depend_property fill-color "fill-opacity";
 @depend_property fill-image "fill-opacity";
-@depend_property image "";
 
 // @style_element_property
 @style_element_property fill "fill-color;fill-image";
