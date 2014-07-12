@@ -1,6 +1,7 @@
 /* DEFAULT VALUES (and make sure that result columns are available) */
 @type text tag_value;
 @type shield-text tag_value;
+@type width int;
 @type icon-image icon;
 @type color color;
 @type casing-color color;
@@ -53,10 +54,14 @@
   ));
 
 // @depend_property: don't check values for e.g. 'text-position' if no 'text' is set
-@depend_property text "text-position;text-transform;font-family;font-weight;font-style";
-@depend_property width "linecap;linejoin";
-@depend_property casing-width "casing-linecap;casing-linejoin";
-@depend_property shield-text "shield-font-family;shield-font-weight;shield-font-style;shield-font-size;shield-text-transform";
+@depend_property text "text-color;text-halo-color;text-opacity;text-halo-radius;text-offset;max-width;text-position;text-transform;font-family;font-weight;font-style;font-size;character-spacing;wrap-character;text-position;text-spacing;text-transform";
+@depend_property width "offset;color;opacity;linejoin;linecap;dashes";
+@depend_property image "";
+@depend_property casing-width "casing-offset;casing-color;casing-opacity;casing-linejoin;casing-linecap;casing-dashes;final-casing-width";
+@depend_property shield-text "shield-spacing;shield-image;shield-opacity;shield-placement;shield-text-color;shield-text-halo-color;shield-text-opacity;shield-text-halo-radius;shield-font-family;shield-font-weight;shield-font-style;shield-font-size;shield-text-transform";
+@depend_property icon-image "final-icon-image;icon-opacity;icon-color;icon-width";
+@depend_property fill-color "fill-opacity";
+@depend_property fill-image "fill-opacity";
 
 // @style_element_property
 @style_element_property fill "fill-color;fill-image";
@@ -67,81 +72,75 @@
 @style_element_property line-text text;
 @style_element_property shield shield-text;
 
-*::(*) {
 // General
-  z-index: 0;
-  layer: eval(any(int(tag('layer')), 0));
+@default_value z-index 0;
 // PointSymbolizer
-  icon-image: ;
-  icon-opacity: 1;
-  icon-color: #444444;
-  icon-width: 24;
-  final-icon-image: ; // used internally to add width and casing-width
+@default_value icon-opacity 1;
+@default_value icon-color #444444;
+@default_value icon-width 24;
+@default_value final-icon-image ; // used internally to add width and casing-width
 // PolygonSymbolizer
-  fill-color: ;
-  fill-opacity: 1;
+@default_value fill-opacity 1;
 // PolygonPatternSymbolizer
-  fill-image: ;
 // LineSymbolizer
-  width: ;
-  color: ;
-  opacity: 1;
-  linejoin: round;
-  linecap: none;
-  dashes: "";
+@default_value color ;
+@default_value opacity 1;
+@default_value linejoin round;
+@default_value linecap butt;
+@default_value dashes "";
 // Casing LineSymbolizer
-  casing-width: ;
-  casing-color: ;
-  casing-opacity: 1;
-  casing-linejoin: ;
-  casing-linecap: ;
-  casing-dashes: "";
-  final-casing-width: ; // used internally to add width and casing-width
+@default_value casing-color ;
+@default_value casing-opacity 1;
+@default_value casing-linejoin ;
+@default_value casing-linecap ;
+@default_value casing-dashes "";
+@default_value final-casing-width ; // used internally to add width and casing-width
 // LinePatternSymbolizer
-  image: ;
 // TextSymbolizer
-  text: ;
-  font-family: "DejaVu Sans";
-  font-weight: normal;
-  font-style: normal;
-  font-size: 12;
-  text-color: #000000;
-  text-halo-color: #ffffff;
-  text-opacity: 1;
-  text-halo-radius: 0;
-  text-offset: 0;
-  max-width: 0;
-  // not in MapCSS 0.2 standard:
-  character-spacing: 0;
-  wrap-character: " ";
-  text-position: center;
-  text-spacing: 0;
-  text-transform: none;
+@default_value font-family "DejaVu Sans";
+@default_value font-weight normal;
+@default_value font-style normal;
+@default_value font-size 12;
+@default_value text-color #000000;
+@default_value text-halo-color #ffffff;
+@default_value text-opacity 1;
+@default_value text-halo-radius 0;
+@default_value text-offset 0;
+@default_value max-width 0;
+// not in MapCSS 0.2 standard
+@default_value character-spacing 0;
+@default_value wrap-character " ";
+@default_value text-position center;
+@default_value text-spacing 0;
+@default_value text-transform none;
 // ShieldSymbolizer
-  shield-text: ;
-  shield-spacing: 196;
-  shield-image: ;
-  shield-opacity: 1;
-  shield-placement: point;
-  shield-text-color: #000000;
-  shield-font-family: ;
-  shield-font-weight: ;
-  shield-font-style: ;
-  shield-font-size: ;
-  shield-text-halo-color: #ffffff;
-  shield-text-opacity: 1;
-  shield-text-halo-radius: 0;
-  shield-text-transform: ;
+@default_value shield-spacing 196;
+@default_value shield-image ;
+@default_value shield-opacity 1;
+@default_value shield-placement point;
+@default_value shield-text-color #000000;
+@default_value shield-font-family ;
+@default_value shield-font-weight ;
+@default_value shield-font-style ;
+@default_value shield-font-size ;
+@default_value shield-text-halo-color #ffffff;
+@default_value shield-text-opacity 1;
+@default_value shield-text-halo-radius 0;
+@default_value shield-text-transform ;
 // Show points, lines and shields after all other symbolizers
-  point-layer: 100;
-  point-text-layer: 101;
-  line-text-layer: 102;
-  shield-layer: 103;
+@default_value point-layer 100;
+@default_value point-text-layer 101;
+@default_value line-text-layer 102;
+@default_value shield-layer 103;
+
+*::(*) {
+  layer: eval(any(int(tag('layer')), 0));
 }
 line::(*) {
   shield-placement: line;
 }
 canvas {
   fill-color: #00000000;
+  fill-image: ;
   buffer: 0;
 }

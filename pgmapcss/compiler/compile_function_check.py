@@ -2,6 +2,19 @@ from .compile_statement import compile_statement
 from .compile_eval import compile_eval
 from .stat import *
 import copy
+import textwrap
+from collections import Counter
+
+def print_postprocess(prop, stat, indent=''):
+    ret = ''
+
+    # postprocess requested properties (see @postprocess)
+    if prop in stat['defines']['postprocess']:
+        v = stat['defines']['postprocess'][prop]
+        ret += indent + "current['properties'][pseudo_element][" + repr(prop) +\
+           "] = " + compile_eval(v['value'], v, stat) + '\n'
+
+    return ret
 
 def print_checks(prop, stat, main_prop=None, indent=''):
     ret = ''
@@ -11,6 +24,11 @@ def print_checks(prop, stat, main_prop=None, indent=''):
         other = stat['defines']['default_other'][prop]['value']
         ret += indent + 'if not ' + repr(prop) + " in current['properties'][pseudo_element] or current['properties'][pseudo_element][" + repr(prop) + "] is None:\n"
         ret += indent + "    current['properties'][pseudo_element][" + repr(prop) + "] = current['properties'][pseudo_element][" + repr(other) + "] if " + repr(other) + " in current['properties'][pseudo_element] else None\n"
+
+    # @default_value
+    if 'default_value' in stat['defines'] and prop in stat['defines']['default_value'] and stat['defines']['default_value'][prop]['value'] is not None:
+        ret += indent + 'if ' + repr(prop) + " not in current['properties'][pseudo_element]:\n" # or current['properties'][pseudo_element][" + repr(prop) + "] in (None, ''):\n"
+        ret += indent + "    current['properties'][pseudo_element][" + repr(prop) + "] = " + repr(stat['defines']['default_value'][prop]['value']) + "\n"
 
     # @values
     if 'values' in stat['defines'] and prop in stat['defines']['values']:
@@ -57,13 +75,50 @@ def check_{min_scale_esc}(object):
 # All statements
 '''.format(**replacement)
 
+    compiled_statements = []
     for i in statements:
         # create a copy of the statement and modify min/max scale
         i = copy.deepcopy(i)
         i['selector']['min_scale'] = min_scale
         i['selector']['max_scale'] = max_scale
 
-        ret += compile_statement(i, stat)
+        compiled_statements.append(compile_statement(i, stat))
+
+    check_count = dict(Counter([
+        check
+        for c in compiled_statements
+        for check in c['check']
+    ]))
+
+    def sort_check_count(c):
+        return check_count[c]
+
+    indent = '    '
+    current_checks = []
+    for i in compiled_statements:
+        checks = i['check']
+        checks.sort(key=sort_check_count, reverse=True)
+        combinable = True
+        for c in reversed(current_checks):
+            if not c in checks:
+                if combinable:
+                    indent = indent[4:]
+                    current_checks = current_checks[:-1]
+                else:
+                    indent = '    '
+                    current_checks = []
+                    break
+            else:
+                combinable = False
+
+        for c in checks:
+            if not c in current_checks:
+                current_checks += [ c ]
+                ret += indent + 'if ' + c + ":\n"
+                indent += '    '
+
+        ret += textwrap.indent(i['body'], indent)
+        ret += "\n"
 
     ret += '''\
     # iterate over all pseudo-elements, sorted by 'object-z-index' if available
@@ -86,27 +141,39 @@ def check_{min_scale_esc}(object):
     indent = '            '
     # start with props from @depend_property
     for main_prop, props in stat['defines']['depend_property'].items():
+        include_main_prop = False
+        if main_prop in stat_properties(stat):
+            include_main_prop = True
+
         props = props['value'].split(';')
         r = ''
 
-        r += print_checks(main_prop, stat, indent=indent + '    ')
+        # main_prop never been used -> skip
+        if include_main_prop:
+            r += print_checks(main_prop, stat, indent=indent + '    ')
+            r += print_postprocess(main_prop, stat, indent=indent + '    ')
+
         done_prop.append(main_prop)
 
         for prop in props:
-            r += print_checks(prop, stat, main_prop=main_prop, indent=indent + '    ')
+            if include_main_prop:
+                r += print_checks(prop, stat, main_prop=main_prop, indent=indent + '    ')
+
             done_prop.append(prop)
 
-        if r != '':
+        # finally, post process values
+        if include_main_prop:
+            for prop in props:
+                r += print_postprocess(prop, stat, indent=indent + '    ')
+            r += print_postprocess(main_prop, stat, indent=indent + '    ')
+
+        if include_main_prop and r != '':
             ret += indent + 'if ' + repr(main_prop) + " in current['properties'][pseudo_element]:\n"
             ret += r
 
     for prop in [ prop for prop in stat_properties(stat) if not prop in done_prop ]:
         ret += print_checks(prop, stat, indent=indent)
-
-    # postprocess requested properties (see @postprocess)
-    for k, v in stat['defines']['postprocess'].items():
-        ret += indent + "current['properties'][pseudo_element][" + repr(k) +\
-               "] = " + compile_eval(v['value'], v, stat) + '\n'
+        ret += print_postprocess(prop, stat, indent=indent)
 
     ret += '''\
             # set geo as return value AND remove key from properties
