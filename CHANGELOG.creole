@@ -1,6 +1,22 @@
 0.8-dev
 * support @media queries, see [[doc/MapCSS.creole|MapCSS docu]]
-* new eval functions: viewport(), intersection()
+* a couple of performance improvements
+* Eval functions:
+** changed parameter order for join() and split()
+** new eval functions: viewport(), intersection(), range(), reverse()
+* Selectors, Conditions (improve compatibility with JOSM MapCSS paint styles):
+** List selector: @= any of the given, e.g. [highway@=primary;secondary]
+** Negated regular expression match: !~
+** Testing for truth/false value: [tag?], [tag?!]
+** Presence of tag by regular expression: [/^addr:/]
+** Support for the following pseudo classes: :closed
+** Negate classes and pseudo classes: way!:closed, way!.class
+** Link selector '∈' or 'within': objects within another object
+** Link selector '∋' or 'surrounds': objects surrounded by another object
+** Link selector '⧉' or 'overlaps': objects which overlap but are not completely contained by each other
+** Support JOSM classes (set without prepending dot); need to set flag
+* Properties (improve compatibility with JOSM MapCSS paint styles)
+** properties of type pixel (e.g. width, offset) accept relative values (added to value on default pseudo element)
 * Lot's of bugfixes, see Git log for details
 
 0.7.0 release 2014-05-20
