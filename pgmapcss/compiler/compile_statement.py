@@ -20,7 +20,9 @@ def compile_statement(statement, stat, indent=''):
     object_selector = statement['selector']
 
     if 'media' in statement:
-        ret['check'].append(compile_media_query(statement['media'], stat))
+        v = compile_media_query(statement['media'], stat)
+        if v:
+            ret['check'].append(v)
 
     ret['check'] += compile_selector_part(object_selector, stat)
 
