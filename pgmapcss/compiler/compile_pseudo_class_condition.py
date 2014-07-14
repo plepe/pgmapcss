@@ -14,7 +14,7 @@ def compile_pseudo_class_condition(condition, stat):
         return ["len(list(objects_member_of(current['object']['id'], 'way', None))) == 0"]
 
     elif condition['key'] == 'tagged':
-        return ["len({ k: v for k, v in current['tags'].items() if not re.match('(source.*|note|comment|converted_by|created_by|watch.*|fixme|FIXME|description|attribution)$') }) != 0"]
+        return ["len({ k: v for k, v in current['tags'].items() if not re.match('(source.*|note|comment|converted_by|created_by|watch.*|fixme|FIXME|description|attribution)$', k) }) != 0"]
 
     else:
         print('unknown/unsupported pseudo class: {key}'.format(**condition))
