@@ -139,6 +139,8 @@ The following pseudo classes are supported:
 | :active | supported for compatibility with MapCSS 0.2; always treated as 'false'
 | :hover | supported for compatibility with MapCSS 0.2; always treated as 'false'
 | :closed | true for ways where the first node is the same as the last and for any multipolygon relation 
+| :connection | true for nodes that are used by more than one way
+| :unconnected | true for nodes that are not used by any way
 
 === Pseudo elements ===
 After the pseudo class(es), separated by '::'. Optional.
