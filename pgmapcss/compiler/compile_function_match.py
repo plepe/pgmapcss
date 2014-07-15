@@ -46,10 +46,7 @@ pgmapcss.eval.functions().print(indent='') +\
 include_text()
     }
 
-    c = resource_string(pgmapcss.mode.__name__, stat['mode'] + '/header.inc')
-    ret = c.decode('utf-8').format(**replacement)
-
-    ret += '''\
+    ret = '''\
 import pghstore
 import re
 import datetime
@@ -227,7 +224,16 @@ else:
 plpy.notice('rendered map features: {{rendered}} / {{total}}, {{perc:.2f}}%'.format(**counter))
 '''.format(**replacement);
 
-    c = resource_string(pgmapcss.mode.__name__, stat['mode'] + '/footer.inc')
-    ret += c.decode('utf-8').format(**replacement)
+    indent = ''
+    if stat['mode'] == 'standalone':
+        indent = '    '
+
+    header = resource_string(pgmapcss.mode.__name__, stat['mode'] + '/header.inc')
+    header = header.decode('utf-8').format(**replacement)
+
+    footer = resource_string(pgmapcss.mode.__name__, stat['mode'] + '/footer.inc')
+    footer = footer.decode('utf-8').format(**replacement)
+
+    ret = header + indent + ret.replace('\n', '\n' + indent) + '\n' + footer
 
     return ret
