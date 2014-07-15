@@ -52,6 +52,11 @@ parser.add_argument('-o', '--options', dest='options', nargs='+',
     choices=['profiler', 'context'],
     help='Additional options. Currently supported options: "profiler": during execution, show some statistics about query/processing time and count of objects. "context": show bounding box and scale denominator of requests.')
 
+parser.add_argument('-m', '--mode', dest='mode',
+    choices=['database-function', 'standalone'],
+    default='database-function',
+    help='Mode of execution. Possible values: "database-function" (default): create function in a PostgreSQL database, e.g. for querying by a renderer like Mapnik. "standalone": create a module/executable which returns resp. prints the data.')
+
 def main():
     print('pgmapcss version %s' % pgmapcss.version.VERSION)
     args = parser.parse_args()
@@ -96,7 +101,8 @@ def main():
 
     stat = {
         'id': style_id,
-        'options': set(args.options) if args.options else set()
+        'options': set(args.options) if args.options else set(),
+        'mode': args.mode
     }
 
     content = open(file_name).read()
