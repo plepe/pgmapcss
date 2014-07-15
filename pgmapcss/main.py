@@ -146,8 +146,12 @@ def main():
     for i in style:
         debug.write("\n***** " + i + " *****\n" + style[i])
 
-    pgmapcss.db.install(style_id, style, conn)
-    pgmapcss.mapnik.process_mapnik(style_id, args, stat, conn)
+    if stat['mode'] == 'database-function':
+        pgmapcss.db.install(style_id, style, conn)
+        pgmapcss.mapnik.process_mapnik(style_id, args, stat, conn)
+    elif stat['mode'] == 'standalone':
+        open('pgmapcss_' + style_id + '.py', 'w').write(style['function_match'])
+
     pgmapcss.icons.process_icons(style_id, args, stat, conn)
 
     debug.close()

@@ -1,0 +1,35 @@
+#!/usr/bin/python3
+
+import postgresql
+class fake_plpy:
+    def __init__(self):
+        self.conn = postgresql.open(
+            host='localhost',
+            password='PASSWORD',
+            database='test',
+            user='test'
+        )
+
+    def notice(self, *arg):
+        print('NOTICE:', *arg)
+
+    def warning(self, *arg):
+        print('WARNING:', *arg)
+
+    def prepare(self, query, param_type):
+        for (i, t) in enumerate(param_type):
+            i1 = i + 1
+            if t == 'geometry':
+                t = 'text'
+            query = query.replace('$' + str(i1), '$' + str(i1) + '::' + t)
+
+        return self.conn.prepare(query)
+
+    def execute(self, plan, param=[]):
+        return [
+            dict(r)
+            for r in plan(*param)
+        ]
+
+def pgmapcss_{style_id}(bbox=None, scale_denominator=2000, _all_style_elements=['default']):
+    plpy = fake_plpy()
