@@ -49,8 +49,8 @@ parser.add_argument('-r', '--database-update', dest='database_update',
     help='Whether the database should be updated to the current version. Possible values: "re-init": re-initializes the database, need to re-compile all pgmapcss styles, "update": update all database functions, "none": do not update, "auto": if necessary a database functions update will be performed.')
 
 parser.add_argument('-o', '--options', dest='options', nargs='+',
-    choices=['profiler'],
-    help='Additional options. Currently supported options: "profiler": during execution, show some statistics about query/processing time and count of objects.')
+    choices=['profiler', 'context'],
+    help='Additional options. Currently supported options: "profiler": during execution, show some statistics about query/processing time and count of objects. "context": show bounding box and scale denominator of requests.')
 
 def main():
     print('pgmapcss version %s' % pgmapcss.version.VERSION)

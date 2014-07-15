@@ -64,6 +64,12 @@ global current
 global render_context
 current = None
 render_context = {{ 'bbox': bbox, 'scale_denominator': scale_denominator }}
+'''.format(**replacement)
+
+    if 'context' in stat['options']:
+        ret += 'plpy.notice(render_context)\n'
+
+    ret += '''\
 {db_query}
 {eval_functions}
 {function_check}
