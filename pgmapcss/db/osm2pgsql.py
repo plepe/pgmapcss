@@ -1,7 +1,6 @@
 # Use this functions only with a database based on an import with osm2pgsql
 def objects(_bbox, where_clauses, add_columns=[], add_param_type=[], add_param_value=[]):
     import pghstore
-    time_start = datetime.datetime.now() # profiling
 
     qry = ''
 
@@ -126,9 +125,6 @@ where osm_id<0 and {bbox} ( {w} )
         for r in res:
             r['tags'] = pghstore.loads(r['tags'])
             yield(r)
-
-    time_stop = datetime.datetime.now() # profiling
-    plpy.notice('querying db objects took %.2fs' % (time_stop - time_start).total_seconds())
 
 def objects_by_id(id_list):
     _id_list = [ int(i[1:]) for i in id_list if i[0] == 'n' ]
