@@ -220,7 +220,7 @@ for layer in layers:
     if 'profiler' in stat['options']:
         ret += '''\
 time_stop = datetime.datetime.now() # profiling
-plpy.notice('total run of processing (excl. querying db objects) took %.2fs' % (time_stop - time_start).total_seconds())
+plpy.notice('total run of processing (incl. querying db objects) took %.2fs' % (time_stop - time_start).total_seconds())
 if counter['total'] == 0:
     counter['perc'] = 100.0
 else:
