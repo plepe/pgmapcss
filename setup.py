@@ -14,8 +14,7 @@ setup(
         'pgmapcss.db.eval': [ '*.sql' ],
         'pgmapcss.mapnik': [ '*.mapcss', '*.mapnik' ],
         'pgmapcss.icons': [ 'maki/*' ],
-        'pgmapcss.mode.database-function': [ '*.inc' ],
-        'pgmapcss.mode.standalone': [ '*.inc' ],
+        'pgmapcss.mode': [ '*/*.inc' ],
     },
     scripts = [ 'bin/pgmapcss' ],
     install_requires = [
