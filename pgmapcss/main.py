@@ -48,6 +48,10 @@ parser.add_argument('-r', '--database-update', dest='database_update',
     default='auto',
     help='Whether the database should be updated to the current version. Possible values: "re-init": re-initializes the database, need to re-compile all pgmapcss styles, "update": update all database functions, "none": do not update, "auto": if necessary a database functions update will be performed.')
 
+parser.add_argument('-o', '--options', dest='options', nargs='+',
+    choices=[],
+    help='Additional options. Currently supported options:')
+
 def main():
     print('pgmapcss version %s' % pgmapcss.version.VERSION)
     args = parser.parse_args()
@@ -90,7 +94,10 @@ def main():
     if args.eval_tests:
         pgmapcss.eval.functions().test_all()
 
-    stat = { 'id': style_id }
+    stat = {
+        'id': style_id,
+        'options': set(args.options) if args.options else set()
+    }
 
     content = open(file_name).read()
 
