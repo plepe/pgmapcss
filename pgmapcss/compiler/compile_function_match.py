@@ -4,6 +4,7 @@ from .compile_function_get_where import compile_function_get_where
 from .compile_function_check import compile_function_check
 from ..includes import include_text
 import pgmapcss.eval
+import pgmapcss.mode
 from .stat import *
 
 def compile_function_match(stat):
@@ -45,12 +46,10 @@ pgmapcss.eval.functions().print(indent='') +\
 include_text()
     }
 
-    ret = '''\
-create or replace function pgmapcss_{style_id}(
-  IN bbox                geometry,
-  IN scale_denominator   float,
-  _all_style_elements\ttext[] default Array['default']
-) returns setof pgmapcss_result as $body$
+    c = resource_string(pgmapcss.mode.__name__, stat['mode'] + '/header.inc')
+    ret = c.decode('utf-8').format(**replacement)
+
+    ret += '''\
 import pghstore
 import re
 import datetime
@@ -228,8 +227,7 @@ else:
 plpy.notice('rendered map features: {{rendered}} / {{total}}, {{perc:.2f}}%'.format(**counter))
 '''.format(**replacement);
 
-    ret += '''\
-$body$ language 'plpython3u' immutable;
-'''.format(**replacement);
+    c = resource_string(pgmapcss.mode.__name__, stat['mode'] + '/footer.inc')
+    ret += c.decode('utf-8').format(**replacement)
 
     return ret
