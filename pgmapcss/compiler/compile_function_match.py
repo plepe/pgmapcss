@@ -54,11 +54,22 @@ create or replace function pgmapcss_{style_id}(
 import pghstore
 import re
 import datetime
-time_start = datetime.datetime.now() # profiling
+'''.format(**replacement)
+
+    if 'profiler' in stat['options']:
+        ret += 'time_start = datetime.datetime.now() # profiling\n'
+
+    ret += '''\
 global current
 global render_context
 current = None
 render_context = {{ 'bbox': bbox, 'scale_denominator': scale_denominator }}
+'''.format(**replacement)
+
+    if 'context' in stat['options']:
+        ret += 'plpy.notice(render_context)\n'
+
+    ret += '''\
 {db_query}
 {eval_functions}
 {function_check}
@@ -80,7 +91,18 @@ if render_context['bbox'] == None:
     }}]
     all_style_elements = ['default']
 else:
-    src = objects(render_context.get('bbox'), match_where)
+'''.format(**replacement)
+
+    func = "objects(render_context.get('bbox'), match_where)"
+    if 'profiler' in stat['options']:
+        ret += "    time_qry_start = datetime.datetime.now() # profiling\n"
+        ret += "    src = list(" + func + ")\n"
+        ret += "    time_qry_stop = datetime.datetime.now() # profiling\n"
+        ret += "    plpy.notice('querying db objects took %.2fs' % (time_qry_stop - time_qry_start).total_seconds())\n"
+    else:
+        ret += "    src = " + func + "\n"
+
+    ret += '''\
 
 def ST_Collect(geometries):
     plan = plpy.prepare('select ST_Collect($1) as r', ['geometry[]'])
@@ -193,14 +215,20 @@ for layer in layers:
             }}
             yield x
 
+'''.format(**replacement)
+
+    if 'profiler' in stat['options']:
+        ret += '''\
 time_stop = datetime.datetime.now() # profiling
-plpy.notice('total run of match() (incl. querying db objects) took %.2fs' % (time_stop - time_start).total_seconds())
+plpy.notice('total run of processing (excl. querying db objects) took %.2fs' % (time_stop - time_start).total_seconds())
 if counter['total'] == 0:
     counter['perc'] = 100.0
 else:
     counter['perc'] = counter['rendered'] / counter['total'] * 100.0
 plpy.notice('rendered map features: {{rendered}} / {{total}}, {{perc:.2f}}%'.format(**counter))
+'''.format(**replacement);
 
+    ret += '''\
 $body$ language 'plpython3u' immutable;
 '''.format(**replacement);
 
