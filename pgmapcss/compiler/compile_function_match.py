@@ -63,6 +63,12 @@ import datetime
 global current
 global render_context
 current = None
+
+if type(bbox) == list and len(bbox) == 4:
+    plan = plpy.prepare('select ST_Transform(SetSRID(MakeBox2D(ST_Point($1, $2), ST_Point($3, $4)), 4326), 900913) as bounds', ['float', 'float', 'float', 'float'])
+    res = plpy.execute(plan, [float(b) for b in bbox])
+    bbox = res[0]['bounds']
+
 render_context = {{ 'bbox': bbox, 'scale_denominator': scale_denominator }}
 '''.format(**replacement)
 
