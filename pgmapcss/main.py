@@ -102,7 +102,8 @@ def main():
     stat = {
         'id': style_id,
         'options': set(args.options) if args.options else set(),
-        'mode': args.mode
+        'mode': args.mode,
+        'args': args
     }
 
     content = open(file_name).read()

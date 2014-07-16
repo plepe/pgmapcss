@@ -4,10 +4,10 @@ import postgresql
 class fake_plpy:
     def __init__(self):
         self.conn = postgresql.open(
-            host='localhost',
-            password='PASSWORD',
-            database='test',
-            user='test'
+            host='{host}',
+            password='{password}',
+            database='{database}',
+            user='{user}'
         )
 
     def notice(self, *arg):

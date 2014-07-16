@@ -31,6 +31,10 @@ def compile_function_match(stat):
 
     replacement = {
       'style_id': stat['id'],
+      'host': stat['args'].host,
+      'password': stat['args'].password,
+      'database': stat['args'].database,
+      'user': stat['args'].user,
       'style_element_property': repr({
           k: v['value'].split(';')
           for k, v in stat['defines']['style_element_property'].items()
