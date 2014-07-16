@@ -1,6 +1,7 @@
 if __name__ == '__main__':
     import argparse
     import re
+    import json
 
     parser = argparse.ArgumentParser(description='Executes the compiled map style and prints resulting objects.')
 
@@ -29,5 +30,17 @@ if __name__ == '__main__':
         print("Error parsing scale.")
         sys.exit(1)
 
-    for i in pgmapcss_tmp(bounds, scale_denom):
-        print(i)
+    first = True
+    for result in pgmapcss_tmp(bounds, scale_denom):
+        if first:
+            print("[")
+            first = False
+        else:
+            print(",")
+
+        print(json.dumps(result, indent=2))
+
+    if first:
+        print("[]\n")
+    else:
+        print("]\n")
