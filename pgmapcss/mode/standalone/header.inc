@@ -1,6 +1,8 @@
 #!/usr/bin/python3
 
 import postgresql
+import sys
+
 class fake_plpy:
     def __init__(self):
         self.conn = postgresql.open(
@@ -11,10 +13,10 @@ class fake_plpy:
         )
 
     def notice(self, *arg):
-        print('NOTICE:', *arg)
+        sys.stderr.write('NOTICE: ' + ' '.join([repr(a) for a in arg]))
 
     def warning(self, *arg):
-        print('WARNING:', *arg)
+        sys.stderr.write('WARNING: ' + ' '.join([repr(a) for a in arg]))
 
     def prepare(self, query, param_type):
         for (i, t) in enumerate(param_type):
