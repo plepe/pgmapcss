@@ -61,7 +61,7 @@ def check_{min_scale_esc}(object):
         'object': object,
         'pseudo_elements': {pseudo_elements},
         'tags': object['tags'],
-        'types': object['types'],
+        'types': list(object['types']),
         'properties': {{
             pseudo_element: {{ 'geo': object['geo'] }}
             for pseudo_element in {pseudo_elements}
@@ -129,7 +129,7 @@ def check_{min_scale_esc}(object):
             # Finally build return value(s)
             ret = {{
                 'id': object['id'],
-                'types': object['types'],
+                'types': list(object['types']),
                 'tags': current['tags'],
                 'pseudo_element': pseudo_element
             }}

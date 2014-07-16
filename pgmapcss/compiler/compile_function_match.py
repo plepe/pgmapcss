@@ -202,7 +202,10 @@ for layer in layers:
                 x['properties'].get(style_element + '-z-index') or
                 x['properties'].get('z-index')
                 , 0))
+'''.format(**replacement)
 
+    if stat['mode'] == 'database-function':
+        ret += '''\
         for result in result_list:
             x = {{
                 'id': result['id'],
@@ -214,8 +217,22 @@ for layer in layers:
                 'properties': pghstore.dumps(result['properties'])
             }}
             yield x
+        '''.format(**replacement)
 
-'''.format(**replacement)
+    elif stat['mode'] == 'standalone':
+        ret += '''\
+        for result in result_list:
+            x = {{
+                'id': result['id'],
+                'types': result['types'],
+                'tags': result['tags'],
+                'style-element': style_element,
+                'pseudo_element': result['pseudo_element'],
+                'geo': result['geo'],
+                'properties': result['properties']
+            }}
+            yield x
+        '''.format(**replacement)
 
     if 'profiler' in stat['options']:
         ret += '''\
