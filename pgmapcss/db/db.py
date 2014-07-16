@@ -1,4 +1,5 @@
 import postgresql
+import pgmapcss.data
 from pkg_resources import *
 from .version import *
 conn = None
@@ -30,6 +31,17 @@ def db_init(conn):
         c = resource_string(__name__, f)
         c = c.decode('utf-8')
         conn.execute(c)
+
+    # populate _pgmapcss_left_right_hand_traffic table
+    f = resource_stream(pgmapcss.data.__name__, 'left-right-hand-traffic.wkt')
+    res = conn.prepare("insert into _pgmapcss_left_right_hand_traffic values (ST_Transform(ST_SetSRID($1::text, 4326), 900913))")
+    while True:
+        r = f.readline().decode('utf-8')
+        if not r:
+            break
+        if r[0] != '#':
+            res(r)
+    f.close()
 
     db_version_create()
     db_update(conn)
