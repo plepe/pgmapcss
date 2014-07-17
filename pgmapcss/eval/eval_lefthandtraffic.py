@@ -2,11 +2,15 @@ class config_eval_lefthandtraffic(config_base):
     mutable = 1
 
 def eval_lefthandtraffic(param):
-    if not 'righthandtraffic' in render_context:
+    force = False
+    if len(param) > 1:
+        force = param[1] == 'force'
+
+    if not force and not 'righthandtraffic' in render_context:
         render_context['righthandtraffic'] = None
         render_context['righthandtraffic'] = eval_righthandtraffic([render_context['bbox']])
 
-    if render_context['righthandtraffic'] not in ( None, 'partly' ):
+    if not force and render_context['righthandtraffic'] not in ( None, 'partly' ):
         if render_context['righthandtraffic'] == 'true':
             return 'false'
         else:
@@ -31,4 +35,3 @@ def eval_lefthandtraffic(param):
         return 'partly'
 
     return 'true'
-
