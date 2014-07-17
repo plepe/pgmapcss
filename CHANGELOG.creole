@@ -9,7 +9,7 @@
 ** Negated regular expression match: !~
 ** Testing for truth/false value: [tag?], [tag?!]
 ** Presence of tag by regular expression: [/^addr:/]
-** Support for the following pseudo classes: :closed
+** Support for the following pseudo classes: :closed, :connection, :unconnected, :tagged, :righthandtraffic, :lefthandtraffic
 ** Negate classes and pseudo classes: way!:closed, way!.class
 ** Link selector '∈' or 'within': objects within another object
 ** Link selector '∋' or 'surrounds': objects surrounded by another object
