@@ -2,10 +2,20 @@ class config_eval_righthandtraffic(config_base):
     mutable = 1
 
 def eval_righthandtraffic(param):
+    if not 'righthandtraffic' in render_context:
+        render_context['righthandtraffic'] = None
+        render_context['righthandtraffic'] = eval_righthandtraffic([render_context['bbox']])
+
+    if render_context['righthandtraffic'] not in ( None, 'partly' ):
+        return render_context['righthandtraffic']
+
     if len(param) > 0:
         geo = param[0]
     else:
         geo = current['properties'][current['pseudo_element']]['geo']
+
+    if not geo:
+        return 'partly'
 
     plan = plpy.prepare('select ST_Within($1, geo) as r from _pgmapcss_left_right_hand_traffic where ST_Intersects($1, geo)', ['geometry'])
     res = plpy.execute(plan, [ geo ])
