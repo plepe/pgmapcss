@@ -142,6 +142,8 @@ The following pseudo classes are supported:
 | :connection | true for nodes that are used by more than one way
 | :unconnected | true for nodes that are not used by any way
 | :tagged | what is considered tagged, i.e. an object that with a tag key other than the following: source*, source_ref, note, comment, converted_by, created_by, watch*, fixme, FIXME, description, attribution (in this list, * is a glob). Note: osm2pgsql does not even import those object into the database.
+| :righthandtraffic | true if there is right-hand traffic at the current location
+| :lefthandtraffic | true if there is left-hand traffic at the current locatiown
 
 === Pseudo elements ===
 After the pseudo class(es), separated by '::'. Optional.

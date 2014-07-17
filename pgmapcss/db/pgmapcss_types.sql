@@ -14,3 +14,9 @@ create type pgmapcss_result as (
   properties		hstore,
   "style-element"       text
 );
+
+drop table if exists _pgmapcss_left_right_hand_traffic cascade;
+create table _pgmapcss_left_right_hand_traffic (
+  geo                   geometry
+);
+create index _pgmapcss_left_right_hand_traffic_geo on _pgmapcss_left_right_hand_traffic using gist(geo);
