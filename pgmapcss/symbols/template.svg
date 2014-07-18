@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   width="{final-symbol-size}px"
+   height="{final-symbol-size}px"
+   id="svg2"
+   version="1.1"
+>
+  <g id="layer1">
+    <path
+       style="fill: {symbol-fill-color};fill-opacity: {symbol-fill-opacity};stroke: {symbol-stroke-color}; stroke-width: {symbol-stroke-width};stroke-linecap:butt;stroke-miterlimit:4;stroke-opacity: {symbol-stroke-opacity};stroke-dasharray:none;stroke-dashoffset:0"
+       id="path1"
+       d="{path}" />
+  </g>
+</svg>

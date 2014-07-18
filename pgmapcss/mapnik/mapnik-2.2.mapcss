@@ -11,6 +11,8 @@
 @type text-halo-color color;
 @type shield-text-color color;
 @type shield-text-halo-color color;
+@type symbol-stroke-color color;
+@type symbol-fill-color color;
 @type width pixels;
 @type offset pixels;
 @type casing-width pixels;
@@ -55,6 +57,8 @@
     style_id() . '.icons/' . substr(prop('icon-image'), 5) . '-' . prop('icon-color') . '-' . prop('icon-width'). '.svg',
     prop('icon-image')
   ));
+@postprocess final-symbol-image eval(
+style_id() . '.icons/symbol-' . prop('symbol-shape') .'-'. prop('symbol-size') .'-'. prop('symbol-stroke-width') .'-'. prop('symbol-stroke-color') .'-'. prop('symbol-stroke-opacity') .'-'. prop('symbol-fill-color') .'-'. prop('symbol-fill-opacity') .'.svg');
 
 // @depend_property: don't check values for e.g. 'text-position' if no 'text' is set
 @depend_property text "text-color;text-halo-color;text-opacity;text-halo-radius;text-offset;max-width;text-position;text-transform;font-family;font-weight;font-style;font-size;character-spacing;wrap-character;text-position;text-spacing;text-transform";
@@ -62,6 +66,7 @@
 @depend_property image "";
 @depend_property casing-width "casing-offset;casing-color;casing-opacity;casing-linejoin;casing-linecap;casing-dashes;final-casing-width";
 @depend_property shield-text "shield-spacing;shield-image;shield-opacity;shield-placement;shield-text-color;shield-text-halo-color;shield-text-opacity;shield-text-halo-radius;shield-font-family;shield-font-weight;shield-font-style;shield-font-size;shield-text-transform";
+@depend_property symbol-shape "final-symbol-image;symbol-shape;symbol-size;symbol-stroke-width;symbol-stroke-color;symbol-stroke-opacity;symbol-fill-color;symbol-fill-opacity";
 @depend_property icon-image "final-icon-image;icon-opacity;icon-color;icon-width";
 @depend_property fill-color "fill-opacity";
 @depend_property fill-image "fill-opacity";
@@ -70,7 +75,7 @@
 @style_element_property fill "fill-color;fill-image";
 @style_element_property casing casing-width;
 @style_element_property line "width;image";
-@style_element_property point icon-image;
+@style_element_property point "icon-image;symbol-shape";
 @style_element_property point-text text;
 @style_element_property line-text text;
 @style_element_property shield shield-text;
@@ -82,6 +87,13 @@
 @default_value icon-color #444444;
 @default_value icon-width 24;
 @default_value final-icon-image ; // used internally to add width and casing-width
+@default_value symbol-size 10;
+@default_value symbol-stroke-width 1;
+@default_value symbol-stroke-color #ffc800;
+@default_value symbol-stroke-opacity 1;
+@default_value symbol-fill-color #0000ff;
+@default_value symbol-fill-opacity 1;
+
 // PolygonSymbolizer
 @default_value fill-opacity 1;
 // PolygonPatternSymbolizer
