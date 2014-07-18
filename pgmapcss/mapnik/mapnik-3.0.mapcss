@@ -81,6 +81,7 @@
 @default_value icon-opacity 1;
 @default_value icon-color #444444;
 @default_value icon-width 24;
+@default_value icon-rotation 0;
 @default_value final-icon-image ; // used internally to add width and casing-width
 // PolygonSymbolizer
 @default_value fill-opacity 1;
