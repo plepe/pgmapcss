@@ -63,7 +63,7 @@ style_id() . '.icons/symbol-' . prop('symbol-shape') .'-'. prop('symbol-size') .
 @depend_property image "";
 @depend_property casing-width "casing-offset;casing-color;casing-opacity;casing-linejoin;casing-linecap;casing-dashes;final-casing-width";
 @depend_property shield-text "shield-spacing;shield-image;shield-opacity;shield-placement;shield-text-color;shield-text-halo-color;shield-text-opacity;shield-text-halo-radius;shield-font-family;shield-font-weight;shield-font-style;shield-font-size;shield-text-transform";
-@depend_property symbol-shape "final-symbol-image;symbol-shape;symbol-size;symbol-stroke-width;symbol-stroke-color;symbol-stroke-opacity;symbol-fill-color;symbol-fill-opacity";
+@depend_property symbol-shape "final-symbol-image;symbol-shape;symbol-size;symbol-stroke-width;symbol-stroke-color;symbol-stroke-opacity;symbol-fill-color;symbol-fill-opacity;symbol-rotation";
 @depend_property icon-image "final-icon-image;icon-opacity;icon-color;icon-width;icon-rotation";
 @depend_property fill-color "fill-opacity";
 @depend_property fill-image "fill-opacity";
@@ -91,6 +91,7 @@ style_id() . '.icons/symbol-' . prop('symbol-shape') .'-'. prop('symbol-size') .
 @default_value symbol-stroke-opacity 1;
 @default_value symbol-fill-color #0000ff;
 @default_value symbol-fill-opacity 1;
+@default_value symbol-rotation 0;
 
 // PolygonSymbolizer
 @default_value fill-opacity 1;

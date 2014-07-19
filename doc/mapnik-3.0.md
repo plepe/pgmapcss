@@ -58,6 +58,7 @@ Point properties
 | symbol-stroke-opacity | line opacity | 1.0 | NO, JOSM (*)
 | symbol-fill-color | fill color for the shape | #0000FF | NO, JOSM (*)
 | symbol-fill-opacity | fill opacity | 1.0 | NO, JOSM (*)
+| symbol-rotation | Rotation of the symbol in degrees. | 0 | NO
 
 Line properties
 ---------------

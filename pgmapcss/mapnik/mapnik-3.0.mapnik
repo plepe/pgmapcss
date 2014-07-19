@@ -132,7 +132,7 @@
 <!-- POINTS -->
     <Rule>
       <Filter>[style-element] = 'point' and [final-symbol-image]</Filter>
-      <PointSymbolizer file="[final-symbol-image]" />
+      <PointSymbolizer file="[final-symbol-image]" transform="rotate([symbol-rotation])" />
     </Rule>
 
 # FOR icon-opacity
