@@ -19,9 +19,14 @@ def build_symbol(x, stat):
     f2 = open(stat['symbols_dir'] + '/' + dest, 'w')
 
     s1 = float(x['symbol-size'])
+    s2 = float(x['symbol-stroke-width']) / 2
 
     if x['symbol-shape'] == 'square':
-        x['path'] = "M 0,0 " +\
+        x['fill-path'] = "M " + repr(s2) + "," + repr(s2) + " " +\
+                      repr(s1 - s2) + "," + repr(s2) + " " +\
+                      repr(s1 - s2) + "," + repr(s1 - s2) + " " +\
+                      repr(s2) + "," + repr(s1 - s2) + " z"
+        x['stroke-path'] = "M 0,0 " +\
                       repr(s1) + ",0 " +\
                       repr(s1) + "," + repr(s1) + " " +\
                       "0," + repr(s1) + " z"

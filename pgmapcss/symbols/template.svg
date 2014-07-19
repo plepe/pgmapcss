@@ -11,8 +11,12 @@
 >
   <g id="layer1">
     <path
-       style="fill: {symbol-fill-color};fill-opacity: {symbol-fill-opacity};stroke: {symbol-stroke-color}; stroke-width: {symbol-stroke-width};stroke-linecap:butt;stroke-miterlimit:4;stroke-opacity: {symbol-stroke-opacity};stroke-dasharray:none;stroke-dashoffset:0"
-       id="path1"
-       d="{path}" />
+       style="fill: {symbol-fill-color};fill-opacity: {symbol-fill-opacity}; stroke-width: none;"
+       id="fill-path"
+       d="{fill-path}" />
+    <path
+       style="fill: none;stroke: {symbol-stroke-color}; stroke-width: {symbol-stroke-width};stroke-linecap:butt;stroke-miterlimit:4;stroke-opacity: {symbol-stroke-opacity};stroke-dasharray:none;stroke-dashoffset:0"
+       id="stroke-path"
+       d="{stroke-path}" />
   </g>
 </svg>
