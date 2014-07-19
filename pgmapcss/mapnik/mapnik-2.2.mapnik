@@ -130,12 +130,12 @@
     </Rule>
 
 <!-- POINTS -->
-#FOR symbol-rotation
+# FOR symbol-rotation
     <Rule>
       <Filter>[style-element] = 'point' and [final-symbol-image] and '{symbol-rotation}' = [symbol-rotation]</Filter>
       <PointSymbolizer file="[final-symbol-image]" transform="rotate({symbol-rotation})" />
     </Rule>
-#END
+# END
 
 # FOR icon-opacity icon-rotation
     <Rule>
