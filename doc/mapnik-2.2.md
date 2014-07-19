@@ -73,6 +73,7 @@ Line properties
 | linejoin | The style for line corners: 'round', 'miter' or 'bevel'. | round | YES
 | linecap | The style for the end of the line: 'none' (default), 'round' or 'square' | none | YES
 | dashes | An array of alternating on/off lengths | | YES(*)
+| dashes-background-color | The color to use in between the dashes (optional) | | NO, JOSM (*)
 | casing-color | Colour of the casing (border) of a line. | | YES(*)
 | casing-width | Width of the casing (border) of the line (added to 'width' of the line). | 0 | YES(*)
 | casing-offset | Pixels to offset the casing of the line to the left or right. | value of `offset` | no standard(*)
@@ -80,6 +81,7 @@ Line properties
 | casing-linejoin | The style for casing corners: 'round', 'miter' or 'bevel'. | value of `linejoin` | YES
 | casing-linecap | The style for the end of the casing: 'none', 'round' or 'square' | value of `linecap`| YES
 | casing-dashes | An array of alternating on/off lengths | | YES(*)
+| casing-dashes-background-color | The color to use in between the dashes (optional) | | NO, JOSM (*)
 
 * MapCSS 0.2 properties not (yet) supported: extrude, extrude-*
 

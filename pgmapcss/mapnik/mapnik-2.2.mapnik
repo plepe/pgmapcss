@@ -108,17 +108,18 @@
     </Rule>
 
 <!-- CASING LINES -->
-# FOR casing-color final-casing-width casing-offset casing-opacity casing-linejoin casing-linecap casing-dashes
+# FOR casing-color final-casing-width casing-offset casing-opacity casing-linejoin casing-linecap casing-dashes casing-dashes-background-color
     <Rule>
-        <Filter>[style-element] = 'casing' and '{casing-color} {final-casing-width} {casing-offset} {casing-opacity} {casing-linejoin} {casing-linecap} {casing-dashes}' = [casing-color final-casing-width casing-offset casing-opacity casing-linejoin casing-linecap casing-dashes]</Filter>
-      <LineSymbolizer stroke="{casing-color}" stroke-width="{final-casing-width}" offset="{casing-offset}" stroke-opacity="{casing-opacity}" stroke-linejoin="{casing-linejoin}" stroke-linecap="{casing-linecap}" stroke-dasharray="{casing-dashes}" />
+        <Filter>[style-element] = 'casing' and '{casing-color} {final-casing-width} {casing-offset} {casing-opacity} {casing-linejoin} {casing-linecap} {casing-dashes} {casing-dashes-background-color}' = [casing-color final-casing-width casing-offset casing-opacity casing-linejoin casing-linecap casing-dashes casing-dashes-background-color]</Filter>
+      <LineSymbolizer stroke="{casing-dashes-background-color}" stroke-width="{final-casing-width}" offset="{casing-offset}" stroke-opacity="{casing-opacity}" stroke-linejoin="{casing-linejoin}" stroke-linecap="{casing-linecap}" />
     </Rule>
 # END
 
 <!-- LINES -->
-# FOR color width offset opacity linejoin linecap dashes
+# FOR color width offset opacity linejoin linecap dashes dashes-background-color
     <Rule>
-        <Filter>[style-element] = 'line' and '{color} {width} {offset} {opacity} {linejoin} {linecap} {dashes}' = [color width offset opacity linejoin linecap dashes]</Filter>
+        <Filter>[style-element] = 'line' and '{color} {width} {offset} {opacity} {linejoin} {linecap} {dashes} {dashes-background-color}' = [color width offset opacity linejoin linecap dashes dashes-background-color]</Filter>
+      <LineSymbolizer stroke="{dashes-background-color}" stroke-width="{width}" offset="{offset}" stroke-opacity="{opacity}" stroke-linejoin="{linejoin}" stroke-linecap="{linecap}" />
       <LineSymbolizer stroke="{color}" stroke-width="{width}" offset="{offset}" stroke-opacity="{opacity}" stroke-linejoin="{linejoin}" stroke-linecap="{linecap}" stroke-dasharray="{dashes}" />
     </Rule>
 # END
