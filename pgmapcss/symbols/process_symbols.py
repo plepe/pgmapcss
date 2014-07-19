@@ -19,14 +19,12 @@ def build_symbol(x, stat):
     f2 = open(stat['symbols_dir'] + '/' + dest, 'w')
 
     s1 = float(x['symbol-size'])
-    s2 = float(x['symbol-stroke-width']) / 2
-    x['final-symbol-size'] = repr(s1 + s2 * 2)
 
     if x['symbol-shape'] == 'square':
-        x['path'] = "M " + repr(s2) + "," + repr(s2) + " " +\
-                           repr(s2 + s1) + "," + repr(s2) + " " +\
-                           repr(s2 + s1) + "," + repr(s2 + s1) + " " +\
-                           repr(s2) + "," + repr(s2 + s1) + " z"
+        x['path'] = "M 0,0 " +\
+                      repr(s1) + ",0 " +\
+                      repr(s1) + "," + repr(s1) + " " +\
+                      "0," + repr(s1) + " z"
 
     content = f1.read().decode('utf-8')
     content = content.format(**x)

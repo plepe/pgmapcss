@@ -4,8 +4,8 @@
 <svg
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
-   width="{final-symbol-size}px"
-   height="{final-symbol-size}px"
+   width="{symbol-size}px"
+   height="{symbol-size}px"
    id="svg2"
    version="1.1"
 >
