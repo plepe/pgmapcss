@@ -50,6 +50,13 @@ Point properties
 | icon-opacity | Opacity of the icon image | 100% (opaque) | YES(*)
 | icon-width | Width of image. Ignored for custom images. For icons from Mapbox Maki project values 12, 18 or 24 have to be used. | 24 | PARTLY
 | icon-height | Height of image. Ignored. | - | -- | NO
+| symbol-shape | Display a symbol at the position of the point. Supported values: square | - | NO, JOSM (*)
+| symbol-size | Size of the symbol (px) | 10 | NO, JOSM (*)
+| symbol-stroke-width | outline stroke width | 1 | NO, JOSM (*)
+| symbol-stroke-color | line color | #FFC800 | NO, JOSM (*)
+| symbol-stroke-opacity | line opacity | 1.0 | NO, JOSM (*)
+| symbol-fill-color | fill color for the shape | #0000FF | NO, JOSM (*)
+| symbol-fill-opacity | fill opacity | 1.0 | NO, JOSM (*)
 
 Line properties
 ---------------
