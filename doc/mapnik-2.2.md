@@ -50,6 +50,7 @@ Point properties
 | icon-opacity | Opacity of the icon image | 100% (opaque) | YES(*)
 | icon-width | Width of image. Ignored for custom images. For icons from Mapbox Maki project values 12, 18 or 24 have to be used. | 24 | PARTLY
 | icon-height | Height of image. Ignored. | - | -- | NO
+| icon-rotation | Rotation of the image in degrees. | 0 | NO(*)
 
 Line properties
 ---------------
