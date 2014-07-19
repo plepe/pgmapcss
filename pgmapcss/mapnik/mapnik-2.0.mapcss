@@ -64,7 +64,7 @@ style_id() . '.icons/symbol-' . prop('symbol-shape') .'-'. prop('symbol-size') .
 @depend_property casing-width "casing-offset;casing-color;casing-opacity;casing-linejoin;casing-linecap;casing-dashes;final-casing-width";
 @depend_property shield-text "shield-spacing;shield-image;shield-opacity;shield-placement;shield-text-color;shield-text-halo-color;shield-text-opacity;shield-text-halo-radius;shield-font-family;shield-font-weight;shield-font-style;shield-font-size;shield-text-transform";
 @depend_property symbol-shape "final-symbol-image;symbol-shape;symbol-size;symbol-stroke-width;symbol-stroke-color;symbol-stroke-opacity;symbol-fill-color;symbol-fill-opacity";
-@depend_property icon-image "final-icon-image;icon-opacity;icon-color;icon-width";
+@depend_property icon-image "final-icon-image;icon-opacity;icon-color;icon-width;icon-rotation";
 @depend_property fill-color "fill-opacity";
 @depend_property fill-image "fill-opacity";
 
@@ -83,6 +83,7 @@ style_id() . '.icons/symbol-' . prop('symbol-shape') .'-'. prop('symbol-size') .
 @default_value icon-opacity 1;
 @default_value icon-color #444444;
 @default_value icon-width 24;
+@default_value icon-rotation 0;
 @default_value final-icon-image ; // used internally to add width and casing-width
 @default_value symbol-size 10;
 @default_value symbol-stroke-width 1;
