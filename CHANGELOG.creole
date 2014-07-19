@@ -18,6 +18,7 @@
 * Properties (improve compatibility with JOSM MapCSS paint styles)
 ** properties of type pixel (e.g. width, offset) accept relative values (added to value on default pseudo element)
 ** New property: icon-rotation
+** symbol-* as in JOSM, plus symbol-rotation
 * Lot's of bugfixes, see Git log for details
 
 0.7.0 release 2014-05-20
