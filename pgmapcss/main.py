@@ -6,6 +6,7 @@ import pgmapcss.parser
 import pgmapcss.compiler
 import pgmapcss.version
 import pgmapcss.icons
+import pgmapcss.symbols
 import argparse
 import getpass
 import pgmapcss.db
@@ -129,6 +130,7 @@ def main():
 
     pgmapcss.mapnik.init(stat)
     pgmapcss.icons.init(stat)
+    pgmapcss.symbols.init(stat)
 
     try:
         style = pgmapcss.compiler.compile_style(stat)
@@ -143,6 +145,7 @@ def main():
     pgmapcss.db.install(style_id, style, conn)
     pgmapcss.mapnik.process_mapnik(style_id, args, stat, conn)
     pgmapcss.icons.process_icons(style_id, args, stat, conn)
+    pgmapcss.symbols.process_symbols(style_id, args, stat, conn)
 
     debug.close()
 
