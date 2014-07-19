@@ -73,6 +73,7 @@ Line properties
 | linecap | The style for the end of the line: 'none' (default), 'round' or 'square' | none | YES
 | dashes | An array of alternating on/off lengths | | YES(*)
 | dashes-background-color | The color to use in between the dashes (optional) | | NO, JOSM (*)
+| dashes-background-opacity | Opacity value for the dashes background (optional) | | NO, JOSM (*)
 | casing-color | Colour of the casing (border) of a line. | | YES(*)
 | casing-width | Width of the casing (border) of the line (added to 'width' of the line). | 0 | YES(*)
 | casing-opacity | How transparent the casing is, from 0 (transparent) to 1 (opaque). | 1 | YES(*)
@@ -80,6 +81,7 @@ Line properties
 | casing-linecap | The style for the end of the casing: 'none', 'round' or 'square' | value of `linecap`| YES
 | casing-dashes | An array of alternating on/off lengths | | YES(*)
 | casing-dashes-background-color | The color to use in between the dashes (optional) | | NO, JOSM (*)
+| casing-dashes-background-opacity |  Opacity value for the dashes background (optional) | | NO, JOSM (*)
 
 * MapCSS 0.2 properties not (yet) supported: extrude, extrude-*
 * Further properties not supported: offset, casing-offset (needs Mapnik 2.2 or higher)

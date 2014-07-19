@@ -32,6 +32,8 @@
 @default_other shield-font-style font-style;
 @default_other shield-font-size font-size;
 @default_other shield-text-transform text-transform;
+@default_other dashes-background-opacity opacity;
+@default_other casing-dashes-background-opacity casing-opacity;
 
 // @values: Possible values of properties; the first value is the default value
 // linecap actually has 'none' as default value. the following statement automatically replaces 'none' by 'butt'
