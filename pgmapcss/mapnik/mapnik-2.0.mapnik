@@ -108,19 +108,19 @@
     </Rule>
 
 <!-- CASING LINES -->
-# FOR casing-color final-casing-width casing-opacity casing-linejoin casing-linecap casing-dashes casing-dashes-background-color
+# FOR casing-color final-casing-width casing-opacity casing-linejoin casing-linecap casing-dashes casing-dashes-background-color casing-dashes-background-opacity
     <Rule>
-      <Filter>[style-element] = 'casing' and '{casing-color} {final-casing-width} {casing-opacity} {casing-linejoin} {casing-linecap} {casing-dashes} {casing-dashes-background-color}' = [casing-color final-casing-width casing-opacity casing-linejoin casing-linecap casing-dashes casing-dashes-background-color]</Filter>
-      <LineSymbolizer stroke="{casing-dashes-background-color}" stroke-width="{final-casing-width}" stroke-opacity="{casing-opacity}" stroke-linejoin="{casing-linejoin}" stroke-linecap="{casing-linecap}" />
+      <Filter>[style-element] = 'casing' and '{casing-color} {final-casing-width} {casing-opacity} {casing-linejoin} {casing-linecap} {casing-dashes} {casing-dashes-background-color} {casing-dashes-background-opacity}' = [casing-color final-casing-width casing-opacity casing-linejoin casing-linecap casing-dashes casing-dashes-background-color casing-dashes-background-opacity]</Filter>
+      <LineSymbolizer stroke="{casing-dashes-background-color}" stroke-width="{final-casing-width}" stroke-opacity="{casing-dashes-background-opacity}" stroke-linejoin="{casing-linejoin}" stroke-linecap="{casing-linecap}" />
       <LineSymbolizer stroke="{casing-color}" stroke-width="{final-casing-width}" stroke-opacity="{casing-opacity}" stroke-linejoin="{casing-linejoin}" stroke-linecap="{casing-linecap}" stroke-dasharray="{casing-dashes}" />
     </Rule>
 # END
 
 <!-- LINES -->
-# FOR color width opacity linejoin linecap dashes dashes-background-color
+# FOR color width opacity linejoin linecap dashes dashes-background-color dashes-background-opacity
     <Rule>
-      <Filter>[style-element] = 'line' and '{color} {width} {opacity} {linejoin} {linecap} {dashes} {dashes-background-color}' = [color width opacity linejoin linecap dashes dashes-background-color]</Filter>
-      <LineSymbolizer stroke="{dashes-background-color}" stroke-width="{width}" stroke-opacity="{opacity}" stroke-linejoin="{linejoin}" stroke-linecap="{linecap}" />
+      <Filter>[style-element] = 'line' and '{color} {width} {opacity} {linejoin} {linecap} {dashes} {dashes-background-color} {dashes-background-opacity}' = [color width opacity linejoin linecap dashes dashes-background-color dashes-background-opacity]</Filter>
+      <LineSymbolizer stroke="{dashes-background-color}" stroke-width="{width}" stroke-opacity="{dashes-background-opacity}" stroke-linejoin="{linejoin}" stroke-linecap="{linecap}" />
       <LineSymbolizer stroke="{color}" stroke-width="{width}" stroke-opacity="{opacity}" stroke-linejoin="{linejoin}" stroke-linecap="{linecap}" stroke-dasharray="{dashes}" />
     </Rule>
 # END
