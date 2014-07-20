@@ -3,7 +3,7 @@
 * a couple of performance improvements
 * Eval functions:
 ** changed parameter order for join() and split()
-** new eval functions: viewport(), intersection(), range(), reverse(), lefthandtraffic(), righthandtraffic()
+** new eval functions: viewport(), intersection(), range(), reverse(), lefthandtraffic(), righthandtraffic(), line_locate_azimuth()
 * Selectors, Conditions (improve compatibility with JOSM MapCSS paint styles):
 ** List selector: @= any of the given, e.g. [highway@=primary;secondary]
 ** Negated regular expression match: !~
