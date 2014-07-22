@@ -9,6 +9,9 @@ def build_icon(x, stat):
     src = x['icon-image'] + '-' + x['icon-width'] + '.svg'
     dest = x['icon-image'] + '-' + x['icon-color'] + '-' + x['icon-width'] + '.svg'
 
+    if not 'icons_dir' in stat:
+        return dest
+
     try:
         f1 = resource_stream(__name__, 'maki/' + src)
     except IOError:
