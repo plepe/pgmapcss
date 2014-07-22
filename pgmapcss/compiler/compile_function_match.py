@@ -4,6 +4,7 @@ from .compile_function_get_where import compile_function_get_where
 from .compile_function_check import compile_function_check
 from ..includes import include_text
 import pgmapcss.eval
+import pgmapcss.types
 from .stat import *
 
 def compile_function_match(stat):
@@ -68,6 +69,17 @@ render_context = {{ 'bbox': bbox, 'scale_denominator': scale_denominator }}
 
     if 'context' in stat['options']:
         ret += 'plpy.notice(render_context)\n'
+
+    global_data = {}
+    for prop in stat_properties(stat):
+        # make sure that automatic properties are generated
+        stat_property_values(prop, stat)
+        # get global data from type
+        prop_type = pgmapcss.types.get(prop, stat)
+        d = prop_type.get_global_data()
+        if d:
+            global_data[prop] = d
+    ret += 'global_data = ' + repr(global_data) + '\n'
 
     ret += '''\
 {db_query}

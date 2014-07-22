@@ -14,3 +14,6 @@ class default:
 
     def stat_all_values(self):
         return {True}
+
+    def get_global_data(self):
+        pass
