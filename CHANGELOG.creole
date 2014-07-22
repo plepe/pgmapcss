@@ -20,6 +20,7 @@
 ** New property: icon-rotation, dashes-background-color, dashes-background-opacity, casing-dashes-background-color, casing-dashes-background-opacity
 ** symbol-* as in JOSM, plus symbol-rotation
 * Lot's of bugfixes, see Git log for details
+* A new dependency: python3-wand
 
 0.7.0 release 2014-05-20
 * Until 0.6 eval() expressions could not be used with many properties (e.g. width, color, ...). Now possible return values have to be predictable, therefore you can use e.g. width: eval(cond(zoom() > 6; zoom() * 2; 15)); or color: eval(lighten(rgb(0.5, 30, 20), 1)).
