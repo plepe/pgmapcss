@@ -98,6 +98,11 @@ def stat_property_values(prop, stat, pseudo_element=None, include_illegal_values
             for combination in combinations
         })
 
+    if 'postprocess' in stat['defines'] and prop in stat['defines']['postprocess']:
+        p = stat['defines']['postprocess'][prop]
+        v = pgmapcss.eval.possible_values(p['value'], p, stat)[0]
+        values = values.union(v)
+
     if include_illegal_values:
         property_values_cache[cache_id] = values
         return values
