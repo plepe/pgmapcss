@@ -29,6 +29,17 @@ def compile_function_match(stat):
         check_chooser += "elif render_context['scale_denominator'] >= %i:\n" % i
         check_chooser += "    check = check_%s\n" % str(i).replace('.', '_')
 
+    global_data = {}
+    for prop in stat_properties(stat):
+        # make sure that automatic properties are generated
+        stat_property_values(prop, stat)
+        # get global data from type
+        prop_type = pgmapcss.types.get(prop, stat)
+        d = prop_type.get_global_data()
+        if d:
+            global_data[prop] = d
+    stat['global_data'] = global_data
+
     replacement = {
       'style_id': stat['id'],
       'style_element_property': repr({
@@ -70,15 +81,6 @@ render_context = {{ 'bbox': bbox, 'scale_denominator': scale_denominator }}
     if 'context' in stat['options']:
         ret += 'plpy.notice(render_context)\n'
 
-    global_data = {}
-    for prop in stat_properties(stat):
-        # make sure that automatic properties are generated
-        stat_property_values(prop, stat)
-        # get global data from type
-        prop_type = pgmapcss.types.get(prop, stat)
-        d = prop_type.get_global_data()
-        if d:
-            global_data[prop] = d
     ret += 'global_data = ' + repr(global_data) + '\n'
 
     ret += '''\
