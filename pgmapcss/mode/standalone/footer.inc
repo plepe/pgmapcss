@@ -30,17 +30,29 @@ if __name__ == '__main__':
         print("Error parsing scale.")
         sys.exit(1)
 
+    plpy = fake_plpy()
+    plan_to_geojson = plpy.prepare('select ST_asGeoJSON(ST_Transform($1, 4326)) as r', [ 'geometry' ])
+
     first = True
     for result in pgmapcss_{style_id}(bounds, scale_denom):
         if first:
-            print("[")
+            print('{{ "type": "FeatureCollection", "features": [')
             first = False
         else:
             print(",")
 
-        print(json.dumps(result, indent=2))
+        res = plpy.execute(plan_to_geojson, [ result['geo'] ])
+
+        result['tags']['result'] = result['properties']
+        feature = {{
+            'type': 'Feature',
+            'geometry': json.loads(res[0]['r']),
+            'properties': result['tags'],
+        }}
+
+        print(json.dumps(feature, indent=2))
 
     if first:
-        print("[]\n")
+        print('{{ "type": "FeatureCollection", "features": []}}')
     else:
-        print("]\n")
+        print("]}}\n")
