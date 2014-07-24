@@ -139,8 +139,20 @@ def check_{min_scale_esc}(object):
     # handle @values, @default_other for all properties
     done_prop = []
     indent = '            '
+
+    # make sure, that depend_properties are compiled in the same order as
+    # specified in the mapcss file
+    main_prop_order = [
+        k
+        for k, d in stat['defines']['depend_property'].items()
+    ]
+    def main_prop_order_key(k):
+        return stat['defines']['depend_property'][k]['pos']
+    main_prop_order.sort(key=main_prop_order_key)
+
     # start with props from @depend_property
-    for main_prop, props in stat['defines']['depend_property'].items():
+    for main_prop in main_prop_order:
+        props = stat['defines']['depend_property'][main_prop]
         include_main_prop = False
         if main_prop in stat_properties(stat):
             include_main_prop = True
