@@ -58,15 +58,16 @@
   ));
 @postprocess final-symbol-image eval(
 style_id() . '.icons/symbol-' . prop('symbol-shape') .'-'. prop('symbol-size') .'-'. prop('symbol-stroke-width') .'-'. prop('symbol-stroke-color') .'-'. prop('symbol-stroke-opacity') .'-'. prop('symbol-fill-color') .'-'. prop('symbol-fill-opacity') .'.svg');
+@postprocess text-offset eval(_text_offset(prop('text-offset'), prop('text-anchor-vertical'), prop('icon-image'), prop('icon-width'), prop('symbol-shape'), prop('symbol-size'), prop('symbol-stroke-width')));
 
 // @depend_property: don't check values for e.g. 'text-position' if no 'text' is set
-@depend_property text "text-color;text-halo-color;text-opacity;text-halo-radius;text-offset;max-width;text-position;text-transform;font-family;font-weight;font-style;font-size;character-spacing;wrap-character;text-position;text-spacing;text-transform";
 @depend_property width "offset;color;opacity;linejoin;linecap;dashes;dashes-background-color;dashes-background-opacity";
 @depend_property image "";
 @depend_property casing-width "casing-offset;casing-color;casing-opacity;casing-linejoin;casing-linecap;casing-dashes;final-casing-width;casing-dashes-background-color;casing-dashes-background-opacity";
 @depend_property shield-text "shield-spacing;shield-image;shield-opacity;shield-placement;shield-text-color;shield-text-halo-color;shield-text-opacity;shield-text-halo-radius;shield-font-family;shield-font-weight;shield-font-style;shield-font-size;shield-text-transform";
 @depend_property symbol-shape "final-symbol-image;symbol-shape;symbol-size;symbol-stroke-width;symbol-stroke-color;symbol-stroke-opacity;symbol-fill-color;symbol-fill-opacity;symbol-rotation";
 @depend_property icon-image "final-icon-image;icon-opacity;icon-color;icon-width;icon-rotation";
+@depend_property text "text-color;text-halo-color;text-opacity;text-halo-radius;text-offset;max-width;text-position;text-transform;font-family;font-weight;font-style;font-size;character-spacing;wrap-character;text-position;text-spacing;text-transform"; // after icon-image and symbol-shape, so that defaults are already set (for text-offset)
 @depend_property fill-color "fill-opacity";
 @depend_property fill-image "fill-opacity";
 
@@ -123,7 +124,7 @@ style_id() . '.icons/symbol-' . prop('symbol-shape') .'-'. prop('symbol-size') .
 @default_value text-halo-color #ffffff;
 @default_value text-opacity 1;
 @default_value text-halo-radius 0;
-@default_value text-offset 0;
+@default_value text-offset ;
 @default_value max-width 0;
 // not in MapCSS 0.2 standard
 @default_value character-spacing 0;
