@@ -46,7 +46,7 @@ def eval__text_offset(param):
 
     if 'icon-image' in prop and prop['icon-image']:
         c = prop['icon-image']
-        if c in global_data['icon-image']:
+        if 'icon-image' in global_data and c in global_data['icon-image']:
             ret_icon = math.ceil(float(global_data['icon-image'][c][1]) / 2.0) + 1.0
 
         elif prop['icon-image'][:5] == 'icon:': # maki icon
