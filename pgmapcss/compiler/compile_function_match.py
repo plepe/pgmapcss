@@ -30,10 +30,12 @@ def compile_function_match(stat):
         check_chooser += "    check = check_%s\n" % str(i).replace('.', '_')
 
     global_data = {}
+    # make sure that automatic properties are generated
     for prop in stat_properties(stat):
-        # make sure that automatic properties are generated
         stat_property_values(prop, stat)
-        # get global data from type
+
+    # get global data from type
+    for prop in stat_properties(stat):
         prop_type = pgmapcss.types.get(prop, stat)
         d = prop_type.get_global_data()
         if d:
