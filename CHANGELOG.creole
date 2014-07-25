@@ -17,7 +17,7 @@
 ** Support JOSM classes (set without prepending dot); need to set flag
 * Properties (improve compatibility with JOSM MapCSS paint styles)
 ** properties of type pixel (e.g. width, offset) accept relative values (added to value on default pseudo element)
-** New property: icon-rotation, dashes-background-color, dashes-background-opacity, casing-dashes-background-color, casing-dashes-background-opacity
+** New properties: icon-rotation, dashes-background-color, dashes-background-opacity, casing-dashes-background-color, casing-dashes-background-opacity; text-offset, text-anchor-vertical
 ** symbol-* as in JOSM, plus symbol-rotation
 * Lot's of bugfixes, see Git log for details
 * A new dependency: python3-wand

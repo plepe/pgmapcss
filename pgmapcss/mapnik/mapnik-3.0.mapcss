@@ -48,6 +48,7 @@
 @values text-transform "none;uppercase;lowercase;capitalize";
 @values shield-text-transform "none;uppercase;lowercase;capitalize";
 @values icon-width "24;18;12";
+@values text-anchor-vertical "below;above";
 
 // @postprocess: To calculate final value of property X call
 // eval-function as specified.
@@ -70,7 +71,7 @@ style_id() . '.icons/symbol-' . prop('symbol-shape') .'-'. prop('symbol-size') .
 @depend_property shield-text "shield-spacing;shield-image;shield-opacity;shield-placement;shield-text-color;shield-text-halo-color;shield-text-opacity;shield-text-halo-radius;shield-font-family;shield-font-weight;shield-font-style;shield-font-size;shield-text-transform";
 @depend_property symbol-shape "final-symbol-image;symbol-shape;symbol-size;symbol-stroke-width;symbol-stroke-color;symbol-stroke-opacity;symbol-fill-color;symbol-fill-opacity;symbol-rotation";
 @depend_property icon-image "final-icon-image;icon-opacity;icon-color;icon-width;icon-rotation";
-@depend_property text "text-color;text-halo-color;text-opacity;text-halo-radius;text-offset;max-width;text-position;text-transform;font-family;font-weight;font-style;font-size;character-spacing;wrap-character;text-position;text-spacing;text-transform"; // after icon-image and symbol-shape, so that defaults are already set (for text-offset)
+@depend_property text "text-color;text-halo-color;text-opacity;text-halo-radius;text-offset;max-width;text-position;text-transform;font-family;font-weight;font-style;font-size;character-spacing;wrap-character;text-position;text-spacing;text-transform;text-anchor-vertical"; // after icon-image and symbol-shape, so that defaults are already set (for text-offset)
 @depend_property fill-color "fill-opacity";
 @depend_property fill-image "fill-opacity";
 
@@ -130,6 +131,7 @@ style_id() . '.icons/symbol-' . prop('symbol-shape') .'-'. prop('symbol-size') .
 @default_value text-opacity 1;
 @default_value text-halo-radius 0;
 @default_value text-offset ;
+@default_value text-anchor-vertical below;
 @default_value max-width 0;
 // not in MapCSS 0.2 standard
 @default_value character-spacing 0;
