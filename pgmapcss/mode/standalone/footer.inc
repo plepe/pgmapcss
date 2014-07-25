@@ -3,6 +3,11 @@ if __name__ == '__main__':
     import re
     import json
 
+    # Handle negative values in --bounds parameter
+    # thanks to http://stackoverflow.com/a/21446783
+    for i, arg in enumerate(sys.argv):
+        if (arg[0] == '-') and arg[1].isdigit(): sys.argv[i] = ' ' + arg
+
     parser = argparse.ArgumentParser(description='Executes the compiled map style and prints resulting objects.')
 
     parser.add_argument('-b', '--bounds', dest='bounds',
