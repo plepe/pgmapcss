@@ -145,10 +145,10 @@
 # END
 
 <!-- TEXTS on Points -->
-# FOR font-family font-weight font-style text-offset max-width
+# FOR font-family font-weight font-style text-offset max-width text-anchor-horizontal
     <Rule>
-      <Filter>[text] and [style-element] = 'point-text' and [text-position] = 'center' and '{font-family} {font-weight} {font-style} {text-offset} {max-width}' = [font-family font-weight font-style text-offset max-width]</Filter>
-      <TextSymbolizer placement="interior" fontset-name="{font-family} - {font-weight} - {font-style}" dy="{text-offset}" wrap-width="{max-width}"><ExpressionFormat size="[font-size]" halo-radius="[text-halo-radius]" character-spacing="[character-spacing]" opacity="[text-opacity]" wrap-character="[wrap-character]" fill="[text-color]" halo-fill="[text-halo-color]">[text]</ExpressionFormat></TextSymbolizer>
+      <Filter>[text] and [style-element] = 'point-text' and [text-position] = 'center' and '{font-family} {font-weight} {font-style} {text-offset} {max-width} {text-anchor-horizontal}' = [font-family font-weight font-style text-offset max-width text-anchor-horizontal]</Filter>
+      <TextSymbolizer placement="interior" fontset-name="{font-family} - {font-weight} - {font-style}" dy="{text-offset}" wrap-width="{max-width}" horizontal-alignment="{text-anchor-horizontal}"><ExpressionFormat size="[font-size]" halo-radius="[text-halo-radius]" character-spacing="[character-spacing]" opacity="[text-opacity]" wrap-character="[wrap-character]" fill="[text-color]" halo-fill="[text-halo-color]">[text]</ExpressionFormat></TextSymbolizer>
     </Rule>
 # END
 

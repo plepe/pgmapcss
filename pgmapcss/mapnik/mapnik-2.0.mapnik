@@ -147,10 +147,10 @@
 # END
 
 <!-- TEXTS on Points -->
-# FOR font-family font-weight font-style text-color text-halo-color text-offset max-width font-size text-halo-radius character-spacing text-opacity wrap-character
+# FOR font-family font-weight font-style text-color text-halo-color text-offset max-width font-size text-halo-radius character-spacing text-opacity wrap-character text-anchor-horizontal
     <Rule>
-      <Filter>[text] and [style-element] = 'point-text' and [text-position] = 'center' and '{font-family} {font-weight} {font-style} {text-color} {text-halo-color} {text-offset} {max-width} {font-size} {text-halo-radius} {character-spacing} {text-opacity} {wrap-character}' = [font-family font-weight font-style text-color text-halo-color text-offset max-width font-size text-halo-radius character-spacing text-opacity wrap-character]</Filter>
-      <TextSymbolizer placement="point" fontset-name="{font-family} - {font-weight} - {font-style}" fill="{text-color}" halo-fill="{text-halo-color}" dy="{text-offset}" wrap-width="{max-width}" size="{font-size}" halo-radius="{text-halo-radius}" character-spacing="{character-spacing}" opacity="{text-opacity}" wrap-character="{wrap-character}">[text]</TextSymbolizer>
+      <Filter>[text] and [style-element] = 'point-text' and [text-position] = 'center' and '{font-family} {font-weight} {font-style} {text-color} {text-halo-color} {text-offset} {max-width} {font-size} {text-halo-radius} {character-spacing} {text-opacity} {wrap-character} {text-anchor-horizontal}' = [font-family font-weight font-style text-color text-halo-color text-offset max-width font-size text-halo-radius character-spacing text-opacity wrap-character text-anchor-horizontal]</Filter>
+      <TextSymbolizer placement="point" fontset-name="{font-family} - {font-weight} - {font-style}" fill="{text-color}" halo-fill="{text-halo-color}" dy="{text-offset}" wrap-width="{max-width}" size="{font-size}" halo-radius="{text-halo-radius}" character-spacing="{character-spacing}" opacity="{text-opacity}" wrap-character="{wrap-character}" horizontal-alignment="{text-anchor-horizontal}">[text]</TextSymbolizer>
     </Rule>
 # END
 
