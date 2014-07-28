@@ -99,6 +99,7 @@ def main():
         'id': style_id,
         'options': set(args.options) if args.options else set()
     }
+    eval_functions = pgmapcss.eval.functions(stat).list()
 
     content = open(file_name).read()
 

@@ -4,6 +4,7 @@ from .compile_function_get_where import compile_function_get_where
 from .compile_function_check import compile_function_check
 from ..includes import include_text
 import pgmapcss.eval
+import pgmapcss.types
 from .stat import *
 
 def compile_function_match(stat):
@@ -27,6 +28,19 @@ def compile_function_match(stat):
     for i in scale_denominators:
         check_chooser += "elif render_context['scale_denominator'] >= %i:\n" % i
         check_chooser += "    check = check_%s\n" % str(i).replace('.', '_')
+
+    global_data = {}
+    # make sure that automatic properties are generated
+    for prop in stat_properties(stat):
+        stat_property_values(prop, stat)
+
+    # get global data from type
+    for prop in stat_properties(stat):
+        prop_type = pgmapcss.types.get(prop, stat)
+        d = prop_type.get_global_data()
+        if d:
+            global_data[prop] = d
+    stat['global_data'] = global_data
 
     replacement = {
       'style_id': stat['id'],
@@ -68,6 +82,8 @@ render_context = {{ 'bbox': bbox, 'scale_denominator': scale_denominator }}
 
     if 'context' in stat['options']:
         ret += 'plpy.notice(render_context)\n'
+
+    ret += 'global_data = ' + repr(global_data) + '\n'
 
     ret += '''\
 {db_query}

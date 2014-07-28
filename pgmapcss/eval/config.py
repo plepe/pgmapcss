@@ -3,8 +3,8 @@ from pkg_resources import *
 import pgmapcss.db
 import re
 
-def load():
-    eval_functions = Functions()
+def load(stat):
+    eval_functions = Functions(stat)
 
     conn = pgmapcss.db.connection()
 

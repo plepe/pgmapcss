@@ -1,5 +1,6 @@
 import pgmapcss.types
 import pgmapcss.eval
+import copy
 property_values_cache = {}
 
 def stat_all_scale_denominators(stat):
@@ -97,6 +98,14 @@ def stat_property_values(prop, stat, pseudo_element=None, include_illegal_values
             gen[1](combination, stat)
             for combination in combinations
         })
+
+    if 'postprocess' in stat['defines'] and prop in stat['defines']['postprocess'] and max_prop_id is None:
+        p = copy.copy(stat['defines']['postprocess'][prop])
+        p['id'] = stat['max_prop_id'] + 1
+        for pe in ([pseudo_element] if pseudo_element else stat['pseudo_elements']):
+            p['statement'] = { 'selector': { 'pseudo_element': pe }}
+            v = pgmapcss.eval.possible_values(p['value'], p, stat)[0]
+            values = values.union(v)
 
     if include_illegal_values:
         property_values_cache[cache_id] = values

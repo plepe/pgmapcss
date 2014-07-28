@@ -97,6 +97,7 @@ def parse_defines(stat, to_parse):
             current = {}
             parse_value(current, to_parse)
 
+            current['pos'] = len(stat['defines'][define_type])
             stat['defines'][define_type][key] = current
 
             if not to_parse.match('\s*;'):

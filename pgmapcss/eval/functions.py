@@ -3,10 +3,11 @@ from ..includes import *
 from .base import config_base
 
 class Functions:
-    def __init__(self):
+    def __init__(self, stat):
         self.eval_functions = None
         self.eval_functions_source = {}
         self._eval = None
+        self.stat = stat
 
     def list(self):
         if not self.eval_functions:
@@ -27,10 +28,14 @@ class Functions:
 
 
     def eval(self, statement):
+        if not 'global_data' in self.stat:
+            self.stat['global_data'] = {}
+
         if not self._eval:
             content = \
                 'def _eval(statement):\n' +\
                 '    import re\n' +\
+                '    global_data = ' + repr(self.stat['global_data']) + '\n' +\
                 '    ' + resource_string(__name__, 'base.py').decode('utf-8').replace('\n', '\n    ') +\
                 '\n' +\
                 '    ' + include_text().replace('\n', '\n    ') +\
@@ -94,7 +99,8 @@ import re
 resource_string(__name__, 'base.py').decode('utf-8') +\
 include_text() +\
 '''
-current = { 'object': { 'id': 'n123', 'tags': { 'amenity': 'restaurant', 'name': 'Foobar', 'cuisine': 'pizza;kebab;noodles' }}, 'pseudo_element': 'default', 'pseudo_elements': ['default', 'test'], 'tags': { 'amenity': 'restaurant', 'name': 'Foobar', 'cuisine': 'pizza;kebab;noodles' }, 'properties': { 'default': { 'width': '2', 'color': '#ff0000' }, 'test': { 'fill-color': '#00ff00' } } }
+global_data = {'icon-image': {'crossing.svg': (11, 7)}}
+current = { 'object': { 'id': 'n123', 'tags': { 'amenity': 'restaurant', 'name': 'Foobar', 'cuisine': 'pizza;kebab;noodles' }}, 'pseudo_element': 'default', 'pseudo_elements': ['default', 'test'], 'tags': { 'amenity': 'restaurant', 'name': 'Foobar', 'cuisine': 'pizza;kebab;noodles' }, 'properties': { 'default': { 'width': '2', 'color': '#ff0000' }, 'test': { 'fill-color': '#00ff00', 'icon-image': 'crossing.svg', 'text': 'Test' } } }
 render_context = {'bbox': '010300002031BF0D000100000005000000DBF1839BB5DC3B41E708549B2B705741DBF1839BB5DC3B41118E9739B171574182069214CCE23B41118E9739B171574182069214CCE23B41E708549B2B705741DBF1839BB5DC3B41E708549B2B705741', 'scale_denominator': 8536.77}
 '''
         ret += self.print()

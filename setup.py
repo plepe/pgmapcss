@@ -21,5 +21,6 @@ setup(
     install_requires = [
       "pghstore",
       "py-postgresql",
+      "wand",
     ]
 )

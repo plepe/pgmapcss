@@ -6,7 +6,7 @@ sudo apt-get install python-software-properties
 sudo add-apt-repository ppa:mapnik/v2.2.0
 sudo add-apt-repository ppa:kakrueger/openstreetmap
 sudo apt-get update
-sudo apt-get install postgresql postgresql-contrib postgresql-9.1-postgis python-mapnik git osm2pgsql python3 python3-setuptools python3-postgresql python3-dev postgresql-plpython3
+sudo apt-get install postgresql postgresql-contrib postgresql-9.1-postgis python-mapnik git osm2pgsql python3 python3-setuptools python3-postgresql python3-dev postgresql-plpython3 python3-wand
 ```
 
 More dependencies:
