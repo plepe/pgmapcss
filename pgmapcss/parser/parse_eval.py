@@ -92,7 +92,7 @@ def parse_eval(to_parse, math_level=0, current_op=None, rek=0):
 
                 result = parse_eval(to_parse, math_level=j, rek=rek+1)
 
-                current_result.append([ 'o:!', result ])
+                current_result.append([ 'u:' + current, result ])
                 current = ''
                 mode = 20
 

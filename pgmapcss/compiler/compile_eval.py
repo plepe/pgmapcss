@@ -37,13 +37,16 @@ def compile_eval(value, prop, stat):
     if len(value) == 0:
         return ''
 
-    if not value[0][0:2] in ('f:', 'o:'):
+    if not value[0][0:2] in ('f:', 'o:', 'u:'):
         return compile_eval(value[0], prop, stat)
 
     param = [ compile_eval(i, prop, stat) for i in value[1:] ]
 
     if value[0][0:2] == 'o:':
-        func = [ k for k, v in eval_functions.items() if value[0][2:] in v.op ][0]
+        func = [ k for k, v in eval_functions.items() if value[0][2:] in v.op and not v.unary ][0]
+
+    elif value[0][0:2] == 'u:':
+        func = [ k for k, v in eval_functions.items() if value[0][2:] in v.op and v.unary ][0]
 
     elif value[0][0:2] == 'f:':
         func = value[0][2:]
