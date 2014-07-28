@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   width="{symbol-size}px"
+   height="{symbol-size}px"
+   id="svg2"
+   version="1.1"
+>
+  <g id="layer1">
+    <circle cx="0" cy="0" r="{radius-fill}" fill="{symbol-fill-color}" fill-opacity="{symbol-fill-opacity}" />
+    <circle cx="0" cy="0" r="{radius-stroke}" stroke="{symbol-stroke-color}" stroke-width="{symbol-stroke-width}" stroke-opacity="{symbol-stroke-opacity}" fill="none" />
+  </g>
+</svg>

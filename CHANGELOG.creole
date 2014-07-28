@@ -3,13 +3,13 @@
 * a couple of performance improvements
 * Eval functions:
 ** changed parameter order for join() and split()
-** new eval functions: viewport(), intersection(), range(), reverse(), URL_encode(), XML_encode(), CRC32_checksum()
+** new eval functions: viewport(), intersection(), range(), reverse(), lefthandtraffic(), righthandtraffic(), line_locate_azimuth(), URL_encode(), XML_encode(), CRC32_checksum()
 * Selectors, Conditions (improve compatibility with JOSM MapCSS paint styles):
 ** List selector: @= any of the given, e.g. [highway@=primary;secondary]
 ** Negated regular expression match: !~
 ** Testing for truth/false value: [tag?], [tag?!]
 ** Presence of tag by regular expression: [/^addr:/]
-** Support for the following pseudo classes: :closed
+** Support for the following pseudo classes: :closed, :connection, :unconnected, :tagged, :righthandtraffic, :lefthandtraffic
 ** Negate classes and pseudo classes: way!:closed, way!.class
 ** Link selector '∈' or 'within': objects within another object
 ** Link selector '∋' or 'surrounds': objects surrounded by another object
@@ -17,7 +17,10 @@
 ** Support JOSM classes (set without prepending dot); need to set flag
 * Properties (improve compatibility with JOSM MapCSS paint styles)
 ** properties of type pixel (e.g. width, offset) accept relative values (added to value on default pseudo element)
+** New properties: icon-rotation, dashes-background-color, dashes-background-opacity, casing-dashes-background-color, casing-dashes-background-opacity; text-offset, text-anchor-vertical, text-anchor-horizontal
+** symbol-* as in JOSM, plus symbol-rotation
 * Lot's of bugfixes, see Git log for details
+* A new dependency: python3-wand
 
 0.7.0 release 2014-05-20
 * Until 0.6 eval() expressions could not be used with many properties (e.g. width, color, ...). Now possible return values have to be predictable, therefore you can use e.g. width: eval(cond(zoom() > 6; zoom() * 2; 15)); or color: eval(lighten(rgb(0.5, 30, 20), 1)).

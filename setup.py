@@ -14,10 +14,13 @@ setup(
         'pgmapcss.db.eval': [ '*.sql' ],
         'pgmapcss.mapnik': [ '*.mapcss', '*.mapnik' ],
         'pgmapcss.icons': [ 'maki/*' ],
+        'pgmapcss.symbols': [ '*.svg' ],
+        'pgmapcss.data': [ '*.wkt' ],
     },
     scripts = [ 'bin/pgmapcss' ],
     install_requires = [
       "pghstore",
       "py-postgresql",
+      "wand",
     ]
 )

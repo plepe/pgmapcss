@@ -4,7 +4,7 @@ I recommend [installing Mapnik 2.2 instead](Install pgmapcss with Mapnik_2.2 on 
 
 Install additional packages:
 ```sh
-sudo apt-get install postgresql postgresql-contrib postgresql-9.1-postgis python-mapnik2 git osm2pgsql python3 python3-setuptools python3-postgresql python3-dev postgresql-plpython3
+sudo apt-get install postgresql postgresql-contrib postgresql-9.1-postgis python-mapnik2 git osm2pgsql python3 python3-setuptools python3-postgresql python3-dev postgresql-plpython3 python3-wand
 ```
 
 More dependencies:

@@ -108,17 +108,19 @@
     </Rule>
 
 <!-- CASING LINES -->
-# FOR casing-color final-casing-width casing-opacity casing-linejoin casing-linecap casing-dashes
+# FOR casing-color final-casing-width casing-opacity casing-linejoin casing-linecap casing-dashes casing-dashes-background-color casing-dashes-background-opacity
     <Rule>
-      <Filter>[style-element] = 'casing' and '{casing-color} {final-casing-width} {casing-opacity} {casing-linejoin} {casing-linecap} {casing-dashes}' = [casing-color final-casing-width casing-opacity casing-linejoin casing-linecap casing-dashes]</Filter>
+      <Filter>[style-element] = 'casing' and '{casing-color} {final-casing-width} {casing-opacity} {casing-linejoin} {casing-linecap} {casing-dashes} {casing-dashes-background-color} {casing-dashes-background-opacity}' = [casing-color final-casing-width casing-opacity casing-linejoin casing-linecap casing-dashes casing-dashes-background-color casing-dashes-background-opacity]</Filter>
+      <LineSymbolizer stroke="{casing-dashes-background-color}" stroke-width="{final-casing-width}" stroke-opacity="{casing-dashes-background-opacity}" stroke-linejoin="{casing-linejoin}" stroke-linecap="{casing-linecap}" />
       <LineSymbolizer stroke="{casing-color}" stroke-width="{final-casing-width}" stroke-opacity="{casing-opacity}" stroke-linejoin="{casing-linejoin}" stroke-linecap="{casing-linecap}" stroke-dasharray="{casing-dashes}" />
     </Rule>
 # END
 
 <!-- LINES -->
-# FOR color width opacity linejoin linecap dashes
+# FOR color width opacity linejoin linecap dashes dashes-background-color dashes-background-opacity
     <Rule>
-      <Filter>[style-element] = 'line' and '{color} {width} {opacity} {linejoin} {linecap} {dashes}' = [color width opacity linejoin linecap dashes]</Filter>
+      <Filter>[style-element] = 'line' and '{color} {width} {opacity} {linejoin} {linecap} {dashes} {dashes-background-color} {dashes-background-opacity}' = [color width opacity linejoin linecap dashes dashes-background-color dashes-background-opacity]</Filter>
+      <LineSymbolizer stroke="{dashes-background-color}" stroke-width="{width}" stroke-opacity="{dashes-background-opacity}" stroke-linejoin="{linejoin}" stroke-linecap="{linecap}" />
       <LineSymbolizer stroke="{color}" stroke-width="{width}" stroke-opacity="{opacity}" stroke-linejoin="{linejoin}" stroke-linecap="{linecap}" stroke-dasharray="{dashes}" />
     </Rule>
 # END
@@ -130,18 +132,25 @@
     </Rule>
 
 <!-- POINTS -->
-# FOR icon-opacity
+# FOR symbol-rotation
     <Rule>
-      <Filter>[style-element] = 'point' and [final-icon-image] and '{icon-opacity}' = [icon-opacity]</Filter>
-      <PointSymbolizer file="[final-icon-image]" opacity="{icon-opacity}" />
+      <Filter>[style-element] = 'point' and [final-symbol-image] and '{symbol-rotation}' = [symbol-rotation]</Filter>
+      <PointSymbolizer file="[final-symbol-image]" transform="rotate({symbol-rotation})" />
+    </Rule>
+# END
+
+# FOR icon-opacity icon-rotation
+    <Rule>
+      <Filter>[style-element] = 'point' and [final-icon-image] and '{icon-opacity} {icon-rotation}' = [icon-opacity icon-rotation]</Filter>
+      <PointSymbolizer file="[final-icon-image]" opacity="{icon-opacity}" transform="rotate({icon-rotation})" />
     </Rule>
 # END
 
 <!-- TEXTS on Points -->
-# FOR font-family font-weight font-style text-color text-halo-color text-offset max-width font-size text-halo-radius character-spacing text-opacity wrap-character
+# FOR font-family font-weight font-style text-color text-halo-color text-offset max-width font-size text-halo-radius character-spacing text-opacity wrap-character text-anchor-horizontal
     <Rule>
-      <Filter>[text] and [style-element] = 'point-text' and [text-position] = 'center' and '{font-family} {font-weight} {font-style} {text-color} {text-halo-color} {text-offset} {max-width} {font-size} {text-halo-radius} {character-spacing} {text-opacity} {wrap-character}' = [font-family font-weight font-style text-color text-halo-color text-offset max-width font-size text-halo-radius character-spacing text-opacity wrap-character]</Filter>
-      <TextSymbolizer placement="point" fontset-name="{font-family} - {font-weight} - {font-style}" fill="{text-color}" halo-fill="{text-halo-color}" dy="{text-offset}" wrap-width="{max-width}" size="{font-size}" halo-radius="{text-halo-radius}" character-spacing="{character-spacing}" opacity="{text-opacity}" wrap-character="{wrap-character}">[text]</TextSymbolizer>
+      <Filter>[text] and [style-element] = 'point-text' and [text-position] = 'center' and '{font-family} {font-weight} {font-style} {text-color} {text-halo-color} {text-offset} {max-width} {font-size} {text-halo-radius} {character-spacing} {text-opacity} {wrap-character} {text-anchor-horizontal}' = [font-family font-weight font-style text-color text-halo-color text-offset max-width font-size text-halo-radius character-spacing text-opacity wrap-character text-anchor-horizontal]</Filter>
+      <TextSymbolizer placement="point" fontset-name="{font-family} - {font-weight} - {font-style}" fill="{text-color}" halo-fill="{text-halo-color}" dy="{text-offset}" wrap-width="{max-width}" size="{font-size}" halo-radius="{text-halo-radius}" character-spacing="{character-spacing}" opacity="{text-opacity}" wrap-character="{wrap-character}" horizontal-alignment="{text-anchor-horizontal}">[text]</TextSymbolizer>
     </Rule>
 # END
 

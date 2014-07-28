@@ -4,7 +4,7 @@ Install additional packages:
 ```sh
 sudo apt-get install python-software-properties
 sudo add-apt-repository ppa:mapnik/nightly-trunk
-sudo apt-get install git postgresql postgresql-contrib postgresql-9.3-postgis-2.1 python3-setuptools python3-dev python-mapnik osm2pgsql postgresql-plpython3 python3-postgresql ttf-unifont mapnik-input-plugin-postgis libmapnik libmapnik-dev mapnik-utils
+sudo apt-get install git postgresql postgresql-contrib postgresql-9.3-postgis-2.1 python3-setuptools python3-dev python-mapnik osm2pgsql postgresql-plpython3 python3-postgresql ttf-unifont mapnik-input-plugin-postgis libmapnik libmapnik-dev mapnik-utils python3-wand
 ```
 
 More dependencies:

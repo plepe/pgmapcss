@@ -50,6 +50,15 @@ Point properties
 | icon-opacity | Opacity of the icon image | 100% (opaque) | YES(*)
 | icon-width | Width of image. Ignored for custom images. For icons from Mapbox Maki project values 12, 18 or 24 have to be used. | 24 | PARTLY
 | icon-height | Height of image. Ignored. | - | -- | NO
+| icon-rotation | Rotation of the image in degrees. | 0 | NO(*)
+| symbol-shape | Display a symbol at the position of the point. Supported values: square, circle, triangle, pentagon, hexagon, heptagon, octagon, nonagon, decagon | - | NO, JOSM (*)
+| symbol-size | Size of the symbol (px) | 10 | NO, JOSM (*)
+| symbol-stroke-width | outline stroke width | 1 | NO, JOSM (*)
+| symbol-stroke-color | line color | #FFC800 | NO, JOSM (*)
+| symbol-stroke-opacity | line opacity | 1.0 | NO, JOSM (*)
+| symbol-fill-color | fill color for the shape | #0000FF | NO, JOSM (*)
+| symbol-fill-opacity | fill opacity | 1.0 | NO, JOSM (*)
+| symbol-rotation | Rotation of the symbol in degrees. | 0 | NO (*)
 
 Line properties
 ---------------
@@ -63,12 +72,16 @@ Line properties
 | linejoin | The style for line corners: 'round', 'miter' or 'bevel'. | round | YES
 | linecap | The style for the end of the line: 'none' (default), 'round' or 'square' | none | YES
 | dashes | An array of alternating on/off lengths | | YES(*)
+| dashes-background-color | The color to use in between the dashes (optional) | | NO, JOSM (*)
+| dashes-background-opacity | Opacity value for the dashes background (optional) | | NO, JOSM (*)
 | casing-color | Colour of the casing (border) of a line. | | YES(*)
 | casing-width | Width of the casing (border) of the line (added to 'width' of the line). | 0 | YES(*)
 | casing-opacity | How transparent the casing is, from 0 (transparent) to 1 (opaque). | 1 | YES(*)
 | casing-linejoin | The style for casing corners: 'round', 'miter' or 'bevel'. | value of `linejoin` | YES
 | casing-linecap | The style for the end of the casing: 'none', 'round' or 'square' | value of `linecap`| YES
 | casing-dashes | An array of alternating on/off lengths | | YES(*)
+| casing-dashes-background-color | The color to use in between the dashes (optional) | | NO, JOSM (*)
+| casing-dashes-background-opacity |  Opacity value for the dashes background (optional) | | NO, JOSM (*)
 
 * MapCSS 0.2 properties not (yet) supported: extrude, extrude-*
 * Further properties not supported: offset, casing-offset (needs Mapnik 2.2 or higher)
@@ -88,7 +101,9 @@ Label properties
 | CSS parameter | Description | Default value | Compatibility MapCSS 0.2 |
 |---------------|-------------|---------------|--------------------------|
 | max-width | The maximum width of a text label for a point, after which it should wrap onto the next line. | | YES(*)
-| text-offset | The vertical offset from the centre of the way or point. | 0 | YES(*)
+| text-offset | The vertical offset from the centre of the way or point. By default relative to an icon/symbol (see text-anchor-vertical) | 0 | YES(*)
+| text-anchor-vertical | vertical text label placement relative to icon/symbol, possible values (below, above) | below | NO, JOSM (*)
+| text-anchor-horizontal | Position of label relative to point position (left, middle, right) | middle | NO, JOSM (*)
 | text-position | Whether the text follows the path of the way ('line') or is centred on the area ('center') | center | YES
 | font-family | Name of the font to use default (see 'Fonts' below) | DejaVu Sans | YES(*)
 | font-weight |  'bold' or 'normal' | normal | YES

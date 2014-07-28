@@ -119,7 +119,8 @@ Mapnik < 3.0 can't read dynamic color values. Therefore pgmapcss has to know all
 | buffer | geometry, number | geometry | Draws a buffer of the specified size (default: pixels) around the input geometry, e.g. buffer(prop(geo), 100m); if no or invalid number is specified the input geometry is returned.
 | line_merge | geometry | geometry | Merges collected line strings; polygons and other geometries will get lost.
 | convex_hull | geometry | geometry | Create a convex hull from the input geometry: http://postgis.net/docs/ST_ConvexHull.html
-| line_locate_point | geometry, geometry | geometry | Returns a number between 0 and the length of the line representing the location of the closest point on a line (1st geometry) to the given point (2nd geometry).
+| line_locate_point | geometry, geometry | number | Returns a number between 0 and the length of the line representing the location of the closest point on a line (1st geometry) to the given point (2nd geometry).
+| line_locate_azimuth | line geometry, pos geometry or number, [distance number] | number | Returns the north-based azimuth as the angle in degrees measured clockwise from the vertical on a point on the line which is either located closest to the given point pos or which is interpolated along the line (from 0..length of line). optional parameter 'dist': distance from located point which is used to measure angle (default 1px).
 | line_interpolate_point | geometry, number | geometry | Returns a point interpolated along a line. 2nd argument is a number between 0 and the length of the line (1st argument).
 | line_part | geometry, number[, number] | geometry | Return a linestring being a substring of the input line starting and ending at the given fractions of total length. 2nd argument ist start location, 3rd argument is end location between 0..length of line. If negative arguments are used the location is calculated from the end. If the 3rd argument is omitted the end of the line is assumed.
 | line | geometry, geometry, [geometry, ...] | geometry | Return a line of all input geometries (points).
@@ -130,7 +131,9 @@ Mapnik < 3.0 can't read dynamic color values. Therefore pgmapcss has to know all
 | area | geometry | number | returns area of polygon in square pixels
 | centroid | geometry | geometry | returns the centroid of the input geometry
 | intersection | geometry A, geometry B | geometry | Returns a geometry that represents the shared portion of A and B (see [[http://postgis.net/docs/manual-2.0/ST_Intersection.html|Postgis: ST_Intersection]])
-| is_closed | [geometry] | checks (return 'true' or 'false') whether the given geometry is a polygon or multipolygon, or a line whose start equals the end. if no parameter is passed, will use the current property 'geo' in the current pseudo element.
+| is_closed | [geometry] | boolean | checks (return 'true' or 'false') whether the given geometry is a polygon or multipolygon, or a line whose start equals the end. if no parameter is passed, will use the current property 'geo' in the current pseudo element.
+| lefthandtraffic | [geometry, ["force"]] | boolean | checks if the geometry (default: the geometry of the current object) is in a region with left hand traffic. returns 'true', 'false' or 'partly' (if it crosses boundaries of left/right hand traffic). If the current viewport is in an area with only left-/right hand traffic, this function will only be evaluated once (unless "force" is passed as 2nd parameter).
+| righthandtraffic | [geometry, ["force"]] | boolean | checks if the geometry (default: the geometry of the current object) is in a region with right hand traffic. returns 'true', 'false' or 'partly' (if it crosses boundaries of left/right hand traffic). If the current viewport is in an area with only left-/right hand traffic, this function will only be evaluated once (unless "force" is passed as 2nd parameter).
 
 == Internal functions ==
 |= Function |= Parameters |= Return value |= Description

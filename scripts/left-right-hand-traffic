@@ -1,0 +1,37 @@
+#!/bin/sh
+
+SOURCE="http://josm.openstreetmap.de/export/7313/josm/trunk/data/left-right-hand-traffic.osm"
+TMP="/tmp/left-right-hand-traffic"
+DEST="pgmapcss/data/left-right-hand-traffic.wkt"
+rm -rf $TMP
+mkdir $TMP
+
+
+cat >$DEST <<EOL
+# right- and left-hand traffic database
+# Polygons enclosing areas of the earth with left-hand traffic
+#
+# Loosely based on boundary lines data from naturalearthdata.com.
+# Traffic law info from wikipedia.
+# Boundaries generalized, especially in areas where there seem to be no roads.
+# Should be mostly correct, but some remote islands and atolls may be assigned wrongly.
+# Alway check before you start driving. :)
+#
+# Source: http://josm.openstreetmap.de/browser/josm/trunk/data/left-right-hand-traffic.osm
+# License: CC0
+EOL
+
+# 1. Download current left-right-hand-traffic.osm from JOSM
+# 2. Convert id's and ref's to positive values
+# 3. add some stupid tag to each way, so that ogr2ogr accepts the way
+wget -O - $SOURCE | sed "s/\(id\|ref\)='-/\1='/" | sed "s^</way>^<tag k='leisure' v='park'/></way>^" > $TMP/data.osm
+
+# 4. convert osm to csv file with WKT geometries
+ogr2ogr -lco GEOMETRY=AS_WKT --config OSM_USE_CUSTOM_INDEXING NO -f CSV $TMP/data.csv $TMP/data.osm
+
+# 5. remove lines without MULTIPOLYGON
+# 6. parse the wkt of all polygons
+# 7. save to pgmapcss/data/left-right-hand-traffic.wkt
+grep MULTIPOLYGON $TMP/multipolygons.csv | cut -d'"' -f2 >> $DEST
+
+echo "Updated file $DEST"

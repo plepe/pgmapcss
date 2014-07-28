@@ -1,7 +1,6 @@
 # Use this functions only with a database based on an import with osm2pgsql
 def objects(_bbox, where_clauses, add_columns=[], add_param_type=[], add_param_value=[]):
     import pghstore
-    time_start = datetime.datetime.now() # profiling
 
     qry = ''
 
@@ -127,9 +126,6 @@ where osm_id<0 and {bbox} ( {w} )
             r['tags'] = pghstore.loads(r['tags'])
             yield(r)
 
-    time_stop = datetime.datetime.now() # profiling
-    plpy.notice('querying db objects took %.2fs' % (time_stop - time_start).total_seconds())
-
 def objects_by_id(id_list):
     _id_list = [ int(i[1:]) for i in id_list if i[0] == 'n' ]
     plan = plpy.prepare('select * from planet_osm_point where osm_id=any($1)', ['bigint[]']);
@@ -199,7 +195,7 @@ def objects_member_of(member_id, parent_type, parent_conditions):
                 if member['member_id'] == member_id:
                     t = {
                         'id': 'r' + str(r['id']),
-                        'tags': flatarray_to_tags(r['tags']),
+                        'tags': flatarray_to_tags(r['tags']) if r['tags'] else {},
                         'type': ['relation'],
                         'geo': None,
                         'link_tags': member
@@ -215,7 +211,7 @@ def objects_member_of(member_id, parent_type, parent_conditions):
                 if member == num_id:
                     t = {
                         'id': 'w' + str(r['id']),
-                        'tags': pghstore.loads(r['tags']),
+                        'tags': pghstore.loads(r['tags']) if r['tags'] else {},
                         'type': ['way'],
                         'geo': r['geo'],
                         'link_tags': {
