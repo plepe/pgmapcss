@@ -5,6 +5,8 @@
 @type icon-image icon;
 @type color color;
 @type casing-color color;
+@type dashes-background-color color;
+@type casing-dashes-background-color color;
 @type icon-color color;
 @type fill-color color;
 @type text-color color;
