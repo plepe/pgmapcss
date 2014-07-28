@@ -199,28 +199,3 @@ class _stat(dict):
             if not 'max_id' in filter or statement['id'] <= filter['max_id']
             if not 'has_set_tag' in filter or _has_set_tag(statement, filter['has_set_tag'], self)
         ]
-
-# compatibility to legacy interface
-def stat_all_scale_denominators(stat):
-    return stat.all_scale_denominators()
-
-def stat_properties(stat, object_type=None):
-    return stat.properties(object_type)
-
-def stat_property_values(prop, stat, pseudo_element=None, include_illegal_values=False, value_type=None, eval_true=True, max_prop_id=None, include_none=False, object_type=None):
-    return stat.property_values(prop, pseudo_element, include_illegal_values, value_type, eval_true, max_prop_id, include_none, object_type)
-
-def stat_properties_combinations_pseudo_element(keys, stat, pseudo_element, include_illegal_values=False, value_type=None, eval_true=True, max_prop_id=None, include_none=False):
-    return stat.properties_combinations_pseudo_element(keys, pseudo_element, include_illegal_values, value_type, eval_true, max_prop_id, include_none)
-
-def stat_properties_combinations(keys, stat, pseudo_elements=None, include_illegal_values=False, value_type=None, eval_true=True, max_prop_id=None, include_none=False):
-    return stat.properties_combinations(keys, pseudo_elements, include_illegal_values, value_type, eval_true, max_prop_id, include_none)
-
-def stat_add_generated_property(key, keys, fun, stat):
-    return stat.add_generated_property(key, keys, fun)
-
-def _has_set_tag(statement, key, stat):
-    return stat._has_set_tag(statement, key)
-
-def stat_filter_statements(stat, filter):
-    return stat.filter_statements(filter)
