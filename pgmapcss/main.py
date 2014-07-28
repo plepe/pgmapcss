@@ -95,10 +95,10 @@ def main():
     if args.eval_tests:
         pgmapcss.eval.functions().test_all()
 
-    stat = {
+    stat = pgmapcss.compiler.stat._stat({
         'id': style_id,
         'options': set(args.options) if args.options else set()
-    }
+    })
     eval_functions = pgmapcss.eval.functions(stat).list()
 
     content = open(file_name).read()
