@@ -3,7 +3,7 @@
 * a couple of performance improvements
 * Eval functions:
 ** changed parameter order for join() and split()
-** new eval functions: viewport(), intersection(), range(), reverse(), is_left_hand_traffic(), is_right_hand_traffic(), line_locate_azimuth(), red(), green(), blue(), alpha(), URL_encode(), XML_encode(), CRC32_checksum()
+** new eval functions: viewport(), intersection(), range(), reverse(), is_left_hand_traffic(), is_right_hand_traffic(), line_locate_azimuth(), red(), green(), blue(), alpha(), URL_encode(), XML_encode(), CRC32_checksum(), regexp_text(), regexp_match()
 ** support inline condition operator: (condition?if_true:else)
 ** an identifier may no longer contain ':' (because of inline condition operator)
 ** an identifier may contain # (e.g. colors)

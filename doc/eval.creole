@@ -81,6 +81,10 @@ If you read a number, unit conversion takes place. The following units are suppo
 | URL_encode | string | string | percent-encode a string. May be useful for data URLs | JOSM
 | XML_encode | string | string | escape special characters in xml. E.g. < becomes &lt;, other special characters: >, ", ', & | JOSM
 | CRC32_checksum| string | number | calculate the CRC32 checksum of a string (result is an integer from 0 to 232-1) | JOSM
+| regexp_test | pattern:string, str:string, [flags:string] | test if string str matches the pattern. flags is a string that may contain "i" (case insensitive). | JOSM¹
+| regexp_match | pattern:string, str:string, [flags:string] | Tries to match str against the pattern. Returns a list of capture groups in case of success. The first element (index 0) is the complete match (i.e. string). Further elements correspond to the bracketed parts of the regular expression. flags is a string that may contain "i" (case insensitive). | JOSM¹
+
+¹ in contrast to JOSM the pattern does not need to match the whole string; you should add ^ and $ to limit pattern.
 
 === List functions ===
 * List functions are not part of the MapCSS 0.2 standard, but follow the [[http://wiki.openstreetmap.org/wiki/MapCSS/0.2/Proposal_lists|proposal for lists]]
