@@ -23,7 +23,7 @@ If you read a number, unit conversion takes place. The following units are suppo
 |= Operator |= Description |= Compatibility
 | +, -, *, / | arithmetic operations (see add, sub, mul, div for description) | MapCSS 0.2
 | . | concatenate strings (strings need to be quoted though) | MapCSS 0.2
-| == | Comparision (equal); perform canonization for numbers prior to comparison, so "2" == "2.0" == "02" | MapCSS 0.2
+| ==, = | Comparision (equal); perform canonization for numbers prior to comparison, so "2" == "2.0" == "02" | MapCSS 0.2
 | !=, <> | Comparision (differing); perform canonization for numbers prior to comparison (see ==); If more than two values are compared, ALL values must be differing. | MapCSS 0.2
 | eq, (also ===) | Comparision (identical); string comparison, therefore "2" ne "02". | MapCSS 0.2: "eq"
 | ne, (also !==) | Comparision (nonidentical); string comparison; If more than two values are compared, ALL values must be differing. | MapCSS 0.2: "ne"
