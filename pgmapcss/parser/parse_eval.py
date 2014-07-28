@@ -63,7 +63,7 @@ def parse_eval(to_parse, math_level=0, current_op=None, rek=0):
                 mode = 20
 
             # an identifier
-            elif to_parse.match('[a-zA-Z_][a-zA-Z_0-9]*'):
+            elif to_parse.match('[a-zA-Z_#][a-zA-Z_0-9#]*'):
                 current = to_parse.match_group(0)
                 mode = 10
 

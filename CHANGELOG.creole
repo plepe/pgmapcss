@@ -6,6 +6,7 @@
 ** new eval functions: viewport(), intersection(), range(), reverse(), lefthandtraffic(), righthandtraffic(), line_locate_azimuth(), URL_encode(), XML_encode(), CRC32_checksum()
 ** support inline condition operator: (condition?if_true:else)
 ** an identifier may no longer contain ':' (because of inline condition operator)
+** an identifier may contain # (e.g. colors)
 * Selectors, Conditions (improve compatibility with JOSM MapCSS paint styles):
 ** List selector: @= any of the given, e.g. [highway@=primary;secondary]
 ** Negated regular expression match: !~
