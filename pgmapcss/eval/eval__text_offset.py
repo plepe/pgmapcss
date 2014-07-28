@@ -24,7 +24,10 @@ class config_eval__text_offset(config_base):
             for c in param_values[2]:
                 if c in stat['global_data']['icon-image']:
                     d = stat['global_data']['icon-image'][c]
-                    values.add(math.ceil(float(d[1]) / 2.0) + 1.0)
+                    if d:
+                        values.add(math.ceil(float(d[1]) / 2.0) + 1.0)
+                    else:
+                        values.add(True)
 
         # symbol-shape used
         if len(param_values[4]):
