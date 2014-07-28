@@ -63,7 +63,7 @@ def parse_eval(to_parse, math_level=0, current_op=None, rek=0):
                 mode = 20
 
             # an identifier
-            elif to_parse.match('[a-zA-Z_:][a-zA-Z_:0-9]*'):
+            elif to_parse.match('[a-zA-Z_][a-zA-Z_0-9]*'):
                 current = to_parse.match_group(0)
                 mode = 10
 
@@ -136,11 +136,21 @@ def parse_eval(to_parse, math_level=0, current_op=None, rek=0):
             if to_parse.match('\s+'):
                 pass
 
-            elif to_parse.match('^(\)|,|;)', wind=None) or to_parse.to_parse() == '':
+            elif to_parse.match('^(\)|,|;|:)', wind=None) or to_parse.to_parse() == '':
                 if len(current_result) == 1:
                     return current_result[0]
                 else:
                     return current_result
+
+            elif to_parse.match('\?'):
+                x = parse_eval(to_parse, rek=rek+1)
+
+                if to_parse.match(':'):
+                    y = parse_eval(to_parse, rek=rek+1)
+                else:
+                    raise ParseError(to_parse, 'Error parsing eval(...), excepting ":", at')
+
+                return [ 'f:cond', current_result, x, y ]
 
             elif to_parse.match(eval_op_regexp, wind=None):
                 current = to_parse.match_group(1)

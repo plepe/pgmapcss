@@ -33,6 +33,7 @@ If you read a number, unit conversion takes place. The following units are suppo
 | && | logical and | no standard
 | {{{||}}} | logical or | no standard
 | ! | logical not | no standard
+| condition ? if_true : else | If condition evaluates to a truth value, if_true will be executed, else otherwise. Equals cond(condition, if_true, else). | no standard, JOSM
 
 == Functions ==
 |= Function |= Parameters |= Return value |= Description | Compatibility
