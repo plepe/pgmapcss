@@ -1,5 +1,4 @@
 import pgmapcss.db as db
-from .stat import *
 from .compile_sql import *
 
 def get_where_selectors(filter, stat):
@@ -66,7 +65,7 @@ def get_where_selectors(filter, stat):
 def compile_function_get_where(id, stat):
     ret = ''
 
-    scale_denominators = stat_all_scale_denominators(stat)
+    scale_denominators = stat.all_scale_denominators()
 
     max_scale = None
     for min_scale in scale_denominators:

@@ -1,6 +1,5 @@
 from .compile_statement import compile_statement
 from .compile_eval import compile_eval
-from .stat import *
 import copy
 import textwrap
 from collections import Counter
@@ -49,7 +48,7 @@ def print_checks(prop, stat, main_prop=None, indent=''):
     # @values
     if 'values' in stat['defines'] and prop in stat['defines']['values']:
         values = stat['defines']['values'][prop]['value'].split(';')
-        used_values = stat_property_values(prop, stat, include_illegal_values=True)
+        used_values = stat.property_values(prop, include_illegal_values=True)
 
         # if there are used values which are not allowed, always check
         # resulting value and - if not allowed - replace by the first
@@ -170,7 +169,7 @@ def check_{min_scale_esc}(object):
     for main_prop in main_prop_order:
         props = stat['defines']['depend_property'][main_prop]
         include_main_prop = False
-        if main_prop in stat_properties(stat):
+        if main_prop in stat.properties():
             include_main_prop = True
 
         props = props['value'].split(';')
@@ -199,7 +198,7 @@ def check_{min_scale_esc}(object):
             ret += indent + 'if ' + repr(main_prop) + " in current['properties'][pseudo_element]:\n"
             ret += r
 
-    for prop in [ prop for prop in stat_properties(stat) if not prop in done_prop ]:
+    for prop in [ prop for prop in stat.properties() if not prop in done_prop ]:
         ret += print_checks(prop, stat, indent=indent)
         ret += print_postprocess(prop, stat, indent=indent)
 

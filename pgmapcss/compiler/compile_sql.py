@@ -1,5 +1,4 @@
 import pgmapcss.db as db
-from .stat import stat_filter_statements
 
 def compile_condition_sql(condition, statement, stat, prefix='current.', filter={}):
     ret = ''
@@ -13,7 +12,7 @@ def compile_condition_sql(condition, statement, stat, prefix='current.', filter=
         f = filter.copy()
         f['has_set_tag'] = condition['key']
         f['max_id'] = statement['id']
-        set_statements = stat_filter_statements(stat, f)
+        set_statements = stat.filter_statements(f)
 
         if len(set_statements) == 0:
             return 'false'

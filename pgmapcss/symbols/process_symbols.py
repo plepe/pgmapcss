@@ -1,6 +1,5 @@
 import os
 import math
-from pgmapcss.compiler.stat import *
 from pkg_resources import *
 
 def build_symbol(x, stat):
@@ -65,11 +64,10 @@ def build_symbol(x, stat):
     return dest
 
 def init(stat):
-    stat_add_generated_property(
+    stat.add_generated_property(
         'final-symbol-image',
         { 'symbol-shape', 'symbol-size', 'symbol-stroke-width', 'symbol-stroke-color', 'symbol-stroke-opacity', 'symbol-fill-color', 'symbol-fill-opacity' },
-        lambda x, stat: build_symbol(x, stat),
-        stat
+        lambda x, stat: build_symbol(x, stat)
     )
 
 def process_symbols(style_id, args, stat, conn):
@@ -80,4 +78,4 @@ def process_symbols(style_id, args, stat, conn):
         pass
 
     stat['symbols_dir'] = symbols_dir
-    images = stat_property_values('final-symbol-image', stat, value_type='value')
+    images = stat.property_values('final-symbol-image', value_type='value')
