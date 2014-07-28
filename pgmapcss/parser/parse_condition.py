@@ -82,6 +82,16 @@ def parse_condition(to_parse):
             condition['value'] = [ 'f:metric', 'v:' + to_parse.match_group(1) + to_parse.match_group(2) ]
             condition['value_type'] = 'eval'
 
+    elif condition['op'] in ('=~', '!~'):
+        condition['value'] = parse_string(to_parse, delim="/")
+
+        m = to_parse.match('([^\]]*)\]')
+
+        if m:
+            condition['regexp_flags'] = to_parse.match_group(1)
+        else:
+            raise ParseError(to_parse, 'parse condition: expecting ]')
+
     else:
         m = to_parse.match('([^\]]*)\]')
         if m:
