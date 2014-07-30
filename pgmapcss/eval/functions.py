@@ -35,6 +35,7 @@ class Functions:
             content = \
                 'def _eval(statement):\n' +\
                 '    import re\n' +\
+                '    import math\n' +\
                 '    global_data = ' + repr(self.stat['global_data']) + '\n' +\
                 '    ' + resource_string(__name__, 'base.py').decode('utf-8').replace('\n', '\n    ') +\
                 '\n' +\
@@ -95,6 +96,7 @@ class Functions:
 create or replace function __eval_test__() returns text
 as $body$
 import re
+import math
 ''' +\
 resource_string(__name__, 'base.py').decode('utf-8') +\
 include_text() +\

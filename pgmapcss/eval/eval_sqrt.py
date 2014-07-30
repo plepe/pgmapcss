@@ -6,7 +6,6 @@ class config_eval_sqrt(config_base):
         return min(ret)
 
 def eval_sqrt(param):
-    import math
     if len(param) == 0:
         return ''
 
