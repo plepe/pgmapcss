@@ -87,6 +87,16 @@ If you read a number, unit conversion takes place. The following units are suppo
 | round | v number, [s int] | number | Round the input value v to s decimal places (or 0). E.g. round(-50.6, 1) => -51 | no standard
 | floor | v number | number | Returns the next lowest integer value by rounding down v if necessary. | JOSM
 | ceil | v number | number | Returns the next highest integer value by rounding up v if necessary. | JOSM
+| sin | a angle | number | Returns the trigonometric sine of an angle in the current angular system. | JOSM
+| cos | a angle | number | Returns the trigonometric cosine of an angle in the current angular system. | JOSM
+| tan | a angle | number | Returns the trigonometric tangent of an angle in the current angular system. | JOSM
+| asin | a number | angle | Returns the arc sine of a value. The returned value is in the current angular system. | JOSM
+| acos | a number | angle | Returns the arc cosine of a value. The returned value is in the current angular system. | JOSM
+| atan | a number | angle | Returns the arc tangent of a value. The returned value is in the current angular system. | JOSM
+| atan2 | y number, x number | angle | Returns the angle theta (in the current angular system) from the conversion of rectangular coordinates (x, y) to polar coordinates (r, theta). | JOSM
+| sinh | x number | number | Returns the hyperbolic sine of a double value. | JOSM
+| cosh | x number | number | Returns the hyperbolic cosine of a double value. | JOSM
+| tanh | x number | number | Returns the hyperbolic tangent of a double value. | JOSM
 
 === List functions ===
 * List functions are not part of the MapCSS 0.2 standard, but follow the [[http://wiki.openstreetmap.org/wiki/MapCSS/0.2/Proposal_lists|proposal for lists]]
