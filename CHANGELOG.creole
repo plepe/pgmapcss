@@ -4,7 +4,7 @@
 * Config option angular_system whether angles (rotation, azimuth functions) should use degrees or radians
 * Eval functions:
 ** changed parameter order for join() and split()
-** new eval functions: viewport(), intersection(), range(), reverse(), is_left_hand_traffic(), is_right_hand_traffic(), line_locate_azimuth(), red(), green(), blue(), alpha(), URL_encode(), XML_encode(), CRC32_checksum(), regexp_text(), regexp_match(), floor(), ceil(), length(), is_prop_set(), has_tag_key(), sin(), cos(), tan(), asin(), acos(), atan(), atan2(), sinh(), cosh(), tanh(), signum(), log(), exp(), replace()
+** new eval functions: viewport(), intersection(), range(), reverse(), is_left_hand_traffic(), is_right_hand_traffic(), line_locate_azimuth(), red(), green(), blue(), alpha(), URL_encode(), XML_encode(), CRC32_checksum(), regexp_text(), regexp_match(), floor(), ceil(), length(), is_prop_set(), has_tag_key(), sin(), cos(), tan(), asin(), acos(), atan(), atan2(), sinh(), cosh(), tanh(), signum(), log(), exp(), replace(), JOSM_pref()
 ** Deprecations: substr() renamed to substring()
 ** support inline condition operator: (condition?if_true:else)
 ** an identifier may no longer contain ':' (because of inline condition operator)
