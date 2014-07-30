@@ -66,8 +66,8 @@ If you read a number, unit conversion takes place. The following units are suppo
 | URL_encode | string | string | percent-encode a string. May be useful for data URLs | JOSM
 | XML_encode | string | string | escape special characters in xml. E.g. < becomes &lt;, other special characters: >, ", ', & | JOSM
 | CRC32_checksum| string | number | calculate the CRC32 checksum of a string (result is an integer from 0 to 232-1) | JOSM
-| regexp_test | pattern:string, str:string, [flags:string] | test if string str matches the pattern. flags is a string that may contain "i" (case insensitive). | JOSM¹
-| regexp_match | pattern:string, str:string, [flags:string] | Tries to match str against the pattern. Returns a list of capture groups in case of success. The first element (index 0) is the complete match (i.e. string). Further elements correspond to the bracketed parts of the regular expression. flags is a string that may contain "i" (case insensitive). | JOSM¹
+| regexp_test | pattern:string, str:string, [flags:string] | boolean | test if string str matches the pattern. flags is a string that may contain "i" (case insensitive). | JOSM¹
+| regexp_match | pattern:string, str:string, [flags:string] | list | Tries to match str against the pattern. Returns a list of capture groups in case of success. The first element (index 0) is the complete match (i.e. string). Further elements correspond to the bracketed parts of the regular expression. flags is a string that may contain "i" (case insensitive). | JOSM¹
 
 ¹ in contrast to JOSM the pattern does not need to match the whole string; you should add ^ and $ to limit pattern.
 
@@ -111,8 +111,8 @@ Mapnik < 3.0 can't read dynamic color values. Therefore pgmapcss has to know all
 | rgba | red, green, blue, alpha. As rgb(), but with an additional alpha channel with 0=transparent and 1.0 / 255 / 100%=fully opaque. E.g. rgba(0.1, 127, 90%, 50%) | A color in hex notation, e.g. '#1a7fe57f' | Creates a color with an alpha channel from the input parameters
 | deluma | color (hex notation, e.g. #123456), factor (float, e.g. 0.5) | color in hex notation | reduce color luma by a given factor
 | lighten | color (hex notation, e.g. #123456), factor (float, e.g. 0.5) | color in hex notation | lighten a color by a given factor
-| red, green, blue | color (hex notation, e.g. #123456) | get value of color channels in rgb color model (0..1)
-| alpha | color (hex notation, e.g. #123456 or #12345678) | grep the alpha value of the given color (0..1)
+| red, green, blue | color (hex notation, e.g. #123456) | number (from 0..1) | get value of color channels in rgb color model (0..1)
+| alpha | color (hex notation, e.g. #123456 or #12345678) | number (from 0..1) | grep the alpha value of the given color (0..1)
 
 == Geometric functions ===
 * Geometric functions are not part of the MapCSS 0.2 standard
