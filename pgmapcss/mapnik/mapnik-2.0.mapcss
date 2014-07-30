@@ -22,6 +22,8 @@
 @type shield-font-size numeric;
 @type dashes dashes;
 @type casing-dashes dashes;
+@type icon-rotation angle;
+@type symbol-rotation angle;
 
 // The follwing properties default to the final value of another property
 @default_other casing-linecap linecap;

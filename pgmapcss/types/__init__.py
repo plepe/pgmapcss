@@ -6,6 +6,7 @@ from .values import values
 from .pixels import pixels
 from .numeric import numeric
 from .dashes import dashes
+from .angle import angle
 
 global classes
 classes = {
@@ -17,6 +18,7 @@ classes = {
     'pixels': pixels,
     'numeric': numeric,
     'dashes': dashes,
+    'angle': angle,
 }
 
 properties = {
