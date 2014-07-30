@@ -129,14 +129,14 @@ Mapnik < 3.0 can't read dynamic color values. Therefore pgmapcss has to know all
 | line_merge | geometry | geometry | Merges collected line strings; polygons and other geometries will get lost.
 | convex_hull | geometry | geometry | Create a convex hull from the input geometry: http://postgis.net/docs/ST_ConvexHull.html
 | line_locate_point | geometry, geometry | number | Returns a number between 0 and the length of the line representing the location of the closest point on a line (1st geometry) to the given point (2nd geometry).
-| line_locate_azimuth | line geometry, pos geometry or number, [distance number] | number | Returns the north-based azimuth as the angle in degrees measured clockwise from the vertical on a point on the line which is either located closest to the given point pos or which is interpolated along the line (from 0..length of line). optional parameter 'dist': distance from located point which is used to measure angle (default 1px).
+| line_locate_azimuth | line geometry, pos geometry or number, [distance number] | number | Returns the north-based azimuth as the angle in the current angular system measured clockwise from the vertical on a point on the line which is either located closest to the given point pos or which is interpolated along the line (from 0..length of line). optional parameter 'dist': distance from located point which is used to measure angle (default 1px).
 | line_interpolate_point | geometry, number | geometry | Returns a point interpolated along a line. 2nd argument is a number between 0 and the length of the line (1st argument).
 | line_part | geometry, number[, number] | geometry | Return a linestring being a substring of the input line starting and ending at the given fractions of total length. 2nd argument ist start location, 3rd argument is end location between 0..length of line. If negative arguments are used the location is calculated from the end. If the 3rd argument is omitted the end of the line is assumed.
 | line | geometry, geometry, [geometry, ...] | geometry | Return a line of all input geometries (points).
 | line | list | geometry | Return a line of all input geometries (points).
-| azimuth | geometry, geometry | number | Returns the north-based azimuth as the angle in degrees measured clockwise from the vertical on point1 to point2 (see http://postgis.net/docs/ST_Azimuth.html)
+| azimuth | geometry, geometry | number | Returns the north-based azimuth as the angle in the current angular system measured clockwise from the vertical on point1 to point2 (see http://postgis.net/docs/ST_Azimuth.html)
 | translate | geometry, X number, Y number | geometry | Translates the geometry to a new location using the numeric parameters as offsets (default px).
-| rotate | geometry, angle number, [center geometry] | geometry | Rotates the geometry around the center geometry (or the centroid of the input geometry) by angle degrees.
+| rotate | geometry, angle number, [center geometry] | geometry | Rotates the geometry around the center geometry (or the centroid of the input geometry) by the given angle (in the current angular system).
 | area | geometry | number | returns area of polygon in square pixels
 | centroid | geometry | geometry | returns the centroid of the input geometry
 | intersection | geometry A, geometry B | geometry | Returns a geometry that represents the shared portion of A and B (see [[http://postgis.net/docs/manual-2.0/ST_Intersection.html|Postgis: ST_Intersection]])

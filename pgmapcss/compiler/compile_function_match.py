@@ -67,6 +67,7 @@ create or replace function pgmapcss_{style_id}(
 ) returns setof pgmapcss_result as $body$
 import pghstore
 import re
+import math
 import datetime
 '''.format(**replacement)
 

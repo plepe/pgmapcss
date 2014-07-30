@@ -83,7 +83,7 @@ def parse_defines(stat, to_parse):
             stat['config'][key] = current['value']
 
             if not to_parse.match('\s*;'):
-                raise ParseError(to_parse, 'Error parsing config option, expecing ;')
+                raise ParseError(to_parse, 'Error parsing config option, expecting ;')
 
         else:
             if not to_parse.match('\s*([A-Za-z0-9_\-]*)\s+'):
