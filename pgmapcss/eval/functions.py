@@ -125,9 +125,10 @@ render_context = {'bbox': '010300002031BF0D000100000005000000DBF1839BB5DC3B41E70
             if m:
                 param_in = eval(m.group(1))
 
-            m = re.match('# OUT (.*)$', r)
+            m = re.match('# OUT(_ROUND)? (.*)$', r)
             if m:
-                return_out = eval(m.group(1))
+                return_out = eval(m.group(2))
+                shall_round = m.group(1) == '_ROUND'
 
                 ret += 'ret = ' + config.compiler([ repr(p) for p in param_in ], '', {}) + '\n'
                 ret += 'result += "IN  %s\\n"\n' % repr(param_in)
@@ -135,7 +136,10 @@ render_context = {'bbox': '010300002031BF0D000100000005000000DBF1839BB5DC3B41E70
                 ret += 'result += "OUT %s\\n" % repr(ret)\n'
 
                 ret += 'if type(ret) != str:\n    result += "ERROR not a string: " + repr(ret) + "\\n"\n'
-                ret += 'elif ret != %s:\n    result += "ERROR return value wrong!\\n"\n' % repr(return_out)
+                if shall_round:
+                    ret += 'elif round(float(ret), 5) != %s:\n    result += "ERROR return value wrong!\\n"\n' % repr(round(float(return_out), 5))
+                else:
+                    ret += 'elif ret != %s:\n    result += "ERROR return value wrong!\\n"\n' % repr(return_out)
 
         ret += 'return result\n'
         ret += "$body$ language 'plpython3u' immutable;"

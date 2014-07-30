@@ -15,16 +15,18 @@ def stat_all_scale_denominators(stat):
         ])),
         reverse=True)
 
-def stat_properties(stat, object_type=None):
+def stat_properties(stat, pseudo_element=None, max_prop_id=None, object_type=None):
     ret = set([
         p['key']
         for v in stat['statements']
         if object_type is None or v['selector']['type'] == object_type
+        if pseudo_element == None or v['selector']['pseudo_element'] in ('*', pseudo_element)
         for p in v['properties']
         if p['assignment_type'] == 'P'
+        if max_prop_id is None or p['id'] <= max_prop_id
     ])
 
-    if 'default_value' in stat['defines']:
+    if max_prop_id is None or 'default_value' in stat['defines']:
         for k in stat['defines']['default_value']:
             ret.add(k)
 
