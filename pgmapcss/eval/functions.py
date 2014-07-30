@@ -21,6 +21,17 @@ class Functions:
         for func, src in self.eval_functions_source.items():
             ret += src
 
+        if not self.stat or 'angular_system' not in self.stat['config'] or self.stat['config']['angular_system'] == 'degrees':
+            ret = ret.replace("FROM_DEGREES", "")
+            ret = ret.replace("FROM_RADIANS", "math.degrees")
+            ret = ret.replace("TO_DEGREES", "")
+            ret = ret.replace("TO_RADIANS", "math.radians")
+        else:
+            ret = ret.replace("FROM_DEGREES", "math.radians")
+            ret = ret.replace("FROM_RADIANS", "")
+            ret = ret.replace("TO_DEGREES", "math.degrees")
+            ret = ret.replace("TO_RADIANS", "")
+
         # indent all lines
         ret = indent + ret.replace('\n', '\n' + indent)
 

@@ -1,6 +1,7 @@
 0.8-dev
 * support @media queries, see [[doc/MapCSS.creole|MapCSS docu]]
 * a couple of performance improvements
+* Config option angular_system whether angles (rotation, azimuth functions) should use degrees or radians
 * Eval functions:
 ** changed parameter order for join() and split()
 ** new eval functions: viewport(), intersection(), range(), reverse(), lefthandtraffic(), righthandtraffic(), line_locate_azimuth()
