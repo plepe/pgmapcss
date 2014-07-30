@@ -65,6 +65,7 @@ If you read a number, unit conversion takes place. The following units are suppo
 | concat | string, [string, [string, ...]] | string | Concatenate all strings | no standard
 | text_transform | string, "none" or "uppercase" or "lowercase" or "capitalize" | string | | no standard
 | substring | text string, int start, [int length] | text | Return part of a string. The string will start at the start'th position (counting from zero). If start is negative, the returned string will start at the start'th charactor from the end of the string. If length is given and is positive, the string returned will contain at most length characters, beginning from start. If length is given and negative, the returned string will stop at the length'th character from the end of the string. Example: substring('abcde', 2, 2) => 'cd'; substring('abcde', -4, -2) => 'bc'; substring('abcde', 1) => 'bcde' | JOSM
+| replace | text string, from string, to string | string | In string text replace all occurances of from by to. E.g.: replace("foobar", "o", "a") => "faabar" | JOSM
 | length | string | number | Return length of string, e.g. length("foobar") => 6 | no standard
 | join | string, string, string[, ...] | string | Join the list of strings (starting at the 2nd string) by the 1st string (the separator), e.g. join(" and ", "Alice", "Bob") -> "Alice and Bob". | JOSM
 | URL_encode | string | string | percent-encode a string. May be useful for data URLs | JOSM
