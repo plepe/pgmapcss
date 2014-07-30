@@ -38,7 +38,9 @@ If you read a number, unit conversion takes place. The following units are suppo
 == General Functions ==
 |= Function |= Parameters |= Return value |= Description | Compatibility
 | prop | key, [string] | value | current value of the computed property on pseudo element param2 (default: current pseudo element). Examples: prop(width), prop(width, casing) | MapCSS 0.2 (no standard: pseudo element)
+| is_prop_set | key:string, [pseudo_element:string] | boolean | returns true if the property key has been set on the pseudo element pseudo_element | JOSM
 | tag | key, [key, [key, ...]] | value | value of the tag key (e.g. tag("name") ). If several keys are passed, the first set tag is returned, e.g. tag("name:en", "int_name", "name"). | MapCSS 0.2 (only one key)
+| has_tag_key | key:string | boolean | returns true if the object has a tag with the given key | JOSM
 | parent_id | | text | Return the id of the current parent object. | no standard
 | parent_tag | key, [key, [key, ...]] | value | value of the tag key (e.g. parent_tag("name") ) of the parent element in the link selector. If several keys are passed, the first set tag is returned, e.g. parent_tag("name:en", "int_name", "name"). | no standard
 | parent_geo | | geometry | Return the geometry of the current parent object. | no standard
