@@ -78,7 +78,9 @@ If you read a number, unit conversion takes place. The following units are suppo
 == Mathematical Functions ==
 |= Function |= Parameters |= Return value |= Description | Compatibility
 | sqrt | number | number | Square root of input value | MapCSS 0.2
-| power | number, number | number | Calculates the first value (base) raised to the power of the second value (exp). E.g. power(2, 3) => 8 | no standard
+| power | number, number | number | Calculates the first value (base) raised to the power of the second value (exp). E.g. power(2, 3) => 8, power(4, 0.5) => 2 | no standard
+| log | v number, [base number] | number | Return the logarithm to the given base (default: natural logarithm, base e) | no standard
+| exp | v number | number | Return e raised to the power of v | no standard
 | min | number, [number, [number, ...]] | number | Returns lowest of the input values. | MapCSS 0.2
 | max | number, [number, [number, ...]] | number | Returns highest of the input values. | MapCSS 0.2
 | metric | value | number | Converts the input to pixels (or ""). E.g. number('3m') => '1.5' when the scale is '2 meters in 1 pixel'. | MapCSS 0.2
