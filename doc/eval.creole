@@ -85,6 +85,7 @@ If you read a number, unit conversion takes place. The following units are suppo
 | metric | value, [string] | number | Converts the input to a number (or "") of the specified unit (parameter 2, default 'px'). E.g. number('2px') => '2' or number('100px', 'm') => '238.86' (at zoom level 16). | no standard
 | zmetric | value | number | Currently not supported, returns '' |
 | round | v number, [s int] | number | Round the input value v to s decimal places (or 0). E.g. round(-50.6, 1) => -51 | no standard
+| signum | v number | number | Returns the signum function of the argument; zero if the argument is zero, 1 if the argument is greater than zero, -1 if the argument is less than zero.
 | floor | v number | number | Returns the next lowest integer value by rounding down v if necessary. | JOSM
 | ceil | v number | number | Returns the next highest integer value by rounding up v if necessary. | JOSM
 | sin | a angle | number | Returns the trigonometric sine of an angle in the current angular system. | JOSM
