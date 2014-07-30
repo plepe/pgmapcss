@@ -100,6 +100,7 @@ If you read a number, unit conversion takes place. The following units are suppo
 | sinh | x number | number | Returns the hyperbolic sine of a double value. | JOSM
 | cosh | x number | number | Returns the hyperbolic cosine of a double value. | JOSM
 | tanh | x number | number | Returns the hyperbolic tangent of a double value. | JOSM
+| random | | number | returns a random value between 0 and 1 | JOSM
 
 === List functions ===
 * List functions are not part of the MapCSS 0.2 standard, but follow the [[http://wiki.openstreetmap.org/wiki/MapCSS/0.2/Proposal_lists|proposal for lists]]
