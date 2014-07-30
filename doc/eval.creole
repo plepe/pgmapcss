@@ -112,7 +112,7 @@ Mapnik < 3.0 can't read dynamic color values. Therefore pgmapcss has to know all
 | deluma | color (hex notation, e.g. #123456), factor (float, e.g. 0.5) | color in hex notation | reduce color luma by a given factor
 | lighten | color (hex notation, e.g. #123456), factor (float, e.g. 0.5) | color in hex notation | lighten a color by a given factor
 | red, green, blue | color (hex notation, e.g. #123456) | number (from 0..1) | get value of color channels in rgb color model (0..1)
-| alpha | color (hex notation, e.g. #123456 or #12345678) | number (from 0..1) | grep the alpha value of the given color (0..1)
+| alpha | color (hex notation, e.g. #123456 or #12345678) | number (from 0..1) | get the alpha value of the given color (0..1)
 
 == Geometric functions ===
 * Geometric functions are not part of the MapCSS 0.2 standard
