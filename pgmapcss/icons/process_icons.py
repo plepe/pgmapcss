@@ -1,5 +1,4 @@
 import os
-from pgmapcss.compiler.stat import *
 from pkg_resources import *
 
 def build_icon(x, stat):
@@ -31,11 +30,10 @@ def build_icon(x, stat):
     return dest
 
 def init(stat):
-    stat_add_generated_property(
+    stat.add_generated_property(
         'final-icon-image',
         { 'icon-image', 'icon-width', 'icon-color' },
-        lambda x, stat: build_icon(x, stat),
-        stat
+        lambda x, stat: build_icon(x, stat)
     )
 
 def process_icons(style_id, args, stat, conn):
@@ -46,4 +44,4 @@ def process_icons(style_id, args, stat, conn):
         pass
 
     stat['icons_dir'] = icons_dir
-    images = stat_property_values('final-icon-image', stat, value_type='value')
+    images = stat.property_values('final-icon-image', value_type='value')

@@ -14,7 +14,7 @@ class config_eval_is_prop_set(config_base):
         if not 'id' in prop:
             return ( True, 0 )
 
-        keys = pgmapcss.compiler.stat.stat_properties(param_values[0], stat, pseudo_element=pseudo_element, max_prop_id=prop['id'] - 1)
+        keys = stat.properties(param_values[0], pseudo_element=pseudo_element, max_prop_id=prop['id'] - 1)
 
         return ( param_values[0] in keys, 0 )
 

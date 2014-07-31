@@ -5,10 +5,9 @@ from .compile_function_check import compile_function_check
 from ..includes import include_text
 import pgmapcss.eval
 import pgmapcss.types
-from .stat import *
 
 def compile_function_match(stat):
-    scale_denominators = sorted(stat_all_scale_denominators(stat), reverse=True)
+    scale_denominators = sorted(stat.all_scale_denominators(), reverse=True)
 
     check_functions = ''
     max_scale = None
@@ -31,11 +30,11 @@ def compile_function_match(stat):
 
     global_data = {}
     # make sure that automatic properties are generated
-    for prop in stat_properties(stat):
-        stat_property_values(prop, stat)
+    for prop in stat.properties():
+        stat.property_values(prop)
 
     # get global data from type
-    for prop in stat_properties(stat):
+    for prop in stat.properties():
         prop_type = pgmapcss.types.get(prop, stat)
         d = prop_type.get_global_data()
         if d:

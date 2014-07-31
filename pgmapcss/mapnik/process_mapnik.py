@@ -1,6 +1,5 @@
 import pghstore
 import re
-from pgmapcss.compiler.stat import *
 from pkg_resources import *
 import pgmapcss.db as db
 import hashlib
@@ -15,11 +14,10 @@ def shorten_column(s):
     return hashlib.md5(s.encode('UTF-8')).hexdigest()
 
 def init(stat):
-    stat_add_generated_property(
+    stat.add_generated_property(
         'final-casing-width',
         { 'width', 'casing-width' },
-        lambda x, stat: '%g' % (float(x['width'] or '0') + 2 * float(x['casing-width'] or '0')),
-        stat
+        lambda x, stat: '%g' % (float(x['width'] or '0') + 2 * float(x['casing-width'] or '0'))
     )
 
 def sql_convert_prop(k, s, stat):
@@ -75,7 +73,7 @@ def process(f1, replacement, stat, rek=0):
             m = re.match('# FOR\s*(.*)', r)
             k = m.group(1).split(' ')
 
-            combinations_list = combinations_combine(replacement, stat_properties_combinations(k, stat, eval_true=False), stat)
+            combinations_list = combinations_combine(replacement, stat.properties_combinations(k, eval_true=False), stat)
             f1_pos = f1.tell()
 
             # if no combinations found, skip to next # END
