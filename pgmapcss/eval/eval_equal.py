@@ -1,6 +1,6 @@
 class config_eval_equal(config_base):
     math_level = 7
-    op = '=='
+    op = ('==', '=')
     def mutable(self, param_values, stat):
         import pgmapcss.eval
         config_metric = pgmapcss.eval.eval_functions.list()['metric']

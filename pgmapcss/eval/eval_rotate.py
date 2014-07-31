@@ -17,7 +17,9 @@ def eval_rotate(param):
     else:
         center = param[2]
 
-    plan = plpy.prepare('select ST_Translate(ST_Rotate(ST_Translate($1, -ST_X($3), -ST_Y($3)), radians($2)), ST_X($3), ST_Y($3)) as r', ['geometry', 'float', 'geometry'])
+    angle = TO_RADIANS(angle)
+
+    plan = plpy.prepare('select ST_Translate(ST_Rotate(ST_Translate($1, -ST_X($3), -ST_Y($3)), $2), ST_X($3), ST_Y($3)) as r', ['geometry', 'float', 'geometry'])
     res = plpy.execute(plan, [ param[0], angle, center ])
 
     return res[0]['r']

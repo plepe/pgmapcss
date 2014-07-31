@@ -1,14 +1,18 @@
 parse_string_repl = { 'n': '\n' }
 
-def parse_string(to_parse):
+def parse_string(to_parse, delim=("'", '"')):
     done = ''
     parsed = ''
     pos = 0
 
-    if not to_parse.match('[\'"]'):
+    if type(delim) == str:
+        delim = { delim }
+
+    if not to_parse.to_parse()[0] in delim:
         return None
 
-    c = to_parse.match_group(0)
+    c = to_parse.to_parse()[0]
+    to_parse.wind(1)
     esc = False
     parsed += c
 

@@ -21,6 +21,17 @@ class Functions:
         for func, src in self.eval_functions_source.items():
             ret += src
 
+        if not self.stat or 'angular_system' not in self.stat['config'] or self.stat['config']['angular_system'] == 'degrees':
+            ret = ret.replace("FROM_DEGREES", "")
+            ret = ret.replace("FROM_RADIANS", "math.degrees")
+            ret = ret.replace("TO_DEGREES", "")
+            ret = ret.replace("TO_RADIANS", "math.radians")
+        else:
+            ret = ret.replace("FROM_DEGREES", "math.radians")
+            ret = ret.replace("FROM_RADIANS", "")
+            ret = ret.replace("TO_DEGREES", "math.degrees")
+            ret = ret.replace("TO_RADIANS", "")
+
         # indent all lines
         ret = indent + ret.replace('\n', '\n' + indent)
 
@@ -35,6 +46,7 @@ class Functions:
             content = \
                 'def _eval(statement):\n' +\
                 '    import re\n' +\
+                '    import math\n' +\
                 '    global_data = ' + repr(self.stat['global_data']) + '\n' +\
                 '    ' + resource_string(__name__, 'base.py').decode('utf-8').replace('\n', '\n    ') +\
                 '\n' +\
@@ -95,6 +107,7 @@ class Functions:
 create or replace function __eval_test__() returns text
 as $body$
 import re
+import math
 ''' +\
 resource_string(__name__, 'base.py').decode('utf-8') +\
 include_text() +\
@@ -112,9 +125,10 @@ render_context = {'bbox': '010300002031BF0D000100000005000000DBF1839BB5DC3B41E70
             if m:
                 param_in = eval(m.group(1))
 
-            m = re.match('# OUT (.*)$', r)
+            m = re.match('# OUT(_ROUND)? (.*)$', r)
             if m:
-                return_out = eval(m.group(1))
+                return_out = eval(m.group(2))
+                shall_round = m.group(1) == '_ROUND'
 
                 ret += 'ret = ' + config.compiler([ repr(p) for p in param_in ], '', {}) + '\n'
                 ret += 'result += "IN  %s\\n"\n' % repr(param_in)
@@ -122,7 +136,10 @@ render_context = {'bbox': '010300002031BF0D000100000005000000DBF1839BB5DC3B41E70
                 ret += 'result += "OUT %s\\n" % repr(ret)\n'
 
                 ret += 'if type(ret) != str:\n    result += "ERROR not a string: " + repr(ret) + "\\n"\n'
-                ret += 'elif ret != %s:\n    result += "ERROR return value wrong!\\n"\n' % repr(return_out)
+                if shall_round:
+                    ret += 'elif round(float(ret), 5) != %s:\n    result += "ERROR return value wrong!\\n"\n' % repr(round(float(return_out), 5))
+                else:
+                    ret += 'elif ret != %s:\n    result += "ERROR return value wrong!\\n"\n' % repr(return_out)
 
         ret += 'return result\n'
         ret += "$body$ language 'plpython3u' immutable;"

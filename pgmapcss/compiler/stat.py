@@ -16,16 +16,18 @@ class _stat(dict):
             ])),
             reverse=True)
 
-    def properties(self, object_type=None):
+    def properties(self, pseudo_element=None, max_prop_id=None, object_type=None):
         ret = set([
             p['key']
             for v in self['statements']
             if object_type is None or v['selector']['type'] == object_type
+            if pseudo_element == None or v['selector']['pseudo_element'] in ('*', p)
             for p in v['properties']
             if p['assignment_type'] == 'P'
+            if max_prop_id is None or p['id'] <= max_prop_id
         ])
 
-        if 'default_value' in self['defines']:
+        if max_prop_id is None or 'default_value' in stat['defines']:
             for k in self['defines']['default_value']:
                 ret.add(k)
 

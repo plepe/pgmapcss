@@ -53,6 +53,9 @@ parser.add_argument('-o', '--options', dest='options', nargs='+',
     choices=['profiler', 'context'],
     help='Additional options. Currently supported options: "profiler": during execution, show some statistics about query/processing time and count of objects. "context": show bounding box and scale denominator of requests.')
 
+parser.add_argument('-c', '--config', dest='config', nargs='+',
+    help='Set configuration options, e.g. -c foo=bar. See doc/MapCSS.creole for available configuration options.')
+
 def main():
     print('pgmapcss version %s' % pgmapcss.version.VERSION)
     args = parser.parse_args()
@@ -97,7 +100,8 @@ def main():
 
     stat = pgmapcss.compiler.stat._stat({
         'id': style_id,
-        'options': set(args.options) if args.options else set()
+        'options': set(args.options) if args.options else set(),
+        'config': {},
     })
     eval_functions = pgmapcss.eval.functions(stat).list()
 
@@ -121,6 +125,11 @@ def main():
     except pgmapcss.parser.ParseError as e:
         print(e)
         sys.exit(1)
+
+    if args.config:
+        for v in args.config:
+            v = v.split("=")
+            stat['config'][v[0]] = v[1]
 
     debug = open(style_id + '.output', 'w')
 

@@ -20,7 +20,38 @@ def init(stat):
         lambda x, stat: '%g' % (float(x['width'] or '0') + 2 * float(x['casing-width'] or '0'))
     )
 
-def combinations_combine(base, combinations_list):
+def sql_convert_prop(k, s, stat):
+    if not k in stat['defines']['type']:
+        return '(' + s + ')'
+
+    t = stat['defines']['type'][k]['value']
+
+    if t == 'angle' and 'angular_system' in stat['config'] and stat['config']['angular_system'] == 'radians':
+        return 'cast(round(cast(degrees(cast(' + s + ' as numeric)) as numeric), 5) as text)'
+
+    return '(' + s + ')'
+
+def rep_convert_prop(k, v, stat):
+    import math
+    if not k in stat['defines']['type']:
+        return v
+
+    t = stat['defines']['type'][k]['value']
+
+    if t == 'angle' and 'angular_system' in stat['config'] and stat['config']['angular_system'] == 'radians':
+        return str(round(math.degrees(float(v)), 5))
+
+    return v
+
+def combinations_combine(base, combinations_list, stat):
+    combinations_list = [
+        {
+            k: rep_convert_prop(k, v, stat)
+            for k, v in c.items()
+        }
+        for c in combinations_list
+    ]
+
     return [
         dict(list(base.items()) + list(b.items()))
         for b in combinations_list
@@ -42,7 +73,7 @@ def process(f1, replacement, stat, rek=0):
             m = re.match('# FOR\s*(.*)', r)
             k = m.group(1).split(' ')
 
-            combinations_list = combinations_combine(replacement, stat.properties_combinations(k, eval_true=False))
+            combinations_list = combinations_combine(replacement, stat.properties_combinations(k, eval_true=False), stat)
             f1_pos = f1.tell()
 
             # if no combinations found, skip to next # END
@@ -119,7 +150,7 @@ def process_mapnik(style_id, args, stat, conn):
     replacement = {}
     replacement['columns'] = ',\n  '.join([
         ' || \' \' || '.join([
-            '(properties->' + db.format(p) + ')'
+            sql_convert_prop(p, 'properties->' + db.format(p), stat)
             for p in props.split(' ')
         ]) + ' as "' + shorten_column(props) + '"'
         for props in stat['mapnik_columns']
