@@ -69,6 +69,24 @@ def process(f1, replacement, stat, rek=0):
         if not r:
             break;
 
+        elif re.match('# IF\s', r):
+            m = re.match('# IF\s*(.*)', r)
+            keys = m.group(1).split(' ')
+
+            # Check if all of the keys are used
+            count = [
+                True
+                for k in keys
+                if len(stat.property_values(k))
+            ]
+
+            # Process anyway ...
+            t = process(f1, replacement, stat, rek + 1)
+
+            # ... but if not used, ignore
+            if len(count):
+                text += t
+
         elif re.match('# FOR\s', r):
             m = re.match('# FOR\s*(.*)', r)
             k = m.group(1).split(' ')
