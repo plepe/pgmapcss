@@ -2,6 +2,9 @@ from .default import default
 
 class tag_value(default):
     def compile(self, prop):
+        if prop['value_type'] == 'string':
+            return repr(prop['value'])
+
         return "current['tags'].get(" + repr(prop['value']) + ")"
 
     def stat_value(self, prop):
