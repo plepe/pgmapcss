@@ -161,10 +161,10 @@
 # END
 
   <!-- SHIELDS -->
-# FOR shield-font-family shield-font-weight shield-font-style shield-font-size shield-text-color shield-text-halo-color shield-spacing shield-opacity shield-placement shield-text-halo-radius
+# FOR shield-font-family shield-font-weight shield-font-style
     <Rule>
-      <Filter>[shield-text] and [style-element] = 'shield' and '{shield-font-family} {shield-font-weight} {shield-font-style} {shield-font-size} {shield-text-color} {shield-text-halo-color} {shield-spacing} {shield-opacity} {shield-placement} {shield-text-halo-radius}' = [shield-font-family shield-font-weight shield-font-style shield-font-size shield-text-color shield-text-halo-color shield-spacing shield-opacity shield-placement shield-text-halo-radius]</Filter>
-      <ShieldSymbolizer placement="{shield-placement}" fontset-name="{shield-font-family} - {shield-font-weight} - {shield-font-style}" fill="{shield-text-color}" halo-fill="{shield-text-halo-color}" spacing="{shield-spacing}" size="{shield-font-size}" halo-radius="{shield-text-halo-radius}" opacity="{shield-opacity}" file="[shield-image]">[shield-text]</ShieldSymbolizer>
+      <Filter>[shield-text] and [style-element] = 'shield' and '{shield-font-family} {shield-font-weight} {shield-font-style}' = [shield-font-family shield-font-weight shield-font-style]</Filter>
+      <ShieldSymbolizer placement="[shield-placement]" fontset-name="{shield-font-family} - {shield-font-weight} - {shield-font-style}" fill="[shield-text-color]" halo-fill="[shield-text-halo-color]" spacing="[shield-spacing]" size="[shield-font-size]" halo-radius="[shield-text-halo-radius]" opacity="[shield-opacity]" file="[shield-image]">[shield-text]</ShieldSymbolizer>
     </Rule>
 # END
 </Style>
