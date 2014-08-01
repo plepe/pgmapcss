@@ -94,12 +94,10 @@
   <Style name="pgmapcss">
 <!-- POLYGONS -->
 
-# FOR fill-opacity
     <Rule>
       <Filter>[style-element] = 'fill' and [fill-color]</Filter>
       <PolygonSymbolizer fill="[fill-color]" fill-opacity="[fill-opacity]" />
     </Rule>
-# END
 
 <!-- POLYGON PATTERN -->
     <Rule>
@@ -108,20 +106,20 @@
     </Rule>
 
 <!-- CASING LINES -->
-# FOR casing-linejoin casing-linecap casing-dashes
+# FOR casing-dashes
     <Rule>
-      <Filter>[style-element] = 'casing' and [final-casing-width] and '{casing-linejoin} {casing-linecap} {casing-dashes}' = [casing-linejoin casing-linecap casing-dashes]</Filter>
-      <LineSymbolizer stroke="[casing-dashes-background-color]" stroke-width="[final-casing-width]" offset="[casing-offset]" stroke-opacity="[casing-dashes-background-opacity]" stroke-linejoin="{casing-linejoin}" stroke-linecap="{casing-linecap}" />
-      <LineSymbolizer stroke="[casing-color]" stroke-width="[final-casing-width]" offset="[casing-offset]" stroke-opacity="[casing-opacity]" stroke-linejoin="{casing-linejoin}" stroke-linecap="{casing-linecap}" stroke-dasharray="{casing-dashes}" />
+      <Filter>[style-element] = 'casing' and [final-casing-width] and '{casing-dashes}' = [casing-dashes]</Filter>
+      <LineSymbolizer stroke="[casing-dashes-background-color]" stroke-width="[final-casing-width]" offset="[casing-offset]" stroke-opacity="[casing-dashes-background-opacity]" stroke-linejoin="[casing-linejoin]" stroke-linecap="[casing-linecap]" />
+      <LineSymbolizer stroke="[casing-color]" stroke-width="[final-casing-width]" offset="[casing-offset]" stroke-opacity="[casing-opacity]" stroke-linejoin="[casing-linejoin]" stroke-linecap="[casing-linecap]" stroke-dasharray="{casing-dashes}" />
     </Rule>
 # END
 
 <!-- LINES -->
-# FOR linejoin linecap dashes
+# FOR dashes
     <Rule>
-      <Filter>[style-element] = 'line' and [width] and '{linejoin} {linecap} {dashes}' = [linejoin linecap dashes]</Filter>
-      <LineSymbolizer stroke="[dashes-background-color]" stroke-width="[width]" offset="[offset]" stroke-opacity="[dashes-background-opacity]" stroke-linejoin="{linejoin}" stroke-linecap="{linecap}" />
-      <LineSymbolizer stroke="[color]" stroke-width="[width]" offset="[offset]" stroke-opacity="[opacity]" stroke-linejoin="{linejoin}" stroke-linecap="{linecap}" stroke-dasharray="{dashes}" />
+      <Filter>[style-element] = 'line' and [width] and '{dashes}' = [dashes]</Filter>
+      <LineSymbolizer stroke="[dashes-background-color]" stroke-width="[width]" offset="[offset]" stroke-opacity="[dashes-background-opacity]" stroke-linejoin="[linejoin]" stroke-linecap="[linecap]" />
+      <LineSymbolizer stroke="[color]" stroke-width="[width]" offset="[offset]" stroke-opacity="[opacity]" stroke-linejoin="[linejoin]" stroke-linecap="[linecap]" stroke-dasharray="{dashes}" />
     </Rule>
 # END
 
