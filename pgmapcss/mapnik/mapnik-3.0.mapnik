@@ -135,12 +135,10 @@
       <PointSymbolizer file="[final-symbol-image]" transform="rotate([symbol-rotation])" />
     </Rule>
 
-# FOR icon-opacity
     <Rule>
-      <Filter>[style-element] = 'point' and [final-icon-image] and '{icon-opacity}' = [icon-opacity]</Filter>
-      <PointSymbolizer file="[final-icon-image]" opacity="{icon-opacity}" transform="rotate([icon-rotation])" />
+      <Filter>[style-element] = 'point' and [final-icon-image]</Filter>
+      <PointSymbolizer file="[final-icon-image]" opacity="[icon-opacity]" transform="rotate([icon-rotation])" />
     </Rule>
-# END
 
 <!-- TEXTS on Points -->
 # FOR font-family font-weight font-style
