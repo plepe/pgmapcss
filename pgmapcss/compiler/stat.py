@@ -199,5 +199,5 @@ class _stat(dict):
             if not 'min_scale' in filter or statement['selector']['min_scale'] <= filter['min_scale']
             if not 'max_scale' in filter or filter['max_scale'] == None or statement['selector']['max_scale'] == None or statement['selector']['max_scale'] >= filter['max_scale']
             if not 'max_id' in filter or statement['id'] <= filter['max_id']
-            if not 'has_set_tag' in filter or _has_set_tag(statement, filter['has_set_tag'], self)
+            if not 'has_set_tag' in filter or self._has_set_tag(statement, filter['has_set_tag'])
         ]
