@@ -102,10 +102,12 @@
 # END
 
 <!-- POLYGON PATTERN -->
+# IF fill-image
     <Rule>
       <Filter>[style-element] = 'fill' and [fill-image]</Filter>
       <PolygonPatternSymbolizer file="[fill-image]" />
     </Rule>
+# END
 
 <!-- CASING LINES -->
 # FOR casing-color final-casing-width casing-offset casing-opacity casing-linejoin casing-linecap casing-dashes casing-dashes-background-color casing-dashes-background-opacity
@@ -126,27 +128,34 @@
 # END
 
 <!-- LINE PATTERN -->
+# IF image
     <Rule>
       <Filter>[style-element] = 'line' and [image]</Filter>
       <LinePatternSymbolizer file="[image]" />
     </Rule>
+# END
 
 <!-- POINTS -->
+# IF symbol-shape
 # FOR symbol-rotation
     <Rule>
       <Filter>[style-element] = 'point' and [final-symbol-image] and '{symbol-rotation}' = [symbol-rotation]</Filter>
       <PointSymbolizer file="[final-symbol-image]" transform="rotate({symbol-rotation})" />
     </Rule>
 # END
+# END
 
+# IF icon-image
 # FOR icon-opacity icon-rotation
     <Rule>
       <Filter>[style-element] = 'point' and [final-icon-image] and '{icon-opacity} {icon-rotation}' = [icon-opacity icon-rotation]</Filter>
       <PointSymbolizer file="[final-icon-image]" opacity="{icon-opacity}" transform="rotate({icon-rotation})" />
     </Rule>
 # END
+# END
 
 <!-- TEXTS on Points -->
+# IF text
 # FOR font-family font-weight font-style text-color text-halo-color text-offset max-width text-anchor-horizontal
     <Rule>
         <Filter>[text] and [style-element] = 'point-text' and [text-position] = 'center' and '{font-family} {font-weight} {font-style} {text-color} {text-halo-color} {text-offset} {max-width} {text-anchor-horizontal}' = [font-family font-weight font-style text-color text-halo-color text-offset max-width text-anchor-horizontal]</Filter>
@@ -161,13 +170,16 @@
       <TextSymbolizer placement="line" fontset-name="{font-family} - {font-weight} - {font-style}" fill="{text-color}" halo-fill="{text-halo-color}" dy="{text-offset}" wrap-width="{max-width}" spacing="{text-spacing}"><ExpressionFormat size="[font-size]" halo-radius="[text-halo-radius]" character-spacing="[character-spacing]" opacity="[text-opacity]" wrap-character="[wrap-character]">[text]</ExpressionFormat></TextSymbolizer>
     </Rule>
 # END
+# END
 
   <!-- SHIELDS -->
+# IF shield-text
 # FOR shield-font-family shield-font-weight shield-font-style shield-font-size shield-text-color shield-text-halo-color shield-spacing shield-opacity shield-placement shield-text-halo-radius
     <Rule>
         <Filter>[shield-text] and [style-element] = 'shield' and '{shield-font-family} {shield-font-weight} {shield-font-style} {shield-font-size} {shield-text-color} {shield-text-halo-color} {shield-spacing} {shield-opacity} {shield-placement} {shield-text-halo-radius}' = [shield-font-family shield-font-weight shield-font-style shield-font-size shield-text-color shield-text-halo-color shield-spacing shield-opacity shield-placement shield-text-halo-radius]</Filter>
       <ShieldSymbolizer placement="{shield-placement}" fontset-name="{shield-font-family} - {shield-font-weight} - {shield-font-style}" fill="{shield-text-color}" halo-fill="{shield-text-halo-color}" spacing="{shield-spacing}" size="{shield-font-size}" halo-radius="{shield-text-halo-radius}" opacity="{shield-opacity}" file="[shield-image]">[shield-text]</ShieldSymbolizer>
     </Rule>
+# END
 # END
 </Style>
 

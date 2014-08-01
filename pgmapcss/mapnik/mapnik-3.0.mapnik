@@ -94,18 +94,23 @@
   <Style name="pgmapcss">
 <!-- POLYGONS -->
 
+# IF fill-color
     <Rule>
       <Filter>[style-element] = 'fill' and [fill-color]</Filter>
       <PolygonSymbolizer fill="[fill-color]" fill-opacity="[fill-opacity]" />
     </Rule>
+# END
 
 <!-- POLYGON PATTERN -->
+# IF fill-image
     <Rule>
       <Filter>[style-element] = 'fill' and [fill-image]</Filter>
       <PolygonPatternSymbolizer file="[fill-image]" />
     </Rule>
+# END
 
 <!-- CASING LINES -->
+# IF casing-width
 # FOR casing-dashes
     <Rule>
       <Filter>[style-element] = 'casing' and [final-casing-width] and '{casing-dashes}' = [casing-dashes]</Filter>
@@ -113,7 +118,9 @@
       <LineSymbolizer stroke="[casing-color]" stroke-width="[final-casing-width]" offset="[casing-offset]" stroke-opacity="[casing-opacity]" stroke-linejoin="[casing-linejoin]" stroke-linecap="[casing-linecap]" stroke-dasharray="{casing-dashes}" />
     </Rule>
 # END
+# END
 
+# IF width
 <!-- LINES -->
 # FOR dashes
     <Rule>
@@ -122,24 +129,32 @@
       <LineSymbolizer stroke="[color]" stroke-width="[width]" offset="[offset]" stroke-opacity="[opacity]" stroke-linejoin="[linejoin]" stroke-linecap="[linecap]" stroke-dasharray="{dashes}" />
     </Rule>
 # END
+# END
 
 <!-- LINE PATTERN -->
+# IF image
     <Rule>
       <Filter>[style-element] = 'line' and [image]</Filter>
       <LinePatternSymbolizer file="[image]" />
     </Rule>
+# END
 
 <!-- POINTS -->
+# IF symbol-shape
     <Rule>
       <Filter>[style-element] = 'point' and [final-symbol-image]</Filter>
       <PointSymbolizer file="[final-symbol-image]" transform="rotate([symbol-rotation])" />
     </Rule>
+# END
 
+# IF icon-image
     <Rule>
       <Filter>[style-element] = 'point' and [final-icon-image]</Filter>
       <PointSymbolizer file="[final-icon-image]" opacity="[icon-opacity]" transform="rotate([icon-rotation])" />
     </Rule>
+# END
 
+# IF text
 <!-- TEXTS on Points -->
 # FOR font-family font-weight font-style
     <Rule>
@@ -155,13 +170,16 @@
       <TextSymbolizer placement="line" fontset-name="{font-family} - {font-weight} - {font-style}" dy="[text-offset]" wrap-width="[max-width]" spacing="[text-spacing]" size="[font-size]" halo-radius="[text-halo-radius]" character-spacing="[character-spacing]" opacity="[text-opacity]" wrap-character="[wrap-character]" fill="[text-color]" halo-fill="[text-halo-color]">[text]</TextSymbolizer>
     </Rule>
 # END
+# END
 
   <!-- SHIELDS -->
+# IF shield-text
 # FOR shield-font-family shield-font-weight shield-font-style
     <Rule>
       <Filter>[shield-text] and [style-element] = 'shield' and '{shield-font-family} {shield-font-weight} {shield-font-style}' = [shield-font-family shield-font-weight shield-font-style]</Filter>
       <ShieldSymbolizer placement="[shield-placement]" fontset-name="{shield-font-family} - {shield-font-weight} - {shield-font-style}" fill="[shield-text-color]" halo-fill="[shield-text-halo-color]" spacing="[shield-spacing]" size="[shield-font-size]" halo-radius="[shield-text-halo-radius]" opacity="[shield-opacity]" file="[shield-image]">[shield-text]</ShieldSymbolizer>
     </Rule>
+# END
 # END
 </Style>
 
