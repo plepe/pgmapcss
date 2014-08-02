@@ -1,5 +1,34 @@
 from .ParseError import *
 from ..version import *
+import re
+
+def _check_version(check, current, comp='=='):
+    if type(check) == str:
+        check = re.split("[\.-]", check)
+    if type(current) == str:
+        current = re.split("[\.-]", current)
+
+    for i, v in enumerate(check):
+        if len(current) >= i:
+            try:
+                v = int(v)
+            except:
+                v = None
+
+            try:
+                c = int(current[i])
+            except:
+                c = None
+
+            if v and c:
+                if comp == '==' and v != c:
+                    return False
+                if comp == 'min' and v > c:
+                    return False
+                if comp == 'max' and v < c:
+                    return False
+
+    return True
 
 # returns
 # * the media query to include in statement (might be simplified)
@@ -16,24 +45,24 @@ def check_media_query(stat, to_parse, query):
 
         for q in q1[1:]:
             m1 = False
+            condition_key = q[0]
+            condition_value = q[1]
+            minmax_condition_key = q[0]
+            minmax = '=='
+
+            q2 = re.match('((min|max)-)?(.*)$', q[0])
+            if q2:
+                minmax_condition_key = q2.group(3)
+                minmax = q2.group(2)
+            print(condition_key, minmax_condition_key, minmax, condition_value)
 
 # add here all queries that are (or might be) True
-            if q[0] == 'user-agent' and q[1] == 'pgmapcss':
+            if condition_key == 'user-agent' and q[1] == 'pgmapcss':
                 m1 = True
-            elif q[0] == 'min-pgmapcss-version':
-                m1 = True
-                check_version = q[1].split('.')
-                for i, v in enumerate(check_version):
-                    if len(VERSION_INFO) < i or (type(VERSION_INFO[i]) == int and VERSION_INFO[i] < int(v)):
-                        m1 = False
-            elif q[0] == 'max-pgmapcss-version':
-                m1 = True
-                check_version = q[1].split('.')
-                for i, v in enumerate(check_version):
-                    if len(VERSION_INFO) < i or (type(VERSION_INFO[i]) == int and VERSION_INFO[i] > int(v)):
-                        m1 = False
+            elif minmax_condition_key == 'pgmapcss-version':
+                m1 = _check_version(condition_value, VERSION_INFO, minmax)
 
-            elif q[0] == 'type':
+            elif condition_key == 'type':
                 m1 = True
 
             if not m1:
