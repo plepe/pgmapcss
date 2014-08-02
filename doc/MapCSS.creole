@@ -381,6 +381,8 @@ Media queries are used to skip a section of the style under certain conditions. 
 |= Media condition |= Description
 | {{{(user-agent: <string>)}}} | Only include @media section when the name of the editor / renderer matches the given string. The only accepted value is {{{pgmapcss}}}.
 | {{{(pgmapcss-version: <version>)}}} | Only include @media section when the current version of pgmapcss matches the specified version, e.g. 0.8. Can be prefixed by {{{min-}}} or {{{max-}}} to compare ranges. (e.g. {{{min-pgmapcss-version: 0.8}}} would match the following versions: 0.8, 0.9, 0.12, 1.0 but not not 0.4 and 0.7.
+| {{{(renderer: <string>)}}} | pgmapcss is used with the specified renderer (currently only "mapnik" is supported).
+| {{{(renderer-version: <version>)}}} | Check if the specified renderer version is used (assessed at compile time, dependening on the used template). {{{min-}}} and {{{max-}}} prefixes supported, see {{{pgmapcss-version}} for details.
 
 Conditions can be combined with {{{and}}}, chained with a comma (logical or) and negated (e.g. {{{not (user-agent: pgmapcss)}}}).
 

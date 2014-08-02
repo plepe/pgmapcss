@@ -102,6 +102,7 @@ def main():
         'id': style_id,
         'options': set(args.options) if args.options else set(),
         'config': {},
+        'base_style': args.base_style,
     })
     eval_functions = pgmapcss.eval.functions(stat).list()
 

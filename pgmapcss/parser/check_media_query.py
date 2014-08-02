@@ -62,6 +62,12 @@ def check_media_query(stat, to_parse, query):
             elif minmax_condition_key == 'pgmapcss-version':
                 m1 = _check_version(condition_value, VERSION_INFO, minmax)
 
+            elif condition_key == 'renderer':
+                m1 = (q[1] == stat['base_style'].split("-")[0])
+
+            elif minmax_condition_key == 'renderer-version':
+                m1 = _check_version(condition_value, stat['base_style'].split("-")[1], minmax)
+
             elif condition_key == 'type':
                 m1 = True
 
