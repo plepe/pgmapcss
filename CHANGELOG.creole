@@ -25,6 +25,7 @@
 ** properties of type pixel (e.g. width, offset) accept relative values (added to value on default pseudo element)
 ** New properties: icon-rotation, dashes-background-color, dashes-background-opacity, casing-dashes-background-color, casing-dashes-background-opacity; text-offset, text-anchor-vertical, text-anchor-horizontal
 ** symbol-* as in JOSM, plus symbol-rotation
+** Property 'image': for Mapnik 2.0 and 2.2, SVGs will automatically be converted to PNGs
 * Lot's of bugfixes, see Git log for details
 * A new dependency: python3-wand
 

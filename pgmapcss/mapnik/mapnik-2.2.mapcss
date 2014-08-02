@@ -26,6 +26,7 @@
 @type casing-dashes dashes;
 @type icon-rotation angle;
 @type symbol-rotation angle;
+@type image image_png;
 
 // The follwing properties default to the final value of another property
 @default_other casing-offset offset;
