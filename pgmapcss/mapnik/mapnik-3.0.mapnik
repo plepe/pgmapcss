@@ -139,6 +139,15 @@
     </Rule>
 # END
 
+# IF repeat-image
+# FOR repeat-image-offset
+    <Rule>
+      <Filter>[style-element] = 'line' and [repeat-image] and '{repeat-image-offset}' = [repeat-image-offset]</Filter>
+      <LinePatternSymbolizer file="[repeat-image]" offset="{repeat-image-offset}" />
+    </Rule>
+# END
+# END
+
 <!-- POINTS -->
 # IF symbol-shape
     <Rule>

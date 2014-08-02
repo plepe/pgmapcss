@@ -82,9 +82,10 @@ Line properties
 | casing-dashes | An array of alternating on/off lengths | | YES(*)
 | casing-dashes-background-color | The color to use in between the dashes (optional) | | NO, JOSM (*)
 | casing-dashes-background-opacity |  Opacity value for the dashes background (optional) | | NO, JOSM (*)
+| repeat-image | Repeated image along a line (actually similar to "image", but with more features and compatible to JOSM) | | JOSM
 
 * MapCSS 0.2 properties not (yet) supported: extrude, extrude-*
-* Further properties not supported: offset, casing-offset (needs Mapnik 2.2 or higher)
+* Further properties not supported: offset, casing-offset (needs Mapnik 2.2 or higher), repeat-image-offset
 
 Area properties
 ---------------
