@@ -37,11 +37,4 @@ def init(stat):
     )
 
 def process_icons(style_id, args, stat, conn):
-    icons_dir = style_id + '.icons'
-    try:
-        os.mkdir(icons_dir)
-    except OSError:
-        pass
-
-    stat['icons_dir'] = icons_dir
     images = stat.property_values('final-icon-image', value_type='value')
