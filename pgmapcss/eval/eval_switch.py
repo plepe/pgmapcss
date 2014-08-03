@@ -5,13 +5,13 @@ class config_eval_switch(config_base):
         if param_values[0] is not True:
             return config_base.possible_values(self, param_values, prop, stat)
 
-        ret = {}
+        ret = set()
 
-        for i in range(1, len(param) - 1, 2):
-            ret.add(param[i + 1])
+        for i in range(1, len(param_values) - 1, 2):
+            ret.add(param_values[i + 1])
 
-        if len(param) % 2 == 0:
-            ret.add(param[-1])
+        if len(param_values) % 2 == 0:
+            ret.add(param_values[-1])
 
         return ( ret, 3 )
 
