@@ -35,6 +35,7 @@ def compile_function_match(stat):
         d = prop_type.get_global_data()
         if d:
             stat['global_data'][prop] = d
+            stat.clear_property_values_cache()
 
     replacement = {
       'style_id': stat['id'],

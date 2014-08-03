@@ -104,6 +104,7 @@ def main():
         'config': {},
         'base_style': args.base_style,
         'icons_dir': style_id + '.icons',
+        'global_data': None,
     })
 
     try:
