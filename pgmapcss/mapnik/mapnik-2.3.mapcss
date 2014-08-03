@@ -28,6 +28,7 @@
 @type symbol-rotation angle;
 @type image image_png;
 @type repeat-image image_png;
+@type repeat-image-offset pixels;
 
 // The follwing properties default to the final value of another property
 @default_other casing-offset offset;
@@ -40,6 +41,7 @@
 @default_other shield-text-transform text-transform;
 @default_other dashes-background-opacity opacity;
 @default_other casing-dashes-background-opacity casing-opacity;
+@default_other repeat-image-offset offset;
 
 // @values: Possible values of properties; the first value is the default value
 // linecap actually has 'none' as default value. the following statement automatically replaces 'none' by 'butt'
@@ -56,6 +58,7 @@
 @values icon-width "24;18;12";
 @values text-anchor-vertical "below;above";
 @values text-anchor-horizontal "middle;left;right";
+@values repeat-image-align "center;top;bottom";
 
 // @postprocess: To calculate final value of property X call
 // eval-function as specified.
@@ -70,11 +73,19 @@
 @postprocess final-symbol-image eval(
 style_id() . '.icons/symbol-' . prop('symbol-shape') .'-'. prop('symbol-size') .'-'. prop('symbol-stroke-width') .'-'. prop('symbol-stroke-color') .'-'. prop('symbol-stroke-opacity') .'-'. prop('symbol-fill-color') .'-'. prop('symbol-fill-opacity') .'.svg');
 @postprocess text-offset eval(_text_offset(prop('text-offset'), prop('text-anchor-vertical'), prop('icon-image'), prop('icon-width'), prop('symbol-shape'), prop('symbol-size'), prop('symbol-stroke-width')));
+@postprocess final-repeat-image-offset eval(
+    prop('repeat-image-offset') +
+    switch(prop('repeat-image-align'),
+        'center', 0,
+        'top', -_global_data('repeat-image', prop('repeat-image'), 1) / 2,
+        'bottom', _global_data('repeat-image', prop('repeat-image'), 1) / 2
+    )
+);
 
 // @depend_property: don't check values for e.g. 'text-position' if no 'text' is set
 @depend_property width "offset;color;opacity;linejoin;linecap;dashes;dashes-background-color;dashes-background-opacity";
 @depend_property image "";
-@depend_property repeat-image "";
+@depend_property repeat-image "repeat-image-offset;final-repeat-image-offset";
 @depend_property casing-width "casing-offset;casing-color;casing-opacity;casing-linejoin;casing-linecap;casing-dashes;final-casing-width;casing-dashes-background-color;casing-dashes-background-opacity";
 @depend_property shield-text "shield-spacing;shield-image;shield-opacity;shield-placement;shield-text-color;shield-text-halo-color;shield-text-opacity;shield-text-halo-radius;shield-font-family;shield-font-weight;shield-font-style;shield-font-size;shield-text-transform";
 @depend_property symbol-shape "final-symbol-image;symbol-shape;symbol-size;symbol-stroke-width;symbol-stroke-color;symbol-stroke-opacity;symbol-fill-color;symbol-fill-opacity;symbol-rotation";
@@ -128,6 +139,7 @@ style_id() . '.icons/symbol-' . prop('symbol-shape') .'-'. prop('symbol-size') .
 @default_value casing-dashes none;
 @default_value casing-dashes-background-color #00000000;
 @default_value final-casing-width ; // used internally to add width and casing-width
+@default_value repeat-image-align "center";
 // LinePatternSymbolizer
 // TextSymbolizer
 @default_value font-family "DejaVu Sans";

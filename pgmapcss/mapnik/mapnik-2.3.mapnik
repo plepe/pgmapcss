@@ -136,10 +136,12 @@
 # END
 
 # IF repeat-image
+# FOR final-repeat-image-offset
     <Rule>
-      <Filter>[style-element] = 'line' and [repeat-image]</Filter>
-      <LinePatternSymbolizer file="[repeat-image]" />
+      <Filter>[style-element] = 'line' and [repeat-image] and '{final-repeat-image-offset}' = [final-repeat-image-offset]</Filter>
+      <LinePatternSymbolizer file="[repeat-image]" offset="{final-repeat-image-offset}" />
     </Rule>
+# END
 # END
 
 <!-- POINTS -->
