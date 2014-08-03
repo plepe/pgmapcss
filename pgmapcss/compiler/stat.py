@@ -1,9 +1,13 @@
 import pgmapcss.types
 import pgmapcss.eval
 import copy
-property_values_cache = {}
 
 class _stat(dict):
+    property_values_cache = {}
+
+    def clear_property_values_cache(self):
+        self.property_values_cache = {}
+
     def all_scale_denominators(self):
         return sorted(list(set([
                 v['selector']['min_scale']
@@ -48,8 +52,8 @@ class _stat(dict):
         object_type: return values only for given object type (e.g. 'canvas')
         """
         cache_id = prop + '-' + repr(pseudo_element) + '-' + repr(include_illegal_values) + '-' + repr(value_type) + '-' + repr(eval_true) + '-' + repr(max_prop_id) + '-' + repr(include_none)
-        if cache_id in property_values_cache:
-            return property_values_cache[cache_id]
+        if cache_id in self.property_values_cache:
+            return self.property_values_cache[cache_id]
 
         prop_type = pgmapcss.types.get(prop, self)
 
@@ -111,7 +115,7 @@ class _stat(dict):
                 values = values.union(v)
 
         if include_illegal_values:
-            property_values_cache[cache_id] = values
+            self.property_values_cache[cache_id] = values
             return values
 
         if True in values:
@@ -133,7 +137,7 @@ class _stat(dict):
         if not eval_true and True in values:
             values.remove(True)
 
-        property_values_cache[cache_id] = values
+        self.property_values_cache[cache_id] = values
         return values
 
     def properties_combinations_pseudo_element(self, keys, pseudo_element, include_illegal_values=False, value_type=None, eval_true=True, max_prop_id=None, include_none=False):
