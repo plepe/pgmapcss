@@ -15,6 +15,9 @@ class image(default):
         return repr(prop['value'])
 
     def stat_value(self, prop):
+        if prop['value'] is None:
+            return prop['value']
+
         if os.path.exists(prop['value']):
             img = Image(filename=prop['value'])
             self.data[prop['value']] = img.size
