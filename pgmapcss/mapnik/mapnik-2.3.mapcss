@@ -30,6 +30,16 @@
 @type image image_png;
 @type repeat-image image_png;
 @type repeat-image-offset pixels;
+@type left-casing-width pixels;
+@type left-casing-offset pixels;
+@type left-casing-color color;
+@type left-casing-dashes dashes;
+@type left-casing-dashes-background-color color;
+@type right-casing-width pixels;
+@type right-casing-offset pixels;
+@type right-casing-color color;
+@type right-casing-dashes dashes;
+@type right-casing-dashes-background-color color;
 
 // The follwing properties default to the final value of another property
 @default_other casing-offset offset;
@@ -43,6 +53,16 @@
 @default_other dashes-background-opacity opacity;
 @default_other casing-dashes-background-opacity casing-opacity;
 @default_other repeat-image-offset offset;
+@default_other left-casing-opacity casing-opacity;
+@default_other left-casing-offset casing-offset;
+@default_other left-casing-linecap casing-linecap;
+@default_other left-casing-linejoin casing-linejoin;
+@default_other left-casing-dashes-background-opacity left-casing-opacity;
+@default_other right-casing-opacity casing-opacity;
+@default_other right-casing-offset casing-offset;
+@default_other right-casing-linecap casing-linecap;
+@default_other right-casing-linejoin casing-linejoin;
+@default_other right-casing-dashes-background-opacity right-casing-opacity;
 
 // @values: Possible values of properties; the first value is the default value
 // linecap actually has 'none' as default value. the following statement automatically replaces 'none' by 'butt'
@@ -60,6 +80,10 @@
 @values text-anchor-vertical "below;above";
 @values text-anchor-horizontal "middle;left;right";
 @values repeat-image-align "center;top;bottom";
+@values left-casing-linecap "butt;round;square";
+@values left-casing-linejoin "round;miter;bevel";
+@values right-casing-linecap "butt;round;square";
+@values right-casing-linejoin "round;miter;bevel";
 
 // @postprocess: To calculate final value of property X call
 // eval-function as specified.
@@ -82,12 +106,16 @@ style_id() . '.icons/symbol-' . prop('symbol-shape') .'-'. prop('symbol-size') .
         'bottom', _global_data('repeat-image', prop('repeat-image'), 1) / 2
     )
 );
+@postprocess final-left-casing-offset eval(prop('left-casing-offset') + prop('width') / 2 + prop('left-casing-width') / 2);
+@postprocess final-right-casing-offset eval(prop('right-casing-offset') - prop('width') / 2 - prop('right-casing-width') / 2);
 
 // @depend_property: don't check values for e.g. 'text-position' if no 'text' is set
 @depend_property width "offset;color;opacity;linejoin;linecap;dashes;dashes-background-color;dashes-background-opacity";
 @depend_property image "";
 @depend_property repeat-image "repeat-image-offset;repeat-image-align;final-repeat-image-offset";
 @depend_property casing-width "casing-offset;casing-color;casing-opacity;casing-linejoin;casing-linecap;casing-dashes;final-casing-width;casing-dashes-background-color;casing-dashes-background-opacity";
+@depend_property left-casing-width "left-casing-offset;left-casing-color;left-casing-opacity;left-casing-linejoin;left-casing-linecap;left-casing-dashes;left-casing-dashes-background-color;left-casing-dashes-background-opacity;final-left-casing-offset";
+@depend_property right-casing-width "right-casing-offset;right-casing-color;right-casing-opacity;right-casing-linejoin;right-casing-linecap;right-casing-dashes;right-casing-dashes-background-color;right-casing-dashes-background-opacity;final-right-casing-offset";
 @depend_property shield-text "shield-spacing;shield-image;shield-opacity;shield-placement;shield-text-color;shield-text-halo-color;shield-text-opacity;shield-text-halo-radius;shield-font-family;shield-font-weight;shield-font-style;shield-font-size;shield-text-transform";
 @depend_property symbol-shape "final-symbol-image;symbol-shape;symbol-size;symbol-stroke-width;symbol-stroke-color;symbol-stroke-opacity;symbol-fill-color;symbol-fill-opacity;symbol-rotation";
 @depend_property icon-image "final-icon-image;icon-opacity;icon-color;icon-width;icon-rotation";
@@ -98,6 +126,7 @@ style_id() . '.icons/symbol-' . prop('symbol-shape') .'-'. prop('symbol-size') .
 // @style_element_property
 @style_element_property fill "fill-color;fill-image";
 @style_element_property casing casing-width;
+@style_element_property side-casing "left-casing-width;right-casing-width";
 @style_element_property line "width;image;repeat-image";
 @style_element_property point "icon-image;symbol-shape";
 @style_element_property point-text text;
@@ -141,6 +170,12 @@ style_id() . '.icons/symbol-' . prop('symbol-shape') .'-'. prop('symbol-size') .
 @default_value casing-dashes-background-color #00000000;
 @default_value final-casing-width ; // used internally to add width and casing-width
 @default_value repeat-image-align "center";
+@default_value left-casing-opacity 1;
+@default_value left-casing-dashes none;
+@default_value left-casing-dashes-background-color #00000000;
+@default_value right-casing-opacity 1;
+@default_value right-casing-dashes none;
+@default_value right-casing-dashes-background-color #00000000;
 // LinePatternSymbolizer
 // TextSymbolizer
 @default_value font-family "DejaVu Sans";

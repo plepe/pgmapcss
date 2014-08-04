@@ -120,6 +120,26 @@
 # END
 # END
 
+# IF left-casing-width
+# FOR left-casing-dashes
+    <Rule>
+      <Filter>[style-element] = 'side-casing' and [left-casing-width] and '{left-casing-dashes}' = [left-casing-dashes]</Filter>
+      <LineSymbolizer stroke="[left-casing-dashes-background-color]" stroke-width="[left-casing-width]" offset="[final-left-casing-offset]" stroke-opacity="[left-casing-dashes-background-opacity]" stroke-linejoin="[left-casing-linejoin]" stroke-linecap="[left-casing-linecap]" />
+      <LineSymbolizer stroke="[left-casing-color]" stroke-width="[left-casing-width]" offset="[final-left-casing-offset]" stroke-opacity="[left-casing-opacity]" stroke-linejoin="[left-casing-linejoin]" stroke-linecap="[left-casing-linecap]" stroke-dasharray="{left-casing-dashes}" />
+    </Rule>
+# END
+# END
+
+# IF right-casing-width
+# FOR right-casing-dashes
+    <Rule>
+      <Filter>[style-element] = 'side-casing' and [right-casing-width] and '{right-casing-dashes}' = [right-casing-dashes]</Filter>
+      <LineSymbolizer stroke="[right-casing-dashes-background-color]" stroke-width="[right-casing-width]" offset="[final-right-casing-offset]" stroke-opacity="[right-casing-dashes-background-opacity]" stroke-linejoin="[right-casing-linejoin]" stroke-linecap="[right-casing-linecap]" />
+      <LineSymbolizer stroke="[right-casing-color]" stroke-width="[right-casing-width]" offset="[final-right-casing-offset]" stroke-opacity="[right-casing-opacity]" stroke-linejoin="[right-casing-linejoin]" stroke-linecap="[right-casing-linecap]" stroke-dasharray="{right-casing-dashes}" />
+    </Rule>
+# END
+# END
+
 # IF width
 <!-- LINES -->
 # FOR dashes
@@ -209,7 +229,7 @@
   {columns},
   "style-element",
   geo as _geo
-from pgmapcss_{style_id}(!bbox!, !scale_denominator!, Array['fill', 'casing', 'line', 'point', 'point-text', 'line-text', 'shield'])) t
+from pgmapcss_{style_id}(!bbox!, !scale_denominator!, Array['fill', 'casing', 'side-casing', 'line', 'point', 'point-text', 'line-text', 'shield'])) t
       </Parameter>
     </Datasource>
     <StyleName>pgmapcss</StyleName>
