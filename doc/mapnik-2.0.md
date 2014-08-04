@@ -1,4 +1,4 @@
-This is the list of properties when using Mapnik 2.2 (use -t mapnik-2.2 when loading mapcss file). 
+This is the list of properties when using Mapnik 2.0 (use -t mapnik-2.0 when loading mapcss file). 
 
 * The value of properties marked with an asterisk (*) in the "Compatibility MapCSS 0.2" column need to be predictable at compile-time; if not, a warning will be issued when compiling. Features might be missing in the rendered image.
 
