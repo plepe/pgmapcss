@@ -1,4 +1,4 @@
-This is the list of properties when using Mapnik 2.0 (use -t mapnik-2.0 when loading mapcss file). 
+This is the list of properties when using Mapnik 2.3 (use -t mapnik-2.3 when loading mapcss file). 
 
 * The value of properties marked with an asterisk (*) in the "Compatibility MapCSS 0.2" column need to be predictable at compile-time; if not, a warning will be issued when compiling. Features might be missing in the rendered image.
 
@@ -67,8 +67,9 @@ Line properties
 |---------------|-------------|---------------|--------------------------|
 | color | Colour of the line. | | YES(*)
 | width | The line width in pixels. | | YES(*)
+| offset | Pixels to offset the line to the left or right. | 0 | no standard(*)
 | opacity | How transparent the line is, from 0 (transparent) to 1 (opaque). | 1 | YES(*)
-| image |  The URL of an image to use for filling the line. As Mapnik 2.0 does not support SVG in LinePatterSymbolizer, it will be converted to PNG. | | YES
+| image |  The URL of an image to use for filling the line. As Mapnik 2.3 does not support SVG in LinePatterSymbolizer, it will be converted to PNG. | | YES
 | linejoin | The style for line corners: 'round', 'miter' or 'bevel'. | round | YES
 | linecap | The style for the end of the line: 'none' (default), 'round' or 'square' | none | YES
 | dashes | An array of alternating on/off lengths | | YES(*)
@@ -76,16 +77,18 @@ Line properties
 | dashes-background-opacity | Opacity value for the dashes background (optional) | | NO, JOSM (*)
 | casing-color | Colour of the casing (border) of a line. | | YES(*)
 | casing-width | Width of the casing (border) of the line (added to 'width' of the line). | 0 | YES(*)
+| casing-offset | Pixels to offset the casing of the line to the left or right. | value of `offset` | no standard(*)
 | casing-opacity | How transparent the casing is, from 0 (transparent) to 1 (opaque). | 1 | YES(*)
 | casing-linejoin | The style for casing corners: 'round', 'miter' or 'bevel'. | value of `linejoin` | YES
 | casing-linecap | The style for the end of the casing: 'none', 'round' or 'square' | value of `linecap`| YES
 | casing-dashes | An array of alternating on/off lengths | | YES(*)
 | casing-dashes-background-color | The color to use in between the dashes (optional) | | NO, JOSM (*)
-| casing-dashes-background-opacity |  Opacity value for the dashes background (optional) | | NO, JOSM (*)
-| repeat-image | Repeated image along a line (actually similar to "image", but with more features and compatible to JOSM). As Mapnik 2.0 does not support SVG in LinePatterSymbolizer, it will be converted to PNG. | | JOSM
+| casing-dashes-background-opacity | Opacity value for the dashes background (optional) | | NO, JOSM (*)
+| repeat-image | Repeated image along a line (actually similar to "image", but with more features and compatible to JOSM). As Mapnik 2.3 does not support SVG in LinePatterSymbolizer, it will be converted to PNG. | | JOSM
+| repeat-image-offset | Offset from the line | value of `offset` | JOSM (*)
+| repeat-image-align | Alignment of the image. Top-, bottom edge or the (horizontal) center line of the image will be along the line. Values: 'top', 'center', bottom' | center | JOSM
 
 * MapCSS 0.2 properties not (yet) supported: extrude, extrude-*
-* Further properties not supported: offset, casing-offset (needs Mapnik 2.2 or higher), repeat-image-offset
 
 Area properties
 ---------------
@@ -94,7 +97,7 @@ Area properties
 |---------------|-------------|---------------|--------------------------|
 | fill-color | Colour in which to fill the area. | | YES(*)
 | fill-opacity | How transparent the fill is, from 0 (transparent) to 1 (opaque) | 1 | YES(*)
-| fill-image |  The URL of an image to use for filling the area. As Mapnik 2.0 does not support SVG in LinePatterSymbolizer, it will be converted to PNG. | | YES
+| fill-image |  The URL of an image to use for filling the area. As Mapnik 2.3 does not support SVG in LinePatterSymbolizer, it will be converted to PNG. | | YES
 
 Label properties
 ----------------
@@ -109,16 +112,16 @@ Label properties
 | font-family | Name of the font to use default (see 'Fonts' below) | DejaVu Sans | YES(*)
 | font-weight |  'bold' or 'normal' | normal | YES
 | font-style |  'italic' or 'normal' | normal | YES
-| font-size | Size of the text | 12 | YES(*)
+| font-size | Size of the text | 12 | YES
 | text-color | Colour of text | #000000 | YES(*)
 | text-halo-color | The colour (hex or CSS) of the 'halo' or 'pull-out' used to make the text stand out from features underneath it. | #ffffff | YES(*)
-| text-halo-radius |  The radius of the halo | 0 | YES(*)
+| text-halo-radius |  The radius of the halo | 0 | YES
 | text | A tag from which text for label will be read, or (if quoted or an eval-statement) the text for the label | | YES
 | text-spacing | Space between repeated labels. If spacing is 0 only one label is placed. | 0 | no standard(*)
 | text-transform |  'none', 'uppercase', 'lowercase', 'capitalize' | none | YES
-| text-opacity | How transparent the text is, from 0 (transparent) to 1 (opaque) | 1 | YES(*)
-| wrap-character | Use this character instead of a space to wrap long names | " " | no standard(*)
-| character-spacing | Additional horizontal spacing between characters. | 0 | no standard(*)
+| text-opacity | How transparent the text is, from 0 (transparent) to 1 (opaque) | 1 | YES
+| wrap-character | Use this character instead of a space to wrap long names | " " | no standard
+| character-spacing | Additional horizontal spacing between characters. | 0 | no standard
 
 * MapCSS 0.2 properties not (yet) supported: font-variant, text-decoration
 

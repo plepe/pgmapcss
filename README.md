@@ -26,7 +26,11 @@ line|z15-[highway=primary] {
 
 Every line with highway=primary should be displayed with a yellow 6px wide line with a 1.5px darkgrey casing (on both sides). Additional the value of the 'name'-tag should be shown on top of the line in the CSS3 color blue. This style is valid from zoom level 15 on.
 
-See [MapCSS Documentation](doc/MapCSS.creole) for general documentation about pgmapcss' dialect of the MapCSS language and [the list of available properties (Mapnik 2.2)](doc/mapnik-2.2.md) for possible style parameters (resp. [here for Mapnik 2.0](doc/mapnik-2.0.md) and [here for the upcoming mapnik 3.0 release](doc/mapnik-3.0.md)).
+See [MapCSS Documentation](doc/MapCSS.creole) for general documentation (e.g. which selectors are supported) about pgmapcss' dialect of the MapCSS language and the list of available properties for possible style parameters for your installed Mapnik release:
+* [Mapnik 2.0](doc/mapnik-2.0.md)
+* [Mapnik 2.2](doc/mapnik-2.2.md)
+* [Mapnik 2.3](doc/mapnik-2.3.md)
+* [Mapnik 3.0](doc/mapnik-3.0.md) (Mapnik interface still changes, so it's important to use a fairly new version)
 
 You can embed MapCSS syntax in a Mapnik file with `<style type='text/mapcss'>`. See [basemap_example.mapcss](./basemap_example.mapcss).
 

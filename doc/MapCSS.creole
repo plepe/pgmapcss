@@ -414,6 +414,8 @@ Currently supported types:
 * numeric: Value may be a number. if a relative number (e.g. '+4') is specified, the value will be added to the value from the default pseudo element.
 * dashes: Value is 'none' or a colon separated list of integers. It may also be specified as list, e.g. "2;4" or list(2,4).
 * angle: like numeric, but make sure that value is correctly converted for Mapnik.
+* image: an image. prints a warning on compile when image is not found.
+* image_png: an image. prints a warning on compile when image is not found. if image is an svg, it will be converted to png.
 
 == Possible values ==
 The following statement defines possible values for a specific property:

@@ -8,6 +8,9 @@ class icon(default):
         self.data = {}
 
     def compile(self, prop):
+        if prop['value'] is None:
+            return prop['value']
+
         if os.path.exists(prop['value']):
             return repr(prop['value'])
 

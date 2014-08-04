@@ -135,6 +135,13 @@
     </Rule>
 # END
 
+# IF repeat-image
+    <Rule>
+      <Filter>[style-element] = 'line' and [repeat-image]</Filter>
+      <LinePatternSymbolizer file="[repeat-image]" />
+    </Rule>
+# END
+
 <!-- POINTS -->
 # IF symbol-shape
 # FOR symbol-rotation

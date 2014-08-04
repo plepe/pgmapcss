@@ -94,10 +94,10 @@
   <Style name="pgmapcss">
 <!-- POLYGONS -->
 
-# IF fill-color
+# FOR fill-color fill-opacity
     <Rule>
-      <Filter>[style-element] = 'fill' and [fill-color]</Filter>
-      <PolygonSymbolizer fill="[fill-color]" fill-opacity="[fill-opacity]" />
+      <Filter>[style-element] = 'fill' and '{fill-color} {fill-opacity}' = [fill-color fill-opacity]</Filter>
+      <PolygonSymbolizer fill="{fill-color}" fill-opacity="{fill-opacity}" />
     </Rule>
 # END
 
@@ -110,25 +110,21 @@
 # END
 
 <!-- CASING LINES -->
-# IF casing-width
-# FOR casing-dashes
+# FOR casing-color final-casing-width casing-offset casing-opacity casing-linejoin casing-linecap casing-dashes casing-dashes-background-color casing-dashes-background-opacity
     <Rule>
-      <Filter>[style-element] = 'casing' and [final-casing-width] and '{casing-dashes}' = [casing-dashes]</Filter>
-      <LineSymbolizer stroke="[casing-dashes-background-color]" stroke-width="[final-casing-width]" offset="[casing-offset]" stroke-opacity="[casing-dashes-background-opacity]" stroke-linejoin="[casing-linejoin]" stroke-linecap="[casing-linecap]" />
-      <LineSymbolizer stroke="[casing-color]" stroke-width="[final-casing-width]" offset="[casing-offset]" stroke-opacity="[casing-opacity]" stroke-linejoin="[casing-linejoin]" stroke-linecap="[casing-linecap]" stroke-dasharray="{casing-dashes}" />
+        <Filter>[style-element] = 'casing' and '{casing-color} {final-casing-width} {casing-offset} {casing-opacity} {casing-linejoin} {casing-linecap} {casing-dashes} {casing-dashes-background-color} {casing-dashes-background-opacity}' = [casing-color final-casing-width casing-offset casing-opacity casing-linejoin casing-linecap casing-dashes casing-dashes-background-color casing-dashes-background-opacity]</Filter>
+      <LineSymbolizer stroke="{casing-dashes-background-color}" stroke-width="{final-casing-width}" offset="{casing-offset}" stroke-opacity="{casing-dashes-background-opacity}" stroke-linejoin="{casing-linejoin}" stroke-linecap="{casing-linecap}" />
+      <LineSymbolizer stroke="{casing-color}" stroke-width="{final-casing-width}" offset="{casing-offset}" stroke-opacity="{casing-opacity}" stroke-linejoin="{casing-linejoin}" stroke-linecap="{casing-linecap}" />
     </Rule>
-# END
 # END
 
-# IF width
 <!-- LINES -->
-# FOR dashes
+# FOR color width offset opacity linejoin linecap dashes dashes-background-color dashes-background-opacity
     <Rule>
-      <Filter>[style-element] = 'line' and [width] and '{dashes}' = [dashes]</Filter>
-      <LineSymbolizer stroke="[dashes-background-color]" stroke-width="[width]" offset="[offset]" stroke-opacity="[dashes-background-opacity]" stroke-linejoin="[linejoin]" stroke-linecap="[linecap]" />
-      <LineSymbolizer stroke="[color]" stroke-width="[width]" offset="[offset]" stroke-opacity="[opacity]" stroke-linejoin="[linejoin]" stroke-linecap="[linecap]" stroke-dasharray="{dashes}" />
+        <Filter>[style-element] = 'line' and '{color} {width} {offset} {opacity} {linejoin} {linecap} {dashes} {dashes-background-color} {dashes-background-opacity}' = [color width offset opacity linejoin linecap dashes dashes-background-color dashes-background-opacity]</Filter>
+      <LineSymbolizer stroke="{dashes-background-color}" stroke-width="{width}" offset="{offset}" stroke-opacity="{dashes-background-opacity}" stroke-linejoin="{linejoin}" stroke-linecap="{linecap}" />
+      <LineSymbolizer stroke="{color}" stroke-width="{width}" offset="{offset}" stroke-opacity="{opacity}" stroke-linejoin="{linejoin}" stroke-linecap="{linecap}" stroke-dasharray="{dashes}" />
     </Rule>
-# END
 # END
 
 <!-- LINE PATTERN -->
@@ -150,43 +146,47 @@
 
 <!-- POINTS -->
 # IF symbol-shape
+# FOR symbol-rotation
     <Rule>
-      <Filter>[style-element] = 'point' and [final-symbol-image]</Filter>
-      <PointSymbolizer file="[final-symbol-image]" transform="rotate([symbol-rotation])" />
+      <Filter>[style-element] = 'point' and [final-symbol-image] and '{symbol-rotation}' = [symbol-rotation]</Filter>
+      <PointSymbolizer file="[final-symbol-image]" transform="rotate({symbol-rotation})" />
     </Rule>
+# END
 # END
 
 # IF icon-image
+# FOR icon-opacity icon-rotation
     <Rule>
-      <Filter>[style-element] = 'point' and [final-icon-image]</Filter>
-      <PointSymbolizer file="[final-icon-image]" opacity="[icon-opacity]" transform="rotate([icon-rotation])" />
+      <Filter>[style-element] = 'point' and [final-icon-image] and '{icon-opacity} {icon-rotation}' = [icon-opacity icon-rotation]</Filter>
+      <PointSymbolizer file="[final-icon-image]" opacity="{icon-opacity}" transform="rotate({icon-rotation})" />
     </Rule>
 # END
+# END
 
-# IF text
 <!-- TEXTS on Points -->
-# FOR font-family font-weight font-style
+# IF text
+# FOR font-family font-weight font-style text-color text-halo-color text-offset max-width text-anchor-horizontal
     <Rule>
-      <Filter>[text] and [style-element] = 'point-text' and [text-position] = 'center' and '{font-family} {font-weight} {font-style}' = [font-family font-weight font-style]</Filter>
-      <TextSymbolizer placement="interior" fontset-name="{font-family} - {font-weight} - {font-style}" dy="[text-offset]" wrap-width="[max-width]" horizontal-alignment="[text-anchor-horizontal]" size="[font-size]" halo-radius="[text-halo-radius]" character-spacing="[character-spacing]" opacity="[text-opacity]" wrap-character="[wrap-character]" fill="[text-color]" halo-fill="[text-halo-color]">[text]</TextSymbolizer>
+        <Filter>[text] and [style-element] = 'point-text' and [text-position] = 'center' and '{font-family} {font-weight} {font-style} {text-color} {text-halo-color} {text-offset} {max-width} {text-anchor-horizontal}' = [font-family font-weight font-style text-color text-halo-color text-offset max-width text-anchor-horizontal]</Filter>
+      <TextSymbolizer placement="interior" fontset-name="{font-family} - {font-weight} - {font-style}" fill="{text-color}" halo-fill="{text-halo-color}" dy="{text-offset}" wrap-width="{max-width}" avoid-edges="false" horizontal-alignment="{text-anchor-horizontal}"><ExpressionFormat size="[font-size]" halo-radius="[text-halo-radius]" character-spacing="[character-spacing]" opacity="[text-opacity]" wrap-character="[wrap-character]">[text]</ExpressionFormat></TextSymbolizer>
     </Rule>
 # END
 
 <!-- TEXTS on Lines -->
-# FOR font-family font-weight font-style
+# FOR font-family font-weight font-style text-color text-halo-color text-offset max-width text-spacing
     <Rule>
-      <Filter>[text] and [style-element] = 'line-text' and [text-position] = 'line' and '{font-family} {font-weight} {font-style}' = [font-family font-weight font-style]</Filter>
-      <TextSymbolizer placement="line" fontset-name="{font-family} - {font-weight} - {font-style}" dy="[text-offset]" wrap-width="[max-width]" spacing="[text-spacing]" size="[font-size]" halo-radius="[text-halo-radius]" character-spacing="[character-spacing]" opacity="[text-opacity]" wrap-character="[wrap-character]" fill="[text-color]" halo-fill="[text-halo-color]">[text]</TextSymbolizer>
+        <Filter>[text] and [style-element] = 'line-text' and [text-position] = 'line' and '{font-family} {font-weight} {font-style} {text-color} {text-halo-color} {text-offset} {max-width} {text-spacing}' = [font-family font-weight font-style text-color text-halo-color text-offset max-width text-spacing]</Filter>
+      <TextSymbolizer placement="line" fontset-name="{font-family} - {font-weight} - {font-style}" fill="{text-color}" halo-fill="{text-halo-color}" dy="{text-offset}" wrap-width="{max-width}" spacing="{text-spacing}"><ExpressionFormat size="[font-size]" halo-radius="[text-halo-radius]" character-spacing="[character-spacing]" opacity="[text-opacity]" wrap-character="[wrap-character]">[text]</ExpressionFormat></TextSymbolizer>
     </Rule>
 # END
 # END
 
   <!-- SHIELDS -->
 # IF shield-text
-# FOR shield-font-family shield-font-weight shield-font-style
+# FOR shield-font-family shield-font-weight shield-font-style shield-font-size shield-text-color shield-text-halo-color shield-spacing shield-opacity shield-placement shield-text-halo-radius
     <Rule>
-      <Filter>[shield-text] and [style-element] = 'shield' and '{shield-font-family} {shield-font-weight} {shield-font-style}' = [shield-font-family shield-font-weight shield-font-style]</Filter>
-      <ShieldSymbolizer placement="[shield-placement]" fontset-name="{shield-font-family} - {shield-font-weight} - {shield-font-style}" fill="[shield-text-color]" halo-fill="[shield-text-halo-color]" spacing="[shield-spacing]" size="[shield-font-size]" halo-radius="[shield-text-halo-radius]" opacity="[shield-opacity]" file="[shield-image]">[shield-text]</ShieldSymbolizer>
+        <Filter>[shield-text] and [style-element] = 'shield' and '{shield-font-family} {shield-font-weight} {shield-font-style} {shield-font-size} {shield-text-color} {shield-text-halo-color} {shield-spacing} {shield-opacity} {shield-placement} {shield-text-halo-radius}' = [shield-font-family shield-font-weight shield-font-style shield-font-size shield-text-color shield-text-halo-color shield-spacing shield-opacity shield-placement shield-text-halo-radius]</Filter>
+      <ShieldSymbolizer placement="{shield-placement}" fontset-name="{shield-font-family} - {shield-font-weight} - {shield-font-style}" fill="{shield-text-color}" halo-fill="{shield-text-halo-color}" spacing="{shield-spacing}" size="{shield-font-size}" halo-radius="{shield-text-halo-radius}" opacity="{shield-opacity}" file="[shield-image]">[shield-text]</ShieldSymbolizer>
     </Rule>
 # END
 # END

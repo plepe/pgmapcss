@@ -2,6 +2,8 @@ from .default import default
 from .tag_value import tag_value
 from .color import color
 from .icon import icon
+from .image import image
+from .image_png import image_png
 from .values import values
 from .pixels import pixels
 from .numeric import numeric
@@ -13,6 +15,8 @@ classes = {
     'default': default,
     'tag_value': tag_value,
     'icon': icon,
+    'image': image,
+    'image_png': image_png,
     'color': color,
     'values': values,
     'pixels': pixels,

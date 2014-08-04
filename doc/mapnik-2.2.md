@@ -35,7 +35,7 @@ Canvas properties
 | CSS parameter | Description | Default value | Compatibility MapCSS 0.2 |
 |---------------|-------------|---------------|--------------------------|
 | fill-color | The color of the background | 0% (transparent) | YES(*)
-| fill-image | an image for the background instead of a color fill | | YES(*)
+| fill-image | an image for the background instead of a color fill. | | YES(*)
 | buffer | set the buffer-size of the Map | 0 | no standard(*)
 
 * MapCSS 0.2 properties not (yet) supported: antialiasing (always fully antialiased), fill-opacity (use alpha-channel on fill-color instead)
@@ -69,7 +69,7 @@ Line properties
 | width | The line width in pixels. | | YES(*)
 | offset | Pixels to offset the line to the left or right. | 0 | no standard(*)
 | opacity | How transparent the line is, from 0 (transparent) to 1 (opaque). | 1 | YES(*)
-| image |  The URL of an image to use for filling the line | | YES
+| image |  The URL of an image to use for filling the line. As Mapnik 2.2 does not support SVG in LinePatterSymbolizer, it will be converted to PNG. | | YES
 | linejoin | The style for line corners: 'round', 'miter' or 'bevel'. | round | YES
 | linecap | The style for the end of the line: 'none' (default), 'round' or 'square' | none | YES
 | dashes | An array of alternating on/off lengths | | YES(*)
@@ -84,6 +84,7 @@ Line properties
 | casing-dashes | An array of alternating on/off lengths | | YES(*)
 | casing-dashes-background-color | The color to use in between the dashes (optional) | | NO, JOSM (*)
 | casing-dashes-background-opacity | Opacity value for the dashes background (optional) | | NO, JOSM (*)
+| repeat-image | Repeated image along a line (actually similar to "image", but with more features and compatible to JOSM). As Mapnik 2.2 does not support SVG in LinePatterSymbolizer, it will be converted to PNG. | | JOSM
 
 * MapCSS 0.2 properties not (yet) supported: extrude, extrude-*
 
@@ -94,7 +95,7 @@ Area properties
 |---------------|-------------|---------------|--------------------------|
 | fill-color | Colour in which to fill the area. | | YES(*)
 | fill-opacity | How transparent the fill is, from 0 (transparent) to 1 (opaque) | 1 | YES(*)
-| fill-image |  The URL of an image to use for filling the area | | YES
+| fill-image |  The URL of an image to use for filling the area. As Mapnik 2.2 does not support SVG in LinePatterSymbolizer, it will be converted to PNG. | | YES
 
 Label properties
 ----------------

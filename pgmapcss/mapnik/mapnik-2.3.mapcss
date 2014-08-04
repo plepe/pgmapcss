@@ -9,7 +9,7 @@
 @type casing-dashes-background-color color;
 @type icon-color color;
 @type fill-color color;
-@type fill-image image;
+@type fill-image image_png;
 @type text-color color;
 @type text-halo-color color;
 @type shield-text-color color;
@@ -27,8 +27,8 @@
 @type casing-dashes dashes;
 @type icon-rotation angle;
 @type symbol-rotation angle;
-@type image image;
-@type repeat-image image;
+@type image image_png;
+@type repeat-image image_png;
 @type repeat-image-offset pixels;
 
 // The follwing properties default to the final value of another property

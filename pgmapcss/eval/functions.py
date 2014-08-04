@@ -7,6 +7,7 @@ class Functions:
         self.eval_functions = None
         self.eval_functions_source = {}
         self._eval = None
+        self._eval_global_data = None
         self.stat = stat
 
     def list(self):
@@ -42,7 +43,11 @@ class Functions:
         if not 'global_data' in self.stat:
             self.stat['global_data'] = {}
 
+        if repr(self.stat['global_data']) != self._eval_global_data:
+            self._eval = None
+
         if not self._eval:
+            self._eval_global_data = repr(self.stat['global_data'])
             content = \
                 'def _eval(statement):\n' +\
                 '    import re\n' +\

@@ -1,4 +1,4 @@
-class config_eval_boolean(config_base):
+class config_eval_debug(config_base):
     mutable = 0
 
     def possible_values(self, param_values, prop, stat):

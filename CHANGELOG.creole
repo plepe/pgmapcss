@@ -2,6 +2,7 @@
 * support @media queries, see [[doc/MapCSS.creole|MapCSS docu]]
 * a couple of performance improvements
 * Config option angular_system whether angles (rotation, azimuth functions) should use degrees or radians
+* Support for Mapnik 2.3 (mostly similar to Mapnik 2.2, but there are some advanced features)
 * Eval functions:
 ** changed parameter order for join() and split()
 ** new eval functions: viewport(), intersection(), range(), reverse(), is_left_hand_traffic(), is_right_hand_traffic(), line_locate_azimuth(), red(), green(), blue(), alpha(), URL_encode(), XML_encode(), CRC32_checksum(), regexp_text(), regexp_match(), floor(), ceil(), length(), is_prop_set(), has_tag_key(), sin(), cos(), tan(), asin(), acos(), atan(), atan2(), sinh(), cosh(), tanh(), signum(), log(), exp(), replace(), JOSM_pref()
@@ -23,8 +24,9 @@
 ** Support JOSM classes (set without prepending dot); need to set flag
 * Properties (improve compatibility with JOSM MapCSS paint styles)
 ** properties of type pixel (e.g. width, offset) accept relative values (added to value on default pseudo element)
-** New properties: icon-rotation, dashes-background-color, dashes-background-opacity, casing-dashes-background-color, casing-dashes-background-opacity; text-offset, text-anchor-vertical, text-anchor-horizontal
+** New properties: icon-rotation, dashes-background-color, dashes-background-opacity, casing-dashes-background-color, casing-dashes-background-opacity; text-offset, text-anchor-vertical, text-anchor-horizontal, repeat-image, repeat-image-offset
 ** symbol-* as in JOSM, plus symbol-rotation
+** Property 'image', 'repeat-image', 'fill-image': for Mapnik 2.x, SVGs will automatically be converted to PNGs
 * Lot's of bugfixes, see Git log for details
 * A new dependency: python3-wand
 

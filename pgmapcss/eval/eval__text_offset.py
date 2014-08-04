@@ -19,8 +19,11 @@ class config_eval__text_offset(config_base):
         if len([c for c in param_values[2] if c is not True and not '.' in c]):
             values = values.union({ math.ceil(float(w) / 2.0) + 1.0 for w in param_values[3] if w in ("12", "18", "24") }) # icon-width
 
+        if stat['global_data'] is None:
+            return ({True}, 0)
+
         # other icons -> read dimensions from global_data
-        if 'global_data' in stat and 'icon-image' in stat['global_data']:
+        if 'icon-image' in stat['global_data']:
             for c in param_values[2]:
                 if c in stat['global_data']['icon-image']:
                     d = stat['global_data']['icon-image'][c]

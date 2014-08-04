@@ -103,7 +103,15 @@ def main():
         'options': set(args.options) if args.options else set(),
         'config': {},
         'base_style': args.base_style,
+        'icons_dir': style_id + '.icons',
+        'global_data': None,
     })
+
+    try:
+        os.mkdir(stat['icons_dir'])
+    except OSError:
+        pass
+
     eval_functions = pgmapcss.eval.functions(stat).list()
 
     content = open(file_name).read()
