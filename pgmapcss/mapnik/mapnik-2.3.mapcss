@@ -9,6 +9,7 @@
 @type casing-dashes-background-color color;
 @type icon-color color;
 @type fill-color color;
+@type fill-image image_png;
 @type text-color color;
 @type text-halo-color color;
 @type shield-text-color color;

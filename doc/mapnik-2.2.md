@@ -35,7 +35,7 @@ Canvas properties
 | CSS parameter | Description | Default value | Compatibility MapCSS 0.2 |
 |---------------|-------------|---------------|--------------------------|
 | fill-color | The color of the background | 0% (transparent) | YES(*)
-| fill-image | an image for the background instead of a color fill | | YES(*)
+| fill-image | an image for the background instead of a color fill. | | YES(*)
 | buffer | set the buffer-size of the Map | 0 | no standard(*)
 
 * MapCSS 0.2 properties not (yet) supported: antialiasing (always fully antialiased), fill-opacity (use alpha-channel on fill-color instead)
@@ -95,7 +95,7 @@ Area properties
 |---------------|-------------|---------------|--------------------------|
 | fill-color | Colour in which to fill the area. | | YES(*)
 | fill-opacity | How transparent the fill is, from 0 (transparent) to 1 (opaque) | 1 | YES(*)
-| fill-image |  The URL of an image to use for filling the area | | YES
+| fill-image |  The URL of an image to use for filling the area. As Mapnik 2.2 does not support SVG in LinePatterSymbolizer, it will be converted to PNG. | | YES
 
 Label properties
 ----------------
