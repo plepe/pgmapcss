@@ -74,6 +74,9 @@ Line properties
 | linecap | The style for the end of the line: 'none' (default), 'round' or 'square' | none | YES
 | dashes | An array of alternating on/off lengths | | YES(*)
 | dashes-background-color | The color to use in between the dashes (optional) | | NO, JOSM
+| repeat-image | Repeated image along a line (actually similar to "image", but with more features and compatible to JOSM) | | JOSM
+| repeat-image-offset | Offset from the line | value of `offset` | JOSM (*)
+| repeat-image-align | Alignment of the image. Top-, bottom edge or the (horizontal) center line of the image will be along the line. Values: 'top', 'center', bottom' | center | JOSM
 | casing-dashes-background-opacity | Opacity value for the dashes background (optional) | | NO, JOSM
 | casing-color | Colour of the casing (border) of a line. | | YES
 | casing-width | Width of the casing (border) of the line (added to 'width' of the line). | 0 | YES
@@ -84,9 +87,8 @@ Line properties
 | casing-dashes | An array of alternating on/off lengths | | YES(*)
 | casing-dashes-background-color | The color to use in between the dashes (optional) | | NO, JOSM
 | casing-dashes-background-opacity | Opacity value for the dashes background (optional) | | NO, JOSM
-| repeat-image | Repeated image along a line (actually similar to "image", but with more features and compatible to JOSM) | | JOSM
-| repeat-image-offset | Offset from the line | value of `offset` | JOSM (*)
-| repeat-image-align | Alignment of the image. Top-, bottom edge or the (horizontal) center line of the image will be along the line. Values: 'top', 'center', bottom' | center | JOSM
+| left-casing-* | Draw a line to to the left of the main line; uses the same suffixes as casing-* | | NO, JOSM
+| right-casing-* | Draw a line to to the right of the main line; uses the same suffixes as casing-* | | NO, JOSM
 
 * MapCSS 0.2 properties not (yet) supported: extrude, extrude-*
 

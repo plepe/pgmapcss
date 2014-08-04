@@ -118,6 +118,22 @@
     </Rule>
 # END
 
+# FOR left-casing-color left-casing-width final-left-casing-offset left-casing-opacity left-casing-linejoin left-casing-linecap left-casing-dashes left-casing-dashes-background-color left-casing-dashes-background-opacity
+    <Rule>
+        <Filter>[style-element] = 'side-casing' and '{left-casing-color} {left-casing-width} {final-left-casing-offset} {left-casing-opacity} {left-casing-linejoin} {left-casing-linecap} {left-casing-dashes} {left-casing-dashes-background-color} {left-casing-dashes-background-opacity}' = [left-casing-color left-casing-width final-left-casing-offset left-casing-opacity left-casing-linejoin left-casing-linecap left-casing-dashes left-casing-dashes-background-color left-casing-dashes-background-opacity]</Filter>
+      <LineSymbolizer stroke="{left-casing-dashes-background-color}" stroke-width="{left-casing-width}" offset="{final-left-casing-offset}" stroke-opacity="{left-casing-dashes-background-opacity}" stroke-linejoin="{left-casing-linejoin}" stroke-linecap="{left-casing-linecap}" />
+      <LineSymbolizer stroke="{left-casing-color}" stroke-width="{left-casing-width}" offset="{final-left-casing-offset}" stroke-opacity="{left-casing-opacity}" stroke-linejoin="{left-casing-linejoin}" stroke-linecap="{left-casing-linecap}" />
+    </Rule>
+# END
+
+# FOR right-casing-color right-casing-width final-right-casing-offset right-casing-opacity right-casing-linejoin right-casing-linecap right-casing-dashes right-casing-dashes-background-color right-casing-dashes-background-opacity
+    <Rule>
+        <Filter>[style-element] = 'side-casing' and '{right-casing-color} {right-casing-width} {final-right-casing-offset} {right-casing-opacity} {right-casing-linejoin} {right-casing-linecap} {right-casing-dashes} {right-casing-dashes-background-color} {right-casing-dashes-background-opacity}' = [right-casing-color right-casing-width final-right-casing-offset right-casing-opacity right-casing-linejoin right-casing-linecap right-casing-dashes right-casing-dashes-background-color right-casing-dashes-background-opacity]</Filter>
+      <LineSymbolizer stroke="{right-casing-dashes-background-color}" stroke-width="{right-casing-width}" offset="{final-right-casing-offset}" stroke-opacity="{right-casing-dashes-background-opacity}" stroke-linejoin="{right-casing-linejoin}" stroke-linecap="{right-casing-linecap}" />
+      <LineSymbolizer stroke="{right-casing-color}" stroke-width="{right-casing-width}" offset="{final-right-casing-offset}" stroke-opacity="{right-casing-opacity}" stroke-linejoin="{right-casing-linejoin}" stroke-linecap="{right-casing-linecap}" />
+    </Rule>
+# END
+
 <!-- LINES -->
 # FOR color width offset opacity linejoin linecap dashes dashes-background-color dashes-background-opacity
     <Rule>
@@ -207,7 +223,7 @@
   {columns},
   "style-element",
   geo as _geo
-from pgmapcss_{style_id}(!bbox!, !scale_denominator!, Array['fill', 'casing', 'line', 'point', 'point-text', 'line-text', 'shield'])) t
+from pgmapcss_{style_id}(!bbox!, !scale_denominator!, Array['fill', 'casing', 'side-casing', 'line', 'point', 'point-text', 'line-text', 'shield'])) t
       </Parameter>
     </Datasource>
     <StyleName>pgmapcss</StyleName>
