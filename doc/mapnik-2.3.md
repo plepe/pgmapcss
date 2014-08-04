@@ -72,6 +72,7 @@ Line properties
 | image |  The URL of an image to use for filling the line. As Mapnik 2.3 does not support SVG in LinePatterSymbolizer, it will be converted to PNG. | | YES
 | linejoin | The style for line corners: 'round', 'miter' or 'bevel'. | round | YES
 | linecap | The style for the end of the line: 'none' (default), 'round' or 'square' | none | YES
+| miterlimit | Applies for linejoin: miter. Sets the maximum overshoot when line segments meet at a very small angle | 4.0 | no standard, JOSM (*)
 | dashes | An array of alternating on/off lengths | | YES(*)
 | dashes-background-color | The color to use in between the dashes (optional) | | NO, JOSM (*)
 | dashes-background-opacity | Opacity value for the dashes background (optional) | | NO, JOSM (*)

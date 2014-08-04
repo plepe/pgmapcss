@@ -61,6 +61,9 @@
 @default_other right-casing-linecap casing-linecap;
 @default_other right-casing-linejoin casing-linejoin;
 @default_other right-casing-dashes-background-opacity right-casing-opacity;
+@default_value casing-miterlimit miterlimit;
+@default_value left-casing-miterlimit casing-miterlimit;
+@default_value right-casing-miterlimit casing-miterlimit;
 
 // @values: Possible values of properties; the first value is the default value
 // linecap actually has 'none' as default value. the following statement automatically replaces 'none' by 'butt'
@@ -99,12 +102,12 @@ style_id() . '.icons/symbol-' . prop('symbol-shape') .'-'. prop('symbol-size') .
 @postprocess final-right-casing-offset eval(prop('right-casing-offset') - prop('width') / 2 - prop('right-casing-width') / 2);
 
 // @depend_property: don't check values for e.g. 'text-position' if no 'text' is set
-@depend_property width "offset;color;opacity;linejoin;linecap;dashes;dashes-background-color;dashes-background-opacity";
+@depend_property width "offset;color;opacity;linejoin;linecap;dashes;dashes-background-color;dashes-background-opacity;miterlimit";
 @depend_property image "";
 @depend_property repeat-image "";
-@depend_property casing-width "casing-offset;casing-color;casing-opacity;casing-linejoin;casing-linecap;casing-dashes;final-casing-width;casing-dashes-background-color;casing-dashes-background-opacity";
-@depend_property left-casing-width "left-casing-offset;left-casing-color;left-casing-opacity;left-casing-linejoin;left-casing-linecap;left-casing-dashes;left-casing-dashes-background-color;left-casing-dashes-background-opacity;final-left-casing-offset";
-@depend_property right-casing-width "right-casing-offset;right-casing-color;right-casing-opacity;right-casing-linejoin;right-casing-linecap;right-casing-dashes;right-casing-dashes-background-color;right-casing-dashes-background-opacity;final-right-casing-offset";
+@depend_property casing-width "casing-offset;casing-color;casing-opacity;casing-linejoin;casing-linecap;casing-dashes;final-casing-width;casing-dashes-background-color;casing-dashes-background-opacity;casing-miterlimit";
+@depend_property left-casing-width "left-casing-offset;left-casing-color;left-casing-opacity;left-casing-linejoin;left-casing-linecap;left-casing-dashes;left-casing-dashes-background-color;left-casing-dashes-background-opacity;final-left-casing-offset;left-casing-miterlimit";
+@depend_property right-casing-width "right-casing-offset;right-casing-color;right-casing-opacity;right-casing-linejoin;right-casing-linecap;right-casing-dashes;right-casing-dashes-background-color;right-casing-dashes-background-opacity;final-right-casing-offset;right-casing-miterlimit";
 @depend_property shield-text "shield-spacing;shield-image;shield-opacity;shield-placement;shield-text-color;shield-text-halo-color;shield-text-opacity;shield-text-halo-radius;shield-font-family;shield-font-weight;shield-font-style;shield-font-size;shield-text-transform";
 @depend_property symbol-shape "final-symbol-image;symbol-shape;symbol-size;symbol-stroke-width;symbol-stroke-color;symbol-stroke-opacity;symbol-fill-color;symbol-fill-opacity;symbol-rotation";
 @depend_property icon-image "final-icon-image;icon-opacity;icon-color;icon-width;icon-rotation";
@@ -149,6 +152,7 @@ style_id() . '.icons/symbol-' . prop('symbol-shape') .'-'. prop('symbol-size') .
 @default_value linecap butt;
 @default_value dashes none;
 @default_value dashes-background-color #00000000;
+@default_value miterlimit 4;
 // Casing LineSymbolizer
 @default_value casing-offset ;
 @default_value casing-color ;

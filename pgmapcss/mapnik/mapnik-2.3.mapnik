@@ -110,36 +110,36 @@
 # END
 
 <!-- CASING LINES -->
-# FOR casing-color final-casing-width casing-offset casing-opacity casing-linejoin casing-linecap casing-dashes casing-dashes-background-color casing-dashes-background-opacity
+# FOR casing-color final-casing-width casing-offset casing-opacity casing-linejoin casing-linecap casing-dashes casing-dashes-background-color casing-dashes-background-opacity casing-miterlimit
     <Rule>
-        <Filter>[style-element] = 'casing' and '{casing-color} {final-casing-width} {casing-offset} {casing-opacity} {casing-linejoin} {casing-linecap} {casing-dashes} {casing-dashes-background-color} {casing-dashes-background-opacity}' = [casing-color final-casing-width casing-offset casing-opacity casing-linejoin casing-linecap casing-dashes casing-dashes-background-color casing-dashes-background-opacity]</Filter>
-      <LineSymbolizer stroke="{casing-dashes-background-color}" stroke-width="{final-casing-width}" offset="{casing-offset}" stroke-opacity="{casing-dashes-background-opacity}" stroke-linejoin="{casing-linejoin}" stroke-linecap="{casing-linecap}" />
-      <LineSymbolizer stroke="{casing-color}" stroke-width="{final-casing-width}" offset="{casing-offset}" stroke-opacity="{casing-opacity}" stroke-linejoin="{casing-linejoin}" stroke-linecap="{casing-linecap}" />
+        <Filter>[style-element] = 'casing' and '{casing-color} {final-casing-width} {casing-offset} {casing-opacity} {casing-linejoin} {casing-linecap} {casing-dashes} {casing-dashes-background-color} {casing-dashes-background-opacity} {casing-miterlimit}' = [casing-color final-casing-width casing-offset casing-opacity casing-linejoin casing-linecap casing-dashes casing-dashes-background-color casing-dashes-background-opacity casing-miterlimit]</Filter>
+      <LineSymbolizer stroke="{casing-dashes-background-color}" stroke-width="{final-casing-width}" offset="{casing-offset}" stroke-opacity="{casing-dashes-background-opacity}" stroke-linejoin="{casing-linejoin}" stroke-linecap="{casing-linecap}" stroke-miterlimit="{casing-miterlimit}" />
+      <LineSymbolizer stroke="{casing-color}" stroke-width="{final-casing-width}" offset="{casing-offset}" stroke-opacity="{casing-opacity}" stroke-linejoin="{casing-linejoin}" stroke-linecap="{casing-linecap}" stroke-miterlimit="{casing-miterlimit}" />
     </Rule>
 # END
 
-# FOR left-casing-color left-casing-width final-left-casing-offset left-casing-opacity left-casing-linejoin left-casing-linecap left-casing-dashes left-casing-dashes-background-color left-casing-dashes-background-opacity
+# FOR left-casing-color left-casing-width final-left-casing-offset left-casing-opacity left-casing-linejoin left-casing-linecap left-casing-dashes left-casing-dashes-background-color left-casing-dashes-background-opacity left-casing-miterlimit
     <Rule>
-        <Filter>[style-element] = 'side-casing' and '{left-casing-color} {left-casing-width} {final-left-casing-offset} {left-casing-opacity} {left-casing-linejoin} {left-casing-linecap} {left-casing-dashes} {left-casing-dashes-background-color} {left-casing-dashes-background-opacity}' = [left-casing-color left-casing-width final-left-casing-offset left-casing-opacity left-casing-linejoin left-casing-linecap left-casing-dashes left-casing-dashes-background-color left-casing-dashes-background-opacity]</Filter>
-      <LineSymbolizer stroke="{left-casing-dashes-background-color}" stroke-width="{left-casing-width}" offset="{final-left-casing-offset}" stroke-opacity="{left-casing-dashes-background-opacity}" stroke-linejoin="{left-casing-linejoin}" stroke-linecap="{left-casing-linecap}" />
-      <LineSymbolizer stroke="{left-casing-color}" stroke-width="{left-casing-width}" offset="{final-left-casing-offset}" stroke-opacity="{left-casing-opacity}" stroke-linejoin="{left-casing-linejoin}" stroke-linecap="{left-casing-linecap}" />
+        <Filter>[style-element] = 'side-casing' and '{left-casing-color} {left-casing-width} {final-left-casing-offset} {left-casing-opacity} {left-casing-linejoin} {left-casing-linecap} {left-casing-dashes} {left-casing-dashes-background-color} {left-casing-dashes-background-opacity} {left-casing-miterlimit}' = [left-casing-color left-casing-width final-left-casing-offset left-casing-opacity left-casing-linejoin left-casing-linecap left-casing-dashes left-casing-dashes-background-color left-casing-dashes-background-opacity left-casing-miterlimit]</Filter>
+      <LineSymbolizer stroke="{left-casing-dashes-background-color}" stroke-width="{left-casing-width}" offset="{final-left-casing-offset}" stroke-opacity="{left-casing-dashes-background-opacity}" stroke-linejoin="{left-casing-linejoin}" stroke-linecap="{left-casing-linecap}" stroke-miterlimit="{left-casing-miterlimit}" />
+      <LineSymbolizer stroke="{left-casing-color}" stroke-width="{left-casing-width}" offset="{final-left-casing-offset}" stroke-opacity="{left-casing-opacity}" stroke-linejoin="{left-casing-linejoin}" stroke-linecap="{left-casing-linecap}" stroke-miterlimit="{left-casing-miterlimit}" />
     </Rule>
 # END
 
-# FOR right-casing-color right-casing-width final-right-casing-offset right-casing-opacity right-casing-linejoin right-casing-linecap right-casing-dashes right-casing-dashes-background-color right-casing-dashes-background-opacity
+# FOR right-casing-color right-casing-width final-right-casing-offset right-casing-opacity right-casing-linejoin right-casing-linecap right-casing-dashes right-casing-dashes-background-color right-casing-dashes-background-opacity right-casing-miterlimit
     <Rule>
-        <Filter>[style-element] = 'side-casing' and '{right-casing-color} {right-casing-width} {final-right-casing-offset} {right-casing-opacity} {right-casing-linejoin} {right-casing-linecap} {right-casing-dashes} {right-casing-dashes-background-color} {right-casing-dashes-background-opacity}' = [right-casing-color right-casing-width final-right-casing-offset right-casing-opacity right-casing-linejoin right-casing-linecap right-casing-dashes right-casing-dashes-background-color right-casing-dashes-background-opacity]</Filter>
-      <LineSymbolizer stroke="{right-casing-dashes-background-color}" stroke-width="{right-casing-width}" offset="{final-right-casing-offset}" stroke-opacity="{right-casing-dashes-background-opacity}" stroke-linejoin="{right-casing-linejoin}" stroke-linecap="{right-casing-linecap}" />
-      <LineSymbolizer stroke="{right-casing-color}" stroke-width="{right-casing-width}" offset="{final-right-casing-offset}" stroke-opacity="{right-casing-opacity}" stroke-linejoin="{right-casing-linejoin}" stroke-linecap="{right-casing-linecap}" />
+        <Filter>[style-element] = 'side-casing' and '{right-casing-color} {right-casing-width} {final-right-casing-offset} {right-casing-opacity} {right-casing-linejoin} {right-casing-linecap} {right-casing-dashes} {right-casing-dashes-background-color} {right-casing-dashes-background-opacity} {right-casing-miterlimit}' = [right-casing-color right-casing-width final-right-casing-offset right-casing-opacity right-casing-linejoin right-casing-linecap right-casing-dashes right-casing-dashes-background-color right-casing-dashes-background-opacity right-casing-miterlimit]</Filter>
+      <LineSymbolizer stroke="{right-casing-dashes-background-color}" stroke-width="{right-casing-width}" offset="{final-right-casing-offset}" stroke-opacity="{right-casing-dashes-background-opacity}" stroke-linejoin="{right-casing-linejoin}" stroke-linecap="{right-casing-linecap}" stroke-miterlimit="{right-casing-miterlimit}" />
+      <LineSymbolizer stroke="{right-casing-color}" stroke-width="{right-casing-width}" offset="{final-right-casing-offset}" stroke-opacity="{right-casing-opacity}" stroke-linejoin="{right-casing-linejoin}" stroke-linecap="{right-casing-linecap}" stroke-miterlimit="{right-casing-miterlimit}" />
     </Rule>
 # END
 
 <!-- LINES -->
-# FOR color width offset opacity linejoin linecap dashes dashes-background-color dashes-background-opacity
+# FOR color width offset opacity linejoin linecap dashes dashes-background-color dashes-background-opacity miterlimit
     <Rule>
-        <Filter>[style-element] = 'line' and '{color} {width} {offset} {opacity} {linejoin} {linecap} {dashes} {dashes-background-color} {dashes-background-opacity}' = [color width offset opacity linejoin linecap dashes dashes-background-color dashes-background-opacity]</Filter>
-      <LineSymbolizer stroke="{dashes-background-color}" stroke-width="{width}" offset="{offset}" stroke-opacity="{dashes-background-opacity}" stroke-linejoin="{linejoin}" stroke-linecap="{linecap}" />
-      <LineSymbolizer stroke="{color}" stroke-width="{width}" offset="{offset}" stroke-opacity="{opacity}" stroke-linejoin="{linejoin}" stroke-linecap="{linecap}" stroke-dasharray="{dashes}" />
+        <Filter>[style-element] = 'line' and '{color} {width} {offset} {opacity} {linejoin} {linecap} {dashes} {dashes-background-color} {dashes-background-opacity} {miterlimit}' = [color width offset opacity linejoin linecap dashes dashes-background-color dashes-background-opacity miterlimit]</Filter>
+      <LineSymbolizer stroke="{dashes-background-color}" stroke-width="{width}" offset="{offset}" stroke-opacity="{dashes-background-opacity}" stroke-linejoin="{linejoin}" stroke-linecap="{linecap}" stroke-miterlimit="{miterlimit}" />
+      <LineSymbolizer stroke="{color}" stroke-width="{width}" offset="{offset}" stroke-opacity="{opacity}" stroke-linejoin="{linejoin}" stroke-linecap="{linecap}" stroke-dasharray="{dashes}" stroke-miterlimit="{miterlimit}" />
     </Rule>
 # END
 

@@ -114,8 +114,8 @@
 # FOR casing-dashes
     <Rule>
       <Filter>[style-element] = 'casing' and [final-casing-width] and '{casing-dashes}' = [casing-dashes]</Filter>
-      <LineSymbolizer stroke="[casing-dashes-background-color]" stroke-width="[final-casing-width]" offset="[casing-offset]" stroke-opacity="[casing-dashes-background-opacity]" stroke-linejoin="[casing-linejoin]" stroke-linecap="[casing-linecap]" />
-      <LineSymbolizer stroke="[casing-color]" stroke-width="[final-casing-width]" offset="[casing-offset]" stroke-opacity="[casing-opacity]" stroke-linejoin="[casing-linejoin]" stroke-linecap="[casing-linecap]" stroke-dasharray="{casing-dashes}" />
+      <LineSymbolizer stroke="[casing-dashes-background-color]" stroke-width="[final-casing-width]" offset="[casing-offset]" stroke-opacity="[casing-dashes-background-opacity]" stroke-linejoin="[casing-linejoin]" stroke-linecap="[casing-linecap]" stroke-miterlimit="[casing-miterlimit]" />
+      <LineSymbolizer stroke="[casing-color]" stroke-width="[final-casing-width]" offset="[casing-offset]" stroke-opacity="[casing-opacity]" stroke-linejoin="[casing-linejoin]" stroke-linecap="[casing-linecap]" stroke-dasharray="{casing-dashes}" stroke-miterlimit="[casing-miterlimit]" />
     </Rule>
 # END
 # END
@@ -124,8 +124,8 @@
 # FOR left-casing-dashes
     <Rule>
       <Filter>[style-element] = 'side-casing' and [left-casing-width] and '{left-casing-dashes}' = [left-casing-dashes]</Filter>
-      <LineSymbolizer stroke="[left-casing-dashes-background-color]" stroke-width="[left-casing-width]" offset="[final-left-casing-offset]" stroke-opacity="[left-casing-dashes-background-opacity]" stroke-linejoin="[left-casing-linejoin]" stroke-linecap="[left-casing-linecap]" />
-      <LineSymbolizer stroke="[left-casing-color]" stroke-width="[left-casing-width]" offset="[final-left-casing-offset]" stroke-opacity="[left-casing-opacity]" stroke-linejoin="[left-casing-linejoin]" stroke-linecap="[left-casing-linecap]" stroke-dasharray="{left-casing-dashes}" />
+      <LineSymbolizer stroke="[left-casing-dashes-background-color]" stroke-width="[left-casing-width]" offset="[final-left-casing-offset]" stroke-opacity="[left-casing-dashes-background-opacity]" stroke-linejoin="[left-casing-linejoin]" stroke-linecap="[left-casing-linecap]" stroke-miterlimit="[left-casing-miterlimit]" />
+      <LineSymbolizer stroke="[left-casing-color]" stroke-width="[left-casing-width]" offset="[final-left-casing-offset]" stroke-opacity="[left-casing-opacity]" stroke-linejoin="[left-casing-linejoin]" stroke-linecap="[left-casing-linecap]" stroke-dasharray="{left-casing-dashes}" stroke-miterlimit="[left-casing-miterlimit]" />
     </Rule>
 # END
 # END
@@ -134,8 +134,8 @@
 # FOR right-casing-dashes
     <Rule>
       <Filter>[style-element] = 'side-casing' and [right-casing-width] and '{right-casing-dashes}' = [right-casing-dashes]</Filter>
-      <LineSymbolizer stroke="[right-casing-dashes-background-color]" stroke-width="[right-casing-width]" offset="[final-right-casing-offset]" stroke-opacity="[right-casing-dashes-background-opacity]" stroke-linejoin="[right-casing-linejoin]" stroke-linecap="[right-casing-linecap]" />
-      <LineSymbolizer stroke="[right-casing-color]" stroke-width="[right-casing-width]" offset="[final-right-casing-offset]" stroke-opacity="[right-casing-opacity]" stroke-linejoin="[right-casing-linejoin]" stroke-linecap="[right-casing-linecap]" stroke-dasharray="{right-casing-dashes}" />
+      <LineSymbolizer stroke="[right-casing-dashes-background-color]" stroke-width="[right-casing-width]" offset="[final-right-casing-offset]" stroke-opacity="[right-casing-dashes-background-opacity]" stroke-linejoin="[right-casing-linejoin]" stroke-linecap="[right-casing-linecap]" stroke-miterlimit="[right-casing-miterlimit]" />
+      <LineSymbolizer stroke="[right-casing-color]" stroke-width="[right-casing-width]" offset="[final-right-casing-offset]" stroke-opacity="[right-casing-opacity]" stroke-linejoin="[right-casing-linejoin]" stroke-linecap="[right-casing-linecap]" stroke-dasharray="{right-casing-dashes}" stroke-miterlimit="[right-casing-miterlimit]" />
     </Rule>
 # END
 # END
@@ -145,8 +145,8 @@
 # FOR dashes
     <Rule>
       <Filter>[style-element] = 'line' and [width] and '{dashes}' = [dashes]</Filter>
-      <LineSymbolizer stroke="[dashes-background-color]" stroke-width="[width]" offset="[offset]" stroke-opacity="[dashes-background-opacity]" stroke-linejoin="[linejoin]" stroke-linecap="[linecap]" />
-      <LineSymbolizer stroke="[color]" stroke-width="[width]" offset="[offset]" stroke-opacity="[opacity]" stroke-linejoin="[linejoin]" stroke-linecap="[linecap]" stroke-dasharray="{dashes}" />
+      <LineSymbolizer stroke="[dashes-background-color]" stroke-width="[width]" offset="[offset]" stroke-opacity="[dashes-background-opacity]" stroke-linejoin="[linejoin]" stroke-linecap="[linecap]" stroke-miterlimit="[miterlimit]" />
+      <LineSymbolizer stroke="[color]" stroke-width="[width]" offset="[offset]" stroke-opacity="[opacity]" stroke-linejoin="[linejoin]" stroke-linecap="[linecap]" stroke-dasharray="{dashes}" stroke-miterlimit="[miterlimit]" />
     </Rule>
 # END
 # END
