@@ -68,7 +68,7 @@ Line properties
 | color | Colour of the line. | | YES(*)
 | width | The line width in pixels. | | YES(*)
 | opacity | How transparent the line is, from 0 (transparent) to 1 (opaque). | 1 | YES(*)
-| image |  The URL of an image to use for filling the line | | YES
+| image |  The URL of an image to use for filling the line. As Mapnik 2.0 does not support SVG in LinePatterSymbolizer, it will be converted to PNG. | | YES
 | linejoin | The style for line corners: 'round', 'miter' or 'bevel'. | round | YES
 | linecap | The style for the end of the line: 'none' (default), 'round' or 'square' | none | YES
 | dashes | An array of alternating on/off lengths | | YES(*)
@@ -82,7 +82,7 @@ Line properties
 | casing-dashes | An array of alternating on/off lengths | | YES(*)
 | casing-dashes-background-color | The color to use in between the dashes (optional) | | NO, JOSM (*)
 | casing-dashes-background-opacity |  Opacity value for the dashes background (optional) | | NO, JOSM (*)
-| repeat-image | Repeated image along a line (actually similar to "image", but with more features and compatible to JOSM) | | JOSM
+| repeat-image | Repeated image along a line (actually similar to "image", but with more features and compatible to JOSM). As Mapnik 2.0 does not support SVG in LinePatterSymbolizer, it will be converted to PNG. | | JOSM
 
 * MapCSS 0.2 properties not (yet) supported: extrude, extrude-*
 * Further properties not supported: offset, casing-offset (needs Mapnik 2.2 or higher), repeat-image-offset
