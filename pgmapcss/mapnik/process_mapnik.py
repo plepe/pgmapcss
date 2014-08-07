@@ -4,6 +4,14 @@ from pkg_resources import *
 import pgmapcss.db as db
 import hashlib
 
+def strtr(s, patterns):
+    keys = sorted([ k for k in patterns ], key=len, reverse=True)
+
+    for k in keys:
+        s = s.replace(k, patterns[k])
+
+    return s
+
 # Postgresql only supports columns names with a length of up to 64 chars
 # When column names get concatenated, this could lead to problems
 # For longer names replace name by its md5 sum
@@ -46,7 +54,7 @@ def rep_convert_prop(k, v, stat):
 def combinations_combine(base, combinations_list, stat):
     combinations_list = [
         {
-            k: rep_convert_prop(k, v, stat)
+            '{' + k + '}': rep_convert_prop(k, v, stat)
             for k, v in c.items()
         }
         for c in combinations_list
@@ -60,7 +68,10 @@ def combinations_combine(base, combinations_list, stat):
     return combinations_list
 
 def process(f1, replacement, stat, rek=0):
-    text = ''
+    ret = {
+        'text': '',
+        'columns': set(),
+    }
 
     while True:
         r = f1.readline()
@@ -81,11 +92,12 @@ def process(f1, replacement, stat, rek=0):
             ]
 
             # Process anyway ...
-            t = process(f1, replacement, stat, rek + 1)
+            res = process(f1, replacement, stat, rek + 1)
 
             # ... but if not used, ignore
             if len(count):
-                text += t
+                ret['text'] += res['text']
+                ret['columns'] = ret['columns'].union(res['columns'])
 
         elif re.match('# FOR\s', r):
             m = re.match('# FOR\s*(.*)', r)
@@ -105,7 +117,10 @@ def process(f1, replacement, stat, rek=0):
 
             for c in combinations_list:
                 f1.seek(f1_pos)
-                text += process(f1, c, stat, rek + 1)
+                res = process(f1, c, stat, rek + 1)
+
+                ret['text'] += res['text']
+                ret['columns'] = ret['columns'].union(res['columns'])
 
         elif re.match('# END', r):
             break;
@@ -122,59 +137,101 @@ def process(f1, replacement, stat, rek=0):
                     else:
                         t += m[0] + '[' + shorten_column(m[2]) + ']'
 
-            text += t.format(**replacement)
+            else:
+                props = re.findall("\[([^\] ]+)\]", t)
+                for p in props:
+                    v = stat.property_values(p).copy()
+# wrap-character: Mapnik 2.2 does not accept fixed values in ExpressionFormat
+                    if len(v) == 1 and not True in v and p not in ('wrap-character'):
+                        v = v.pop()
+                        t = t.replace('[' + p + ']', v)
+                        r = r.replace('[' + p + ']', v)
+
+            ret['text'] += strtr(t, replacement)
 
         # check for columns which need to be added to the sql query
         r1 = r
         m = re.match('[^\[]+\[([a-zA-Z0-9\-_ ]+)\]', r1)
         while m:
-            stat['mapnik_columns'].add(m.group(1))
+            ret['columns'].add(m.group(1))
             r1 = r1[len(m.group(0)):]
             m = re.match('[^\[]+\[([a-zA-Z0-9\-_ ]+)\]', r1)
 
-    return text
+    return ret
+
+def build_sql_column(props, stat):
+    sql_as = shorten_column(' '.join(props))
+
+    prop_values = {
+        k: stat.property_values(k)
+        for k in props
+    }
+    default_props = {
+        k: v.copy().pop()
+        for k, v in prop_values.items()
+        if len(v) == 1
+    }
+
+    r = []
+    first = 'default'
+    last = 'default'
+    for k in props:
+        if k in default_props and default_props[k] is not True:
+            r.append(default_props[k])
+            last = 'default'
+        else:
+            if len(r) == 0:
+                first = 'query'
+            last = 'query'
+            r.append("' || " + sql_convert_prop(k, 'properties->' + db.format(k), stat) + " || '")
+
+    r = "'" + ' '.join(r) + "'"
+
+    if first == 'query':
+        r = r[6:]
+    if last == 'query':
+        r = r[:-6]
+
+    return r + ' as "' + sql_as + '"'
 
 def process_mapnik(style_id, args, stat, conn):
     f1 = resource_stream(__name__, args.base_style + '.mapnik')
     f2 = open(style_id + '.mapnik', 'w')
 
     replacement = {
-        'style_id': style_id,
-        'host': args.host,
-        'password': args.password,
-        'database': args.database,
-        'user': args.user,
-        'columns': '{columns}'
+        '{style_id}': style_id,
+        '{host}': args.host,
+        '{password}': args.password,
+        '{database}': args.database,
+        '{user}': args.user,
+        '{columns}': '{columns}'
     }
 
     stat['mapnik_columns'] = set()
 
     # dirty hack - when render_context.bbox is null, pass type 'canvas' instead of style-element
-    res = db.prepare("select * from pgmapcss_{style_id}(null, 0, Array['canvas']) where pseudo_element='default'".format(**replacement))
+    res = db.prepare(strtr("select * from pgmapcss_{style_id}(null, 0, Array['canvas']) where pseudo_element='default'", replacement))
     result = res()
     if len(result) > 0:
         canvas_properties = result[0][res.column_names.index('properties')]
         canvas_properties = pghstore.loads(canvas_properties)
 
         for (k, v) in canvas_properties.items():
-            replacement['canvas|' + k] = v or ''
+            replacement['{canvas|' + k + '}'] = v or ''
 
-    text = process(f1, replacement, stat)
+    result = process(f1, replacement, stat)
 
     # style-element is an extra column in result set
-    stat['mapnik_columns'].remove('style-element')
+    result['columns'].remove('style-element')
 
     # finally replace 'columns'
     replacement = {}
-    replacement['columns'] = ',\n  '.join([
-        ' || \' \' || '.join([
-            sql_convert_prop(p, 'properties->' + db.format(p), stat)
-            for p in props.split(' ')
-        ]) + ' as "' + shorten_column(props) + '"'
-        for props in stat['mapnik_columns']
+    replacement['{columns}'] = ',\n  '.join([
+        build_sql_column(props.split(' '), stat)
+        for props in result['columns']
     ])
 
-    f2.write(text.format(**replacement))
+    f2.write(strtr(result['text'], replacement))
 
     f1.close()
     f2.close()

@@ -123,10 +123,10 @@ Label properties
 | text-spacing | Space between repeated labels. If spacing is 0 only one label is placed. | 0 | no standard(*)
 | text-transform |  'none', 'uppercase', 'lowercase', 'capitalize' | none | YES
 | text-opacity | How transparent the text is, from 0 (transparent) to 1 (opaque) | 1 | YES
-| wrap-character | Use this character instead of a space to wrap long names | " " | no standard
 | character-spacing | Additional horizontal spacing between characters. | 0 | no standard
 
 * MapCSS 0.2 properties not (yet) supported: font-variant, text-decoration
+* Properties removed in Mapnik 3.0: wrap-character
 
 Shields
 -------

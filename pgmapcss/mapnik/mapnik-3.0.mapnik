@@ -188,7 +188,7 @@
 # FOR font-family font-weight font-style
     <Rule>
       <Filter>[text] and [style-element] = 'point-text' and [text-position] = 'center' and '{font-family} {font-weight} {font-style}' = [font-family font-weight font-style]</Filter>
-      <TextSymbolizer placement="interior" fontset-name="{font-family} - {font-weight} - {font-style}" dy="[text-offset]" wrap-width="[max-width]" horizontal-alignment="[text-anchor-horizontal]" size="[font-size]" halo-radius="[text-halo-radius]" character-spacing="[character-spacing]" opacity="[text-opacity]" wrap-character="[wrap-character]" fill="[text-color]" halo-fill="[text-halo-color]">[text]</TextSymbolizer>
+      <TextSymbolizer placement="interior" fontset-name="{font-family} - {font-weight} - {font-style}" dy="[text-offset]" wrap-width="[max-width]" horizontal-alignment="[text-anchor-horizontal]" size="[font-size]" halo-radius="[text-halo-radius]" character-spacing="[character-spacing]" opacity="[text-opacity]" fill="[text-color]" halo-fill="[text-halo-color]">[text]</TextSymbolizer>
     </Rule>
 # END
 
@@ -196,7 +196,7 @@
 # FOR font-family font-weight font-style
     <Rule>
       <Filter>[text] and [style-element] = 'line-text' and [text-position] = 'line' and '{font-family} {font-weight} {font-style}' = [font-family font-weight font-style]</Filter>
-      <TextSymbolizer placement="line" fontset-name="{font-family} - {font-weight} - {font-style}" dy="[text-offset]" wrap-width="[max-width]" spacing="[text-spacing]" size="[font-size]" halo-radius="[text-halo-radius]" character-spacing="[character-spacing]" opacity="[text-opacity]" wrap-character="[wrap-character]" fill="[text-color]" halo-fill="[text-halo-color]">[text]</TextSymbolizer>
+      <TextSymbolizer placement="line" fontset-name="{font-family} - {font-weight} - {font-style}" dy="[text-offset]" wrap-width="[max-width]" spacing="[text-spacing]" size="[font-size]" halo-radius="[text-halo-radius]" character-spacing="[character-spacing]" opacity="[text-opacity]" fill="[text-color]" halo-fill="[text-halo-color]">[text]</TextSymbolizer>
     </Rule>
 # END
 # END
