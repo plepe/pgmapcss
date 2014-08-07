@@ -152,12 +152,24 @@ def process(f1, replacement, stat, rek=0):
 def build_sql_column(props, stat):
     sql_as = shorten_column(' '.join(props))
 
-    ret = ' || \' \' || '.join([
-            sql_convert_prop(p, 'properties->' + db.format(p), stat)
-            for p in props
-        ]) + ' as "' + sql_as + '"'
+    prop_values = {
+        k: stat.property_values(k)
+        for k in props
+    }
+    default_props = {
+        k: v.pop()
+        for k, v in prop_values.items()
+        if len(v) == 1
+    }
 
-    return ret
+    r = []
+    for k in props:
+        if k in default_props and default_props[k] is not True:
+            r.append(default_props[k])
+        else:
+            r.append("' || " + sql_convert_prop(k, 'properties->' + db.format(k), stat) + " || '")
+
+    return "'" + ' '.join(r) + '\' as "' + sql_as + '"'
 
 def process_mapnik(style_id, args, stat, conn):
     f1 = resource_stream(__name__, args.base_style + '.mapnik')
