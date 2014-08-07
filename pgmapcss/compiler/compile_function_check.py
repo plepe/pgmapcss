@@ -1,7 +1,6 @@
 from .compile_statement import compile_statement
 from .compile_eval import compile_eval
 import copy
-import textwrap
 from collections import Counter
 
 def print_postprocess(prop, stat, indent=''):
@@ -132,7 +131,7 @@ def check_{min_scale_esc}(object):
                 ret += indent + 'if ' + c + ":\n"
                 indent += '    '
 
-        ret += textwrap.indent(i['body'], indent)
+        ret += '\n'.join(indent + x for x in i['body'].splitlines())
         ret += "\n"
 
     ret += '''\
