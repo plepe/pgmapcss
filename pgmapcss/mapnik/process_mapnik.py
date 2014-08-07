@@ -167,7 +167,7 @@ def build_sql_column(props, stat):
         for k in props
     }
     default_props = {
-        k: v.pop()
+        k: v.copy().pop()
         for k, v in prop_values.items()
         if len(v) == 1
     }
