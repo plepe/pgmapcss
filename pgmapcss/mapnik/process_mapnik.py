@@ -149,6 +149,16 @@ def process(f1, replacement, stat, rek=0):
 
     return ret
 
+def build_sql_column(props, stat):
+    sql_as = shorten_column(' '.join(props))
+
+    ret = ' || \' \' || '.join([
+            sql_convert_prop(p, 'properties->' + db.format(p), stat)
+            for p in props
+        ]) + ' as "' + sql_as + '"'
+
+    return ret
+
 def process_mapnik(style_id, args, stat, conn):
     f1 = resource_stream(__name__, args.base_style + '.mapnik')
     f2 = open(style_id + '.mapnik', 'w')
@@ -182,10 +192,7 @@ def process_mapnik(style_id, args, stat, conn):
     # finally replace 'columns'
     replacement = {}
     replacement['{columns}'] = ',\n  '.join([
-        ' || \' \' || '.join([
-            sql_convert_prop(p, 'properties->' + db.format(p), stat)
-            for p in props.split(' ')
-        ]) + ' as "' + shorten_column(props) + '"'
+        build_sql_column(props.split(' '), stat)
         for props in result['columns']
     ])
 
