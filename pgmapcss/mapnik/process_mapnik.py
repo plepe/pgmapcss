@@ -4,6 +4,14 @@ from pkg_resources import *
 import pgmapcss.db as db
 import hashlib
 
+def strtr(s, patterns):
+    keys = sorted([ k for k in patterns ], key=len, reverse=True)
+
+    for k in keys:
+        s = s.replace(k, patterns[k])
+
+    return s
+
 # Postgresql only supports columns names with a length of up to 64 chars
 # When column names get concatenated, this could lead to problems
 # For longer names replace name by its md5 sum
@@ -46,7 +54,7 @@ def rep_convert_prop(k, v, stat):
 def combinations_combine(base, combinations_list, stat):
     combinations_list = [
         {
-            k: rep_convert_prop(k, v, stat)
+            '{' + k + '}': rep_convert_prop(k, v, stat)
             for k, v in c.items()
         }
         for c in combinations_list
@@ -129,7 +137,7 @@ def process(f1, replacement, stat, rek=0):
                     else:
                         t += m[0] + '[' + shorten_column(m[2]) + ']'
 
-            ret['text'] += t.format(**replacement)
+            ret['text'] += strtr(t, replacement)
 
         # check for columns which need to be added to the sql query
         r1 = r
@@ -146,25 +154,25 @@ def process_mapnik(style_id, args, stat, conn):
     f2 = open(style_id + '.mapnik', 'w')
 
     replacement = {
-        'style_id': style_id,
-        'host': args.host,
-        'password': args.password,
-        'database': args.database,
-        'user': args.user,
-        'columns': '{columns}'
+        '{style_id}': style_id,
+        '{host}': args.host,
+        '{password}': args.password,
+        '{database}': args.database,
+        '{user}': args.user,
+        '{columns}': '{columns}'
     }
 
     stat['mapnik_columns'] = set()
 
     # dirty hack - when render_context.bbox is null, pass type 'canvas' instead of style-element
-    res = db.prepare("select * from pgmapcss_{style_id}(null, 0, Array['canvas']) where pseudo_element='default'".format(**replacement))
+    res = db.prepare(strtr("select * from pgmapcss_{style_id}(null, 0, Array['canvas']) where pseudo_element='default'", replacement))
     result = res()
     if len(result) > 0:
         canvas_properties = result[0][res.column_names.index('properties')]
         canvas_properties = pghstore.loads(canvas_properties)
 
         for (k, v) in canvas_properties.items():
-            replacement['canvas|' + k] = v or ''
+            replacement['{canvas|' + k + '}'] = v or ''
 
     result = process(f1, replacement, stat)
 
@@ -173,7 +181,7 @@ def process_mapnik(style_id, args, stat, conn):
 
     # finally replace 'columns'
     replacement = {}
-    replacement['columns'] = ',\n  '.join([
+    replacement['{columns}'] = ',\n  '.join([
         ' || \' \' || '.join([
             sql_convert_prop(p, 'properties->' + db.format(p), stat)
             for p in props.split(' ')
@@ -181,7 +189,7 @@ def process_mapnik(style_id, args, stat, conn):
         for props in result['columns']
     ])
 
-    f2.write(result['text'].format(**replacement))
+    f2.write(strtr(result['text'], replacement))
 
     f1.close()
     f2.close()
