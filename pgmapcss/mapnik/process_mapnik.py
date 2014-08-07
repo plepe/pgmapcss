@@ -137,6 +137,16 @@ def process(f1, replacement, stat, rek=0):
                     else:
                         t += m[0] + '[' + shorten_column(m[2]) + ']'
 
+            else:
+                props = re.findall("\[([^\] ]+)\]", t)
+                for p in props:
+                    v = stat.property_values(p).copy()
+# wrap-character: Mapnik 2.2 does not accept fixed values in ExpressionFormat
+                    if len(v) == 1 and not True in v and p not in ('wrap-character'):
+                        v = v.pop()
+                        t = t.replace('[' + p + ']', v)
+                        r = r.replace('[' + p + ']', v)
+
             ret['text'] += strtr(t, replacement)
 
         # check for columns which need to be added to the sql query
