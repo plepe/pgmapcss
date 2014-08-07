@@ -60,7 +60,10 @@ def combinations_combine(base, combinations_list, stat):
     return combinations_list
 
 def process(f1, replacement, stat, rek=0):
-    text = ''
+    ret = {
+        'text': '',
+        'columns': set(),
+    }
 
     while True:
         r = f1.readline()
@@ -81,11 +84,12 @@ def process(f1, replacement, stat, rek=0):
             ]
 
             # Process anyway ...
-            t = process(f1, replacement, stat, rek + 1)
+            res = process(f1, replacement, stat, rek + 1)
 
             # ... but if not used, ignore
             if len(count):
-                text += t
+                ret['text'] += res['text']
+                ret['columns'] = ret['columns'].union(res['columns'])
 
         elif re.match('# FOR\s', r):
             m = re.match('# FOR\s*(.*)', r)
@@ -105,7 +109,10 @@ def process(f1, replacement, stat, rek=0):
 
             for c in combinations_list:
                 f1.seek(f1_pos)
-                text += process(f1, c, stat, rek + 1)
+                res = process(f1, c, stat, rek + 1)
+
+                ret['text'] += res['text']
+                ret['columns'] = ret['columns'].union(res['columns'])
 
         elif re.match('# END', r):
             break;
@@ -122,17 +129,17 @@ def process(f1, replacement, stat, rek=0):
                     else:
                         t += m[0] + '[' + shorten_column(m[2]) + ']'
 
-            text += t.format(**replacement)
+            ret['text'] += t.format(**replacement)
 
         # check for columns which need to be added to the sql query
         r1 = r
         m = re.match('[^\[]+\[([a-zA-Z0-9\-_ ]+)\]', r1)
         while m:
-            stat['mapnik_columns'].add(m.group(1))
+            ret['columns'].add(m.group(1))
             r1 = r1[len(m.group(0)):]
             m = re.match('[^\[]+\[([a-zA-Z0-9\-_ ]+)\]', r1)
 
-    return text
+    return ret
 
 def process_mapnik(style_id, args, stat, conn):
     f1 = resource_stream(__name__, args.base_style + '.mapnik')
@@ -159,10 +166,10 @@ def process_mapnik(style_id, args, stat, conn):
         for (k, v) in canvas_properties.items():
             replacement['canvas|' + k] = v or ''
 
-    text = process(f1, replacement, stat)
+    result = process(f1, replacement, stat)
 
     # style-element is an extra column in result set
-    stat['mapnik_columns'].remove('style-element')
+    result['columns'].remove('style-element')
 
     # finally replace 'columns'
     replacement = {}
@@ -171,10 +178,10 @@ def process_mapnik(style_id, args, stat, conn):
             sql_convert_prop(p, 'properties->' + db.format(p), stat)
             for p in props.split(' ')
         ]) + ' as "' + shorten_column(props) + '"'
-        for props in stat['mapnik_columns']
+        for props in result['columns']
     ])
 
-    f2.write(text.format(**replacement))
+    f2.write(result['text'].format(**replacement))
 
     f1.close()
     f2.close()
