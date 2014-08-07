@@ -163,13 +163,26 @@ def build_sql_column(props, stat):
     }
 
     r = []
+    first = 'default'
+    last = 'default'
     for k in props:
         if k in default_props and default_props[k] is not True:
             r.append(default_props[k])
+            last = 'default'
         else:
+            if len(r) == 0:
+                first = 'query'
+            last = 'query'
             r.append("' || " + sql_convert_prop(k, 'properties->' + db.format(k), stat) + " || '")
 
-    return "'" + ' '.join(r) + '\' as "' + sql_as + '"'
+    r = "'" + ' '.join(r) + "'"
+
+    if first == 'query':
+        r = r[6:]
+    if last == 'query':
+        r = r[:-6]
+
+    return r + ' as "' + sql_as + '"'
 
 def process_mapnik(style_id, args, stat, conn):
     f1 = resource_stream(__name__, args.base_style + '.mapnik')
