@@ -53,7 +53,7 @@ If you read a number, unit conversion takes place. The following units are suppo
 | str | value | string | "Converts" input value to string. As every input is a string, does nothing. | MapCSS 0.2
 | int | value | number | Returns the integer part of the input (e.g. '-5.6' => '-5', '8.9' => '8'). Does not accept units.
 | num | value | number | Checks if the input is a number. If not, none is returned. | MapCSS 0.2
-| debug | value | value | raise a postgresql notice with the value(s); returns first value. E.g. width: eval(debug(5+4)); => notice '9'; width: eval(debug(5+4, 'test')); => notice [ '9', 'test' ], returns '9'. | no standard
+| debug, print, println | value | value | raise a postgresql notice with the value(s); returns first value. E.g. width: eval(debug(5+4)); => notice '9'; width: eval(debug(5+4, 'test')); => notice [ '9', 'test' ], returns '9'. | no standard
 | osm_id | | text | ID of the object from OpenStreetMap, e.g. 'n1234' | no standard
 | number_of_tags | | number | Returns the count of tags of the current object, e.g. '3' | JOSM
 | keys_of_tags | | list | Returns a list of tag keys of the current object, e.g. list('amenity', 'name') | no standard
