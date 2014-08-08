@@ -16,9 +16,9 @@ def compile_eval(value, prop, stat):
 
     possible_values, mutable = pgmapcss.eval.possible_values(value, prop, stat)
 
-    # if a the eval function returns only one possible value, we can just take
-    # it for granted
-    if len(possible_values) == 1:
+    # if the eval function returns only one possible value and mutability is 3,
+    # we can just take it for granted
+    if mutable == 3 and len(possible_values) == 1:
         possible_values = possible_values.pop()
         if type(possible_values) == str:
             return repr(possible_values)
