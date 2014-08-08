@@ -65,10 +65,16 @@ def possible_values(value, prop, stat):
 
     # if not, calculate possible values for all combinations of input parameters
     except AttributeError:
+        combinations = pgmapcss.combinations(param)
+
+        if len(combinations) > 256:
+            print('eval::possible_values: found {} possible combinations for "{}" using function {}() -> stopping getting possible values'.format(len(combinations), prop.get('key', 'unknown'), func))
+            return ({ True }, mutable)
+
         # finally calculate possible results
         result = [
             eval_functions[func].possible_values(p, prop, stat)
-            for p in pgmapcss.combinations(param)
+            for p in combinations
         ]
         if(len(result)):
             mutable = min(mutable, min([ r[1] for r in result ]))
