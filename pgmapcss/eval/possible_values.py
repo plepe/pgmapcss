@@ -24,7 +24,10 @@ def possible_values(value, prop, stat):
         elif value[0:2] == 'f:':
             func = value[2:]
             if not func in eval_functions:
-                raise Exception('Unknown eval function: ' + func)
+                if func in pgmapcss.eval.functions().aliases:
+                    func = pgmapcss.eval.functions().aliases[func]
+                else:
+                    raise Exception('Unknown eval function: ' + func)
             r, mutable = eval_functions[func].possible_values([], prop, stat)
             if type(r) == set:
                 return ( r, mutable )
@@ -53,7 +56,10 @@ def possible_values(value, prop, stat):
         func = value[0][2:]
 
     if not func in eval_functions:
-        raise Exception('Unknown eval function: ' + func)
+        if func in pgmapcss.eval.functions().aliases:
+            func = pgmapcss.eval.functions().aliases[func]
+        else:
+            raise Exception('Unknown eval function: ' + func)
 
     # make sure all elements are sets
     param = [ {p} if type(p) == str else p for p in param ]

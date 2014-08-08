@@ -74,6 +74,7 @@ class Functions:
         )
 
         self.eval_functions = {}
+        self.aliases = {}
         for func, src in self.eval_functions_source.items():
             if 'config_eval_' + func in locals():
                 config = locals()['config_eval_' + func](func)
@@ -86,6 +87,10 @@ class Functions:
                 config.op = set( config.op )
             else:
                 config.op = { config.op }
+
+            if config.aliases is not None:
+                for a in config.aliases:
+                    self.aliases[a] = func
 
             self.eval_functions[func] = config
 

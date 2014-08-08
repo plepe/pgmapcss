@@ -24,6 +24,7 @@ class config_base:
     math_level = None
     op = None
     unary = False
+    aliases = None
     mutable = 0
 # 'mutable' says whether a function returns different output for the same set
 # of input parameters:

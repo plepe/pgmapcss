@@ -29,7 +29,10 @@ def compile_eval(value, prop, stat):
         elif value[0:2] == 'f:':
             func = value[2:]
             if not func in eval_functions:
-                raise Exception('Unknown eval function: ' + func)
+                if func in pgmapcss.eval.functions().aliases:
+                    func = pgmapcss.eval.functions().aliases[func]
+                else:
+                    raise Exception('Unknown eval function: ' + func)
             return eval_functions[func].compiler([], eval_param, stat)
         else:
             raise Exception('compiling eval: ' + repr(value))
@@ -52,6 +55,9 @@ def compile_eval(value, prop, stat):
         func = value[0][2:]
 
     if not func in eval_functions:
-        raise Exception('Unknown eval function: ' + func)
+        if func in pgmapcss.eval.functions().aliases:
+            func = pgmapcss.eval.functions().aliases[func]
+        else:
+            raise Exception('Unknown eval function: ' + func)
 
     return eval_functions[func].compiler(param, eval_param, stat)
