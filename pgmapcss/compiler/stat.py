@@ -37,6 +37,21 @@ class _stat(dict):
 
         return ret
 
+    def property_default_value(self, prop):
+        if 'default_other' in self['defines'] and prop in self['defines']['default_other']:
+            other = self['defines']['default_other'][prop]['value']
+            value = self.property_default_value(other)
+            if value is not None:
+                return value
+
+        if 'default_value' in self['defines'] and prop in self['defines']['default_value']:
+            value = self['defines']['default_value'][prop]['value']
+            if value is not None:
+                return value
+
+        return None
+
+
     def property_values(self, prop, pseudo_element=None, include_illegal_values=False, value_type=None, eval_true=True, max_prop_id=None, include_none=False, object_type=None):
         """Returns set of all values used on this property in any statement.
         Returns boolean 'True' if property is result of an unresolveable eval
