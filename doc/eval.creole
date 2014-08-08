@@ -182,3 +182,4 @@ Mapnik < 3.0 can't read dynamic color values. Therefore pgmapcss has to know all
 | JOSM_pref | key:string, default:value | value | used in JOSM for advanced preferences. Does nothing, but return the default value
 | JOSM_search | | boolean | always returns false
 | _global_data | [key, [key, [...]]] | value | access a value from global_data
+| tr | str:string, arg0:value, arg1:value | JOSM-compatibility function: In JOSM this function translates English strings to the current language. In pgmapcss this is not supported (yet), but it replaces occurences of "{}" by the arguments. You can also specify the nth argument by using "{n}". Example: tr("Test: {1}{}{0}", "bar", "foo") => "Test: foobarbar")
