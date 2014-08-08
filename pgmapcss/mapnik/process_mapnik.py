@@ -142,7 +142,7 @@ def process(f1, replacement, stat, rek=0):
                 for p in props:
                     v = stat.property_values(p).copy()
 # wrap-character: Mapnik 2.2 does not accept fixed values in ExpressionFormat
-                    if len(v) == 1 and not True in v and p not in ('wrap-character'):
+                    if len(v) == 1 and not True in v and stat.property_default_value(p) in v and p not in ('wrap-character'):
                         v = v.pop()
                         t = t.replace('[' + p + ']', v)
                         r = r.replace('[' + p + ']', v)
@@ -169,7 +169,7 @@ def build_sql_column(props, stat):
     default_props = {
         k: v.copy().pop()
         for k, v in prop_values.items()
-        if len(v) == 1
+        if len(v) == 1 and stat.property_default_value(k) in v
     }
 
     r = []
