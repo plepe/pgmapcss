@@ -180,4 +180,5 @@ Mapnik < 3.0 can't read dynamic color values. Therefore pgmapcss has to know all
 |= Function |= Parameters |= Return value |= Description
 | to_dashes | string | a valid dashes string or 'none' | Checks the validity of a dashes definition
 | JOSM_pref | key:string, default:value | value | used in JOSM for advanced preferences. Does nothing, but return the default value
+| JOSM_search | | boolean | always returns false
 | _global_data | [key, [key, [...]]] | value | access a value from global_data
