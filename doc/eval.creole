@@ -136,6 +136,7 @@ Mapnik < 3.0 can't read dynamic color values. Therefore pgmapcss has to know all
 | lighten | color (hex notation, e.g. #123456), factor (float, e.g. 0.5) | color in hex notation | lighten a color by a given factor
 | red, green, blue | color (hex notation, e.g. #123456) | number (from 0..1) | get value of color channels in rgb color model (0..1)
 | alpha | color (hex notation, e.g. #123456 or #12345678) | number (from 0..1) | get the alpha value of the given color (0..1)
+| hsv, hsv_color | hue, saturation, value. | A color in hex notation, e.g. '#1a7fe5' | Creates a color from the input parameters. hue is a value from 0..360. For saturation and value the following formats are recognised: integer 0..100, float 0.0..1.0, percent 0%..100%, e.g. hsv(120, 0.2, 50) => #667666.
 
 == Geometric functions ===
 * Geometric functions are not part of the MapCSS 0.2 standard

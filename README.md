@@ -112,7 +112,7 @@ As Mapnik 2.x can't read symbolizer values (like color, width, ...) from databas
 
 Find installation instructions in [Install pgmapcss with Mapnik 2.2 on Ubuntu 12.04](doc/Install pgmapcss with Mapnik_2.2 on Ubuntu_12.04.md).
 
-There's a file [test.mapcss](./test.mapcss) which you can use to build upon. You can [try it online!](http://pgmapcss.openstreetbrowser.org/?style=d9c30&zoom=14&lat=48.2098&lon=16.3725)
+There's a file [test.mapcss](./test.mapcss) which you can use to build upon. You can [try it online!](http://pgmapcss.openstreetbrowser.org/?style=f457f&zoom=14&lat=48.2098&lon=16.3725)
 
 Share this
 ----------
