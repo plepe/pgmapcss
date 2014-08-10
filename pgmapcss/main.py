@@ -56,6 +56,9 @@ parser.add_argument('-o', '--options', dest='options', nargs='+',
 parser.add_argument('-c', '--config', dest='config', nargs='+',
     help='Set configuration options, e.g. -c foo=bar. See doc/MapCSS.creole for available configuration options.')
 
+parser.add_argument('-D', '--defaults', dest='defaults', nargs='+',
+    help='Load specified defaults. These can either be included in the pgmapcss distribution (see doc/defaults.md for a list of available defaults) or local files (specified by trailing .mapcss). You may specify several defaults which will be loaded consecutive (e.g. -D josm local.mapcss)')
+
 def main():
     print('pgmapcss version %s' % pgmapcss.version.VERSION)
     args = parser.parse_args()
@@ -130,7 +133,7 @@ def main():
         content = mapcss.firstChild.nodeValue
 
     try:
-        pgmapcss.parser.parse_file(stat, filename=file_name, content=content, base_style=args.base_style)
+        pgmapcss.parser.parse_file(stat, filename=file_name, content=content, base_style=args.base_style, defaults=args.defaults)
     except pgmapcss.parser.ParseError as e:
         print(e)
         sys.exit(1)

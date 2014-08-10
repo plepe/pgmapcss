@@ -16,6 +16,7 @@ setup(
         'pgmapcss.icons': [ 'maki/*' ],
         'pgmapcss.symbols': [ '*.svg' ],
         'pgmapcss.data': [ '*.wkt' ],
+        'pgmapcss.defaults': [ '*.mapcss' ],
     },
     scripts = [ 'bin/pgmapcss' ],
     install_requires = [
