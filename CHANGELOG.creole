@@ -5,7 +5,7 @@
 * Support for Mapnik 2.3 (mostly similar to Mapnik 2.2, but there are some advanced features)
 * Eval functions:
 ** changed parameter order for join() and split()
-** new eval functions: viewport(), intersection(), range(), reverse(), is_left_hand_traffic(), is_right_hand_traffic(), line_locate_azimuth(), red(), green(), blue(), alpha(), URL_encode(), XML_encode(), CRC32_checksum(), regexp_text(), regexp_match(), floor(), ceil(), length(), is_prop_set(), has_tag_key(), sin(), cos(), tan(), asin(), acos(), atan(), atan2(), sinh(), cosh(), tanh(), signum(), log(), exp(), replace(), JOSM_pref()
+** new eval functions: viewport(), intersection(), range(), reverse(), is_left_hand_traffic(), is_right_hand_traffic(), line_locate_azimuth(), red(), green(), blue(), alpha(), URL_encode(), XML_encode(), CRC32_checksum(), regexp_text(), regexp_match(), floor(), ceil(), length(), is_prop_set(), has_tag_key(), sin(), cos(), tan(), asin(), acos(), atan(), atan2(), sinh(), cosh(), tanh(), signum(), log(), exp(), replace(), JOSM_pref(), JOSM_search(), keys_of_tags(), number_of_tags(), tr(), hsv() resp. hsv_color()
 ** Deprecations: substr() renamed to substring()
 ** support inline condition operator: (condition?if_true:else)
 ** an identifier may no longer contain ':' (because of inline condition operator)
@@ -28,6 +28,7 @@
 ** Support left-casing-* and right-casing-* (with the same suffixes as casing-*)
 ** symbol-* as in JOSM, plus symbol-rotation
 ** Property 'image', 'repeat-image', 'fill-image': for Mapnik 2.x, SVGs will automatically be converted to PNGs
+** Accept colors in hsv()
 * Lot's of bugfixes, see Git log for details
 * A new dependency: python3-wand
 

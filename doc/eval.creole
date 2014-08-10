@@ -53,8 +53,10 @@ If you read a number, unit conversion takes place. The following units are suppo
 | str | value | string | "Converts" input value to string. As every input is a string, does nothing. | MapCSS 0.2
 | int | value | number | Returns the integer part of the input (e.g. '-5.6' => '-5', '8.9' => '8'). Does not accept units.
 | num | value | number | Checks if the input is a number. If not, none is returned. | MapCSS 0.2
-| debug | value | value | raise a postgresql notice with the value(s); returns first value. E.g. width: eval(debug(5+4)); => notice '9'; width: eval(debug(5+4, 'test')); => notice [ '9', 'test' ], returns '9'. | no standard
+| debug, print, println | value | value | raise a postgresql notice with the value(s); returns first value. E.g. width: eval(debug(5+4)); => notice '9'; width: eval(debug(5+4, 'test')); => notice [ '9', 'test' ], returns '9'. | no standard
 | osm_id | | text | ID of the object from OpenStreetMap, e.g. 'n1234' | no standard
+| number_of_tags | | number | Returns the count of tags of the current object, e.g. '3' | JOSM
+| keys_of_tags | | list | Returns a list of tag keys of the current object, e.g. list('amenity', 'name') | no standard
 | style_id | | text | ID of the current style | no standard
 | zoom | | number | Returns current zoom level, e.g. '15' | no standard
 | scale_denominator | | number | Returns current scale denominator, e.g. '17061.8366708' (at zoom level 15) | no standard
@@ -134,6 +136,7 @@ Mapnik < 3.0 can't read dynamic color values. Therefore pgmapcss has to know all
 | lighten | color (hex notation, e.g. #123456), factor (float, e.g. 0.5) | color in hex notation | lighten a color by a given factor
 | red, green, blue | color (hex notation, e.g. #123456) | number (from 0..1) | get value of color channels in rgb color model (0..1)
 | alpha | color (hex notation, e.g. #123456 or #12345678) | number (from 0..1) | get the alpha value of the given color (0..1)
+| hsv, hsv_color | hue, saturation, value. | A color in hex notation, e.g. '#1a7fe5' | Creates a color from the input parameters. hue is a value from 0..360. For saturation and value the following formats are recognised: integer 0..100, float 0.0..1.0, percent 0%..100%, e.g. hsv(120, 0.2, 50) => #667666.
 
 == Geometric functions ===
 * Geometric functions are not part of the MapCSS 0.2 standard
@@ -178,4 +181,6 @@ Mapnik < 3.0 can't read dynamic color values. Therefore pgmapcss has to know all
 |= Function |= Parameters |= Return value |= Description
 | to_dashes | string | a valid dashes string or 'none' | Checks the validity of a dashes definition
 | JOSM_pref | key:string, default:value | value | used in JOSM for advanced preferences. Does nothing, but return the default value
+| JOSM_search | | boolean | always returns false
 | _global_data | [key, [key, [...]]] | value | access a value from global_data
+| tr | str:string, arg0:value, arg1:value | JOSM-compatibility function: In JOSM this function translates English strings to the current language. In pgmapcss this is not supported (yet), but it replaces occurences of "{}" by the arguments. You can also specify the nth argument by using "{n}". Example: tr("Test: {1}{}{0}", "bar", "foo") => "Test: foobarbar")

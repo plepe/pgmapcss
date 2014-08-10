@@ -1,5 +1,6 @@
 class config_eval_debug(config_base):
     mutable = 0
+    aliases = ( 'print', 'println' )
 
     def possible_values(self, param_values, prop, stat):
         return (param_values[0], 0)
