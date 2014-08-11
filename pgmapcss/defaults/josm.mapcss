@@ -1,0 +1,6 @@
+@config josm_classes true;
+@default_value font-size 8;
+@default_value text-color #ffffff;
+@default_value text-halo-color #000000;
+@default_value fill-opacity 0.3;
+@default_value linecap round;
