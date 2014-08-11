@@ -25,7 +25,7 @@ class pixels(default):
             return None
 
         # relative value add/sub from value on default layer
-        if v[0][0] in ('-', '+'):
+        if v[0][0] in ('+'):
             if v[1] == 'px':
                 return self.compile_check(compile_eval([ 'o:+', [ 'f:prop', 'v:' + prop['key'], 'v:default' ], 'v:' + v[0] ], prop, self.stat))
             else:

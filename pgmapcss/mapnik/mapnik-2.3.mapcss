@@ -225,6 +225,7 @@ style_id() . '.icons/symbol-' . prop('symbol-shape') .'-'. prop('symbol-size') .
 }
 line::(*) {
   shield-placement: line;
+  text-position: line;
 }
 canvas {
   fill-color: #00000000;

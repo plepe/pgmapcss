@@ -105,7 +105,7 @@ Label properties
 | text-offset | The vertical offset from the centre of the way or point. By default relative to an icon/symbol (see text-anchor-vertical) | 0 | YES(*)
 | text-anchor-vertical | vertical text label placement relative to icon/symbol, possible values (below, above) | below | NO, JOSM (*)
 | text-anchor-horizontal | Position of label relative to point position (left, middle, right) | middle | NO, JOSM (*)
-| text-position | Whether the text follows the path of the way ('line') or is centred on the area ('center') | center | YES
+| text-position | Whether the text follows the path of the way ('line') or is centred on the area ('center') | center; line for lines | YES
 | font-family | Name of the font to use default (see 'Fonts' below) | DejaVu Sans | YES(*)
 | font-weight |  'bold' or 'normal' | normal | YES
 | font-style |  'italic' or 'normal' | normal | YES
