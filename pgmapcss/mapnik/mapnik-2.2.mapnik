@@ -160,37 +160,37 @@
 
 <!-- POINTS -->
 # IF symbol-shape
-# FOR symbol-rotation
+# FOR symbol-rotation symbol-allow-overlap symbol-ignore-placement
     <Rule>
-      <Filter>[style-element] = 'point' and [final-symbol-image] and '{symbol-rotation}' = [symbol-rotation]</Filter>
-      <PointSymbolizer file="[final-symbol-image]" transform="rotate({symbol-rotation})" />
+      <Filter>[style-element] = 'point' and [final-symbol-image] and '{symbol-rotation} {symbol-allow-overlap} {symbol-ignore-placement}' = [symbol-rotation symbol-allow-overlap symbol-ignore-placement]</Filter>
+      <PointSymbolizer file="[final-symbol-image]" transform="rotate({symbol-rotation})" allow-overlap="{symbol-allow-overlap}" ignore-placement="{symbol-ignore-placement}" />
     </Rule>
 # END
 # END
 
 # IF icon-image
-# FOR icon-opacity icon-rotation
+# FOR icon-opacity icon-rotation icon-allow-overlap icon-ignore-placement
     <Rule>
-      <Filter>[style-element] = 'point' and [final-icon-image] and '{icon-opacity} {icon-rotation}' = [icon-opacity icon-rotation]</Filter>
-      <PointSymbolizer file="[final-icon-image]" opacity="{icon-opacity}" transform="rotate({icon-rotation})" />
+      <Filter>[style-element] = 'point' and [final-icon-image icon-allow-overlap icon-ignore-placement] and '{icon-opacity} {icon-rotation} {icon-allow-overlap} {icon-ignore-placement}' = [icon-opacity icon-rotation icon-allow-overlap icon-ignore-placement]</Filter>
+      <PointSymbolizer file="[final-icon-image]" opacity="{icon-opacity}" transform="rotate({icon-rotation})" allow-overlap="{icon-allow-overlap}" ignore-placement="{icon-ignore-placement}" />
     </Rule>
 # END
 # END
 
 <!-- TEXTS on Points -->
 # IF text
-# FOR font-family font-weight font-style text-color text-halo-color text-offset max-width text-anchor-horizontal
+# FOR font-family font-weight font-style text-color text-halo-color text-offset max-width text-anchor-horizontal text-allow-overlap
     <Rule>
-        <Filter>[text] and [style-element] = 'point-text' and [text-position] = 'center' and '{font-family} {font-weight} {font-style} {text-color} {text-halo-color} {text-offset} {max-width} {text-anchor-horizontal}' = [font-family font-weight font-style text-color text-halo-color text-offset max-width text-anchor-horizontal]</Filter>
-      <TextSymbolizer placement="interior" fontset-name="{font-family} - {font-weight} - {font-style}" fill="{text-color}" halo-fill="{text-halo-color}" dy="{text-offset}" wrap-width="{max-width}" avoid-edges="false" horizontal-alignment="{text-anchor-horizontal}"><ExpressionFormat size="[font-size]" halo-radius="[text-halo-radius]" character-spacing="[character-spacing]" opacity="[text-opacity]" wrap-character="[wrap-character]">[text]</ExpressionFormat></TextSymbolizer>
+        <Filter>[text] and [style-element] = 'point-text' and [text-position] = 'center' and '{font-family} {font-weight} {font-style} {text-color} {text-halo-color} {text-offset} {max-width} {text-anchor-horizontal} {text-allow-overlap}' = [font-family font-weight font-style text-color text-halo-color text-offset max-width text-anchor-horizontal text-allow-overlap]</Filter>
+      <TextSymbolizer placement="interior" fontset-name="{font-family} - {font-weight} - {font-style}" fill="{text-color}" halo-fill="{text-halo-color}" dy="{text-offset}" wrap-width="{max-width}" avoid-edges="false" horizontal-alignment="{text-anchor-horizontal}" allow-overlap="{text-allow-overlap}"><ExpressionFormat size="[font-size]" halo-radius="[text-halo-radius]" character-spacing="[character-spacing]" opacity="[text-opacity]" wrap-character="[wrap-character]">[text]</ExpressionFormat></TextSymbolizer>
     </Rule>
 # END
 
 <!-- TEXTS on Lines -->
-# FOR font-family font-weight font-style text-color text-halo-color text-offset max-width text-spacing
+# FOR font-family font-weight font-style text-color text-halo-color text-offset max-width text-spacing text-allow-overlap
     <Rule>
-        <Filter>[text] and [style-element] = 'line-text' and [text-position] = 'line' and '{font-family} {font-weight} {font-style} {text-color} {text-halo-color} {text-offset} {max-width} {text-spacing}' = [font-family font-weight font-style text-color text-halo-color text-offset max-width text-spacing]</Filter>
-      <TextSymbolizer placement="line" fontset-name="{font-family} - {font-weight} - {font-style}" fill="{text-color}" halo-fill="{text-halo-color}" dy="{text-offset}" wrap-width="{max-width}" spacing="{text-spacing}"><ExpressionFormat size="[font-size]" halo-radius="[text-halo-radius]" character-spacing="[character-spacing]" opacity="[text-opacity]" wrap-character="[wrap-character]">[text]</ExpressionFormat></TextSymbolizer>
+        <Filter>[text] and [style-element] = 'line-text' and [text-position] = 'line' and '{font-family} {font-weight} {font-style} {text-color} {text-halo-color} {text-offset} {max-width} {text-spacing} {text-allow-overlap}' = [font-family font-weight font-style text-color text-halo-color text-offset max-width text-spacing text-allow-overlap]</Filter>
+      <TextSymbolizer placement="line" fontset-name="{font-family} - {font-weight} - {font-style}" fill="{text-color}" halo-fill="{text-halo-color}" dy="{text-offset}" wrap-width="{max-width}" spacing="{text-spacing}" allow-overlap="{text-allow-overlap}"><ExpressionFormat size="[font-size]" halo-radius="[text-halo-radius]" character-spacing="[character-spacing]" opacity="[text-opacity]" wrap-character="[wrap-character]">[text]</ExpressionFormat></TextSymbolizer>
     </Rule>
 # END
 # END

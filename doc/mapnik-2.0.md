@@ -51,6 +51,8 @@ Point properties
 | icon-width | Width of image. Ignored for custom images. For icons from Mapbox Maki project values 12, 18 or 24 have to be used. | 24 | PARTLY
 | icon-height | Height of image. Ignored. | - | -- | NO
 | icon-rotation | Rotation of the image in the current angular system. | 0 | NO(*)
+| icon-allow-overlap | allow text to overlap the point image (true/false) | false | NO
+| icon-ignore-placement | allow subsequent point/shield iconizers to overlap this icon (true/false) | false | NO
 | symbol-shape | Display a symbol at the position of the point. Supported values: square, circle, triangle, pentagon, hexagon, heptagon, octagon, nonagon, decagon | - | NO, JOSM (*)
 | symbol-size | Size of the symbol (px) | 10 | NO, JOSM (*)
 | symbol-stroke-width | outline stroke width | 1 | NO, JOSM (*)
@@ -59,6 +61,8 @@ Point properties
 | symbol-fill-color | fill color for the shape | #0000FF | NO, JOSM (*)
 | symbol-fill-opacity | fill opacity | 1.0 | NO, JOSM (*)
 | symbol-rotation | Rotation of the symbol in the current angular system. | 0 | NO (*)
+| symbol-allow-overlap | allow text to overlap the point image (true/false) | false | NO
+| symbol-ignore-placement | allow subsequent point/shield symbolizers to overlap this symbol (true/false) | false | NO
 
 Line properties
 ---------------
@@ -119,6 +123,7 @@ Label properties
 | text-opacity | How transparent the text is, from 0 (transparent) to 1 (opaque) | 1 | YES(*)
 | wrap-character | Use this character instead of a space to wrap long names | " " | no standard(*)
 | character-spacing | Additional horizontal spacing between characters. | 0 | no standard(*)
+| text-allow-overlap | Allow labels to overlap other labels (true/false) | false | no standard
 
 * MapCSS 0.2 properties not (yet) supported: font-variant, text-decoration
 

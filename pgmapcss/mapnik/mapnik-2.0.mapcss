@@ -97,6 +97,8 @@ style_id() . '.icons/symbol-' . prop('symbol-shape') .'-'. prop('symbol-size') .
 @default_value icon-color #444444;
 @default_value icon-width 24;
 @default_value icon-rotation 0;
+@default_value icon-allow-overlap false;
+@default_value icon-ignore-placement false;
 @default_value final-icon-image ; // used internally to add width and casing-width
 @default_value symbol-size 10;
 @default_value symbol-stroke-width 1;
@@ -105,6 +107,8 @@ style_id() . '.icons/symbol-' . prop('symbol-shape') .'-'. prop('symbol-size') .
 @default_value symbol-fill-color #0000ff;
 @default_value symbol-fill-opacity 1;
 @default_value symbol-rotation 0;
+@default_value symbol-allow-overlap false;
+@default_value symbol-ignore-placement false;
 
 // PolygonSymbolizer
 @default_value fill-opacity 1;
@@ -138,6 +142,7 @@ style_id() . '.icons/symbol-' . prop('symbol-shape') .'-'. prop('symbol-size') .
 @default_value text-anchor-vertical below;
 @default_value text-anchor-horizontal middle;
 @default_value max-width 0;
+@default_value text-allow-overlap false;
 // not in MapCSS 0.2 standard
 @default_value character-spacing 0;
 @default_value wrap-character " ";
