@@ -1,0 +1,41 @@
+node::(*) {
+  geo: buffer(prop('geo'), '9px');
+  color: #03f;
+  width:2;
+  opacity:0.7;
+  fill-color:#fc0;
+  fill-opacity:0.3;
+  text-offset: -12;
+}
+/* line features */
+line::(*) {
+  color:#03f;
+  width:5;
+  opacity:0.6;
+}
+/* polygon features */
+area::(*) {
+  color:#03f;
+  width:2;
+  opacity:0.7;
+  fill-color:#fc0;
+  fill-opacity:0.3;
+}
+/* style modifications */
+/* objects in relations */
+relation node::(*), relation way::(*), relation relation::(*) {
+  color:#d0f;
+}
+/* tainted objects */
+// way:tainted, relation:tainted {
+//   dashes:5,8;
+// } -- not supported by pgmapcss yet
+/* placeholder points */
+// way:placeholder, relation:placeholder {
+//   fill-color:red;
+// } -- no support for placeholders
+/* highlighted features */
+// node:active, way:active, relation:active {
+//   color:#f50;
+//   fill-color:#f50;
+// } -- no interactivity
