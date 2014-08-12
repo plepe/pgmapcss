@@ -121,7 +121,7 @@ Label properties
 | text-color | Colour of text | #000000 | YES(*)
 | text-halo-color | The colour (hex or CSS) of the 'halo' or 'pull-out' used to make the text stand out from features underneath it. | #ffffff | YES(*)
 | text-halo-radius |  The radius of the halo | 0 | YES
-| text | A tag from which text for label will be read, or (if quoted or an eval-statement) the text for the label | | YES
+| text | A tag from which text for label will be read, or (if quoted or an eval-statement) the text for the label. If value is 'auto', one of the following tags will be used: "name", "int_name", "ref", "operator", "brand" and "addr:housenumber". | | YES
 | text-spacing | Space between repeated labels. If spacing is 0 only one label is placed. | 0 | no standard(*)
 | text-transform |  'none', 'uppercase', 'lowercase', 'capitalize' | none | YES
 | text-opacity | How transparent the text is, from 0 (transparent) to 1 (opaque) | 1 | YES
@@ -144,7 +144,7 @@ Shields
 | shield-text-color | Colour of text | #000000 | no standard(*)
 | shield-text-halo-color | The colour (hex or CSS) of the 'halo' or 'pull-out' used to make the text stand out from features underneath it. | #ffffff | no standard(*)
 | shield-text-halo-radius |  The radius of the halo | 0 | no standard(*)
-| shield-text | A tag from which text for label will be read, or (if quoted or an eval-statement) the text for the label | | YES
+| shield-text | A tag from which text for label will be read, or (if quoted or an eval-statement) the text for the label. If value is 'auto', one of the following tags will be used: "name", "int_name", "ref", "operator", "brand" and "addr:housenumber". | | YES
 | shield-spacing | Space between repeated shields. If spacing is 0 only one label is placed | 196 | no standard(*)
 | shield-opacity |  How transparent the shield is, from 0 (transparent) to 1 (opaque) | 1 | YES(*)
 | shield-image |  The URL (absolute or relative) of an image to use as a background for text. | | YES
