@@ -4,3 +4,9 @@
 @default_value text-halo-color #000000;
 @default_value fill-opacity 0.3;
 @default_value linecap round;
+@default_value icon-allow-overlap true;
+@default_value icon-ignore-placement true;
+@default_value symbol-allow-overlap true;
+@default_value symbol-ignore-placement true;
+@default_value text-allow-overlap true;
+@config angular_system radians;

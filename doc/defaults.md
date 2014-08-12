@@ -3,6 +3,8 @@ Improves compatibility with JOSM:
 * "set foo" implies "set .foo" (class is set too)
 * Assume black as background color, use white texts per default
 * Areas have a 0.3 (?) opacity per default
+* Labels and icons may overlap
+* Uses radians as angular system
 * Some other minor changes to default values (e.g. font-size, linecap, ...)
 
 == overpass-turbo ==
