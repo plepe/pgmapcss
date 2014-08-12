@@ -9,6 +9,12 @@ class default:
     def compile(self, prop):
         return repr(prop['value'])
 
+    def compile_postprocess(self):
+        return None
+
+    def stat_postprocess(self, values, pseudo_element=None):
+        pass
+
     def stat_value(self, prop):
         return prop['value']
 

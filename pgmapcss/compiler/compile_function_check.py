@@ -2,9 +2,16 @@ from .compile_statement import compile_statement
 from .compile_eval import compile_eval
 import copy
 from collections import Counter
+import pgmapcss.types
 
 def print_postprocess(prop, stat, indent=''):
     ret = ''
+
+    # tag type specific stuff
+    prop_type = pgmapcss.types.get(prop, stat)
+    r = prop_type.compile_postprocess()
+    if r:
+        ret += '\n'.join(indent + x for x in r.splitlines()) + '\n'
 
     # postprocess requested properties (see @postprocess)
     if prop in stat['defines']['postprocess']:
