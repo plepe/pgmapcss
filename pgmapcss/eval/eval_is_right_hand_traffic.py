@@ -8,7 +8,7 @@ def eval_is_right_hand_traffic(param):
 
     if not force and not 'righthandtraffic' in render_context:
         render_context['righthandtraffic'] = None
-        render_context['righthandtraffic'] = eval_righthandtraffic([render_context['bbox']])
+        render_context['righthandtraffic'] = eval_is_right_hand_traffic([render_context['bbox']])
 
     if not force and render_context['righthandtraffic'] not in ( None, 'partly' ) and not force:
         return render_context['righthandtraffic']
