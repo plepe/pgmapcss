@@ -2,15 +2,30 @@ from .compile_statement import compile_statement
 from .compile_eval import compile_eval
 import copy
 from collections import Counter
+import pgmapcss.types
 
 def print_postprocess(prop, stat, indent=''):
     ret = ''
+
+    # tag type specific stuff
+    prop_type = pgmapcss.types.get(prop, stat)
+    r = prop_type.compile_postprocess()
+    if r:
+        ret += '\n'.join(indent + x for x in r.splitlines()) + '\n'
 
     # postprocess requested properties (see @postprocess)
     if prop in stat['defines']['postprocess']:
         v = stat['defines']['postprocess'][prop]
         ret += indent + "current['properties'][pseudo_element][" + repr(prop) +\
            "] = " + compile_eval(v['value'], v, stat) + '\n'
+
+    if ret != '':
+        if prop in stat['may_have_postprocessed']:
+            ret = indent + 'if not ' + repr(prop) + ' in has_postprocessed:\n' +\
+                  '\n'.join('    ' + x for x in ret.splitlines()) + '\n'
+
+        ret += indent + 'has_postprocessed.add(' + repr(prop) + ')\n'
+        stat['may_have_postprocessed'].add(prop)
 
     return ret
 
@@ -136,6 +151,7 @@ def check_{min_scale_esc}(object):
 
     ret += '''\
     # iterate over all pseudo-elements, sorted by 'object-z-index' if available
+    has_postprocessed = set()
     for pseudo_element in sorted({pseudo_elements}, key=lambda s: to_float(current['properties'][s]['object-z-index'], 0.0) if 'object-z-index' in current['properties'][s] else 0):
         if current['has_pseudo_element'][pseudo_element]:
             current['pseudo_element'] = pseudo_element # for eval functions
@@ -164,6 +180,7 @@ def check_{min_scale_esc}(object):
         return stat['defines']['depend_property'][k]['pos']
     main_prop_order.sort(key=main_prop_order_key)
 
+    stat['may_have_postprocessed'] = set()
     # start with props from @depend_property
     for main_prop in main_prop_order:
         props = stat['defines']['depend_property'][main_prop]

@@ -52,7 +52,7 @@ class _stat(dict):
         return None
 
 
-    def property_values(self, prop, pseudo_element=None, include_illegal_values=False, value_type=None, eval_true=True, max_prop_id=None, include_none=False, object_type=None):
+    def property_values(self, prop, pseudo_element=None, include_illegal_values=False, value_type=None, eval_true=True, max_prop_id=None, include_none=False, object_type=None, postprocess=True):
         """Returns set of all values used on this property in any statement.
         Returns boolean 'True' if property is result of an unresolveable eval
         expression.
@@ -65,6 +65,7 @@ class _stat(dict):
         eval_true: Return 'True' for values which result of an unresolvable eval expression. Otherwise this value will be removed. Default: True.
         max_prop_id: evaluate only properties with an id <= max_prop_id
         object_type: return values only for given object type (e.g. 'canvas')
+        postprocess: include values derived from postprocessing
         """
         cache_id = prop + '-' + repr(pseudo_element) + '-' + repr(include_illegal_values) + '-' + repr(value_type) + '-' + repr(eval_true) + '-' + repr(max_prop_id) + '-' + repr(include_none)
         if cache_id in self.property_values_cache:
@@ -121,13 +122,18 @@ class _stat(dict):
                 for combination in combinations
             })
 
-        if 'postprocess' in self['defines'] and prop in self['defines']['postprocess'] and max_prop_id is None:
+        if postprocess and 'postprocess' in self['defines'] and prop in self['defines']['postprocess'] and max_prop_id is None:
             p = copy.copy(self['defines']['postprocess'][prop])
             p['id'] = self['max_prop_id'] + 1
             for pe in ([pseudo_element] if pseudo_element else self['pseudo_elements']):
                 p['statement'] = { 'selector': { 'pseudo_element': pe }}
                 v = pgmapcss.eval.possible_values(p['value'], p, self)[0]
                 values = values.union(v)
+
+        if postprocess:
+            v = prop_type.stat_postprocess(values, pseudo_element=pseudo_element)
+            if v:
+                values = v
 
         if include_illegal_values:
             self.property_values_cache[cache_id] = values
