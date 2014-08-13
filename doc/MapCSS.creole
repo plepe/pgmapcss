@@ -447,6 +447,8 @@ E.g.
 @default_other casing-linecap linecap; // value of 'casing-linecap' defaults to value of 'linecap'
 }}}
 
+If the value is empty (e.g. {@default_other casing-linecap ;}) the reference is removed.
+
 == Postprocess values ==
 Define postprocess functions:
 {{{
