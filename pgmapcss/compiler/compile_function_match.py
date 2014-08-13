@@ -77,7 +77,7 @@ render_context = {{ 'bbox': bbox, 'scale_denominator': scale_denominator }}
 '''.format(**replacement)
 
     if 'context' in stat['options']:
-        ret += 'plpy.notice(render_context)\n'
+        ret += 'plpy.warning(render_context)\n'
 
     ret += 'global_data = ' + repr(stat['global_data']) + '\n'
 
@@ -110,7 +110,7 @@ else:
         ret += "    time_qry_start = datetime.datetime.now() # profiling\n"
         ret += "    src = list(" + func + ")\n"
         ret += "    time_qry_stop = datetime.datetime.now() # profiling\n"
-        ret += "    plpy.notice('querying db objects took %.2fs' % (time_qry_stop - time_qry_start).total_seconds())\n"
+        ret += "    plpy.warning('querying db objects took %.2fs' % (time_qry_stop - time_qry_start).total_seconds())\n"
     else:
         ret += "    src = " + func + "\n"
 
@@ -142,7 +142,7 @@ while src:
         counter['total'] += 1
         for result in check(object):
             if type(result) != tuple or len(result) == 0:
-                plpy.notice('unknown check result: ', result)
+                plpy.warning('unknown check result: ', result)
             elif result[0] == 'result':
                 shown = True
                 results.append(result[1])
@@ -154,12 +154,12 @@ while src:
                     combined_objects[result[1]][result[2]] = []
                 combined_objects[result[1]][result[2]].append(result[3])
             else:
-                plpy.notice('unknown check result: ', result)
+                plpy.warning('unknown check result: ', result)
 
         if shown:
             counter['rendered'] += 1
 #        else:
-#            plpy.notice('not rendered: ' + object['id'] + ' ' + repr(object['tags']))
+#            plpy.warning('not rendered: ' + object['id'] + ' ' + repr(object['tags']))
 
     src = None
 
@@ -232,12 +232,12 @@ for layer in layers:
     if 'profiler' in stat['options']:
         ret += '''\
 time_stop = datetime.datetime.now() # profiling
-plpy.notice('total run of processing (incl. querying db objects) took %.2fs' % (time_stop - time_start).total_seconds())
+plpy.warning('total run of processing (incl. querying db objects) took %.2fs' % (time_stop - time_start).total_seconds())
 if counter['total'] == 0:
     counter['perc'] = 100.0
 else:
     counter['perc'] = counter['rendered'] / counter['total'] * 100.0
-plpy.notice('rendered map features: {{rendered}} / {{total}}, {{perc:.2f}}%'.format(**counter))
+plpy.warning('rendered map features: {{rendered}} / {{total}}, {{perc:.2f}}%'.format(**counter))
 '''.format(**replacement);
 
     ret += '''\

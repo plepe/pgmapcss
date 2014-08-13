@@ -7,8 +7,8 @@ class config_eval_debug(config_base):
 
 def eval_debug(param):
     if len(param) == 1:
-        plpy.notice(param[0])
+        plpy.warning(param[0])
     else:
-        plpy.notice(param)
+        plpy.warning(param)
 
     return param[0]
