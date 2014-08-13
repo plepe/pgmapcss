@@ -423,7 +423,7 @@ The following statement defines possible values for a specific property:
 @values property_name "value1;value2;value3";
 }}}
 
-Other values will be accepted in the MapCSS file, but will finally be replaced by the default value (the first value).
+Other values will be accepted in the MapCSS file, but will finally be replaced by the default value (the first value of the specified list or the value as defined in @default_value).
 
 == Default values ==
 Define default values for properties like:

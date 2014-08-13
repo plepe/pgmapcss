@@ -71,7 +71,15 @@ def print_checks(prop, stat, main_prop=None, indent=''):
         # allowed value
         if len([ v for v in used_values if not v in values ]):
             ret += indent + 'if ' + repr(prop) + " not in current['properties'][pseudo_element] or current['properties'][pseudo_element][" + repr(prop) + "] not in " + repr(values) + ":\n"
-            ret += indent + "    current['properties'][pseudo_element][" + repr(prop) + "] = " + repr(values[0]) + '\n'
+
+            # if a default value is defined for this property, use this.
+            if 'default_value' in stat['defines'] and prop in stat['defines']['default_value']:
+                default_value = repr(stat['defines']['default_value'][prop]['value'])
+            # otherwise use the first of the allowed values
+            else:
+                default_value = repr(values[0])
+
+            ret += indent + "    current['properties'][pseudo_element][" + repr(prop) + "] = " + default_value + '\n'
 
     return ret
 
