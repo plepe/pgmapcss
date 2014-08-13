@@ -40,9 +40,10 @@ class _stat(dict):
     def property_default_value(self, prop):
         if 'default_other' in self['defines'] and prop in self['defines']['default_other']:
             other = self['defines']['default_other'][prop]['value']
-            value = self.property_default_value(other)
-            if value is not None:
-                return value
+            if other:
+                value = self.property_default_value(other)
+                if value is not None:
+                    return value
 
         if 'default_value' in self['defines'] and prop in self['defines']['default_value']:
             value = self['defines']['default_value'][prop]['value']
@@ -111,8 +112,9 @@ class _stat(dict):
 
         if 'default_other' in self['defines'] and prop in self['defines']['default_other']:
             other = self['defines']['default_other'][prop]['value']
-            other = self.property_values(other, pseudo_element, include_illegal_values, value_type, eval_true, max_prop_id)
-            values = values.union(other)
+            if other:
+                other = self.property_values(other, pseudo_element, include_illegal_values, value_type, eval_true, max_prop_id)
+                values = values.union(other)
 
         if 'generated_properties' in self and prop in self['generated_properties']:
             gen = self['generated_properties'][prop]
