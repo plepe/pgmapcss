@@ -19,6 +19,8 @@ def print_postprocess(prop, stat, indent=''):
         ret += indent + "current['properties'][pseudo_element][" + repr(prop) +\
            "] = " + compile_eval(v['value'], v, stat) + '\n'
 
+    # if property has been postprocessed (because it is ad depending property
+    # in several main properties), don't process again
     if ret != '':
         if prop in stat['may_have_postprocessed']:
             ret = indent + 'if not ' + repr(prop) + ' in has_postprocessed:\n' +\
