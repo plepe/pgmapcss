@@ -26,11 +26,12 @@ class pixels(default):
 
 
     def compile_postprocess(self):
-        return "if pseudo_element != 'default':\n" +\
-               "    current['properties'][pseudo_element][" + repr(self.key) + "] = " +\
+        return "if " + repr(self.key) + " in current['properties'][pseudo_element] and current['properties'][pseudo_element][" + repr(self.key) + "] is not None and len(current['properties'][pseudo_element][" + repr(self.key) + "]) > 0 and current['properties'][pseudo_element][" + repr(self.key) + "][0] == '+':\n" +\
+               "    if pseudo_element != 'default':\n" +\
+               "        current['properties'][pseudo_element][" + repr(self.key) + "] = " +\
                compile_eval([ 'o:+', [ 'f:prop', 'v:' + self.key, 'v:default' ], [ 'f:prop', 'v:' + self.key ]], { 'key': self.key }, self.stat) + "\n" +\
-               "elif " + repr(self.key) + " in current['properties'][pseudo_element] and current['properties'][pseudo_element][" + repr(self.key) + "][0] == '+':\n" +\
-               "    current['properties'][pseudo_element][" + repr(self.key) + "] = " +\
+               "    else:\n" +\
+               "        current['properties'][pseudo_element][" + repr(self.key) + "] = " +\
                "current['properties'][pseudo_element][" + repr(self.key) + "][1:]"
 
     def stat_postprocess(self, values, pseudo_element=None):
