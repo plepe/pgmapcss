@@ -1,6 +1,7 @@
 from .default import default
 from ..compiler.compile_eval import compile_eval
 import re
+import copy
 
 def float_to_str(v, default=None):
     r = repr(v)
@@ -46,7 +47,7 @@ class pixels(default):
         if pseudo_element:
             pseudo_elements = { pseudo_element }
         else:
-            pseudo_elements = self.stat['pseudo_elements'].copy()
+            pseudo_elements = copy.copy(self.stat['pseudo_elements'])
         if 'default' in pseudo_elements:
             pseudo_elements.remove('default')
 
