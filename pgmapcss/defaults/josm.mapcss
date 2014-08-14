@@ -12,13 +12,13 @@
 @config angular_system radians;
 
 @default_value linecap ;
-@postprocess linecap eval(any(prop(linecap), cond(search(list('', 'none'), prop(casing-dashes)) == '', 'butt', 'round')));
+@postprocess linecap eval(any(prop('linecap'), cond(search(list('', 'none'), prop('dashes')) == '', 'butt', 'round')));
 @default_other casing-linecap ;
 @default_value casing-linecap ;
-@postprocess casing-linecap eval(any(prop(casing-linecap), cond(search(list('', 'none'), prop(casing-dashes)) == '', 'butt', 'round')));
+@postprocess casing-linecap eval(any(prop('casing-linecap'), cond(search(list('', 'none'), prop('casing-dashes')) == '', 'butt', 'round')));
 @default_other left-casing-linecap ;
 @default_value left-casing-linecap ;
-@postprocess left-casing-linecap eval(any(prop(casing-linecap), cond(search(list('', 'none'), prop(casing-dashes)) == '', 'butt', 'round')));
+@postprocess left-casing-linecap eval(any(prop('left-casing-linecap'), cond(search(list('', 'none'), prop('left-casing-dashes')) == '', 'butt', 'round')));
 @default_other right-casing-linecap ;
 @default_value right-casing-linecap ;
-@postprocess right-casing-linecap eval(any(prop(casing-linecap), cond(search(list('', 'none'), prop(casing-dashes)) == '', 'butt', 'round')));
+@postprocess right-casing-linecap eval(any(prop('right-casing-linecap'), cond(search(list('', 'none'), prop('right-casing-dashes')) == '', 'butt', 'round')));
