@@ -114,7 +114,7 @@ style_id() . '.icons/symbol-' . prop('symbol-shape') .'-'. prop('symbol-size') .
 @default_value fill-opacity 1;
 // PolygonPatternSymbolizer
 // LineSymbolizer
-@default_value color ;
+@default_value color #ffffff;
 @default_value opacity 1;
 @default_value linejoin round;
 @default_value linecap butt;
