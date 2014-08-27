@@ -53,7 +53,7 @@ class _stat(dict):
         return None
 
 
-    def property_values(self, prop, pseudo_element=None, include_illegal_values=False, value_type=None, eval_true=True, max_prop_id=None, include_none=False, object_type=None, postprocess=True):
+    def property_values(self, prop, pseudo_element=None, include_illegal_values=False, value_type=None, eval_true=True, max_prop_id=None, include_none=False, object_type=None, postprocess=True, warn_unresolvable=False):
         """Returns set of all values used on this property in any statement.
         Returns boolean 'True' if property is result of an unresolveable eval
         expression.
@@ -67,9 +67,15 @@ class _stat(dict):
         max_prop_id: evaluate only properties with an id <= max_prop_id
         object_type: return values only for given object type (e.g. 'canvas')
         postprocess: include values derived from postprocessing
+        warn_unresolvable: warn, if the property might be unresolvable
         """
-        cache_id = prop + '-' + repr(pseudo_element) + '-' + repr(include_illegal_values) + '-' + repr(value_type) + '-' + repr(eval_true) + '-' + repr(max_prop_id) + '-' + repr(include_none)
+        cache_id = prop + '-' + repr(pseudo_element) + '-' + repr(include_illegal_values) + '-' + repr(value_type) + '-' + repr(eval_true) + '-' + repr(max_prop_id) + '-' + repr(include_none) + '-' + repr(warn_unresolvable)
         if cache_id in self.property_values_cache:
+            if warn_unresolvable and True in self.property_values_cache[cache_id]:
+                if not 'unresolvable_properties' in self:
+                    self['unresolvable_properties'] = set()
+                self['unresolvable_properties'].add(prop)
+
             return self.property_values_cache[cache_id]
 
         prop_type = pgmapcss.types.get(prop, self)
@@ -152,7 +158,7 @@ class _stat(dict):
                 if v != None
             }
 
-        if True in values:
+        if warn_unresolvable and True in values:
             if not 'unresolvable_properties' in self:
                 self['unresolvable_properties'] = set()
             self['unresolvable_properties'].add(prop)
@@ -163,14 +169,14 @@ class _stat(dict):
         self.property_values_cache[cache_id] = values
         return values
 
-    def properties_combinations_pseudo_element(self, keys, pseudo_element, include_illegal_values=False, value_type=None, eval_true=True, max_prop_id=None, include_none=False):
+    def properties_combinations_pseudo_element(self, keys, pseudo_element, include_illegal_values=False, value_type=None, eval_true=True, max_prop_id=None, include_none=False, warn_unresolvable=False):
         combinations_list = [{}]
 
         for k in keys:
             new_combinations_list = []
 
             for combination in combinations_list:
-                for v in self.property_values(k, pseudo_element, include_illegal_values, value_type, eval_true, max_prop_id, include_none):
+                for v in self.property_values(k, pseudo_element, include_illegal_values, value_type, eval_true, max_prop_id, include_none, warn_unresolvable=warn_unresolvable):
                     c = combination.copy()
                     c[k] = v
                     new_combinations_list.append(c)
@@ -179,7 +185,7 @@ class _stat(dict):
 
         return combinations_list
 
-    def properties_combinations(self, keys, pseudo_elements=None, include_illegal_values=False, value_type=None, eval_true=True, max_prop_id=None, include_none=False):
+    def properties_combinations(self, keys, pseudo_elements=None, include_illegal_values=False, value_type=None, eval_true=True, max_prop_id=None, include_none=False, warn_unresolvable=False):
         combinations = []
         if type(pseudo_elements) == str:
             pseudo_elements = [ pseudo_elements ]
@@ -187,7 +193,7 @@ class _stat(dict):
             pseudo_elements = self['pseudo_elements']
 
         for pseudo_element in pseudo_elements:
-            combinations += self.properties_combinations_pseudo_element(keys, pseudo_element, include_illegal_values, value_type, eval_true, max_prop_id, include_none)
+            combinations += self.properties_combinations_pseudo_element(keys, pseudo_element, include_illegal_values, value_type, eval_true, max_prop_id, include_none, warn_unresolvable)
 
         ret = []
         for combination in combinations:
