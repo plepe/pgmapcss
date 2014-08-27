@@ -21,7 +21,7 @@ def build_symbol(x, stat):
         print('Warning: Can\'t read image symbols/{}'.format(file))
         return None
 
-    f2 = open(stat['symbols_dir'] + '/' + dest, 'w')
+    f2 = open(stat['icons_dir'] + '/' + dest, 'w')
 
     if x['symbol-shape'] == 'square':
         x['symbol-size'] = float(x['symbol-size']) * math.sqrt(2)
