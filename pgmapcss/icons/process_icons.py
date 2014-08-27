@@ -5,6 +5,9 @@ def build_icon(x, stat):
     if os.path.exists(x['icon-image']):
         return x['icon-image']
 
+    if True in x.values():
+        return True
+
     src = x['icon-image'] + '-' + x['icon-width'] + '.svg'
     dest = x['icon-image'] + '-' + x['icon-color'] + '-' + x['icon-width'] + '.svg'
 
@@ -37,4 +40,4 @@ def init(stat):
     )
 
 def process_icons(style_id, args, stat, conn):
-    images = stat.property_values('final-icon-image', value_type='value')
+    images = stat.property_values('final-icon-image', value_type='value', eval_true=False, warn_unresolvable=True)

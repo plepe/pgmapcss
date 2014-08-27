@@ -5,6 +5,9 @@ from pkg_resources import *
 def build_symbol(x, stat):
     shapes = { 'triangle': 3, 'square': 4, 'pentagon': 5, 'hexagon': 6, 'heptagon': 7, 'octagon': 8, 'nonagon': 9, 'decagon': 10, 'circle': None }
 
+    if True in x.values():
+        return True
+
     if x['symbol-shape'] not in shapes:
         print('Warning: invalid shape {symbol-shape}'.format(x))
         return None
@@ -78,4 +81,4 @@ def process_symbols(style_id, args, stat, conn):
         pass
 
     stat['symbols_dir'] = symbols_dir
-    images = stat.property_values('final-symbol-image', value_type='value')
+    images = stat.property_values('final-symbol-image', value_type='value', eval_true=False, warn_unresolvable=True)
