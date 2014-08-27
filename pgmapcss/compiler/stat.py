@@ -71,11 +71,6 @@ class _stat(dict):
         """
         cache_id = prop + '-' + repr(pseudo_element) + '-' + repr(include_illegal_values) + '-' + repr(value_type) + '-' + repr(eval_true) + '-' + repr(max_prop_id) + '-' + repr(include_none) + '-' + repr(warn_unresolvable)
         if cache_id in self.property_values_cache:
-            if warn_unresolvable and True in self.property_values_cache[cache_id]:
-                if not 'unresolvable_properties' in self:
-                    self['unresolvable_properties'] = set()
-                self['unresolvable_properties'].add(prop)
-
             return self.property_values_cache[cache_id]
 
         prop_type = pgmapcss.types.get(prop, self)
