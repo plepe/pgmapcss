@@ -69,9 +69,23 @@ class _stat(dict):
         postprocess: include values derived from postprocessing
         warn_unresolvable: warn, if the property might be unresolvable
         """
-        cache_id = prop + '-' + repr(pseudo_element) + '-' + repr(include_illegal_values) + '-' + repr(value_type) + '-' + repr(eval_true) + '-' + repr(max_prop_id) + '-' + repr(include_none) + '-' + repr(object_type) + '-' + repr(postprocess) + '-' + repr(warn_unresolvable)
+        # Don't need 'eval_true' and 'warn_unresolvable' in cache_id, will be handled specially
+        cache_id = prop + '-' + repr(pseudo_element) + '-' + repr(include_illegal_values) + '-' + repr(value_type) + '-' + repr(max_prop_id) + '-' + repr(include_none) + '-' + repr(object_type) + '-' + repr(postprocess)
+
+        # Check if values are already calculated in cache
         if cache_id in self.property_values_cache:
-            return self.property_values_cache[cache_id]
+            values = self.property_values_cache[cache_id]
+
+            if warn_unresolvable and True in values:
+                if not 'unresolvable_properties' in self:
+                    self['unresolvable_properties'] = set()
+                self['unresolvable_properties'].add(prop)
+
+            if not eval_true and True in values:
+                values = copy.copy(values)
+                values.remove(True)
+
+            return values
 
         prop_type = pgmapcss.types.get(prop, self)
 
@@ -158,10 +172,12 @@ class _stat(dict):
                 self['unresolvable_properties'] = set()
             self['unresolvable_properties'].add(prop)
 
+        self.property_values_cache[cache_id] = values
+
         if not eval_true and True in values:
+            values = copy.copy(values)
             values.remove(True)
 
-        self.property_values_cache[cache_id] = values
         return values
 
     def properties_combinations_pseudo_element(self, keys, pseudo_element, include_illegal_values=False, value_type=None, eval_true=True, max_prop_id=None, include_none=False, warn_unresolvable=False):
