@@ -133,7 +133,7 @@ class _stat(dict):
 
         if 'generated_properties' in self and prop in self['generated_properties']:
             gen = self['generated_properties'][prop]
-            combinations = self.properties_combinations(gen[0], pseudo_element, include_illegal_values, value_type, eval_true, max_prop_id)
+            combinations = self.properties_combinations(gen[0], pseudo_element, include_illegal_values, value_type, eval_true, max_prop_id, include_none, warn_unresolvable)
             values = values.union({
                 gen[1](combination, self)
                 for combination in combinations
