@@ -69,7 +69,7 @@ class _stat(dict):
         postprocess: include values derived from postprocessing
         warn_unresolvable: warn, if the property might be unresolvable
         """
-        cache_id = prop + '-' + repr(pseudo_element) + '-' + repr(include_illegal_values) + '-' + repr(value_type) + '-' + repr(eval_true) + '-' + repr(max_prop_id) + '-' + repr(include_none) + '-' + repr(warn_unresolvable)
+        cache_id = prop + '-' + repr(pseudo_element) + '-' + repr(include_illegal_values) + '-' + repr(value_type) + '-' + repr(eval_true) + '-' + repr(max_prop_id) + '-' + repr(include_none) + '-' + repr(object_type) + '-' + repr(postprocess) + '-' + repr(warn_unresolvable)
         if cache_id in self.property_values_cache:
             return self.property_values_cache[cache_id]
 
