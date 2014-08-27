@@ -103,7 +103,7 @@ def process(f1, replacement, stat, rek=0):
             m = re.match('# FOR\s*(.*)', r)
             k = m.group(1).split(' ')
 
-            combinations_list = combinations_combine(replacement, stat.properties_combinations(k, eval_true=False), stat)
+            combinations_list = combinations_combine(replacement, stat.properties_combinations(k, eval_true=False, warn_unresolvable=True), stat)
             f1_pos = f1.tell()
 
             # if no combinations found, skip to next # END
