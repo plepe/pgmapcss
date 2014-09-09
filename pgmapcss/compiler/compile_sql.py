@@ -67,4 +67,7 @@ def compile_selector_sql(statement, stat, prefix='current.', filter={}):
     if len(ret) == 0:
         return 'true'
 
+    if 'false' in ret:
+        return 'false'
+
     return ' and '.join(ret)

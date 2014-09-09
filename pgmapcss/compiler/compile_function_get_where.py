@@ -95,8 +95,14 @@ def compile_function_get_where(id, stat):
                     cs
                     for t2, cs in conditions
                     if t == t2
+                    if cs != 'false'
                 ] + all_types_conditions ) + ')'
             for t in types
+        }
+        conditions = {
+            t: cs
+            for t, cs in conditions.items()
+            if cs != '()'
         }
 
         max_scale = min_scale
