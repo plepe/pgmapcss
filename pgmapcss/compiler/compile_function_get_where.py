@@ -73,13 +73,13 @@ def compile_function_get_where(id, stat):
         where_selectors = get_where_selectors(filter, stat)
 
         # compile all selectors
-        conditions = [
+        conditions = {
             (
                 stat['statements'][i]['selector']['type'],
                 compile_selector_sql(stat['statements'][i], stat, prefix='', filter=filter)
             )
             for i in where_selectors
-        ]
+        }
 
         # Move all conditions with * as type selector to all other types
         all_types_conditions = []

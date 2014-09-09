@@ -59,10 +59,10 @@ def compile_condition_sql(condition, statement, stat, prefix='current.', filter=
     return ret;
 
 def compile_selector_sql(statement, stat, prefix='current.', filter={}):
-    ret = [
+    ret = {
         compile_condition_sql(c, statement, stat, prefix, filter) or 'true'
         for c in statement['selector']['conditions']
-    ]
+    }
 
     if len(ret) == 0:
         return 'true'
