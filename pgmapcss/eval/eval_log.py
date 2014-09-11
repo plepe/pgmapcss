@@ -10,11 +10,17 @@ def eval_log(param):
     except ValueError:
         return ''
 
+    if v <= 0:
+        return ''
+
     try:
         base = float(param[1])
     except IndexError:
         base = None
     except ValueError:
+        return ''
+
+    if base is not None and base <= 0:
         return ''
 
     if base:
@@ -29,3 +35,13 @@ def eval_log(param):
 # OUT '2'
 # IN ['4']
 # OUT '1.3862943611198906'
+# IN ['foo']
+# OUT ''
+# IN ['10;100']
+# OUT ''
+# IN ['0']
+# OUT ''
+# IN ['-1']
+# OUT ''
+# IN ['2', '0']
+# OUT ''
