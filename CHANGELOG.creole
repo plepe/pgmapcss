@@ -1,17 +1,21 @@
 0.8-dev
 * support @media queries, see [[doc/MapCSS.creole|MapCSS docu]]
-* a couple of performance improvements
-* Config option angular_system whether angles (rotation, azimuth functions) should use degrees or radians
-* commandline option -D to load additional defaults (either pre-defined, currently josm or overpass-turbo) or local file
-* Support for Mapnik 2.3 (mostly similar to Mapnik 2.2, but there are some advanced features)
+* a lot of performance improvements, including:
+** Reduced the amount of database columns used in Mapnik stylesheets
+** remove Mapnik rules if they are not used anyway
+** group similar selectors together for compiled code
+** set default values after processing an object; set default values only if main property is set (e.g. an object without 'text' does not need 'font-family')
+* Config option 'angular_system', whether angles (rotation, azimuth functions) should use degrees or radians
+* commandline option -D to load additional defaults (either pre-defined, currently 'josm' or 'overpass-turbo') or local file
+* Support for Mapnik 2.3 (mostly similar to Mapnik 2.2, but there are some advanced features); Improved and adapted support for Mapnik 3.0 (as features in Mapnik were added).
 * Eval functions:
 ** changed parameter order for join() and split()
 ** new eval functions: viewport(), intersection(), range(), reverse(), is_left_hand_traffic(), is_right_hand_traffic(), line_locate_azimuth(), red(), green(), blue(), alpha(), URL_encode(), XML_encode(), CRC32_checksum(), regexp_text(), regexp_match(), floor(), ceil(), length(), is_prop_set(), has_tag_key(), sin(), cos(), tan(), asin(), acos(), atan(), atan2(), sinh(), cosh(), tanh(), signum(), log(), exp(), replace(), JOSM_pref(), JOSM_search(), keys_of_tags(), number_of_tags(), tr(), hsv() resp. hsv_color()
 ** Deprecations: substr() renamed to substring()
 ** support inline condition operator: (condition?if_true:else)
 ** an identifier may no longer contain ':' (because of inline condition operator)
-** min() and max() no longer accept input with units -> instead of min('100m') use min(metric('100m'))
 ** an identifier may contain # (e.g. colors)
+** calculations and functions like min() and max() no longer accept input with units -> instead of min('100m') use min(metric('100m'))
 * Selectors, Conditions (improve compatibility with JOSM MapCSS paint styles):
 ** List selector: @= any of the given, e.g. [highway@=primary;secondary]
 ** Negated regular expression match: !~
@@ -22,13 +26,13 @@
 ** Link selector '∈' or 'within': objects within another object
 ** Link selector '∋' or 'surrounds': objects surrounded by another object
 ** Link selector '⧉' or 'overlaps': objects which overlap but are not completely contained by each other
-** Support JOSM classes (set without prepending dot); need to set flag
-* Properties (improve compatibility with JOSM MapCSS paint styles)
+** Support JOSM classes (set without prepending dot, e.g. 'set foo;'); need to enable with flag
+* Properties (improve compatibility with JOSM MapCSS paint styles):
 ** properties of type pixel (e.g. width, offset) accept relative values (added to value on default pseudo element)
 ** New properties: icon-rotation, dashes-background-color, dashes-background-opacity, casing-dashes-background-color, casing-dashes-background-opacity; text-offset, text-anchor-vertical, text-anchor-horizontal, repeat-image, repeat-image-offset, miterlimit, casing-miterlimit, text-allow-overlap, symbol-allow-overlap, symbol-ignore-placement, icon-allow-overlap, icon-ignore-placement
 ** Support left-casing-* and right-casing-* (with the same suffixes as casing-*)
 ** symbol-* as in JOSM, plus symbol-rotation
-** Property 'image', 'repeat-image', 'fill-image': for Mapnik 2.x, SVGs will automatically be converted to PNGs
+** Properties 'image', 'repeat-image', 'fill-image': for Mapnik 2.x, SVGs will automatically be converted to PNGs
 ** text-position: Texts on lines will by default be printed on the line
 ** Accept colors in hsv()
 * Lot's of bugfixes, see Git log for details
