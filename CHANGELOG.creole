@@ -1,4 +1,4 @@
-0.8-dev
+0.8.0 release 2014-09-14
 * support @media queries, see [[doc/MapCSS.creole|MapCSS docu]]
 * a lot of performance improvements, including:
 ** Reduced the amount of database columns used in Mapnik stylesheets
