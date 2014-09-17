@@ -252,6 +252,9 @@ def objects_near(max_distance, ob, parent_selector, where_clause, check_geo=None
     else:
         geom = current['properties'][current['pseudo_element']]['geo']
 
+    if where_clause == '':
+        where_clause = 'true'
+
     max_distance = to_float(eval_metric([ max_distance, 'u' ]))
     if max_distance is None:
         return []
