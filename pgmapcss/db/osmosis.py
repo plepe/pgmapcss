@@ -1,6 +1,6 @@
-# TODO: currently all ways are returned as line and area
-# TODO: multipolygons are not supported
-# TODO: function objects_member_of(), objects_members(), objects_near() missing
+# TODO: currently all ways are returned as line and area - and as linestring, not polygon
+# TODO: multipolygons are supported, but without geometry - all relations in database are checked
+# TODO: objects_near: distance to ways are calculated to linestring (inside not working)
 # Use this functions only with a database based on an import with osmosis
 def objects(_bbox, where_clauses, add_columns=[], add_param_type=[], add_param_value=[]):
     import pghstore
@@ -33,7 +33,7 @@ select 'n' || cast(id as text) as id,
        {add_columns}
 from nodes
 where {bbox} ( {w} )
-'''.format(bbox=bbox, w=' or '.join(w), add_columns=add_columns)
+'''.format(bbox=bbox, w=' or '.join(w), add_columns=add_columns.replace('__geo__', 'geom'))
 
         plan = plpy.prepare(qry, param_type )
         res = plpy.execute(plan, param_value )
@@ -59,7 +59,7 @@ select 'w' || cast(id as text) as id,
        {add_columns}
 from ways
 where {bbox} ( {w} )
-'''.format(bbox=bbox, w=' or '.join(w), add_columns=add_columns)
+'''.format(bbox=bbox, w=' or '.join(w), add_columns=add_columns.replace('__geo__', 'linestring'))
 
         plan = plpy.prepare(qry, param_type )
         res = plpy.execute(plan, param_value )
@@ -141,93 +141,106 @@ def objects_by_id(id_list):
             'types': ['relation']
         }
 
-#def objects_member_of(member_id, parent_type, parent_conditions):
-#    if parent_type == 'relation':
-#        plan = plpy.prepare('select * from relation_members join relation on relation_members.relation_id=relations.id where member_id @> Array[$1] and member_type = $2', ['bigint', 'text']);
-#        res = plpy.execute(plan, [member_id[1:], member_id[0:1].upper()])
-#        for r in res:
-#            for member in flatarray_to_members(r['members']):
-#                if member['member_id'] == member_id:
-#                    t = {
-#                        'id': 'r' + str(r['id']),
-#                        'tags': pghstore.loads(r['tags']),
-#                        'type': ['relation'],
-#                        'geo': None,
-#                        'link_tags': member
-#                    }
-#                    yield(t)
-#
-#    if parent_type == 'way':
-#        num_id = int(member_id[1:])
-#        plan = plpy.prepare('select id, nodes, planet_osm_line.tags, way as geo from planet_osm_ways left join planet_osm_line on planet_osm_ways.id=planet_osm_line.osm_id where nodes::bigint[] @> Array[$1]', ['bigint']);
-#        res = plpy.execute(plan, [num_id])
-#        for r in res:
-#            for i, member in enumerate(r['nodes']):
-#                if member == num_id:
-#                    t = {
-#                        'id': 'w' + str(r['id']),
-#                        'tags': pghstore.loads(r['tags']),
-#                        'type': ['way'],
-#                        'geo': r['geo'],
-#                        'link_tags': {
-#                            'member_id': member_id,
-#                            'sequence_id': str(i)
-#                        }
-#                    }
-#                    yield(t)
-#
-#def objects_members(relation_id, parent_type, parent_conditions):
-#    ob = list(objects_by_id([relation_id]))
-#
-#    if not len(ob):
-#        return
-#
-#    ob = ob[0]
-#
-#    link_obs_ids = [ i['member_id'] for i in ob['members'] ]
-#    link_obs = {}
-#    for o in objects_by_id(link_obs_ids):
-#        link_obs[o['id']] = o
-#
-#    for member in ob['members']:
-#        if not member['member_id'] in link_obs:
-#            continue
-#
-#        ret = link_obs[member['member_id']]
-#
-#        if parent_type not in ret['types']:
-#            continue
-#
-#        ret['link_tags'] = member
-#        yield ret
-#
-#def objects_near(max_distance, ob, parent_selector, where_clause):
-#    if ob:
-#        geom = ob['geo']
-#    else:
-#        geom = current['properties'][current['pseudo_element']]['geo']
-#
-#    max_distance = to_float(eval_metric([ max_distance, 'u' ]))
-#    if max_distance is None:
-#        return []
-#
-#    plan = plpy.prepare('select ST_Buffer(ST_Envelope($1), $2) as r', ['geometry', 'float'])
-#    res = plpy.execute(plan, [ geom, max_distance ])
-#    bbox = res[0]['r']
-#
-#    obs = []
-#    for ob in objects(
-#        bbox,
-#        { parent_selector: where_clause },
-#        [ 'ST_Distance($2, way) as __distance' ],
-#        [ 'geometry' ],
-#        [ geom ]
-#    ):
-#        if ob['__distance'] <= max_distance:
-#            ob['link_tags'] = {
-#                'distance': eval_metric([ str(ob['__distance']) + 'u', 'px' ])
-#            }
-#            obs.append(ob)
-#
-#    obs = sorted(obs, key=lambda ob: ob['__distance'] )
-#    return obs
+def objects_member_of(member_id, parent_type, parent_conditions):
+    if parent_type == 'relation':
+        plan = plpy.prepare('select * from relation_members join relations on relation_members.relation_id=relations.id where member_id=$1 and member_type=$2', ['bigint', 'text']);
+        res = plpy.execute(plan, [member_id[1:], member_id[0:1].upper()])
+        for r in res:
+            t = {
+                'id': 'r' + str(r['id']),
+                'tags': pghstore.loads(r['tags']),
+                'type': ['relation'],
+                'geo': None,
+                'link_tags': {
+                    'sequence_id': str(r['sequence_id']),
+                    'role': str(r['member_role']),
+                    'member_id': r['member_type'].lower() + str(r['member_id']),
+                }
+            }
+            yield(t)
+
+    if parent_type == 'way' and member_id[0] == 'n':
+        num_id = int(member_id[1:])
+        plan = plpy.prepare('select * from way_nodes join ways on way_nodes.way_id=ways.id where node_id=$1', ['bigint']);
+        res = plpy.execute(plan, [num_id])
+        for r in res:
+            t = {
+                'id': 'w' + str(r['id']),
+                'tags': pghstore.loads(r['tags']),
+                'type': ['way'],
+                'geo': r['linestring'],
+                'link_tags': {
+                    'member_id': member_id,
+                    'sequence_id': str(r['sequence_id'])
+                }
+            }
+            yield(t)
+
+def objects_members(relation_id, parent_type, parent_conditions):
+    ob = list(objects_by_id([relation_id]))
+
+    if not len(ob):
+        return
+
+    ob = ob[0]
+
+    link_obs_ids = [ i['member_id'] for i in ob['members'] ]
+    link_obs = {}
+    for o in objects_by_id(link_obs_ids):
+        link_obs[o['id']] = o
+
+    for member in ob['members']:
+        if not member['member_id'] in link_obs:
+            continue
+
+        ret = link_obs[member['member_id']]
+
+        if parent_type not in ret['types']:
+            continue
+
+        ret['link_tags'] = member
+        yield ret
+
+def objects_near(max_distance, ob, parent_selector, where_clause, check_geo=None):
+    plpy.warning(where_clause)
+    if ob:
+        geom = ob['geo']
+    else:
+        geom = current['properties'][current['pseudo_element']]['geo']
+
+    if where_clause == '':
+        where_clause = 'true'
+
+    max_distance = to_float(eval_metric([ max_distance, 'u' ]))
+    if max_distance is None:
+        return []
+    elif max_distance == 0:
+        bbox = geom
+    else:
+        plan = plpy.prepare('select ST_Buffer(ST_Envelope($1), $2) as r', ['geometry', 'float'])
+        res = plpy.execute(plan, [ geom, max_distance ])
+        bbox = res[0]['r']
+
+    if check_geo == 'within':
+        where_clause += " and ST_DWithin(way, $2, 0.0)"
+    elif check_geo == 'surrounds':
+        where_clause += " and ST_DWithin($2, way, 0.0)"
+    elif check_geo == 'overlaps':
+        where_clause += " and ST_Overlaps($2, way)"
+
+    obs = []
+    for ob in objects(
+        bbox,
+        { parent_selector: where_clause },
+        [ 'ST_Distance($2, ST_Transform(__geo__, 900913)) as __distance' ],
+        [ 'geometry' ],
+        [ geom ]
+    ):
+        if ob['__distance'] <= max_distance:
+            ob['link_tags'] = {
+                'distance': eval_metric([ str(ob['__distance']) + 'u', 'px' ])
+            }
+            obs.append(ob)
+
+    obs = sorted(obs, key=lambda ob: ob['__distance'] )
+    return obs
