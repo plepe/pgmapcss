@@ -10,6 +10,7 @@ osm2pgsql
 osmosis pgsnapshot (short: osmosis)
 ===================================
 * The osmosis database contains all nodes, ways and relations from OpenStreetMap. Especially the nodes table is very large and therefore queries for large bounding boxes may take a long time.
-* 'line' and 'area' are synonymous to 'way'
+* 'line' is synonymous to 'way'
+* All closed ways are considered 'area's and their geometry converted to polygons.
 * No multipolygon support.
 * No geometry or bounding box for relations, queries for relation will return all available relations in the database.

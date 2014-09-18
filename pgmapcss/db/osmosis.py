@@ -54,11 +54,12 @@ where {bbox} ( {w} )
             bbox = 'linestring && ST_Transform($1, 4326) and'
 
         qry = '''
+select * from (
 select 'w' || cast(id as text) as id,
-       tags, ST_Transform(linestring, 900913) as geo, Array['line', 'way', 'area'] as types
-       {add_columns}
+       tags, ST_Transform((CASE WHEN ST_IsClosed(linestring) THEN ST_MakePolygon(linestring) ELSE linestring END), 900913) as geo, ST_IsClosed(linestring) as is_closed, Array['line', 'way'] as types
 from ways
-where {bbox} ( {w} )
+where {bbox} ( {w} ) offset 0) t
+       {add_columns}
 '''.format(bbox=bbox, w=' or '.join(w), add_columns=add_columns.replace('__geo__', 'linestring'))
 
         plan = plpy.prepare(qry, param_type )
@@ -66,6 +67,8 @@ where {bbox} ( {w} )
 
         for r in res:
             r['tags'] = pghstore.loads(r['tags'])
+            if r['is_closed']:
+                r['types'].append('area')
             yield(r)
 
     # relations - (no bbox match!)
