@@ -5,7 +5,9 @@ osm2pgsql
 * Only nodes, ways and relations which are considered tagged by osm2pgsql can be used - as only those are added to the database tables. You can influence this list by change the osm2pgsql style file.
 * Objects matching 'line' depend on the osm2pgsql style file; also relation=route are included in 'line'
 * Objects matching 'area' depend on the osm2pgsql style file; also multipolygons and boundaries are included in 'area'.
-* Generally no geometry or bounding box for relations, except for type=route, type=boundary, type=multipolygon. Queries for relations will return only those relations. On the other hand the 'type' tag is removed by osm2pgsql, therefore a query for `relation[type=route]` will not work.
+* As direct query, only relations of type=route, type=boundary and type=multipolygon are available. On the other hand the 'type' tag is removed by osm2pgsql, therefore a query for `relation[type=route]` will not work.
+* Queries of the type `relation node|way|relation` do work for all relation types as parents; even the type-tag is available. Currently those queries are inefficient, as for every possible member all available relations are queried.
+* Queries of the type `way node` work. Currently those queries are inefficient, as for every possible member all available relations are queried.
 
 osmosis pgsnapshot (short: osmosis)
 ===================================
@@ -14,3 +16,4 @@ osmosis pgsnapshot (short: osmosis)
 * All closed ways are considered 'area's and their geometry converted to polygons.
 * No multipolygon support.
 * No geometry or bounding box for relations, queries for relation will return all available relations in the database.
+* Queries of type `relation node|way` resp. `way node` work. Currently those queries are inefficient, as for every possible member all available relations are queried.
