@@ -8,6 +8,7 @@ osm2pgsql
 * As direct query, only relations of type=route, type=boundary and type=multipolygon are available. On the other hand the 'type' tag is removed by osm2pgsql, therefore a query for `relation[type=route]` will not work.
 * Queries of the type `relation node|way|relation` do work for all relation types as parents; even the type-tag is available. Currently those queries are inefficient, as for every possible member all available relations are queried.
 * Queries of the type `way node` work. Currently those queries are inefficient, as for every possible member all available relations are queried.
+* Additionally the tag "osm:id" will be set (e.g. 'n1234'), but it will not be available for querying (see below at osmosis pgsnapshot for additional tags).
 
 osmosis pgsnapshot (short: osmosis)
 ===================================
@@ -16,4 +17,4 @@ osmosis pgsnapshot (short: osmosis)
 * All closed ways are considered 'area's and their geometry converted to polygons.
 * No multipolygon support.
 * No geometry or bounding box for relations, queries for relation will return all available relations in the database.
-* Queries of type `relation node|way` resp. `way node` work. Currently those queries are inefficient, as for every possible member all available relations are queried.
+* Additionally the tags "osm:id", "osm:version", "osm:user_id", "osm:user", "osm:timestasmpe", "osm:changeset" will be set, but they cannot (yet) be used for conditions (like `node[osm:user=skunk]`). Alternatively you may use `node[eval(tag("osm:user")=="skunk")]`, but it will not be as efficient.

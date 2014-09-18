@@ -2,6 +2,24 @@
 # TODO: multipolygons are supported, but without geometry - all relations in database are checked
 # TODO: objects_near: distance to ways are calculated to linestring (inside not working)
 # Use this functions only with a database based on an import with osmosis
+global objects_user_list
+objects_user_list = {}
+global objects_user_list_plan
+objects_user_list_plan = None
+
+# returns name of user for user_id
+def objects_user(user_id):
+    # if user is not available in cache, check database
+    if not user_id in objects_user_list:
+        global objects_user_list_plan
+        if objects_user_list_plan is None:
+            objects_user_list_plan = plpy.prepare('select * from users where id=$1', [ 'integer' ])
+
+        res = plpy.execute(objects_user_list_plan, [ user_id ])
+        objects_user_list[user_id] = res[0]['name']
+
+    return objects_user_list[user_id]
+
 def objects(_bbox, where_clauses, add_columns=[], add_param_type=[], add_param_value=[]):
     import pghstore
     time_start = datetime.datetime.now() # profiling
@@ -28,7 +46,7 @@ def objects(_bbox, where_clauses, add_columns=[], add_param_type=[], add_param_v
             bbox = 'geom && ST_Transform($1, 4326) and'
 
         qry = '''
-select 'n' || cast(id as text) as id,
+select 'n' || cast(id as text) as id, version, user_id, tstamp, changeset_id,
        tags, ST_Transform(geom, 900913) as geo, Array['point', 'node'] as types
        {add_columns}
 from nodes
@@ -40,6 +58,12 @@ where {bbox} ( {w} )
 
         for r in res:
             r['tags'] = pghstore.loads(r['tags'])
+            r['tags']['osm:id'] = str(r['id'])
+            r['tags']['osm:version'] = str(r['version'])
+            r['tags']['osm:user_id'] = str(r['user_id'])
+            r['tags']['osm:user'] = objects_user(r['user_id'])
+            r['tags']['osm:timestamp'] = r['tstamp']
+            r['tags']['osm:changeset'] = str(r['changeset_id'])
             yield(r)
 
     # ways
@@ -55,8 +79,9 @@ where {bbox} ( {w} )
 
         qry = '''
 select * from (
-select 'w' || cast(id as text) as id,
+select 'w' || cast(id as text) as id, version, user_id, tstamp, changeset_id,
        tags, ST_Transform((CASE WHEN ST_IsClosed(linestring) THEN ST_MakePolygon(linestring) ELSE linestring END), 900913) as geo, ST_IsClosed(linestring) as is_closed, Array['line', 'way'] as types
+       {add_columns}
 from ways
 where {bbox} ( {w} ) offset 0) t
        {add_columns}
@@ -69,6 +94,12 @@ where {bbox} ( {w} ) offset 0) t
             r['tags'] = pghstore.loads(r['tags'])
             if r['is_closed']:
                 r['types'].append('area')
+            r['tags']['osm:id'] = str(r['id'])
+            r['tags']['osm:version'] = str(r['version'])
+            r['tags']['osm:user_id'] = str(r['user_id'])
+            r['tags']['osm:user'] = objects_user(r['user_id'])
+            r['tags']['osm:timestamp'] = r['tstamp']
+            r['tags']['osm:changeset'] = str(r['changeset_id'])
             yield(r)
 
     # relations - (no bbox match!)
@@ -79,7 +110,7 @@ where {bbox} ( {w} ) offset 0) t
 
     if len(w):
         qry = '''
-select 'r' || cast(id as text) as id,
+select 'r' || cast(id as text) as id, version, user_id, tstamp, changeset_id,
        tags, null as geo, Array['relation'] as types
        {add_columns}
 from relations
@@ -91,6 +122,12 @@ where {w}
 
         for r in res:
             r['tags'] = pghstore.loads(r['tags'])
+            r['tags']['osm:id'] = str(r['id'])
+            r['tags']['osm:version'] = str(r['version'])
+            r['tags']['osm:user_id'] = str(r['user_id'])
+            r['tags']['osm:user'] = objects_user(r['user_id'])
+            r['tags']['osm:timestamp'] = r['tstamp']
+            r['tags']['osm:changeset'] = str(r['changeset_id'])
             yield(r)
 
     time_stop = datetime.datetime.now() # profiling
@@ -110,10 +147,10 @@ def objects_by_id(id_list):
         }
 
     _id_list = [ int(i[1:]) for i in id_list if i[0] == 'w' ]
-    plan = plpy.prepare('select id, tags, ST_Transform(linestring, 900913) as linestring, array_agg(node_id) as member_ids from (select ways.*, node_id from ways left join way_nodes on ways.id=way_nodes.way_id where ways.id=any($1) order by way_nodes.sequence_id) t group by id, tags, linestring', ['bigint[]']);
+    plan = plpy.prepare('select id, tags, version, user_id, tstamp, changeset_id, ST_Transform(linestring, 900913) as linestring, array_agg(node_id) as member_ids from (select ways.*, node_id from ways left join way_nodes on ways.id=way_nodes.way_id where ways.id=any($1) order by way_nodes.sequence_id) t group by id, tags, linestring', ['bigint[]']);
     res = plpy.execute(plan, [_id_list])
     for r in res:
-        yield {
+        t = {
             'id': 'w' + str(r['id']),
             'members': [ {
                     'member_id': 'n' + str(m),
@@ -125,12 +162,19 @@ def objects_by_id(id_list):
             'geo': r['linestring'],
             'types': ['way', 'line', 'area']
         }
+        t['tags']['osm:id'] = str(t['id'])
+        t['tags']['osm:version'] = str(r['version'])
+        t['tags']['osm:user_id'] = str(r['user_id'])
+        t['tags']['osm:user'] = objects_user(r['user_id'])
+        t['tags']['osm:timestamp'] = r['tstamp']
+        t['tags']['osm:changeset'] = str(r['changeset_id'])
+        yield(t)
 
     _id_list = [ int(i[1:]) for i in id_list if i[0] == 'r' ]
-    plan = plpy.prepare('select id, tags, array_agg(lower(member_type) || member_id) as member_ids, array_agg(member_role) as member_roles from (select relations.*, member_type, member_id, member_role from relations left join relation_members on relations.id=relation_members.relation_id where relations.id=any($1) order by relation_members.sequence_id) t group by id, tags', ['bigint[]']);
+    plan = plpy.prepare('select id, tags, version, user_id, tstamp, changeset_id, array_agg(lower(member_type) || member_id) as member_ids, array_agg(member_role) as member_roles from (select relations.*, member_type, member_id, member_role from relations left join relation_members on relations.id=relation_members.relation_id where relations.id=any($1) order by relation_members.sequence_id) t group by id, tags', ['bigint[]']);
     res = plpy.execute(plan, [_id_list])
     for r in res:
-        yield {
+        t = {
             'id': 'r' + str(r['id']),
             'tags': pghstore.loads(r['tags']),
             'members': [ {
@@ -143,6 +187,13 @@ def objects_by_id(id_list):
             'geo': None,
             'types': ['relation']
         }
+        t['tags']['osm:id'] = str(t['id'])
+        t['tags']['osm:version'] = str(r['version'])
+        t['tags']['osm:user_id'] = str(r['user_id'])
+        t['tags']['osm:user'] = objects_user(r['user_id'])
+        t['tags']['osm:timestamp'] = r['tstamp']
+        t['tags']['osm:changeset'] = str(r['changeset_id'])
+        yield(t)
 
 def objects_member_of(member_id, parent_type, parent_conditions):
     if parent_type == 'relation':
@@ -160,6 +211,12 @@ def objects_member_of(member_id, parent_type, parent_conditions):
                     'member_id': r['member_type'].lower() + str(r['member_id']),
                 }
             }
+            t['tags']['osm:id'] = str(t['id'])
+            t['tags']['osm:version'] = str(r['version'])
+            t['tags']['osm:user_id'] = str(r['user_id'])
+            t['tags']['osm:user'] = objects_user(r['user_id'])
+            t['tags']['osm:timestamp'] = r['tstamp']
+            t['tags']['osm:changeset'] = str(r['changeset_id'])
             yield(t)
 
     if parent_type == 'way' and member_id[0] == 'n':
@@ -177,6 +234,12 @@ def objects_member_of(member_id, parent_type, parent_conditions):
                     'sequence_id': str(r['sequence_id'])
                 }
             }
+            t['tags']['osm:id'] = str(t['id'])
+            t['tags']['osm:version'] = str(r['version'])
+            t['tags']['osm:user_id'] = str(r['user_id'])
+            t['tags']['osm:user'] = objects_user(r['user_id'])
+            t['tags']['osm:timestamp'] = r['tstamp']
+            t['tags']['osm:changeset'] = str(r['changeset_id'])
             yield(t)
 
 def objects_members(relation_id, parent_type, parent_conditions):
