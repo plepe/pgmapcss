@@ -25,6 +25,10 @@ parser.add_argument('-d', '--database', dest='database',
     default=getpass.getuser(),
     help='Name of database (default: username)')
 
+parser.add_argument('--database-type', dest='database_type',
+    default='osm2pgsql',
+    help='Type of database (currently supported: osm2pgsql) (default: osm2pgsql)')
+
 parser.add_argument('-u', '--user', dest='user',
     default=getpass.getuser(),
     help='User for database (default: username)')
