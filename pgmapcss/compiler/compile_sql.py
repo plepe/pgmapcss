@@ -1,4 +1,5 @@
 import pgmapcss.db as db
+from .CompileError import CompileError
 
 def value_format_default(key, value):
     return db.format(value)
