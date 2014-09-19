@@ -2,6 +2,8 @@ import postgresql
 import pgmapcss.data
 from pkg_resources import *
 from .version import *
+import pgmapcss.db.osm2pgsql
+import pgmapcss.db.osmosis
 conn = None
 
 def connection():
@@ -22,6 +24,13 @@ def connect(args):
     )
 
     conn.database_type=args.database_type
+
+    if args.database_type == 'osm2pgsql':
+        conn.database = pgmapcss.db.osm2pgsql.db(conn)
+    elif args.database_type == 'osmosis':
+        conn.database = pgmapcss.db.osmosis.db(conn)
+    else:
+        raise Exception('unknown database type {}'.format(args.database_type))
 
     db_version_check()
 
