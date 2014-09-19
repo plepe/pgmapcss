@@ -31,7 +31,7 @@ def db_update(conn):
     db_version_update()
 
 def db_init(conn):
-    files = [ 'pgmapcss_types.sql', conn.database_type + '.sql' ]
+    files = [ 'pgmapcss_types.sql', conn.database_type + '/init.sql' ]
 
     for f in files:
         print('Installing', f)
@@ -60,4 +60,4 @@ def prepare(sql):
     return conn.prepare(sql)
 
 def query_functions():
-    return resource_string(__name__, conn.database_type + '.py').decode('utf-8')
+    return resource_string(__name__, conn.database_type + '/db_functions.py').decode('utf-8')
