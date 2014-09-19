@@ -7,3 +7,6 @@ class default:
 
     def update(self):
         pass
+
+    def tag_type(self, key):
+        return None
