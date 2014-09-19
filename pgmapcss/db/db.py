@@ -38,6 +38,7 @@ def connect(args):
 
 def db_update(conn):
     db_version_update()
+    conn.database.update()
 
 def db_init(conn):
     files = [ 'pgmapcss_types.sql', conn.database_type + '/init.sql' ]
@@ -61,6 +62,8 @@ def db_init(conn):
 
     db_version_create()
     db_update(conn)
+
+    conn.database.init()
 
 def install(style_id, style, conn):
     conn.execute(style['function_match'])
