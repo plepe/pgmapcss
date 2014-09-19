@@ -1,5 +1,8 @@
 import pgmapcss.db as db
 
+def value_format_default(key, value):
+    return db.format(value)
+
 def compile_condition_hstore_value(condition, statement, tag_type, stat, prefix, filter):
     ret = ''
     key = tag_type[1]
@@ -45,6 +48,10 @@ def compile_condition_column(condition, statement, tag_type, stat, prefix, filte
     ret = ''
     key = tag_type[1]
 
+    value_format = value_format_default
+    if len(tag_type) > 2:
+        value_format = tag_type[2]
+
     if condition['op'][0:2] == '! ':
         return None
 
@@ -67,12 +74,12 @@ def compile_condition_column(condition, statement, tag_type, stat, prefix, filte
 
     # =
     if condition['op'] == '=':
-        ret += prefix + db.ident(key) + ' = ' + db.format(condition['value'])
+        ret += prefix + db.ident(key) + ' = ' + value_format(key, condition['value'])
 
     # @=
     elif condition['op'] == '@=' and condition['value_type'] == 'value':
         ret += prefix + db.ident(key) + ' in (' + ', '.join([
-                db.format(v)
+                value_format(key, v)
                 for v in condition['value'].split(';')
             ]) + ')'
 

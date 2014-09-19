@@ -1,10 +1,12 @@
 from ..default import default
+from ..pg import format
+from ..pg import ident
 
 class db(default):
     def tag_type(self, key):
         if key[0:4] == 'osm:':
             if key == 'osm:id':
-                return ( 'all' )
+                return ( 'column', 'id', self.compile_modify_id )
             elif key == 'osm:user':
                 return ( 'all' )
             elif key == 'osm:user_id':
@@ -19,3 +21,6 @@ class db(default):
                 return None
 
         return ( 'hstore-value', key, 'tags' )
+
+    def compile_modify_id(self, key, value):
+        return format(value[1:])
