@@ -2,12 +2,8 @@ import pgmapcss.db as db
 
 def compile_condition_hstore_value(condition, statement, tag_type, stat, prefix, filter):
     ret = ''
-    final_value = None
     key = tag_type[1]
     column = tag_type[2]
-
-    if 'value' in condition:
-        final_value = db.format(condition['value'])
 
     if condition['op'][0:2] == '! ':
         return None
@@ -47,11 +43,7 @@ def compile_condition_hstore_value(condition, statement, tag_type, stat, prefix,
 
 def compile_condition_column(condition, statement, tag_type, stat, prefix, filter):
     ret = ''
-    final_value = None
     key = tag_type[1]
-
-    if 'value' in condition:
-        final_value = db.format(condition['value'])
 
     if condition['op'][0:2] == '! ':
         return None
