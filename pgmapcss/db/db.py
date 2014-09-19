@@ -2,6 +2,8 @@ import postgresql
 import pgmapcss.data
 from pkg_resources import *
 from .version import *
+import pgmapcss.db.osm2pgsql
+import pgmapcss.db.osmosis
 conn = None
 
 def connection():
@@ -23,15 +25,23 @@ def connect(args):
 
     conn.database_type=args.database_type
 
+    if args.database_type == 'osm2pgsql':
+        conn.database = pgmapcss.db.osm2pgsql.db(conn)
+    elif args.database_type == 'osmosis':
+        conn.database = pgmapcss.db.osmosis.db(conn)
+    else:
+        raise Exception('unknown database type {}'.format(args.database_type))
+
     db_version_check()
 
     return conn
 
 def db_update(conn):
     db_version_update()
+    conn.database.update()
 
 def db_init(conn):
-    files = [ 'pgmapcss_types.sql', conn.database_type + '.sql' ]
+    files = [ 'pgmapcss_types.sql', conn.database_type + '/init.sql' ]
 
     for f in files:
         print('Installing', f)
@@ -53,6 +63,8 @@ def db_init(conn):
     db_version_create()
     db_update(conn)
 
+    conn.database.init()
+
 def install(style_id, style, conn):
     conn.execute(style['function_match'])
 
@@ -60,4 +72,4 @@ def prepare(sql):
     return conn.prepare(sql)
 
 def query_functions():
-    return resource_string(__name__, conn.database_type + '.py').decode('utf-8')
+    return resource_string(__name__, conn.database_type + '/db_functions.py').decode('utf-8')
