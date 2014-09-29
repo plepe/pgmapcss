@@ -113,8 +113,6 @@ def compile_condition_sql(condition, statement, stat, prefix='current.', filter=
         return compile_condition_hstore_value(condition, statement, tag_type, stat, prefix, filter)
     elif tag_type[0] == 'column':
         return compile_condition_column(condition, statement, tag_type, stat, prefix, filter)
-    elif tag_type[0] == 'all':
-        return 'true'
     else:
         raise CompileError('unknown tag type {}'.format(tag_type))
 

@@ -8,7 +8,7 @@ class db(default):
             if key == 'osm:id':
                 return ( 'column', 'id', self.compile_modify_id )
             elif key == 'osm:user':
-                return ( 'all', )
+                return None
             elif key == 'osm:user_id':
                 return ( 'column', 'user_id' )
             elif key == 'osm:version':
