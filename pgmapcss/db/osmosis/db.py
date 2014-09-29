@@ -8,7 +8,7 @@ class db(default):
             if key == 'osm:id':
                 return ( 'column', 'id', self.compile_modify_id )
             elif key == 'osm:user':
-                return None
+                return ( 'column', 'user_id', self.compile_user_id )
             elif key == 'osm:user_id':
                 return ( 'column', 'user_id' )
             elif key == 'osm:version':
@@ -24,3 +24,13 @@ class db(default):
 
     def compile_modify_id(self, key, value):
         return format(value[1:])
+
+    def compile_user_id(self, key, value):
+        plan = self.conn.prepare('select * from users where name=$1')
+        res = plan(value)
+
+        if(len(res)):
+            return str(res[0][0])
+
+        print("Warning compiling tag 'osm:user': User '{1}' not found.".format(key, value))
+        return None
