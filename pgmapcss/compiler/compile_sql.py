@@ -75,14 +75,27 @@ def compile_condition_column(condition, statement, tag_type, stat, prefix, filte
 
     # =
     if condition['op'] == '=':
-        ret += prefix + db.ident(key) + ' = ' + value_format(key, condition['value'])
+        # if value_format returns None -> return false as result
+        f = value_format(key, condition['value'])
+        if f:
+            ret += prefix + db.ident(key) + ' = ' + f
+        else:
+            ret += 'false'
 
     # @=
     elif condition['op'] == '@=' and condition['value_type'] == 'value':
-        ret += prefix + db.ident(key) + ' in (' + ', '.join([
-                value_format(key, v)
-                for v in condition['value'].split(';')
-            ]) + ')'
+        f = {
+            value_format(key, v)
+            for v in condition['value'].split(';')
+        }
+        # if value_format returns None -> return false as result
+        if None in f:
+            f.remove(None)
+
+        if len(f):
+            ret += prefix + db.ident(key) + ' in (' + ', '.join(f) + ')'
+        else:
+            ret += 'false'
 
     else:
         return prefix + db.ident(key) + ' is not null'
