@@ -72,4 +72,12 @@ def prepare(sql):
     return conn.prepare(sql)
 
 def query_functions():
-    return resource_string(__name__, conn.database_type + '/db_functions.py').decode('utf-8')
+    f = resource_stream(__name__, conn.database_type + '/db_functions.py')
+    ret = ''
+
+    while True:
+        r = f.readline()
+        if not r:
+            return ret
+        r = r.decode('utf-8')
+        ret += r
