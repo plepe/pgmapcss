@@ -9,7 +9,7 @@ conn = None
 def connection():
     return conn
 
-def connect(args):
+def connect(args, stat):
     global conn
 
     if not args.database_type in ('osm2pgsql', 'osmosis'):
@@ -26,9 +26,9 @@ def connect(args):
     conn.database_type=args.database_type
 
     if args.database_type == 'osm2pgsql':
-        conn.database = pgmapcss.db.osm2pgsql.db(conn)
+        conn.database = pgmapcss.db.osm2pgsql.db(conn, stat)
     elif args.database_type == 'osmosis':
-        conn.database = pgmapcss.db.osmosis.db(conn)
+        conn.database = pgmapcss.db.osmosis.db(conn, stat)
     else:
         raise Exception('unknown database type {}'.format(args.database_type))
 
