@@ -62,7 +62,13 @@ where {bbox} ( {w} )
         qry = '''
 select * from (
 select 'w' || cast(id as text) as id, version, user_id, (select name from users where id=user_id) as user, tstamp, changeset_id,
-       tags, ST_Transform((CASE WHEN ST_IsClosed(linestring) THEN ST_MakePolygon(linestring) ELSE linestring END), 900913) as geo, ST_IsClosed(linestring) as is_closed, Array['line', 'way'] as types
+       tags, ST_Transform((CASE WHEN ST_IsClosed(linestring) THEN ST_MakePolygon(linestring) ELSE linestring END), 900913) as geo, ST_IsClosed(linestring) as is_closed, Array['line', 'way'] as types '''
+# START db.multipolygons
+        qry += '''
+, (select array_agg(has_outer_tags) from relation_members join multipolygons on relation_members.relation_id=multipolygons.id where relation_members.member_id=ways.id and relation_members.member_type='W' and relation_members.member_role in ('outer', 'exclave')) part_of_mp_outer
+        '''
+# END db.multipolygons
+        qry += '''
        {add_columns}
 from ways
 where {bbox} ( {w} ) offset 0) t
@@ -75,7 +81,10 @@ where {bbox} ( {w} ) offset 0) t
         for r in res:
             r['tags'] = pghstore.loads(r['tags'])
             if r['is_closed']:
-                r['types'].append('area')
+# START db.multipolygons
+                if not r['part_of_mp_outer'] or True not in r['part_of_mp_outer']:
+# END db.multipolygons
+                    r['types'].append('area')
             r['tags']['osm:id'] = str(r['id'])
             r['tags']['osm:version'] = str(r['version'])
             r['tags']['osm:user_id'] = str(r['user_id'])
