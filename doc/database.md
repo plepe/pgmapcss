@@ -26,4 +26,4 @@ There's a module [osmosis-multipolygon](https://github.com/plepe/osmosis-multipo
 There are two "types" of multipolygons, those that have their tags bound to the relation (the standard) and multipolygons which inherit their tags from their outer members (when the relation has no relevant tags and the outer members have exactly the same relevant tags).
 
 * "Standard" multipolygons get their ID prefixed by 'r' (as they are relations).
-* Multipolygons with tags from their outer members get their ID prefixed by 'm' (for multipolygon) and an additional tag 'osm:has_outer_tags' (set to 'yes'). On the other hand closed ways which are an outer member of a multipolygon relation do not count as 'area'.
+* Multipolygons with tags from their outer members get their ID prefixed by 'm' (for multipolygon) and an additional tag 'osm:has_outer_tags' (set to 'yes'). On the other hand closed ways which are an outer member of a multipolygon relation do not count as 'area', whereas the multipolygon itself does not count as 'relation'.
