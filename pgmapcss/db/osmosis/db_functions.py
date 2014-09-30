@@ -126,7 +126,7 @@ where {w}
 
         qry = '''
 select * from (
-select (CASE WHEN has_outer_tags THEN 'm' ELSE 'r' END) || cast(id as text) as id, version, user_id, (select name from users where id=user_id) as user, tstamp, changeset_id,
+select (CASE WHEN has_outer_tags THEN 'm' ELSE 'r' END) || cast(id as text) as id, version, user_id, (select name from users where id=user_id) as user, tstamp, changeset_id, has_outer_tags,
        tags, ST_Transform(geom, 900913) as geo, Array['relation', 'area'] as types
        {add_columns}
 from (select multipolygons.*, relations.version, relations.user_id, relations.tstamp, relations.changeset_id from multipolygons left join relations on multipolygons.id = relations.id) t
@@ -145,6 +145,8 @@ where {bbox} ( {w} ) offset 0) t
             r['tags']['osm:user'] = r['user']
             r['tags']['osm:timestamp'] = r['tstamp']
             r['tags']['osm:changeset'] = str(r['changeset_id'])
+            if r['has_outer_tags']:
+                r['tags']['osm:has_outer_tags'] = 'yes'
             yield(r)
 # END db.multipolygons
 
