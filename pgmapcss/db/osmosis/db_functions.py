@@ -1,5 +1,4 @@
 # TODO: currently all ways are returned as line and area - and as linestring, not polygon
-# TODO: multipolygons are supported, but without geometry - all relations in database are checked
 # TODO: objects_near: distance to ways are calculated to linestring (inside not working)
 # Use this functions only with a database based on an import with osmosis
 
@@ -112,6 +111,42 @@ where {w}
             r['tags']['osm:timestamp'] = r['tstamp']
             r['tags']['osm:changeset'] = str(r['changeset_id'])
             yield(r)
+
+# START db.multipolygons
+    # multipolygons
+    w = []
+    for t in ('*', 'relation', 'area'):
+        if t in where_clauses:
+            w.append(where_clauses[t])
+
+    if len(w):
+        bbox = ''
+        if _bbox is not None:
+            bbox = 'geom && ST_Transform($1, 4326) and'
+
+        qry = '''
+select * from (
+select (CASE WHEN has_outer_tags THEN 'm' ELSE 'r' END) || cast(id as text) as id, version, user_id, (select name from users where id=user_id) as user, tstamp, changeset_id,
+       tags, ST_Transform(geom, 900913) as geo, Array['relation', 'area'] as types
+       {add_columns}
+from (select multipolygons.*, relations.version, relations.user_id, relations.tstamp, relations.changeset_id from multipolygons left join relations on multipolygons.id = relations.id) t
+where {bbox} ( {w} ) offset 0) t
+       {add_columns}
+'''.format(bbox=bbox, w=' or '.join(w), add_columns=add_columns.replace('__geo__', 'linestring'))
+
+        plan = plpy.prepare(qry, param_type )
+        res = plpy.execute(plan, param_value )
+
+        for r in res:
+            r['tags'] = pghstore.loads(r['tags'])
+            r['tags']['osm:id'] = str(r['id'])
+            r['tags']['osm:version'] = str(r['version'])
+            r['tags']['osm:user_id'] = str(r['user_id'])
+            r['tags']['osm:user'] = r['user']
+            r['tags']['osm:timestamp'] = r['tstamp']
+            r['tags']['osm:changeset'] = str(r['changeset_id'])
+            yield(r)
+# END db.multipolygons
 
     time_stop = datetime.datetime.now() # profiling
     plpy.notice('querying db objects took %.2fs' % (time_stop - time_start).total_seconds())
