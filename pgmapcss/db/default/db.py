@@ -1,6 +1,7 @@
 class default:
-    def __init__(self, conn):
+    def __init__(self, conn, stat):
         self.conn = conn
+        self.stat = stat
 
     def init(self):
         pass

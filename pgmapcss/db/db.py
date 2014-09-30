@@ -1,3 +1,4 @@
+import re
 import postgresql
 import pgmapcss.data
 from pkg_resources import *
@@ -9,7 +10,7 @@ conn = None
 def connection():
     return conn
 
-def connect(args):
+def connect(args, stat):
     global conn
 
     if not args.database_type in ('osm2pgsql', 'osmosis'):
@@ -26,9 +27,9 @@ def connect(args):
     conn.database_type=args.database_type
 
     if args.database_type == 'osm2pgsql':
-        conn.database = pgmapcss.db.osm2pgsql.db(conn)
+        conn.database = pgmapcss.db.osm2pgsql.db(conn, stat)
     elif args.database_type == 'osmosis':
-        conn.database = pgmapcss.db.osmosis.db(conn)
+        conn.database = pgmapcss.db.osmosis.db(conn, stat)
     else:
         raise Exception('unknown database type {}'.format(args.database_type))
 
@@ -71,5 +72,30 @@ def install(style_id, style, conn):
 def prepare(sql):
     return conn.prepare(sql)
 
-def query_functions():
-    return resource_string(__name__, conn.database_type + '/db_functions.py').decode('utf-8')
+def query_functions(stat):
+    f = resource_stream(__name__, conn.database_type + '/db_functions.py')
+    ret = ''
+    selectors = set()
+    include = True
+
+    while True:
+        r = f.readline()
+        if not r:
+            return ret
+        r = r.decode('utf-8')
+
+        m = re.match('# (START|END) (.*)', r)
+        if m:
+            if m.group(1) == 'END':
+                selectors.remove(m.group(2))
+            elif m.group(1) == 'START':
+                selectors.add(m.group(2))
+
+            include = not len({
+                True
+                for s in selectors
+                if not s in stat['config'] or stat['config'][s] in ('false', False, 'no')
+            })
+
+        if include:
+            ret += r

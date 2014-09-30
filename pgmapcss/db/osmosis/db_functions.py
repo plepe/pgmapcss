@@ -1,5 +1,4 @@
 # TODO: currently all ways are returned as line and area - and as linestring, not polygon
-# TODO: multipolygons are supported, but without geometry - all relations in database are checked
 # TODO: objects_near: distance to ways are calculated to linestring (inside not working)
 # Use this functions only with a database based on an import with osmosis
 
@@ -63,7 +62,13 @@ where {bbox} ( {w} )
         qry = '''
 select * from (
 select 'w' || cast(id as text) as id, version, user_id, (select name from users where id=user_id) as user, tstamp, changeset_id,
-       tags, ST_Transform((CASE WHEN ST_IsClosed(linestring) THEN ST_MakePolygon(linestring) ELSE linestring END), 900913) as geo, ST_IsClosed(linestring) as is_closed, Array['line', 'way'] as types
+       tags, ST_Transform((CASE WHEN ST_IsClosed(linestring) THEN ST_MakePolygon(linestring) ELSE linestring END), 900913) as geo, ST_IsClosed(linestring) as is_closed, Array['line', 'way'] as types '''
+# START db.multipolygons
+        qry += '''
+, (select array_agg(has_outer_tags) from relation_members join multipolygons on relation_members.relation_id=multipolygons.id where relation_members.member_id=ways.id and relation_members.member_type='W' and relation_members.member_role in ('outer', 'exclave')) part_of_mp_outer
+        '''
+# END db.multipolygons
+        qry += '''
        {add_columns}
 from ways
 where {bbox} ( {w} ) offset 0) t
@@ -76,7 +81,10 @@ where {bbox} ( {w} ) offset 0) t
         for r in res:
             r['tags'] = pghstore.loads(r['tags'])
             if r['is_closed']:
-                r['types'].append('area')
+# START db.multipolygons
+                if not r['part_of_mp_outer'] or True not in r['part_of_mp_outer']:
+# END db.multipolygons
+                    r['types'].append('area')
             r['tags']['osm:id'] = str(r['id'])
             r['tags']['osm:version'] = str(r['version'])
             r['tags']['osm:user_id'] = str(r['user_id'])
@@ -84,6 +92,48 @@ where {bbox} ( {w} ) offset 0) t
             r['tags']['osm:timestamp'] = r['tstamp']
             r['tags']['osm:changeset'] = str(r['changeset_id'])
             yield(r)
+
+    done_multipolygons = set()
+# START db.multipolygons
+    # multipolygons
+    w = []
+    for t in ('*', 'relation', 'area'):
+        if t in where_clauses:
+            w.append(where_clauses[t])
+
+    if len(w):
+        bbox = ''
+        if _bbox is not None:
+            bbox = 'geom && ST_Transform($1, 4326) and'
+
+        qry = '''
+select * from (
+select (CASE WHEN has_outer_tags THEN 'm' ELSE 'r' END) || cast(id as text) as id, id as rid, version, user_id, (select name from users where id=user_id) as user, tstamp, changeset_id, has_outer_tags,
+       tags, ST_Transform(geom, 900913) as geo, Array['area'] as types
+       {add_columns}
+from (select multipolygons.*, relations.version, relations.user_id, relations.tstamp, relations.changeset_id from multipolygons left join relations on multipolygons.id = relations.id) t
+where {bbox} ( {w} ) offset 0) t
+       {add_columns}
+'''.format(bbox=bbox, w=' or '.join(w), add_columns=add_columns.replace('__geo__', 'linestring'))
+
+        plan = plpy.prepare(qry, param_type )
+        res = plpy.execute(plan, param_value )
+
+        for r in res:
+            r['tags'] = pghstore.loads(r['tags'])
+            r['tags']['osm:id'] = str(r['id'])
+            r['tags']['osm:version'] = str(r['version'])
+            r['tags']['osm:user_id'] = str(r['user_id'])
+            r['tags']['osm:user'] = r['user']
+            r['tags']['osm:timestamp'] = r['tstamp']
+            r['tags']['osm:changeset'] = str(r['changeset_id'])
+            if r['has_outer_tags']:
+                r['tags']['osm:has_outer_tags'] = 'yes'
+            else:
+                done_multipolygons.add(r['rid'])
+                r['types'].append('relation')
+            yield(r)
+# END db.multipolygons
 
     # relations - (no bbox match!)
     w = []
@@ -97,8 +147,8 @@ select 'r' || cast(id as text) as id, version, user_id, (select name from users 
        tags, null as geo, Array['relation'] as types
        {add_columns}
 from relations
-where {w}
-'''.format(w=' or '.join(w), add_columns=add_columns)
+where ({w}) and not id = ANY(Array[{done}]::bigint[])
+'''.format(w=' or '.join(w), add_columns=add_columns, done=','.join({ str(d) for d in done_multipolygons}))
 
         plan = plpy.prepare(qry, param_type )
         res = plpy.execute(plan, param_value )

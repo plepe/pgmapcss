@@ -75,7 +75,23 @@ def main():
 
     file_name = style_id + '.mapcss'
 
-    conn = pgmapcss.db.connect(args)
+    stat = pgmapcss.compiler.stat._stat({
+        'id': style_id,
+        'options': set(args.options) if args.options else set(),
+        'config': {},
+        'base_style': args.base_style,
+        'icons_dir': style_id + '.icons',
+        'global_data': None,
+    })
+
+    if args.config:
+        for v in args.config:
+            v = v.split("=")
+            stat['config'][v[0]] = v[1]
+
+    conn = pgmapcss.db.connect(args, stat)
+
+    stat['database'] = conn.database
 
     if args.database_update == 're-init':
         print('* Re-initializing database')
@@ -105,16 +121,6 @@ def main():
     if args.eval_tests:
         pgmapcss.eval.functions().test_all()
 
-    stat = pgmapcss.compiler.stat._stat({
-        'id': style_id,
-        'options': set(args.options) if args.options else set(),
-        'config': {},
-        'base_style': args.base_style,
-        'icons_dir': style_id + '.icons',
-        'global_data': None,
-        'database': conn.database,
-    })
-
     try:
         os.mkdir(stat['icons_dir'])
     except OSError:
@@ -142,11 +148,6 @@ def main():
     except pgmapcss.parser.ParseError as e:
         print(e)
         sys.exit(1)
-
-    if args.config:
-        for v in args.config:
-            v = v.split("=")
-            stat['config'][v[0]] = v[1]
 
     debug = open(style_id + '.output', 'w')
 

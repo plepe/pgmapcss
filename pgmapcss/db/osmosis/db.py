@@ -1,8 +1,22 @@
+from pkg_resources import *
+import postgresql
 from ..default import default
 from ..pg import format
 from ..pg import ident
 
 class db(default):
+    def __init__(self, conn, stat):
+        default.__init__(self, conn, stat)
+
+        if not 'db.multipolygons' in self.stat['config']:
+            try:
+                plan = self.conn.prepare('select * from multipolygons limit 0')
+                res = plan()
+                print("- DB table 'multipolygons' detected; enabling support")
+                self.stat['config']['db.multipolygons'] = True
+            except postgresql.exceptions.UndefinedTableError:
+                self.stat['config']['db.multipolygons'] = False
+
     def tag_type(self, key):
         if key[0:4] == 'osm:':
             if key == 'osm:id':

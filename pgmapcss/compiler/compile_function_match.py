@@ -45,7 +45,7 @@ def compile_function_match(stat):
       }),
       'scale_denominators': repr(scale_denominators),
       'match_where': compile_function_get_where(stat['id'], stat),
-      'db_query': db.query_functions(),
+      'db_query': db.query_functions(stat),
       'function_check': check_functions,
       'check_chooser': check_chooser,
       'eval_functions': \
