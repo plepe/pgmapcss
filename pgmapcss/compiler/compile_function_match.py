@@ -240,6 +240,12 @@ else:
 plpy.warning('rendered map features: {{rendered}} / {{total}}, {{perc:.2f}}%'.format(**counter))
 '''.format(**replacement);
 
+    if 'rusage' in stat['options']:
+        ret += '''\
+import resource
+plpy.warning('Resource Usage: ' + str(resource.getrusage(resource.RUSAGE_SELF)) + '\\nsee https://docs.python.org/3/library/resource.html')
+'''.format(**replacement);
+
     ret += '''\
 $body$ language 'plpython3u' immutable;
 '''.format(**replacement);
