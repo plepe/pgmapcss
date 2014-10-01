@@ -92,6 +92,11 @@ counter = {{ 'rendered': 0, 'total': 0 }}
 {check_chooser}
 combined_objects = {{}}
 all_style_elements = _all_style_elements
+style_element_property = {style_element_property}
+for style_element in all_style_elements:
+    if not style_element in style_element_property:
+        style_element_property[style_element] = []
+
 # dirty hack - when render_context.bbox is null, pass type of object instead of style-element
 if render_context['bbox'] == None:
     src = [{{
@@ -158,13 +163,13 @@ while src:
                     (
                         style_element,
                         i,
-                        to_float(result['properties'].get(style_element + '-layer') or result['properties'].get('layer') or 0),
-                        to_float(result['properties'].get(style_element + '-z-index') or result['properties'].get('z-index') or 0),
+                        to_float(result['properties'][style_element + '-layer'] if style_element + '-layer' in result['properties'] else (result['properties']['layer'] if 'layer' in result['properties'] else 0)),
+                        to_float(result['properties'][style_element + '-z-index'] if style_element + '-z-index' in result['properties'] else (result['properties']['z-index'] if 'z-index' in result['properties'] else 0))
                     )
                     for i, style_element in enumerate(_all_style_elements)
                     if len({{
                         k
-                        for k in {style_element_property}.get(style_element) or []
+                        for k in style_element_property[style_element]
                         if k in result['properties'] and result['properties'][k]
                     }})
                 ]
