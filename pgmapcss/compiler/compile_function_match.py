@@ -91,7 +91,6 @@ counter = {{ 'rendered': 0, 'total': 0 }}
 
 {check_chooser}
 combined_objects = {{}}
-results = []
 all_style_elements = _all_style_elements
 # dirty hack - when render_context.bbox is null, pass type of object instead of style-element
 if render_context['bbox'] == None:
@@ -144,8 +143,45 @@ while src:
             if type(result) != tuple or len(result) == 0:
                 plpy.warning('unknown check result: ', result)
             elif result[0] == 'result':
+                result = result[1]
                 shown = True
-                results.append(result[1])
+
+                # create a list of all style elements where the current
+                # object/pseudo_element is being shown, with a tuple of
+                # [ ( style_element, index in style_element list, layer,
+                # z-index ), ... ], e.g.:
+                # [
+                #   ( 'line', 2, 0, 5 ),
+                #   ( 'line-text', 5, 103, 5 )
+                # ]
+                style_elements = [
+                    (
+                        style_element,
+                        i,
+                        to_float(result['properties'].get(style_element + '-layer') or result['properties'].get('layer') or 0),
+                        to_float(result['properties'].get(style_element + '-z-index') or result['properties'].get('z-index') or 0),
+                    )
+                    for i, style_element in enumerate(_all_style_elements)
+                    if len({{
+                        k
+                        for k in {style_element_property}.get(style_element) or []
+                        if k in result['properties'] and result['properties'][k]
+                    }})
+                ]
+
+                # now build the return columns
+                yield {{
+                    'id': result['id'],
+                    'types': result['types'],
+                    'tags': pghstore.dumps(result['tags']),
+                    'pseudo_element': result['pseudo_element'],
+                    'geo': result['geo'],
+                    'properties': pghstore.dumps(result['properties']),
+                    'style_elements': [ se[0] for se in style_elements ],
+                    'style_elements_index': [ se[1] for se in style_elements ],
+                    'style_elements_layer': [ se[2] for se in style_elements ],
+                    'style_elements_z_index': [ se[3] for se in style_elements ],
+                }}
             elif result[0] == 'combine':
                 shown = True
                 if result[1] not in combined_objects:
@@ -175,58 +211,6 @@ while src:
                 }})
 
         combined_objects = []
-
-layers = sorted(
-    set(
-        x['properties'].get('layer', 0)
-        for x in results
-    ).union(set(
-        x['properties'].get(style_element + '-layer')
-        for x in results
-        for style_element in all_style_elements
-        if style_element + '-layer' in x['properties']
-    )),
-    key=lambda x: to_float(x, 0)
-)
-if None in layers:
-    layers.remove(None)
-
-for layer in layers:
-    for style_element in all_style_elements:
-        result_list = []
-
-        for result in results:
-            result_layer = result['properties'].get(style_element + '-layer') or result['properties'].get('layer') or '0'
-            if result_layer == layer:
-                # check if any property for the current style element is set (or
-                # there is no entry for the current style element in
-                # @style_element_property
-                if {style_element_property}.get(style_element) == None or \
-                    len(set(
-                    True
-                    for k in {style_element_property}.get(style_element)
-                    if result['properties'].get(k)
-                )):
-                    result_list.append(result)
-
-        result_list = sorted(result_list,
-            key=lambda x: to_float(
-                x['properties'].get(style_element + '-z-index') or
-                x['properties'].get('z-index')
-                , 0))
-
-        for result in result_list:
-            x = {{
-                'id': result['id'],
-                'types': result['types'],
-                'tags': pghstore.dumps(result['tags']),
-                'style-element': style_element,
-                'pseudo_element': result['pseudo_element'],
-                'geo': result['geo'],
-                'properties': pghstore.dumps(result['properties'])
-            }}
-            yield x
-
 '''.format(**replacement)
 
     if 'profiler' in stat['options']:

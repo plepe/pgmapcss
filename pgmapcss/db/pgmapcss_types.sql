@@ -12,7 +12,10 @@ create type pgmapcss_result as (
   types			text[],
   pseudo_element	text,
   properties		hstore,
-  "style-element"       text
+  style_elements        text[],
+  style_elements_index  int[],
+  style_elements_layer  float[],
+  style_elements_z_index float[]
 );
 
 drop table if exists _pgmapcss_left_right_hand_traffic cascade;
