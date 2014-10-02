@@ -15,8 +15,10 @@ def eval_is_right_hand_traffic(param):
 
     if len(param) > 0:
         geo = param[0]
-    else:
+    elif 'geo' in current['properties'][current['pseudo_element']]:
         geo = current['properties'][current['pseudo_element']]['geo']
+    else:
+        geo = current['object']['geo']
 
     if not geo:
         return 'partly'

@@ -102,7 +102,7 @@ def check_{min_scale_esc}(object):
         'tags': object['tags'],
         'types': object['types'],
         'properties': {{
-            pseudo_element: {{ 'geo': object['geo'] }}
+            pseudo_element: {{ }}
             for pseudo_element in {pseudo_elements}
          }},
         'has_pseudo_element': {{
@@ -229,8 +229,14 @@ def check_{min_scale_esc}(object):
         ret += print_postprocess(prop, stat, indent=indent)
 
     ret += '''\
-            # set geo as return value AND remove key from properties
-            ret['geo'] = current['properties'][pseudo_element].pop('geo');
+            # if 'geo' has been modified, it can be read from properties, if
+            # not directly from object
+            if 'geo' in current['properties'][pseudo_element]:
+                # set geo as return value AND remove key from properties
+                ret['geo'] = current['properties'][pseudo_element].pop('geo');
+            else:
+                ret['geo'] = current['object']['geo']
+
             ret['properties'] = current['properties'][pseudo_element]
             yield(( 'result', ret))
 '''.format(**replacement)
