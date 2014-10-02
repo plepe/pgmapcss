@@ -40,6 +40,11 @@ def eval_prop(param):
             return ''
         return v
     else:
+        # 'geo' can be read from properties, but it might not has been set yet.
+        # in that case read it directly from object
+        if param[0] == 'geo':
+            return current['object']['geo']
+
         return ''
 
 # TESTS
