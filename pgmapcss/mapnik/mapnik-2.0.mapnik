@@ -203,11 +203,26 @@
       <Parameter name="srid">900913</Parameter>
       <Parameter name="cache-features">on</Parameter>
       <Parameter name="table">
-(select
-  {columns},
-  "style-element",
-  geo as _geo
-from pgmapcss_{style_id}(!bbox!, !scale_denominator!, Array['fill', 'casing', 'line', 'point', 'point-text', 'line-text', 'shield'])) t
+(select * from
+    (select
+      *,
+      unnest(style_elements) as "style-element",
+      unnest(style_elements_index) as style_element_index,
+      unnest(style_elements_layer) as style_element_layer,
+      unnest(style_elements_z_index) as style_element_z_index
+    from
+        (select
+            {columns},
+            style_elements, style_elements_index, style_elements_layer, style_elements_z_index,
+            geo as _geo
+        from pgmapcss_{style_id}(
+            !bbox!,
+            !scale_denominator!,
+            Array['fill', 'casing', 'side-casing', 'line', 'point', 'point-text', 'line-text', 'shield']
+        ) offset 0) t
+    ) t
+    order by "style_element_layer" asc, style_element_index asc, style_element_z_index asc
+) t
       </Parameter>
     </Datasource>
     <StyleName>pgmapcss</StyleName>
