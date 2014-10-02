@@ -10,7 +10,7 @@ setup(
     version = VERSION,
     packages = find_packages(),
     package_data = {
-        'pgmapcss.db': [ '*/*.sql' ],
+        'pgmapcss.db': [ '*.sql', '*/*.sql' ],
         'pgmapcss.db.eval': [ '*.sql' ],
         'pgmapcss.mapnik': [ '*.mapcss', '*.mapnik' ],
         'pgmapcss.icons': [ 'maki/*' ],
