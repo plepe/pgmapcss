@@ -39,12 +39,13 @@ where {bbox} ( {w} )
         res = plpy.execute(plan, param_value )
 
         for r in res:
+            r['types'] = list(r['types'])
             r['tags'] = pghstore.loads(r['tags'])
             r['tags']['osm:id'] = str(r['id'])
             r['tags']['osm:version'] = str(r['version'])
             r['tags']['osm:user_id'] = str(r['user_id'])
             r['tags']['osm:user'] = r['user']
-            r['tags']['osm:timestamp'] = r['tstamp']
+            r['tags']['osm:timestamp'] = str(r['tstamp'])
             r['tags']['osm:changeset'] = str(r['changeset_id'])
             yield(r)
 
@@ -79,6 +80,7 @@ where {bbox} ( {w} ) offset 0) t
         res = plpy.execute(plan, param_value )
 
         for r in res:
+            r['types'] = list(r['types'])
             r['tags'] = pghstore.loads(r['tags'])
             if r['is_closed']:
 # START db.multipolygons
@@ -89,7 +91,7 @@ where {bbox} ( {w} ) offset 0) t
             r['tags']['osm:version'] = str(r['version'])
             r['tags']['osm:user_id'] = str(r['user_id'])
             r['tags']['osm:user'] = r['user']
-            r['tags']['osm:timestamp'] = r['tstamp']
+            r['tags']['osm:timestamp'] = str(r['tstamp'])
             r['tags']['osm:changeset'] = str(r['changeset_id'])
             yield(r)
 
@@ -120,12 +122,13 @@ where {bbox} ( {w} ) offset 0) t
         res = plpy.execute(plan, param_value )
 
         for r in res:
+            r['types'] = list(r['types'])
             r['tags'] = pghstore.loads(r['tags'])
             r['tags']['osm:id'] = str(r['id'])
             r['tags']['osm:version'] = str(r['version'])
             r['tags']['osm:user_id'] = str(r['user_id'])
             r['tags']['osm:user'] = r['user']
-            r['tags']['osm:timestamp'] = r['tstamp']
+            r['tags']['osm:timestamp'] = str(r['tstamp'])
             r['tags']['osm:changeset'] = str(r['changeset_id'])
             if r['has_outer_tags']:
                 r['tags']['osm:has_outer_tags'] = 'yes'
@@ -154,12 +157,13 @@ where ({w}) and not id = ANY(Array[{done}]::bigint[])
         res = plpy.execute(plan, param_value )
 
         for r in res:
+            r['types'] = list(r['types'])
             r['tags'] = pghstore.loads(r['tags'])
             r['tags']['osm:id'] = str(r['id'])
             r['tags']['osm:version'] = str(r['version'])
             r['tags']['osm:user_id'] = str(r['user_id'])
             r['tags']['osm:user'] = r['user']
-            r['tags']['osm:timestamp'] = r['tstamp']
+            r['tags']['osm:timestamp'] = str(r['tstamp'])
             r['tags']['osm:changeset'] = str(r['changeset_id'])
             yield(r)
 
@@ -199,7 +203,7 @@ def objects_by_id(id_list):
         t['tags']['osm:version'] = str(r['version'])
         t['tags']['osm:user_id'] = str(r['user_id'])
         t['tags']['osm:user'] = r['user']
-        t['tags']['osm:timestamp'] = r['tstamp']
+        t['tags']['osm:timestamp'] = str(r['tstamp'])
         t['tags']['osm:changeset'] = str(r['changeset_id'])
         yield(t)
 
@@ -224,7 +228,7 @@ def objects_by_id(id_list):
         t['tags']['osm:version'] = str(r['version'])
         t['tags']['osm:user_id'] = str(r['user_id'])
         t['tags']['osm:user'] = r['user']
-        t['tags']['osm:timestamp'] = r['tstamp']
+        t['tags']['osm:timestamp'] = str(r['tstamp'])
         t['tags']['osm:changeset'] = str(r['changeset_id'])
         yield(t)
 
@@ -248,7 +252,7 @@ def objects_member_of(member_id, parent_type, parent_conditions):
             t['tags']['osm:version'] = str(r['version'])
             t['tags']['osm:user_id'] = str(r['user_id'])
             t['tags']['osm:user'] = r['user']
-            t['tags']['osm:timestamp'] = r['tstamp']
+            t['tags']['osm:timestamp'] = str(r['tstamp'])
             t['tags']['osm:changeset'] = str(r['changeset_id'])
             yield(t)
 
@@ -271,7 +275,7 @@ def objects_member_of(member_id, parent_type, parent_conditions):
             t['tags']['osm:version'] = str(r['version'])
             t['tags']['osm:user_id'] = str(r['user_id'])
             t['tags']['osm:user'] = r['user']
-            t['tags']['osm:timestamp'] = r['tstamp']
+            t['tags']['osm:timestamp'] = str(r['tstamp'])
             t['tags']['osm:changeset'] = str(r['changeset_id'])
             yield(t)
 
