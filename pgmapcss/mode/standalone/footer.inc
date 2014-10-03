@@ -31,7 +31,7 @@ if __name__ == '__main__':
         sys.exit(1)
 
     first = True
-    for result in pgmapcss_tmp(bounds, scale_denom):
+    for result in pgmapcss_{style_id}(bounds, scale_denom):
         if first:
             print("[")
             first = False

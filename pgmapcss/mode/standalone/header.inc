@@ -13,10 +13,10 @@ class fake_plpy:
         )
 
     def notice(self, *arg):
-        sys.stderr.write('NOTICE: ' + ' '.join([repr(a) for a in arg]))
+        sys.stderr.write('NOTICE: ' + ' '.join([repr(a) for a in arg]) + '\n')
 
     def warning(self, *arg):
-        sys.stderr.write('WARNING: ' + ' '.join([repr(a) for a in arg]))
+        sys.stderr.write('WARNING: ' + ' '.join([repr(a) for a in arg]) + '\n')
 
     def prepare(self, query, param_type):
         for (i, t) in enumerate(param_type):
