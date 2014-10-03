@@ -48,11 +48,12 @@ if __name__ == '__main__':
 
         res = plpy.execute(plan_to_geojson, [ result['geo'] ])
 
-        result['tags']['result'] = result['properties']
+        tags = dict(result['tags'])
+        tags['result'] = result['properties']
         feature = {{
             'type': 'Feature',
             'geometry': json.loads(res[0]['r']),
-            'properties': result['tags'],
+            'properties': tags,
         }}
 
         print(json.dumps(feature, indent=2))
