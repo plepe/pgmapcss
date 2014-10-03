@@ -23,6 +23,8 @@ class fake_plpy:
             i1 = i + 1
             if t == 'geometry':
                 t = 'text'
+            elif t == 'geometry[]':
+                t = 'text[]'
             query = query.replace('$' + str(i1), '$' + str(i1) + '::' + t)
 
         return self.conn.prepare(query)
