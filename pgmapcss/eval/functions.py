@@ -39,14 +39,14 @@ class Functions:
         return ret
 
 
-    def eval(self, statement):
+    def eval(self, statement, additional_code=''):
         if not 'global_data' in self.stat:
             self.stat['global_data'] = {}
 
         if repr(self.stat['global_data']) != self._eval_global_data:
             self._eval = None
 
-        if not self._eval:
+        if not self._eval or additional_code != '':
             self._eval_global_data = repr(self.stat['global_data'])
             content = \
                 'def _eval(statement):\n' +\
@@ -57,15 +57,23 @@ class Functions:
                 '\n' +\
                 '    ' + include_text().replace('\n', '\n    ') +\
                 '\n' +\
+                additional_code.replace('\n', '\n    ') +\
+                '\n' +\
                 self.print(indent='    ') + '\n'\
                 '    return eval(statement)'
 
             eval_code = compile(content, '<eval functions>', 'exec')
             eval_ns = {}
             exec(eval_code, eval_ns, eval_ns);
-            self._eval = eval_ns['_eval']
 
-        return self._eval(statement)
+            _eval = eval_ns['_eval']
+            if additional_code == '':
+                self._eval = _eval
+
+        else:
+            _eval = self._eval
+
+        return _eval(statement)
 
     def resolve_config(self):
         exec(
