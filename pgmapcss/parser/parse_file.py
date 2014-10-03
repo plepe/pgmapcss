@@ -6,18 +6,32 @@ from .ParseFile import *
 from .ParseError import *
 import pgmapcss.mapnik
 import copy
+from pkg_resources import *
+import pgmapcss.defaults
 
-def parse_file(stat, filename=None, base_style=None, content=None):
+def parse_file(stat, filename=None, base_style=None, content=None, defaults=[]):
     if not 'max_prop_id' in stat:
         stat['max_prop_id'] = 0
 
     if base_style:
         parse_file(stat, content=pgmapcss.mapnik.get_base_style(base_style))
 
+    if defaults:
+        for d in defaults:
+            if re.search("\.mapcss$", d):
+                try:
+                    parse_file(stat, filename=d)
+                except FileNotFoundError:
+                    print("Warning: No such default file: {}".format(d))
+            else:
+                try:
+                    parse_file(stat, content=resource_string(pgmapcss.defaults.__name__, d + '.mapcss').decode('utf-8'), filename="default:" + d + ".mapcss")
+                except FileNotFoundError:
+                    print("Warning: No such default: {}".format(d))
+
     if not 'statements' in stat:
         stat['statements'] = []
         stat['defines'] = {}
-        stat['config'] = {}
 
     media = None # !None while in a media query
 

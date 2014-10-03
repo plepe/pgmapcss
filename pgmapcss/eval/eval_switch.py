@@ -1,17 +1,44 @@
 class config_eval_switch(config_base):
     mutable = 3
 
-    def possible_values(self, param_values, prop, stat):
-        if param_values[0] is not True:
-            return config_base.possible_values(self, param_values, prop, stat)
+    def possible_values_all(self, param_values, prop, stat):
+        check = param_values[0]
+        ret = set()
+        done = set()
 
-        ret = {}
+        for i in range(1, len(param_values) - 1, 2):
+            if True in param_values[i]:
+                done.add(True)
+                ret = ret.union(param_values[i + 1])
 
-        for i in range(1, len(param) - 1, 2):
-            ret.add(param[i + 1])
+            else:
+                p = {
+                    b
+                    for a in param_values[i]
+                    for b in a.split(";")
+                }
+                done = done.union(p)
 
-        if len(param) % 2 == 0:
-            ret.add(param[-1])
+                if True in check or len([
+                    c
+                    for a in param_values[i]
+                    for b in a.split(";")
+                    for c in check
+                    if b == c
+                ]):
+                    ret = ret.union(param_values[i + 1])
+
+        if len(param_values) % 2 == 0:
+            p = param_values[-1]
+        else:
+            p = { '' }
+
+        if True in check or len([
+            True
+            for c in check
+            if not c in done
+        ]):
+            ret = ret.union(p)
 
         return ( ret, 3 )
 

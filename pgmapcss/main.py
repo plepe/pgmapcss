@@ -6,6 +6,7 @@ import pgmapcss.parser
 import pgmapcss.compiler
 import pgmapcss.version
 import pgmapcss.icons
+import pgmapcss.symbols
 import argparse
 import getpass
 import pgmapcss.db
@@ -23,6 +24,10 @@ parser.add_argument('style_id', type=str, help='''\
 parser.add_argument('-d', '--database', dest='database',
     default=getpass.getuser(),
     help='Name of database (default: username)')
+
+parser.add_argument('--database-type', dest='database_type',
+    default='osm2pgsql',
+    help='Type of database (currently supported: osm2pgsql) (default: osm2pgsql)')
 
 parser.add_argument('-u', '--user', dest='user',
     default=getpass.getuser(),
@@ -49,8 +54,14 @@ parser.add_argument('-r', '--database-update', dest='database_update',
     help='Whether the database should be updated to the current version. Possible values: "re-init": re-initializes the database, need to re-compile all pgmapcss styles, "update": update all database functions, "none": do not update, "auto": if necessary a database functions update will be performed.')
 
 parser.add_argument('-o', '--options', dest='options', nargs='+',
-    choices=['profiler', 'context'],
-    help='Additional options. Currently supported options: "profiler": during execution, show some statistics about query/processing time and count of objects. "context": show bounding box and scale denominator of requests.')
+    choices=['profiler', 'context', 'rusage'],
+    help='Additional options. Currently supported options: "profiler": during execution, show some statistics about query/processing time and count of objects. "context": show bounding box and scale denominator of requests. "rusage": show resource usage at end of processing.')
+
+parser.add_argument('-c', '--config', dest='config', nargs='+',
+    help='Set configuration options, e.g. -c foo=bar. See doc/MapCSS.creole for available configuration options.')
+
+parser.add_argument('-D', '--defaults', dest='defaults', nargs='+',
+    help='Load specified defaults. These can either be included in the pgmapcss distribution (see doc/defaults.md for a list of available defaults) or local files (specified by trailing .mapcss). You may specify several defaults which will be loaded consecutive (e.g. -D josm local.mapcss)')
 
 parser.add_argument('-m', '--mode', dest='mode',
     choices=['database-function', 'standalone'],
@@ -69,7 +80,25 @@ def main():
 
     file_name = style_id + '.mapcss'
 
-    conn = pgmapcss.db.connect(args)
+    stat = pgmapcss.compiler.stat._stat({
+        'id': style_id,
+        'options': set(args.options) if args.options else set(),
+        'config': {},
+        'base_style': args.base_style,
+        'icons_dir': style_id + '.icons',
+        'global_data': None,
+        'mode': args.mode,
+        'args': args
+    })
+
+    if args.config:
+        for v in args.config:
+            v = v.split("=")
+            stat['config'][v[0]] = v[1]
+
+    conn = pgmapcss.db.connect(args, stat)
+
+    stat['database'] = conn.database
 
     if args.database_update == 're-init':
         print('* Re-initializing database')
@@ -99,12 +128,12 @@ def main():
     if args.eval_tests:
         pgmapcss.eval.functions().test_all()
 
-    stat = {
-        'id': style_id,
-        'options': set(args.options) if args.options else set(),
-        'mode': args.mode,
-        'args': args
-    }
+    try:
+        os.mkdir(stat['icons_dir'])
+    except OSError:
+        pass
+
+    eval_functions = pgmapcss.eval.functions(stat).list()
 
     content = open(file_name).read()
 
@@ -122,7 +151,7 @@ def main():
         content = mapcss.firstChild.nodeValue
 
     try:
-        pgmapcss.parser.parse_file(stat, filename=file_name, content=content, base_style=args.base_style)
+        pgmapcss.parser.parse_file(stat, filename=file_name, content=content, base_style=args.base_style, defaults=args.defaults)
     except pgmapcss.parser.ParseError as e:
         print(e)
         sys.exit(1)
@@ -136,6 +165,7 @@ def main():
 
     pgmapcss.mapnik.init(stat)
     pgmapcss.icons.init(stat)
+    pgmapcss.symbols.init(stat)
 
     try:
         style = pgmapcss.compiler.compile_style(stat)
@@ -154,6 +184,7 @@ def main():
         open('pgmapcss_' + style_id + '.py', 'w').write(style['function_match'])
 
     pgmapcss.icons.process_icons(style_id, args, stat, conn)
+    pgmapcss.symbols.process_symbols(style_id, args, stat, conn)
 
     debug.close()
 

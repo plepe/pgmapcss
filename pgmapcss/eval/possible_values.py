@@ -24,7 +24,10 @@ def possible_values(value, prop, stat):
         elif value[0:2] == 'f:':
             func = value[2:]
             if not func in eval_functions:
-                raise Exception('Unknown eval function: ' + func)
+                if func in pgmapcss.eval.functions().aliases:
+                    func = pgmapcss.eval.functions().aliases[func]
+                else:
+                    raise Exception('Unknown eval function: ' + func)
             r, mutable = eval_functions[func].possible_values([], prop, stat)
             if type(r) == set:
                 return ( r, mutable )
@@ -36,7 +39,7 @@ def possible_values(value, prop, stat):
     if len(value) == 0:
         return {}
 
-    if not value[0][0:2] in ('f:', 'o:'):
+    if not value[0][0:2] in ('f:', 'o:', 'u:'):
         return possible_values(value[0], prop, stat)
 
     param = [ possible_values(i, prop, stat) for i in value[1:] ]
@@ -44,13 +47,19 @@ def possible_values(value, prop, stat):
     param = [p[0] for p in param ]
 
     if value[0][0:2] == 'o:':
-        func = [ k for k, v in eval_functions.items() if value[0][2:] in v.op ][0]
+        func = [ k for k, v in eval_functions.items() if value[0][2:] in v.op and not v.unary ][0]
+
+    if value[0][0:2] == 'u:':
+        func = [ k for k, v in eval_functions.items() if value[0][2:] in v.op and v.unary ][0]
 
     elif value[0][0:2] == 'f:':
         func = value[0][2:]
 
     if not func in eval_functions:
-        raise Exception('Unknown eval function: ' + func)
+        if func in pgmapcss.eval.functions().aliases:
+            func = pgmapcss.eval.functions().aliases[func]
+        else:
+            raise Exception('Unknown eval function: ' + func)
 
     # make sure all elements are sets
     param = [ {p} if type(p) == str else p for p in param ]
@@ -62,10 +71,16 @@ def possible_values(value, prop, stat):
 
     # if not, calculate possible values for all combinations of input parameters
     except AttributeError:
+        combinations = pgmapcss.combinations(param)
+
+        if len(combinations) > 256:
+            print('eval::possible_values: found {} possible combinations for "{}" using function {}() -> stopping getting possible values'.format(len(combinations), prop.get('key', 'unknown'), func))
+            return ({ True }, mutable)
+
         # finally calculate possible results
         result = [
             eval_functions[func].possible_values(p, prop, stat)
-            for p in pgmapcss.combinations(param)
+            for p in combinations
         ]
         if(len(result)):
             mutable = min(mutable, min([ r[1] for r in result ]))

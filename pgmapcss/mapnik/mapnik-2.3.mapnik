@@ -1,0 +1,248 @@
+<?xml version="1.0"?>
+<!DOCTYPE Map>
+<Map srs="+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +no_defs +over" background-color="{canvas|fill-color}" background-image="{canvas|fill-image}" buffer-size="{canvas|buffer}">
+  <!-- DejaVu Sans -->
+  <FontSet name="DejaVu Sans - normal - normal">
+    <Font face-name="DejaVu Sans Book" />
+    <Font face-name="unifont Medium" />
+  </FontSet>
+  <FontSet name="DejaVu Sans - bold - normal">
+    <Font face-name="DejaVu Sans Bold" />
+    <Font face-name="unifont Medium" />
+  </FontSet>
+  <FontSet name="DejaVu Sans - normal - italic">
+    <Font face-name="DejaVu Sans Oblique" />
+    <Font face-name="unifont Medium" />
+  </FontSet>
+  <FontSet name="DejaVu Sans - bold - italic">
+    <Font face-name="DejaVu Sans Bold Oblique" />
+    <Font face-name="unifont Medium" />
+  </FontSet>
+
+  <!-- DejaVu Sans Condensed -->
+  <FontSet name="DejaVu Sans Condensed - normal - normal">
+    <Font face-name="DejaVu Sans Condensed" />
+    <Font face-name="unifont Medium" />
+  </FontSet>
+  <FontSet name="DejaVu Sans Condensed - bold - normal">
+    <Font face-name="DejaVu Sans Condensed Bold" />
+    <Font face-name="unifont Medium" />
+  </FontSet>
+  <FontSet name="DejaVu Sans Condensed - normal - italic">
+    <Font face-name="DejaVu Sans Condensed Oblique" />
+    <Font face-name="unifont Medium" />
+  </FontSet>
+  <FontSet name="DejaVu Sans Condensed - bold - italic">
+    <Font face-name="DejaVu Sans Condensed Bold Oblique" />
+    <Font face-name="unifont Medium" />
+  </FontSet>
+
+  <!-- DejaVu Sans Mono -->
+  <FontSet name="DejaVu Sans Mono - normal - normal">
+    <Font face-name="DejaVu Sans Mono Book" />
+    <Font face-name="unifont Medium" />
+  </FontSet>
+  <FontSet name="DejaVu Sans Mono - bold - normal">
+    <Font face-name="DejaVu Sans Mono Bold" />
+    <Font face-name="unifont Medium" />
+  </FontSet>
+  <FontSet name="DejaVu Sans Mono - normal - italic">
+    <Font face-name="DejaVu Sans Mono Oblique" />
+    <Font face-name="unifont Medium" />
+  </FontSet>
+  <FontSet name="DejaVu Sans Mono - bold - italic">
+    <Font face-name="DejaVu Sans Mono Bold Oblique" />
+    <Font face-name="unifont Medium" />
+  </FontSet>
+
+  <!-- DejaVu Serif -->
+  <FontSet name="DejaVu Serif - normal - normal">
+    <Font face-name="DejaVu Serif Book" />
+    <Font face-name="unifont Medium" />
+  </FontSet>
+  <FontSet name="DejaVu Serif - bold - normal">
+    <Font face-name="DejaVu Serif Bold" />
+    <Font face-name="unifont Medium" />
+  </FontSet>
+  <FontSet name="DejaVu Serif - normal - italic">
+    <Font face-name="DejaVu Serif Italic" />
+    <Font face-name="unifont Medium" />
+  </FontSet>
+  <FontSet name="DejaVu Serif - bold - italic">
+    <Font face-name="DejaVu Serif Bold Italic" />
+    <Font face-name="unifont Medium" />
+  </FontSet>
+
+  <!-- DejaVu Serif Condensed -->
+  <FontSet name="DejaVu Serif Condensed - normal - normal">
+    <Font face-name="DejaVu Serif Condensed" />
+    <Font face-name="unifont Medium" />
+  </FontSet>
+  <FontSet name="DejaVu Serif Condensed - bold - normal">
+    <Font face-name="DejaVu Serif Condensed Bold" />
+    <Font face-name="unifont Medium" />
+  </FontSet>
+  <FontSet name="DejaVu Serif Condensed - normal - italic">
+    <Font face-name="DejaVu Serif Condensed Italic" />
+    <Font face-name="unifont Medium" />
+  </FontSet>
+  <FontSet name="DejaVu Serif Condensed - bold - italic">
+    <Font face-name="DejaVu Serif Condensed Bold Italic" />
+    <Font face-name="unifont Medium" />
+  </FontSet>
+
+  <Style name="pgmapcss">
+<!-- POLYGONS -->
+
+# FOR fill-color fill-opacity
+    <Rule>
+      <Filter>[style-element] = 'fill' and '{fill-color} {fill-opacity}' = [fill-color fill-opacity]</Filter>
+      <PolygonSymbolizer fill="{fill-color}" fill-opacity="{fill-opacity}" />
+    </Rule>
+# END
+
+<!-- POLYGON PATTERN -->
+# IF fill-image
+    <Rule>
+      <Filter>[style-element] = 'fill' and [fill-image]</Filter>
+      <PolygonPatternSymbolizer file="[fill-image]" />
+    </Rule>
+# END
+
+<!-- CASING LINES -->
+# FOR casing-color final-casing-width casing-offset casing-opacity casing-linejoin casing-linecap casing-dashes casing-dashes-background-color casing-dashes-background-opacity casing-miterlimit
+    <Rule>
+        <Filter>[style-element] = 'casing' and '{casing-color} {final-casing-width} {casing-offset} {casing-opacity} {casing-linejoin} {casing-linecap} {casing-dashes} {casing-dashes-background-color} {casing-dashes-background-opacity} {casing-miterlimit}' = [casing-color final-casing-width casing-offset casing-opacity casing-linejoin casing-linecap casing-dashes casing-dashes-background-color casing-dashes-background-opacity casing-miterlimit]</Filter>
+      <LineSymbolizer stroke="{casing-dashes-background-color}" stroke-width="{final-casing-width}" offset="{casing-offset}" stroke-opacity="{casing-dashes-background-opacity}" stroke-linejoin="{casing-linejoin}" stroke-linecap="{casing-linecap}" stroke-miterlimit="{casing-miterlimit}" />
+      <LineSymbolizer stroke="{casing-color}" stroke-width="{final-casing-width}" offset="{casing-offset}" stroke-opacity="{casing-opacity}" stroke-linejoin="{casing-linejoin}" stroke-linecap="{casing-linecap}" stroke-miterlimit="{casing-miterlimit}" />
+    </Rule>
+# END
+
+# FOR left-casing-color left-casing-width final-left-casing-offset left-casing-opacity left-casing-linejoin left-casing-linecap left-casing-dashes left-casing-dashes-background-color left-casing-dashes-background-opacity left-casing-miterlimit
+    <Rule>
+        <Filter>[style-element] = 'side-casing' and '{left-casing-color} {left-casing-width} {final-left-casing-offset} {left-casing-opacity} {left-casing-linejoin} {left-casing-linecap} {left-casing-dashes} {left-casing-dashes-background-color} {left-casing-dashes-background-opacity} {left-casing-miterlimit}' = [left-casing-color left-casing-width final-left-casing-offset left-casing-opacity left-casing-linejoin left-casing-linecap left-casing-dashes left-casing-dashes-background-color left-casing-dashes-background-opacity left-casing-miterlimit]</Filter>
+      <LineSymbolizer stroke="{left-casing-dashes-background-color}" stroke-width="{left-casing-width}" offset="{final-left-casing-offset}" stroke-opacity="{left-casing-dashes-background-opacity}" stroke-linejoin="{left-casing-linejoin}" stroke-linecap="{left-casing-linecap}" stroke-miterlimit="{left-casing-miterlimit}" />
+      <LineSymbolizer stroke="{left-casing-color}" stroke-width="{left-casing-width}" offset="{final-left-casing-offset}" stroke-opacity="{left-casing-opacity}" stroke-linejoin="{left-casing-linejoin}" stroke-linecap="{left-casing-linecap}" stroke-miterlimit="{left-casing-miterlimit}" />
+    </Rule>
+# END
+
+# FOR right-casing-color right-casing-width final-right-casing-offset right-casing-opacity right-casing-linejoin right-casing-linecap right-casing-dashes right-casing-dashes-background-color right-casing-dashes-background-opacity right-casing-miterlimit
+    <Rule>
+        <Filter>[style-element] = 'side-casing' and '{right-casing-color} {right-casing-width} {final-right-casing-offset} {right-casing-opacity} {right-casing-linejoin} {right-casing-linecap} {right-casing-dashes} {right-casing-dashes-background-color} {right-casing-dashes-background-opacity} {right-casing-miterlimit}' = [right-casing-color right-casing-width final-right-casing-offset right-casing-opacity right-casing-linejoin right-casing-linecap right-casing-dashes right-casing-dashes-background-color right-casing-dashes-background-opacity right-casing-miterlimit]</Filter>
+      <LineSymbolizer stroke="{right-casing-dashes-background-color}" stroke-width="{right-casing-width}" offset="{final-right-casing-offset}" stroke-opacity="{right-casing-dashes-background-opacity}" stroke-linejoin="{right-casing-linejoin}" stroke-linecap="{right-casing-linecap}" stroke-miterlimit="{right-casing-miterlimit}" />
+      <LineSymbolizer stroke="{right-casing-color}" stroke-width="{right-casing-width}" offset="{final-right-casing-offset}" stroke-opacity="{right-casing-opacity}" stroke-linejoin="{right-casing-linejoin}" stroke-linecap="{right-casing-linecap}" stroke-miterlimit="{right-casing-miterlimit}" />
+    </Rule>
+# END
+
+<!-- LINES -->
+# FOR color width offset opacity linejoin linecap dashes dashes-background-color dashes-background-opacity miterlimit
+    <Rule>
+        <Filter>[style-element] = 'line' and '{color} {width} {offset} {opacity} {linejoin} {linecap} {dashes} {dashes-background-color} {dashes-background-opacity} {miterlimit}' = [color width offset opacity linejoin linecap dashes dashes-background-color dashes-background-opacity miterlimit]</Filter>
+      <LineSymbolizer stroke="{dashes-background-color}" stroke-width="{width}" offset="{offset}" stroke-opacity="{dashes-background-opacity}" stroke-linejoin="{linejoin}" stroke-linecap="{linecap}" stroke-miterlimit="{miterlimit}" />
+      <LineSymbolizer stroke="{color}" stroke-width="{width}" offset="{offset}" stroke-opacity="{opacity}" stroke-linejoin="{linejoin}" stroke-linecap="{linecap}" stroke-dasharray="{dashes}" stroke-miterlimit="{miterlimit}" />
+    </Rule>
+# END
+
+<!-- LINE PATTERN -->
+# IF image
+    <Rule>
+      <Filter>[style-element] = 'line' and [image]</Filter>
+      <LinePatternSymbolizer file="[image]" />
+    </Rule>
+# END
+
+# IF repeat-image
+# FOR final-repeat-image-offset
+    <Rule>
+      <Filter>[style-element] = 'line' and [repeat-image] and '{final-repeat-image-offset}' = [final-repeat-image-offset]</Filter>
+      <LinePatternSymbolizer file="[repeat-image]" offset="{final-repeat-image-offset}" />
+    </Rule>
+# END
+# END
+
+<!-- POINTS -->
+# IF symbol-shape
+# FOR symbol-rotation symbol-allow-overlap symbol-ignore-placement
+    <Rule>
+      <Filter>[style-element] = 'point' and [final-symbol-image] and '{symbol-rotation} {symbol-allow-overlap} {symbol-ignore-placement}' = [symbol-rotation symbol-allow-overlap symbol-ignore-placement]</Filter>
+      <PointSymbolizer file="[final-symbol-image]" transform="rotate({symbol-rotation})" allow-overlap="{symbol-allow-overlap}" ignore-placement="{symbol-ignore-placement}" />
+    </Rule>
+# END
+# END
+
+# IF icon-image
+# FOR icon-opacity icon-rotation icon-allow-overlap icon-ignore-placement
+    <Rule>
+      <Filter>[style-element] = 'point' and [final-icon-image] and '{icon-opacity} {icon-rotation} {icon-allow-overlap} {icon-ignore-placement}' = [icon-opacity icon-rotation icon-allow-overlap icon-ignore-placement]</Filter>
+      <PointSymbolizer file="[final-icon-image]" opacity="{icon-opacity}" transform="rotate({icon-rotation})" allow-overlap="{icon-allow-overlap}" ignore-placement="{icon-ignore-placement}" />
+    </Rule>
+# END
+# END
+
+<!-- TEXTS on Points -->
+# IF text
+# FOR font-family font-weight font-style text-color text-halo-color text-offset max-width text-anchor-horizontal text-allow-overlap
+    <Rule>
+        <Filter>[text] and [style-element] = 'point-text' and [text-position] = 'center' and '{font-family} {font-weight} {font-style} {text-color} {text-halo-color} {text-offset} {max-width} {text-anchor-horizontal} {text-allow-overlap}' = [font-family font-weight font-style text-color text-halo-color text-offset max-width text-anchor-horizontal text-allow-overlap]</Filter>
+      <TextSymbolizer placement="interior" fontset-name="{font-family} - {font-weight} - {font-style}" fill="{text-color}" halo-fill="{text-halo-color}" dy="{text-offset}" wrap-width="{max-width}" avoid-edges="false" horizontal-alignment="{text-anchor-horizontal}" allow-overlap="{text-allow-overlap}"><ExpressionFormat size="[font-size]" halo-radius="[text-halo-radius]" character-spacing="[character-spacing]" opacity="[text-opacity]" wrap-character="[wrap-character]">[text]</ExpressionFormat></TextSymbolizer>
+    </Rule>
+# END
+
+<!-- TEXTS on Lines -->
+# FOR font-family font-weight font-style text-color text-halo-color text-offset max-width text-spacing text-allow-overlap
+    <Rule>
+        <Filter>[text] and [style-element] = 'line-text' and [text-position] = 'line' and '{font-family} {font-weight} {font-style} {text-color} {text-halo-color} {text-offset} {max-width} {text-spacing} {text-allow-overlap}' = [font-family font-weight font-style text-color text-halo-color text-offset max-width text-spacing text-allow-overlap]</Filter>
+      <TextSymbolizer placement="line" fontset-name="{font-family} - {font-weight} - {font-style}" fill="{text-color}" halo-fill="{text-halo-color}" dy="{text-offset}" wrap-width="{max-width}" spacing="{text-spacing}" allow-overlap="{text-allow-overlap}"><ExpressionFormat size="[font-size]" halo-radius="[text-halo-radius]" character-spacing="[character-spacing]" opacity="[text-opacity]" wrap-character="[wrap-character]">[text]</ExpressionFormat></TextSymbolizer>
+    </Rule>
+# END
+# END
+
+  <!-- SHIELDS -->
+# IF shield-text
+# FOR shield-font-family shield-font-weight shield-font-style shield-font-size shield-text-color shield-text-halo-color shield-spacing shield-opacity shield-placement shield-text-halo-radius
+    <Rule>
+        <Filter>[shield-text] and [style-element] = 'shield' and '{shield-font-family} {shield-font-weight} {shield-font-style} {shield-font-size} {shield-text-color} {shield-text-halo-color} {shield-spacing} {shield-opacity} {shield-placement} {shield-text-halo-radius}' = [shield-font-family shield-font-weight shield-font-style shield-font-size shield-text-color shield-text-halo-color shield-spacing shield-opacity shield-placement shield-text-halo-radius]</Filter>
+      <ShieldSymbolizer placement="{shield-placement}" fontset-name="{shield-font-family} - {shield-font-weight} - {shield-font-style}" fill="{shield-text-color}" halo-fill="{shield-text-halo-color}" spacing="{shield-spacing}" size="{shield-font-size}" halo-radius="{shield-text-halo-radius}" opacity="{shield-opacity}" file="[shield-image]">[shield-text]</ShieldSymbolizer>
+    </Rule>
+# END
+# END
+</Style>
+
+  <Layer name="layer" status="on" srs="+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +no_defs +over">
+    <Datasource>
+      <Parameter name="type">postgis</Parameter>
+      <Parameter name="dbname">{database}</Parameter>
+      <Parameter name="user">{user}</Parameter>
+      <Parameter name="password">{password}</Parameter>
+      <Parameter name="host">{host}</Parameter>
+      <Parameter name="estimate_extent">false</Parameter>
+      <Parameter name="extent">-20037508,-19929239,20037508,19929239</Parameter>
+      <Parameter name="geometry_field">_geo</Parameter>
+      <Parameter name="srid">900913</Parameter>
+      <Parameter name="cache-features">on</Parameter>
+      <Parameter name="table">
+(select * from
+    (select
+      *,
+      unnest(style_elements) as "style-element",
+      unnest(style_elements_index) as style_element_index,
+      unnest(style_elements_layer) as style_element_layer,
+      unnest(style_elements_z_index) as style_element_z_index
+    from
+        (select
+            {columns},
+            style_elements, style_elements_index, style_elements_layer, style_elements_z_index,
+            geo as _geo
+        from pgmapcss_{style_id}(
+            !bbox!,
+            !scale_denominator!,
+            Array['fill', 'casing', 'side-casing', 'line', 'point', 'point-text', 'line-text', 'shield']
+        ) offset 0) t
+    ) t
+    order by "style_element_layer" asc, style_element_index asc, style_element_z_index asc
+) t
+      </Parameter>
+    </Datasource>
+    <StyleName>pgmapcss</StyleName>
+  </Layer>
+</Map>

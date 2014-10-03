@@ -1,0 +1,24 @@
+@config josm_classes true;
+@default_value font-size 8;
+@default_value text-color #ffffff;
+@default_value text-halo-color #000000;
+@default_value fill-opacity 0.3;
+@default_value linecap round;
+@default_value icon-allow-overlap true;
+@default_value icon-ignore-placement true;
+@default_value symbol-allow-overlap true;
+@default_value symbol-ignore-placement true;
+@default_value text-allow-overlap true;
+@config angular_system radians;
+
+@default_value linecap ;
+@postprocess linecap eval(any(prop('linecap'), cond(search(list('', 'none'), prop('dashes')) == '', 'butt', 'round')));
+@default_other casing-linecap ;
+@default_value casing-linecap ;
+@postprocess casing-linecap eval(any(prop('casing-linecap'), cond(search(list('', 'none'), prop('casing-dashes')) == '', 'butt', 'round')));
+@default_other left-casing-linecap ;
+@default_value left-casing-linecap ;
+@postprocess left-casing-linecap eval(any(prop('left-casing-linecap'), cond(search(list('', 'none'), prop('left-casing-dashes')) == '', 'butt', 'round')));
+@default_other right-casing-linecap ;
+@default_value right-casing-linecap ;
+@postprocess right-casing-linecap eval(any(prop('right-casing-linecap'), cond(search(list('', 'none'), prop('right-casing-dashes')) == '', 'butt', 'round')));

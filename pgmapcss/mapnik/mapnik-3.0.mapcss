@@ -5,12 +5,17 @@
 @type icon-image icon;
 @type color color;
 @type casing-color color;
+@type dashes-background-color color;
+@type casing-dashes-background-color color;
 @type icon-color color;
 @type fill-color color;
+@type fill-image image;
 @type text-color color;
 @type text-halo-color color;
 @type shield-text-color color;
 @type shield-text-halo-color color;
+@type symbol-stroke-color color;
+@type symbol-fill-color color;
 @type width pixels;
 @type offset pixels;
 @type casing-width pixels;
@@ -20,6 +25,21 @@
 @type shield-font-size numeric;
 @type dashes dashes;
 @type casing-dashes dashes;
+@type icon-rotation angle;
+@type symbol-rotation angle;
+@type image image;
+@type repeat-image image;
+@type repeat-image-offset pixels;
+@type left-casing-width pixels;
+@type left-casing-offset pixels;
+@type left-casing-color color;
+@type left-casing-dashes dashes;
+@type left-casing-dashes-background-color color;
+@type right-casing-width pixels;
+@type right-casing-offset pixels;
+@type right-casing-color color;
+@type right-casing-dashes dashes;
+@type right-casing-dashes-background-color color;
 
 // The follwing properties default to the final value of another property
 @default_other casing-offset offset;
@@ -30,6 +50,22 @@
 @default_other shield-font-style font-style;
 @default_other shield-font-size font-size;
 @default_other shield-text-transform text-transform;
+@default_other dashes-background-opacity opacity;
+@default_other casing-dashes-background-opacity casing-opacity;
+@default_other repeat-image-offset offset;
+@default_other left-casing-opacity casing-opacity;
+@default_other left-casing-offset casing-offset;
+@default_other left-casing-linecap casing-linecap;
+@default_other left-casing-linejoin casing-linejoin;
+@default_other left-casing-dashes-background-opacity left-casing-opacity;
+@default_other right-casing-opacity casing-opacity;
+@default_other right-casing-offset casing-offset;
+@default_other right-casing-linecap casing-linecap;
+@default_other right-casing-linejoin casing-linejoin;
+@default_other right-casing-dashes-background-opacity right-casing-opacity;
+@default_other casing-miterlimit miterlimit;
+@default_other left-casing-miterlimit casing-miterlimit;
+@default_other right-casing-miterlimit casing-miterlimit;
 
 // @values: Possible values of properties; the first value is the default value
 // linecap actually has 'none' as default value. the following statement automatically replaces 'none' by 'butt'
@@ -44,6 +80,13 @@
 @values text-transform "none;uppercase;lowercase;capitalize";
 @values shield-text-transform "none;uppercase;lowercase;capitalize";
 @values icon-width "24;18;12";
+@values text-anchor-vertical "below;above";
+@values text-anchor-horizontal "middle;left;right";
+@values repeat-image-align "center;top;bottom";
+@values left-casing-linecap "butt;round;square";
+@values left-casing-linejoin "round;miter;bevel";
+@values right-casing-linecap "butt;round;square";
+@values right-casing-linejoin "round;miter;bevel";
 
 // @postprocess: To calculate final value of property X call
 // eval-function as specified.
@@ -51,26 +94,44 @@
 @postprocess shield-text eval(text_transform(prop("shield-text"), prop("shield-text-transform")));
 @postprocess final-casing-width eval(prop("width") + prop("casing-width") * 2);
 @postprocess final-icon-image eval(cond(
-  prop('icon-image') && substr(prop('icon-image'), 0, 5) == 'icon:',
-    style_id() . '.icons/' . substr(prop('icon-image'), 5) . '-' . prop('icon-color') . '-' . prop('icon-width'). '.svg',
+  prop('icon-image') && substring(prop('icon-image'), 0, 5) == 'icon:',
+    style_id() . '.icons/' . substring(prop('icon-image'), 5) . '-' . prop('icon-color') . '-' . prop('icon-width'). '.svg',
     prop('icon-image')
   ));
+@postprocess final-symbol-image eval(
+style_id() . '.icons/symbol-' . prop('symbol-shape') .'-'. prop('symbol-size') .'-'. prop('symbol-stroke-width') .'-'. prop('symbol-stroke-color') .'-'. prop('symbol-stroke-opacity') .'-'. prop('symbol-fill-color') .'-'. prop('symbol-fill-opacity') .'.svg');
+@postprocess text-offset eval(_text_offset(prop('text-offset'), prop('text-anchor-vertical'), prop('icon-image'), prop('icon-width'), prop('symbol-shape'), prop('symbol-size'), prop('symbol-stroke-width')));
+@postprocess final-repeat-image-offset eval(
+    prop('repeat-image-offset') +
+    switch(prop('repeat-image-align'),
+        'center', 0,
+        'top', -_global_data('repeat-image', prop('repeat-image'), 1) / 2,
+        'bottom', _global_data('repeat-image', prop('repeat-image'), 1) / 2
+    )
+);
+@postprocess final-left-casing-offset eval(prop('left-casing-offset') + prop('width') / 2 + prop('left-casing-width') / 2);
+@postprocess final-right-casing-offset eval(prop('right-casing-offset') - prop('width') / 2 - prop('right-casing-width') / 2);
 
 // @depend_property: don't check values for e.g. 'text-position' if no 'text' is set
-@depend_property text "text-color;text-halo-color;text-opacity;text-halo-radius;text-offset;max-width;text-position;text-transform;font-family;font-weight;font-style;font-size;character-spacing;wrap-character;text-position;text-spacing;text-transform";
-@depend_property width "offset;color;opacity;linejoin;linecap;dashes";
+@depend_property width "offset;color;opacity;linejoin;linecap;dashes;dashes-background-color;dashes-background-opacity;miterlimit";
 @depend_property image "";
-@depend_property casing-width "casing-offset;casing-color;casing-opacity;casing-linejoin;casing-linecap;casing-dashes;final-casing-width";
+@depend_property repeat-image "repeat-image-offset;repeat-image-align;final-repeat-image-offset";
+@depend_property casing-width "casing-offset;casing-color;casing-opacity;casing-linejoin;casing-linecap;casing-dashes;final-casing-width;casing-dashes-background-color;casing-dashes-background-opacity;casing-miterlimit";
+@depend_property left-casing-width "left-casing-offset;left-casing-color;left-casing-opacity;left-casing-linejoin;left-casing-linecap;left-casing-dashes;left-casing-dashes-background-color;left-casing-dashes-background-opacity;final-left-casing-offset;left-casing-miterlimit";
+@depend_property right-casing-width "right-casing-offset;right-casing-color;right-casing-opacity;right-casing-linejoin;right-casing-linecap;right-casing-dashes;right-casing-dashes-background-color;right-casing-dashes-background-opacity;final-right-casing-offset;right-casing-miterlimit";
 @depend_property shield-text "shield-spacing;shield-image;shield-opacity;shield-placement;shield-text-color;shield-text-halo-color;shield-text-opacity;shield-text-halo-radius;shield-font-family;shield-font-weight;shield-font-style;shield-font-size;shield-text-transform";
-@depend_property icon-image "final-icon-image;icon-opacity;icon-color;icon-width";
+@depend_property symbol-shape "final-symbol-image;symbol-shape;symbol-size;symbol-stroke-width;symbol-stroke-color;symbol-stroke-opacity;symbol-fill-color;symbol-fill-opacity;symbol-rotation";
+@depend_property icon-image "final-icon-image;icon-opacity;icon-color;icon-width;icon-rotation";
+@depend_property text "text-color;text-halo-color;text-opacity;text-halo-radius;text-offset;max-width;text-position;text-transform;font-family;font-weight;font-style;font-size;character-spacing;text-position;text-spacing;text-transform;text-anchor-vertical;text-anchor-horizontal"; // after icon-image and symbol-shape, so that defaults are already set (for text-offset)
 @depend_property fill-color "fill-opacity";
 @depend_property fill-image "fill-opacity";
 
 // @style_element_property
 @style_element_property fill "fill-color;fill-image";
 @style_element_property casing casing-width;
-@style_element_property line "width;image";
-@style_element_property point icon-image;
+@style_element_property side-casing "left-casing-width;right-casing-width";
+@style_element_property line "width;image;repeat-image";
+@style_element_property point "icon-image;symbol-shape";
 @style_element_property point-text text;
 @style_element_property line-text text;
 @style_element_property shield shield-text;
@@ -81,17 +142,32 @@
 @default_value icon-opacity 1;
 @default_value icon-color #444444;
 @default_value icon-width 24;
+@default_value icon-rotation 0;
+@default_value icon-allow-overlap false;
+@default_value icon-ignore-placement false;
 @default_value final-icon-image ; // used internally to add width and casing-width
+@default_value symbol-size 10;
+@default_value symbol-stroke-width 1;
+@default_value symbol-stroke-color #ffc800;
+@default_value symbol-stroke-opacity 1;
+@default_value symbol-fill-color #0000ff;
+@default_value symbol-fill-opacity 1;
+@default_value symbol-rotation 0;
+@default_value symbol-allow-overlap false;
+@default_value symbol-ignore-placement false;
+
 // PolygonSymbolizer
 @default_value fill-opacity 1;
 // PolygonPatternSymbolizer
 // LineSymbolizer
 @default_value offset 0;
-@default_value color ;
+@default_value color #ffffff;
 @default_value opacity 1;
 @default_value linejoin round;
 @default_value linecap butt;
 @default_value dashes none;
+@default_value dashes-background-color #00000000;
+@default_value miterlimit 4;
 // Casing LineSymbolizer
 @default_value casing-offset ;
 @default_value casing-color ;
@@ -99,7 +175,15 @@
 @default_value casing-linejoin ;
 @default_value casing-linecap ;
 @default_value casing-dashes none;
+@default_value casing-dashes-background-color #00000000;
 @default_value final-casing-width ; // used internally to add width and casing-width
+@default_value repeat-image-align "center";
+@default_value left-casing-opacity 1;
+@default_value left-casing-dashes none;
+@default_value left-casing-dashes-background-color #00000000;
+@default_value right-casing-opacity 1;
+@default_value right-casing-dashes none;
+@default_value right-casing-dashes-background-color #00000000;
 // LinePatternSymbolizer
 // TextSymbolizer
 @default_value font-family "DejaVu Sans";
@@ -110,11 +194,13 @@
 @default_value text-halo-color #ffffff;
 @default_value text-opacity 1;
 @default_value text-halo-radius 0;
-@default_value text-offset 0;
+@default_value text-offset ;
+@default_value text-anchor-vertical below;
+@default_value text-anchor-horizontal middle;
 @default_value max-width 0;
+@default_value text-allow-overlap false;
 // not in MapCSS 0.2 standard
 @default_value character-spacing 0;
-@default_value wrap-character " ";
 @default_value text-position center;
 @default_value text-spacing 0;
 @default_value text-transform none;
@@ -143,6 +229,7 @@
 }
 line::(*) {
   shield-placement: line;
+  text-position: line;
 }
 canvas {
   fill-color: #00000000;

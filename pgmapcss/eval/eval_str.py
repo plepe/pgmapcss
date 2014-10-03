@@ -5,4 +5,8 @@ def eval_str(param):
     if len(param) == 0:
         return ''
 
-    return param[1]
+    return param[0]
+
+# TESTS
+# IN ['foo']
+# OUT 'foo'

@@ -73,29 +73,17 @@ def compile_condition(condition, stat, var="current['tags']"):
     elif condition['op'] == '=~':
         flags = ''
 
-        m = re.match('/(.*)/$', condition['value'])
-        if m:
-            condition['value'] = m.group(1)
-
-        m = re.match('/(.*)/i$', condition['value'])
-        if m:
-            condition['value'] = m.group(1)
+        if 'i' in condition['regexp_flags']:
             flags = ', re.IGNORECASE'
 
         ret.append(key + ' in ' + var)
-        ret.append('re.search(' + repr('(' + condition['value'] + ')') + ', ' + var + '[' + key + ']' + flags + '))')
+        ret.append('re.search(' + repr('(' + condition['value'] + ')') + ', ' + var + '[' + key + ']' + flags + ')')
 
     # !~
     elif condition['op'] == '!~':
         flags = ''
 
-        m = re.match('/(.*)/$', condition['value'])
-        if m:
-            condition['value'] = m.group(1)
-
-        m = re.match('/(.*)/i$', condition['value'])
-        if m:
-            condition['value'] = m.group(1)
+        if 'i' in condition['regexp_flags']:
             flags = ', re.IGNORECASE'
 
         ret.append('(not ' + key + ' in ' + var + ' or not re.search(' + repr('(' + condition['value'] + ')') + ', ' + var + '[' + key + ']' + flags + '))')

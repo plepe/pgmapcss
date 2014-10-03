@@ -2,7 +2,7 @@ Installation on a plain Ubuntu 14.04 Server:
 
 Install additional packages:
 ```sh
-sudo apt-get install git postgresql postgresql-contrib postgresql-9.3-postgis-2.1 python3-setuptools python3-dev python-mapnik osm2pgsql postgresql-plpython3 python3-postgresql ttf-unifont
+sudo apt-get install git postgresql postgresql-contrib postgresql-9.3-postgis-2.1 python3-setuptools python3-dev python-mapnik osm2pgsql postgresql-plpython3 python3-postgresql ttf-unifont python3-wand
 ```
 
 More dependencies:

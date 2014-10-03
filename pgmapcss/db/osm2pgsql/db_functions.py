@@ -36,6 +36,7 @@ where {bbox} ( {w} )
 
         for r in res:
             r['tags'] = pghstore.loads(r['tags'])
+            r['tags']['osm:id'] = str(r['id'])
             yield(r)
 
     # planet_osm_line - ways
@@ -58,6 +59,7 @@ where osm_id>0 and {bbox} ( {w} )
 
         for r in res:
             r['tags'] = pghstore.loads(r['tags'])
+            r['tags']['osm:id'] = str(r['id'])
             yield(r)
 
     # planet_osm_line - relations
@@ -80,6 +82,7 @@ where osm_id<0 and {bbox} ( {w} )
 
         for r in res:
             r['tags'] = pghstore.loads(r['tags'])
+            r['tags']['osm:id'] = str(r['id'])
             yield(r)
 
     # planet_osm_polygon - ways
@@ -102,6 +105,7 @@ where osm_id>0 and {bbox} ( {w} )
 
         for r in res:
             r['tags'] = pghstore.loads(r['tags'])
+            r['tags']['osm:id'] = str(r['id'])
             yield(r)
 
     # planet_osm_polygon - relations
@@ -124,6 +128,7 @@ where osm_id<0 and {bbox} ( {w} )
 
         for r in res:
             r['tags'] = pghstore.loads(r['tags'])
+            r['tags']['osm:id'] = str(r['id'])
             yield(r)
 
 def objects_by_id(id_list):
@@ -131,19 +136,21 @@ def objects_by_id(id_list):
     plan = plpy.prepare('select * from planet_osm_point where osm_id=any($1)', ['bigint[]']);
     res = plpy.execute(plan, [_id_list])
     for r in res:
-        yield {
+        t = {
             'id': 'n' + str(r['osm_id']),
             'members': [],
             'tags': pghstore.loads(r['tags']),
             'geo': r['way'],
             'types': ['node', 'point']
         }
+        t['tags']['osm:id'] = t['id']
+        yield t
 
     _id_list = [ int(i[1:]) for i in id_list if i[0] == 'w' ]
     plan = plpy.prepare("select t.*, planet_osm_ways.nodes from (select osm_id, tags, way, 'line' as _type from planet_osm_line where osm_id=any($1) union select osm_id, tags, way, 'way' as _type from planet_osm_polygon where osm_id=any($1)) t left join planet_osm_ways on t.osm_id=planet_osm_ways.id", ['bigint[]']);
     res = plpy.execute(plan, [_id_list])
     for r in res:
-        yield {
+        t = {
             'id': 'w' + str(r['osm_id']),
             'members': [ {
                     'member_id': 'n' + str(m),
@@ -155,18 +162,22 @@ def objects_by_id(id_list):
             'geo': r['way'],
             'types': ['way', r['_type']]
         }
+        t['tags']['osm:id'] = t['id']
+        yield t
 
     _id_list = [ int(i[1:]) for i in id_list if i[0] == 'r' ]
     plan = plpy.prepare("select id, planet_osm_rels.tags, members, planet_osm_polygon.way from planet_osm_rels left join planet_osm_polygon on -planet_osm_rels.id=planet_osm_polygon.osm_id where id=any($1)", ['bigint[]'])
     res = plpy.execute(plan, [_id_list])
     for r in res:
-        yield {
+        t = {
             'id': 'r' + str(r['id']),
             'tags': flatarray_to_tags(r['tags']),
             'members': flatarray_to_members(r['members']),
             'geo': r['way'],
             'types': ['relation'] if r['way'] is None else ['relation', 'area']
         }
+        t['tags']['osm:id'] = t['id']
+        yield t
 
 def flatarray_to_tags(arr):
     ret = {}
@@ -200,6 +211,7 @@ def objects_member_of(member_id, parent_type, parent_conditions):
                         'geo': None,
                         'link_tags': member
                     }
+                    t['tags']['osm:id'] = t['id']
                     yield(t)
 
     if parent_type == 'way':
@@ -219,6 +231,7 @@ def objects_member_of(member_id, parent_type, parent_conditions):
                             'sequence_id': str(i)
                         }
                     }
+                    t['tags']['osm:id'] = t['id']
                     yield(t)
 
 def objects_members(relation_id, parent_type, parent_conditions):
@@ -251,6 +264,9 @@ def objects_near(max_distance, ob, parent_selector, where_clause, check_geo=None
         geom = ob['geo']
     else:
         geom = current['properties'][current['pseudo_element']]['geo']
+
+    if where_clause == '':
+        where_clause = 'true'
 
     max_distance = to_float(eval_metric([ max_distance, 'u' ]))
     if max_distance is None:

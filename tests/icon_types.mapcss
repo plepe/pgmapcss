@@ -1,0 +1,28 @@
+@type foo list;
+
+canvas {
+  fill-color: #d0d0d0;
+}
+node {
+    text-color: black;
+}
+node[amenity=restaurant] {
+    symbol-shape: circle;
+    symbol-size: 15;
+    symbol-stroke-width: 0;
+    text: name;
+}
+node[highway=crossing] {
+    icon-image: crossing.svg;
+    text: "crossing";
+}
+node[highway=bus_stop] {
+    icon-image: bus;
+    icon-width: 18;
+    icon-color: red;
+    text: name;
+    text-anchor-horizontal: left;
+}
+node {
+    text-anchor-vertical: below;
+}

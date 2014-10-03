@@ -42,7 +42,7 @@ def compile_properties(statement, stat, indent=''):
             ', ' + compile_value(prop, stat) + ''', {
     'id': object['id'],
     'tags': current['tags'],
-    'geo': current['properties'][''' + statement['current_pseudo_element'] + ''']['geo']
+    'geo': current['properties'][''' + statement['current_pseudo_element'] + ''']['geo'] if 'geo' in current['properties'][''' + statement['current_pseudo_element'] + '''] else current['object']['geo']
 }))
 '''
 

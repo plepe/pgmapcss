@@ -28,7 +28,10 @@ def compile_link_selector(statement, stat):
                 distance = r
 
         if distance.get('value_type') == 'eval':
-            distance = compile_eval(distance['value'], stat)
+            distance = compile_eval(distance['value'], {
+                    'statement': statement ,
+                    'id': statement['id']
+                }, stat)
         else:
             distance = repr(distance['value'])
 

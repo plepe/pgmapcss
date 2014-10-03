@@ -16,8 +16,6 @@ class config_eval_zoom(config_base):
         return ( { str(i) for i in range(min_zoom, max_zoom + 1) }, self.mutable )
 
 def eval_zoom(param):
-  import math
-
   return float_to_str(math.ceil(math.log(3.93216e+08 / render_context['scale_denominator'], 2)))
 
 # TESTS

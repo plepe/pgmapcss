@@ -142,6 +142,8 @@ The following pseudo classes are supported:
 | :connection | true for nodes that are used by more than one way
 | :unconnected | true for nodes that are not used by any way
 | :tagged | what is considered tagged, i.e. an object that with a tag key other than the following: source*, source_ref, note, comment, converted_by, created_by, watch*, fixme, FIXME, description, attribution (in this list, * is a glob). Note: osm2pgsql does not even import those object into the database.
+| :righthandtraffic | true if there is right-hand traffic at the current location
+| :lefthandtraffic | true if there is left-hand traffic at the current locatiown
 
 === Pseudo elements ===
 After the pseudo class(es), separated by '::'. Optional.
@@ -280,7 +282,7 @@ See documentation for properties of styles based on the 'default' style definiti
 ==== Types ====
 Depending on the type of property, special values are possible:
 
-* colors: You can specify colors as hex value (e.g. #ff0000, #f00) or as rgb(r, g, b) resp. rgbs(r, g, b, opacity) or as name (all named CSS3 colors supported). When using rgb() or rgba(), the following values are possible: If the value is an integer, values between 0..255 are accepted. Floats are accepted in the range 0.0..1.0. Percentage values 0%..100% may be specified too.
+* colors: You can specify colors as hex value (e.g. #ff0000, #f00) or as rgb(r, g, b) resp. rgba(r, g, b, opacity) or hsv(hue, saturation, value) or as name (all named CSS3 colors supported). When using rgb() or rgba(), the following values are possible: If the value is an integer, values between 0..255 are accepted. Floats are accepted in the range 0.0..1.0. Percentage values 0%..100% may be specified too. When using hsv(), hue is a value from 0..360, saturation and value can be expressed as integer (0..100), float (0.0..1.0) or percentage 0%..100%.
 * pixels: You may specify values which take a pixel-dependend value (e.g. width, offset, ...) with a unit, default: 'px' (Pixels on screen). Other supported unites: 'u' (Units in 900913 projection on the map), 'm' (Meters on the map; NOT IMPLEMENTED YET: currently 'u' is used instead).
 * You may specify URLs without url()
 
@@ -378,8 +380,9 @@ Media queries are used to skip a section of the style under certain conditions. 
 
 |= Media condition |= Description
 | {{{(user-agent: <string>)}}} | Only include @media section when the name of the editor / renderer matches the given string. The only accepted value is {{{pgmapcss}}}.
-| {{{(min-pgmapcss-version: <version>)}}} | Only include @media section when the current version of pgmapcss is greater than or equal to the specified version, e.g. 0.8.
-| {{{(max-pgmapcss-version: <version>)}}} | Only include @media section when the current version of pgmapcss is lower than or equal to the specified version, e.g. 0.8.
+| {{{(pgmapcss-version: <version>)}}} | Only include @media section when the current version of pgmapcss matches the specified version, e.g. 0.8. Can be prefixed by {{{min-}}} or {{{max-}}} to compare ranges. (e.g. {{{min-pgmapcss-version: 0.8}}} would match the following versions: 0.8, 0.9, 0.12, 1.0 but not not 0.4 and 0.7.
+| {{{(renderer: <string>)}}} | pgmapcss is used with the specified renderer (currently only "mapnik" is supported).
+| {{{(renderer-version: <version>)}}} | Check if the specified renderer version is used (assessed at compile time, dependening on the used template). {{{min-}}} and {{{max-}}} prefixes supported, see {{{pgmapcss-version}} for details.
 
 Conditions can be combined with {{{and}}}, chained with a comma (logical or) and negated (e.g. {{{not (user-agent: pgmapcss)}}}).
 
@@ -395,6 +398,9 @@ Config options can be set by using {{{@config config_option config_value;}}}. Th
 
 |= Config option |= Description |= Possible values
 | josm_classes | when 'true', a {{{set foo;}}} statement will also set the class foo (synonymous to {{{set .foo;}}}) | 'true' or 'false' (default)
+| angular_system | choose which angular system will be used for trigonometric functions | 'degrees' (default), 'radians'
+
+Config options can also be set as parameters to pgmapcss, by using {{{-c}}} or {{{--config}}}, e.g. {{{pgmapcss --config option1=value1 option2=value2}}}.
 
 == Define Type of property ==
 The type of a property is specified by:
@@ -407,6 +413,9 @@ Currently supported types:
 * tag_name: The current value of the specified tag
 * numeric: Value may be a number. if a relative number (e.g. '+4') is specified, the value will be added to the value from the default pseudo element.
 * dashes: Value is 'none' or a colon separated list of integers. It may also be specified as list, e.g. "2;4" or list(2,4).
+* angle: like numeric, but make sure that value is correctly converted for Mapnik.
+* image: an image. prints a warning on compile when image is not found.
+* image_png: an image. prints a warning on compile when image is not found. if image is an svg, it will be converted to png.
 
 == Possible values ==
 The following statement defines possible values for a specific property:
@@ -414,7 +423,7 @@ The following statement defines possible values for a specific property:
 @values property_name "value1;value2;value3";
 }}}
 
-Other values will be accepted in the MapCSS file, but will finally be replaced by the default value (the first value).
+Other values will be accepted in the MapCSS file, but will finally be replaced by the default value (the first value of the specified list or the value as defined in @default_value).
 
 == Default values ==
 Define default values for properties like:
@@ -437,6 +446,8 @@ E.g.
 {{{
 @default_other casing-linecap linecap; // value of 'casing-linecap' defaults to value of 'linecap'
 }}}
+
+If the value is empty (e.g. {@default_other casing-linecap ;}) the reference is removed.
 
 == Postprocess values ==
 Define postprocess functions:

@@ -25,7 +25,6 @@ line.street_type::highway {
   linecap: round;
   casing-width: 1;
   casing-color: #a0a0a0;
-  casing-linecap: butt;
 }
 line[.street_type=motorway]::highway {
   width: 10;
@@ -45,6 +44,7 @@ line[.street_type=minor]::highway {
 
 line.street_type[bridge]::highway {
   casing-color: #000000;
+  casing-linecap: butt;
 }
 
 /* Combine all lines with an equal '.street_type' tag (which

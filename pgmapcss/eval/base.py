@@ -18,12 +18,13 @@ def float_to_str(v, default=None):
         r = r[:-2]
     return r
 def debug(text):
-    plpy.notice(text)
+    plpy.warning(text)
 
 class config_base:
     math_level = None
     op = None
     unary = False
+    aliases = None
     mutable = 0
 # 'mutable' says whether a function returns different output for the same set
 # of input parameters:

@@ -10,15 +10,19 @@ setup(
     version = VERSION,
     packages = find_packages(),
     package_data = {
-        'pgmapcss.db': [ '*.sql' ],
+        'pgmapcss.db': [ '*.sql', '*/*.sql' ],
         'pgmapcss.db.eval': [ '*.sql' ],
         'pgmapcss.mapnik': [ '*.mapcss', '*.mapnik' ],
         'pgmapcss.icons': [ 'maki/*' ],
         'pgmapcss.mode': [ '*/*.inc' ],
+        'pgmapcss.symbols': [ '*.svg' ],
+        'pgmapcss.data': [ '*.wkt' ],
+        'pgmapcss.defaults': [ '*.mapcss' ],
     },
     scripts = [ 'bin/pgmapcss' ],
     install_requires = [
       "pghstore",
       "py-postgresql",
+      "wand",
     ]
 )

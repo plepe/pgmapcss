@@ -5,10 +5,10 @@ from .compile_function_check import compile_function_check
 from ..includes import include_text
 import pgmapcss.eval
 import pgmapcss.mode
-from .stat import *
+import pgmapcss.types
 
 def compile_function_match(stat):
-    scale_denominators = sorted(stat_all_scale_denominators(stat), reverse=True)
+    scale_denominators = sorted(stat.all_scale_denominators(), reverse=True)
 
     check_functions = ''
     max_scale = None
@@ -29,6 +29,15 @@ def compile_function_match(stat):
         check_chooser += "elif render_context['scale_denominator'] >= %i:\n" % i
         check_chooser += "    check = check_%s\n" % str(i).replace('.', '_')
 
+    stat['global_data'] = {}
+    # get global data from type
+    for prop in stat.properties():
+        prop_type = pgmapcss.types.get(prop, stat)
+        d = prop_type.get_global_data()
+        if d:
+            stat['global_data'][prop] = d
+            stat.clear_property_values_cache()
+
     replacement = {
       'style_id': stat['id'],
       'host': stat['args'].host,
@@ -41,7 +50,7 @@ def compile_function_match(stat):
       }),
       'scale_denominators': repr(scale_denominators),
       'match_where': compile_function_get_where(stat['id'], stat),
-      'db_query': db.query_functions(),
+      'db_query': db.query_functions(stat),
       'function_check': check_functions,
       'check_chooser': check_chooser,
       'eval_functions': \
@@ -53,6 +62,7 @@ include_text()
     ret = '''\
 import pghstore
 import re
+import math
 import datetime
 '''.format(**replacement)
 
@@ -67,13 +77,17 @@ current = None
 if type(bbox) == list and len(bbox) == 4:
     plan = plpy.prepare('select ST_Transform(SetSRID(MakeBox2D(ST_Point($1, $2), ST_Point($3, $4)), 4326), 900913) as bounds', ['float', 'float', 'float', 'float'])
     res = plpy.execute(plan, [float(b) for b in bbox])
-    bbox = res[0]['bounds']
+    _bbox = res[0]['bounds']
+else:
+    _bbox = bbox
 
-render_context = {{ 'bbox': bbox, 'scale_denominator': scale_denominator }}
+render_context = {{ 'bbox': _bbox, 'scale_denominator': scale_denominator }}
 '''.format(**replacement)
 
     if 'context' in stat['options']:
-        ret += 'plpy.notice(render_context)\n'
+        ret += 'plpy.warning(render_context)\n'
+
+    ret += 'global_data = ' + repr(stat['global_data']) + '\n'
 
     ret += '''\
 {db_query}
@@ -85,8 +99,12 @@ counter = {{ 'rendered': 0, 'total': 0 }}
 
 {check_chooser}
 combined_objects = {{}}
-results = []
 all_style_elements = _all_style_elements
+style_element_property = {style_element_property}
+for style_element in all_style_elements:
+    if not style_element in style_element_property:
+        style_element_property[style_element] = []
+
 # dirty hack - when render_context.bbox is null, pass type of object instead of style-element
 if render_context['bbox'] == None:
     src = [{{
@@ -104,7 +122,7 @@ else:
         ret += "    time_qry_start = datetime.datetime.now() # profiling\n"
         ret += "    src = list(" + func + ")\n"
         ret += "    time_qry_stop = datetime.datetime.now() # profiling\n"
-        ret += "    plpy.notice('querying db objects took %.2fs' % (time_qry_stop - time_qry_start).total_seconds())\n"
+        ret += "    plpy.warning('querying db objects took %.2fs' % (time_qry_stop - time_qry_start).total_seconds())\n"
     else:
         ret += "    src = " + func + "\n"
 
@@ -136,10 +154,69 @@ while src:
         counter['total'] += 1
         for result in check(object):
             if type(result) != tuple or len(result) == 0:
-                plpy.notice('unknown check result: ', result)
+                plpy.warning('unknown check result: ', result)
             elif result[0] == 'result':
+                result = result[1]
                 shown = True
-                results.append(result[1])
+
+                # create a list of all style elements where the current
+                # object/pseudo_element is being shown, with a tuple of
+                # [ ( style_element, index in style_element list, layer,
+                # z-index ), ... ], e.g.:
+                # [
+                #   ( 'line', 2, 0, 5 ),
+                #   ( 'line-text', 5, 103, 5 )
+                # ]
+                style_elements = [
+                    (
+                        style_element,
+                        i,
+                        to_float(result['properties'][style_element + '-layer'] if style_element + '-layer' in result['properties'] else (result['properties']['layer'] if 'layer' in result['properties'] else 0)),
+                        to_float(result['properties'][style_element + '-z-index'] if style_element + '-z-index' in result['properties'] else (result['properties']['z-index'] if 'z-index' in result['properties'] else 0))
+                    )
+                    for i, style_element in enumerate(_all_style_elements)
+                    if len({{
+                        k
+                        for k in style_element_property[style_element]
+                        if k in result['properties'] and result['properties'][k]
+                    }})
+                ]
+    '''.format(**replacement)
+
+                # now build the return columns
+    if stat['mode'] == 'database-function':
+        ret += '''
+                yield {{
+                    'id': result['id'],
+                    'types': result['types'],
+                    'tags': pghstore.dumps(result['tags']),
+                    'pseudo_element': result['pseudo_element'],
+                    'geo': result['geo'],
+                    'properties': pghstore.dumps(result['properties']),
+                    'style_elements': [ se[0] for se in style_elements ],
+                    'style_elements_index': [ se[1] for se in style_elements ],
+                    'style_elements_layer': [ se[2] for se in style_elements ],
+                    'style_elements_z_index': [ se[3] for se in style_elements ],
+                }}
+        '''.format(**replacement)
+
+    elif stat['mode'] == 'standalone':
+        ret += '''
+                yield {{
+                    'id': result['id'],
+                    'types': result['types'],
+                    'tags': result['tags'],
+                    'pseudo_element': result['pseudo_element'],
+                    'geo': result['geo'],
+                    'properties': result['properties'],
+                    'style_elements': [ se[0] for se in style_elements ],
+                    'style_elements_index': [ se[1] for se in style_elements ],
+                    'style_elements_layer': [ se[2] for se in style_elements ],
+                    'style_elements_z_index': [ se[3] for se in style_elements ],
+                }}
+        '''.format(**replacement)
+
+    ret += '''
             elif result[0] == 'combine':
                 shown = True
                 if result[1] not in combined_objects:
@@ -148,12 +225,12 @@ while src:
                     combined_objects[result[1]][result[2]] = []
                 combined_objects[result[1]][result[2]].append(result[3])
             else:
-                plpy.notice('unknown check result: ', result)
+                plpy.warning('unknown check result: ', result)
 
         if shown:
             counter['rendered'] += 1
 #        else:
-#            plpy.notice('not rendered: ' + object['id'] + ' ' + repr(object['tags']))
+#            plpy.warning('not rendered: ' + object['id'] + ' ' + repr(object['tags']))
 
     src = None
 
@@ -169,86 +246,23 @@ while src:
                 }})
 
         combined_objects = []
-
-layers = sorted(
-    set(
-        x['properties'].get('layer', 0)
-        for x in results
-    ).union(set(
-        x['properties'].get(style_element + '-layer')
-        for x in results
-        for style_element in all_style_elements
-        if style_element + '-layer' in x['properties']
-    )),
-    key=lambda x: to_float(x, 0)
-)
-if None in layers:
-    layers.remove(None)
-
-for layer in layers:
-    for style_element in all_style_elements:
-        result_list = []
-
-        for result in results:
-            result_layer = result['properties'].get(style_element + '-layer') or result['properties'].get('layer') or '0'
-            if result_layer == layer:
-                # check if any property for the current style element is set (or
-                # there is no entry for the current style element in
-                # @style_element_property
-                if {style_element_property}.get(style_element) == None or \
-                    len(set(
-                    True
-                    for k in {style_element_property}.get(style_element)
-                    if result['properties'].get(k)
-                )):
-                    result_list.append(result)
-
-        result_list = sorted(result_list,
-            key=lambda x: to_float(
-                x['properties'].get(style_element + '-z-index') or
-                x['properties'].get('z-index')
-                , 0))
-'''.format(**replacement)
-
-    if stat['mode'] == 'database-function':
-        ret += '''\
-        for result in result_list:
-            x = {{
-                'id': result['id'],
-                'types': result['types'],
-                'tags': pghstore.dumps(result['tags']),
-                'style-element': style_element,
-                'pseudo_element': result['pseudo_element'],
-                'geo': result['geo'],
-                'properties': pghstore.dumps(result['properties'])
-            }}
-            yield x
-        '''.format(**replacement)
-
-    elif stat['mode'] == 'standalone':
-        ret += '''\
-        for result in result_list:
-            x = {{
-                'id': result['id'],
-                'types': result['types'],
-                'tags': result['tags'],
-                'style-element': style_element,
-                'pseudo_element': result['pseudo_element'],
-                'geo': result['geo'],
-                'properties': result['properties']
-            }}
-            yield x
-        '''.format(**replacement)
+    '''.format(**replacement)
 
     if 'profiler' in stat['options']:
         ret += '''\
 time_stop = datetime.datetime.now() # profiling
-plpy.notice('total run of processing (excl. querying db objects) took %.2fs' % (time_stop - time_start).total_seconds())
+plpy.warning('total run of processing (incl. querying db objects) took %.2fs' % (time_stop - time_start).total_seconds())
 if counter['total'] == 0:
     counter['perc'] = 100.0
 else:
     counter['perc'] = counter['rendered'] / counter['total'] * 100.0
-plpy.notice('rendered map features: {{rendered}} / {{total}}, {{perc:.2f}}%'.format(**counter))
+plpy.warning('rendered map features: {{rendered}} / {{total}}, {{perc:.2f}}%'.format(**counter))
+'''.format(**replacement);
+
+    if 'rusage' in stat['options']:
+        ret += '''\
+import resource
+plpy.warning('Resource Usage: ' + str(resource.getrusage(resource.RUSAGE_SELF)) + '\\nsee https://docs.python.org/3/library/resource.html')
 '''.format(**replacement);
 
     indent = ''

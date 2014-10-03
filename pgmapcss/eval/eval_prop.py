@@ -1,7 +1,5 @@
 class config_eval_prop(config_base):
     def possible_values(self, param_values, prop, stat):
-        import pgmapcss.compiler.stat
-
         if len(param_values) > 1:
             pseudo_element = param_values[1]
         elif not 'statement' in prop or \
@@ -14,7 +12,7 @@ class config_eval_prop(config_base):
         if not 'id' in prop:
             return ( True, 0 )
 
-        values = pgmapcss.compiler.stat.stat_property_values(param_values[0], stat, pseudo_element=pseudo_element, max_prop_id=prop['id'] - 1, include_none=True)
+        values = stat.property_values(param_values[0], pseudo_element=pseudo_element, max_prop_id=prop['id'] - 1, include_none=True)
 
         # convert None to ''
         values = {
@@ -42,6 +40,11 @@ def eval_prop(param):
             return ''
         return v
     else:
+        # 'geo' can be read from properties, but it might not has been set yet.
+        # in that case read it directly from object
+        if param[0] == 'geo':
+            return current['object']['geo']
+
         return ''
 
 # TESTS

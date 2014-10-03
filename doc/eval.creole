@@ -11,6 +11,7 @@ In fact all values are internally stored as strings, but are converted to data t
 | //boolean// | true or false. If expression equals 0, "no", "false" or //none// the value is considerd false, true otherwise. If a function returns a boolean value, "true" or "false" is returned.
 | //list// | A list of values, separated by ';' | 'atm;bank'.
 | //geometry// | A (e)WKB representation of a geometry as used by PostGIS
+| //angle// | An angle in the current angular system (either 'degrees': 0..360 degrees, or 'radians': 0..2*PI)
 
 == Units ==
 If you read a number, unit conversion takes place. The following units are supported:
@@ -23,7 +24,7 @@ If you read a number, unit conversion takes place. The following units are suppo
 |= Operator |= Description |= Compatibility
 | +, -, *, / | arithmetic operations (see add, sub, mul, div for description) | MapCSS 0.2
 | . | concatenate strings (strings need to be quoted though) | MapCSS 0.2
-| == | Comparision (equal); perform canonization for numbers prior to comparison, so "2" == "2.0" == "02" | MapCSS 0.2
+| ==, = | Comparision (equal); perform canonization for numbers prior to comparison, so "2" == "2.0" == "02" | MapCSS 0.2
 | !=, <> | Comparision (differing); perform canonization for numbers prior to comparison (see ==); If more than two values are compared, ALL values must be differing. | MapCSS 0.2
 | eq, (also ===) | Comparision (identical); string comparison, therefore "2" ne "02". | MapCSS 0.2: "eq"
 | ne, (also !==) | Comparision (nonidentical); string comparison; If more than two values are compared, ALL values must be differing. | MapCSS 0.2: "ne"
@@ -33,49 +34,76 @@ If you read a number, unit conversion takes place. The following units are suppo
 | && | logical and | no standard
 | {{{||}}} | logical or | no standard
 | ! | logical not | no standard
+| condition ? if_true : else | If condition evaluates to a truth value, if_true will be executed, else otherwise. Equals cond(condition, if_true, else). | no standard, JOSM
 
-== Functions ==
+== General Functions ==
 |= Function |= Parameters |= Return value |= Description | Compatibility
-| add, sub, mul, div | number, [number, [number, ...]] | number | arithmetic operations. If any of the input parameters is not a number, returns //none//, with the exception of //none//, which will be converted to 0. | no standard
-| equal | text, [text, [text, ...]] | Equal comparison; perform canonization for numbers prior to comparison, so equal("2", "2.0", "02") => true | no standard
-| differing | text, [text, [text, ...]] | Not equal comparison; perform canonization for numbers prior to comparison; If more than two values are compared, ALL values must be differing; so differing("2", "2.0", "5") => false | no standard
-| identical | text, [text, [text, ...]] | Equal comparison; string comparison, so identical("2", "2.0", "02") => false | no standard
-| nonidentical | text, [text, [text, ...]] | Not equal comparison; string comparison; If more than two values are compared, ALL values must be differing; so nonidentical("2", "2", "5") => false | no standard
-| gt, ge, le, lt | number, number | boolean | compares two numbers. >, >=, <= or <. | no standard
-| sqrt | number | number | Square root of input value | MapCSS 0.2
-| power | number, number | Calculates the first value (base) raised to the power of the second value (exp). E.g. power(2, 3) => 8 | no standard
 | prop | key, [string] | value | current value of the computed property on pseudo element param2 (default: current pseudo element). Examples: prop(width), prop(width, casing) | MapCSS 0.2 (no standard: pseudo element)
+| is_prop_set | key:string, [pseudo_element:string] | boolean | returns true if the property key has been set on the pseudo element pseudo_element | JOSM
 | tag | key, [key, [key, ...]] | value | value of the tag key (e.g. tag("name") ). If several keys are passed, the first set tag is returned, e.g. tag("name:en", "int_name", "name"). | MapCSS 0.2 (only one key)
+| has_tag_key | key:string | boolean | returns true if the object has a tag with the given key | JOSM
 | parent_id | | text | Return the id of the current parent object. | no standard
 | parent_tag | key, [key, [key, ...]] | value | value of the tag key (e.g. parent_tag("name") ) of the parent element in the link selector. If several keys are passed, the first set tag is returned, e.g. parent_tag("name:en", "int_name", "name"). | no standard
 | parent_geo | | geometry | Return the geometry of the current parent object. | no standard
 | link_tag | key, [key, [key, ...]] | value | Depending on the type of the link, a couple of tags are automatically set, e.g. 'index', 'distance'. See [[MapCSS.creole]] for details. | no standard
-| concat | string, [string, [string, ...]] | string | Concatenate all strings | no standard
 | any | value, [value, [value, ...]] | value | Returns first value that's not //none//. | MapCSS 0.2
-| min | number, [number, [number, ...]] | number | Returns lowest of the input values. | MapCSS 0.2
-| max | number, [number, [number, ...]] | number | Returns highest of the input values. | MapCSS 0.2
 | boolean | value | boolean | Converts the input to "true" or "false" (see 'Data Types' for an explanation). | MapCSS 0.2
 | cond | boolean, value, [value] | value | if first input parameter is //boolean// true return the second parameter, otherwise the third parameter (or ""). | MapCSS 0.2
 | switch | value, [[list, value], list, value, ...], [value] | value | The first value is compared to each list member of list/value pairs. Returns the value of the matching pair. Of no list matches, returns the last value or if there's none, return ''. E.g. switch("a", "a", "found a", "b", "found b", "c;d", "found c or d", "found neither a, b, c or d") | no standard
-| metric | value | number | Converts the input to pixels (or ""). E.g. number('3m') => '1.5' when the scale is '2 meters in 1 pixel'. | MapCSS 0.2
-| metric | value, [string] | number | Converts the input to a number (or "") of the specified unit (parameter 2, default 'px'). E.g. number('2px') => '2' or number('100px', 'm') => '238.86' (at zoom level 16). | no standard
-| zmetric | value | number | Currently not supported, returns '' |
 | str | value | string | "Converts" input value to string. As every input is a string, does nothing. | MapCSS 0.2
 | int | value | number | Returns the integer part of the input (e.g. '-5.6' => '-5', '8.9' => '8'). Does not accept units.
 | num | value | number | Checks if the input is a number. If not, none is returned. | MapCSS 0.2
-| round | v number, [s int] | Round the input value v to s decimal places (or 0). E.g. round(-50.6, 1) => -51 | no standard
-| debug | value | value | raise a postgresql notice with the value(s); returns first value. E.g. width: eval(debug(5+4)); => notice '9'; width: eval(debug(5+4, 'test')); => notice [ '9', 'test' ], returns '9'. | no standard
-| text_transform | string, "none" or "uppercase" or "lowercase" or "capitalize" | | no standard
+| debug, print, println | value | value | raise a postgresql notice with the value(s); returns first value. E.g. width: eval(debug(5+4)); => notice '9'; width: eval(debug(5+4, 'test')); => notice [ '9', 'test' ], returns '9'. | no standard
 | osm_id | | text | ID of the object from OpenStreetMap, e.g. 'n1234' | no standard
+| number_of_tags | | number | Returns the count of tags of the current object, e.g. '3' | JOSM
+| keys_of_tags | | list | Returns a list of tag keys of the current object, e.g. list('amenity', 'name') | no standard
 | style_id | | text | ID of the current style | no standard
 | zoom | | number | Returns current zoom level, e.g. '15' | no standard
 | scale_denominator | | number | Returns current scale denominator, e.g. '17061.8366708' (at zoom level 15) | no standard
 | viewport | | geometry | Returns the bounding box of the current viewport | no standard
-| and | value, [value, [value, ...]] | boolean | logical and | no standard
-| or | value, [value, [value, ...]] | boolean | logical or | no standard
-| not | value | boolean | logical not | no standard
-| substr | text string, int start, [int length] | text | Return part of a string. The string will start at the start'th position (counting from zero). If start is negative, the returned string will start at the start'th charactor from the end of the string. If length is given and is positive, the string returned will contain at most length characters, beginning from start. If length is given and negative, the returned string will stop at the length'th character from the end of the string. Example: substr('abcde', 2, 2) => 'cd'; substr('abcde', -4, -2) => 'bc'; substr('abcde', 1) => 'bcde' | no standard
-| join | string, string, string[, ...] | string | Join the list of strings (starting at the 2nd string) by the 1st string (the separator), e.g. join(" and ", "Alice", "Bob") -> "Alice and Bob".
+
+== String Functions ==
+|= Function |= Parameters |= Return value |= Description | Compatibility
+| concat | string, [string, [string, ...]] | string | Concatenate all strings | no standard
+| text_transform | string, "none" or "uppercase" or "lowercase" or "capitalize" | string | | no standard
+| substring | text string, int start, [int length] | text | Return part of a string. The string will start at the start'th position (counting from zero). If start is negative, the returned string will start at the start'th charactor from the end of the string. If length is given and is positive, the string returned will contain at most length characters, beginning from start. If length is given and negative, the returned string will stop at the length'th character from the end of the string. Example: substring('abcde', 2, 2) => 'cd'; substring('abcde', -4, -2) => 'bc'; substring('abcde', 1) => 'bcde' | JOSM
+| replace | text string, from string, to string | string | In string text replace all occurances of from by to. E.g.: replace("foobar", "o", "a") => "faabar" | JOSM
+| length | string | number | Return length of string, e.g. length("foobar") => 6 | no standard
+| join | string, string, string[, ...] | string | Join the list of strings (starting at the 2nd string) by the 1st string (the separator), e.g. join(" and ", "Alice", "Bob") -> "Alice and Bob". | JOSM
+| URL_encode | string | string | percent-encode a string. May be useful for data URLs | JOSM
+| XML_encode | string | string | escape special characters in xml. E.g. < becomes &lt;, other special characters: >, ", ', & | JOSM
+| CRC32_checksum| string | number | calculate the CRC32 checksum of a string (result is an integer from 0 to 232-1) | JOSM
+| regexp_test | pattern:string, str:string, [flags:string] | boolean | test if string str matches the pattern. flags is a string that may contain "i" (case insensitive). | JOSM¹
+| regexp_match | pattern:string, str:string, [flags:string] | list | Tries to match str against the pattern. Returns a list of capture groups in case of success. The first element (index 0) is the complete match (i.e. string). Further elements correspond to the bracketed parts of the regular expression. flags is a string that may contain "i" (case insensitive). | JOSM¹
+
+¹ in contrast to JOSM the pattern does not need to match the whole string; you should add ^ and $ to limit pattern.
+
+== Mathematical Functions ==
+|= Function |= Parameters |= Return value |= Description | Compatibility
+| sqrt | number | number | Square root of input value | MapCSS 0.2
+| power | number, number | number | Calculates the first value (base) raised to the power of the second value (exp). E.g. power(2, 3) => 8, power(4, 0.5) => 2 | no standard
+| log | v number, [base number] | number | Return the logarithm to the given base (default: natural logarithm, base e) | no standard
+| exp | v number | number | Return e raised to the power of v | no standard
+| min | number, [number, [number, ...]] | number | Returns lowest of the input values. | MapCSS 0.2
+| max | number, [number, [number, ...]] | number | Returns highest of the input values. | MapCSS 0.2
+| metric | value | number | Converts the input to pixels (or ""). E.g. number('3m') => '1.5' when the scale is '2 meters in 1 pixel'. | MapCSS 0.2
+| metric | value, [string] | number | Converts the input to a number (or "") of the specified unit (parameter 2, default 'px'). E.g. number('2px') => '2' or number('100px', 'm') => '238.86' (at zoom level 16). | no standard
+| zmetric | value | number | Currently not supported, returns '' |
+| round | v number, [s int] | number | Round the input value v to s decimal places (or 0). E.g. round(-50.6, 1) => -51 | no standard
+| signum | v number | number | Returns the signum function of the argument; zero if the argument is zero, 1 if the argument is greater than zero, -1 if the argument is less than zero.
+| floor | v number | number | Returns the next lowest integer value by rounding down v if necessary. | JOSM
+| ceil | v number | number | Returns the next highest integer value by rounding up v if necessary. | JOSM
+| sin | a angle | number | Returns the trigonometric sine of an angle in the current angular system. | JOSM
+| cos | a angle | number | Returns the trigonometric cosine of an angle in the current angular system. | JOSM
+| tan | a angle | number | Returns the trigonometric tangent of an angle in the current angular system. | JOSM
+| asin | a number | angle | Returns the arc sine of a value. The returned value is in the current angular system. | JOSM
+| acos | a number | angle | Returns the arc cosine of a value. The returned value is in the current angular system. | JOSM
+| atan | a number | angle | Returns the arc tangent of a value. The returned value is in the current angular system. | JOSM
+| atan2 | y number, x number | angle | Returns the angle theta (in the current angular system) from the conversion of rectangular coordinates (x, y) to polar coordinates (r, theta). | JOSM
+| sinh | x number | number | Returns the hyperbolic sine of a double value. | JOSM
+| cosh | x number | number | Returns the hyperbolic cosine of a double value. | JOSM
+| tanh | x number | number | Returns the hyperbolic tangent of a double value. | JOSM
+| random | | number | returns a random value between 0 and 1 | JOSM
 
 === List functions ===
 * List functions are not part of the MapCSS 0.2 standard, but follow the [[http://wiki.openstreetmap.org/wiki/MapCSS/0.2/Proposal_lists|proposal for lists]]
@@ -106,6 +134,9 @@ Mapnik < 3.0 can't read dynamic color values. Therefore pgmapcss has to know all
 | rgba | red, green, blue, alpha. As rgb(), but with an additional alpha channel with 0=transparent and 1.0 / 255 / 100%=fully opaque. E.g. rgba(0.1, 127, 90%, 50%) | A color in hex notation, e.g. '#1a7fe57f' | Creates a color with an alpha channel from the input parameters
 | deluma | color (hex notation, e.g. #123456), factor (float, e.g. 0.5) | color in hex notation | reduce color luma by a given factor
 | lighten | color (hex notation, e.g. #123456), factor (float, e.g. 0.5) | color in hex notation | lighten a color by a given factor
+| red, green, blue | color (hex notation, e.g. #123456) | number (from 0..1) | get value of color channels in rgb color model (0..1)
+| alpha | color (hex notation, e.g. #123456 or #12345678) | number (from 0..1) | get the alpha value of the given color (0..1)
+| hsv, hsv_color | hue, saturation, value. | A color in hex notation, e.g. '#1a7fe5' | Creates a color from the input parameters. hue is a value from 0..360. For saturation and value the following formats are recognised: integer 0..100, float 0.0..1.0, percent 0%..100%, e.g. hsv(120, 0.2, 50) => #667666.
 
 == Geometric functions ===
 * Geometric functions are not part of the MapCSS 0.2 standard
@@ -116,19 +147,40 @@ Mapnik < 3.0 can't read dynamic color values. Therefore pgmapcss has to know all
 | buffer | geometry, number | geometry | Draws a buffer of the specified size (default: pixels) around the input geometry, e.g. buffer(prop(geo), 100m); if no or invalid number is specified the input geometry is returned.
 | line_merge | geometry | geometry | Merges collected line strings; polygons and other geometries will get lost.
 | convex_hull | geometry | geometry | Create a convex hull from the input geometry: http://postgis.net/docs/ST_ConvexHull.html
-| line_locate_point | geometry, geometry | geometry | Returns a number between 0 and the length of the line representing the location of the closest point on a line (1st geometry) to the given point (2nd geometry).
+| line_locate_point | geometry, geometry | number | Returns a number between 0 and the length of the line representing the location of the closest point on a line (1st geometry) to the given point (2nd geometry).
+| line_locate_azimuth | line geometry, pos geometry or number, [distance number] | angle | Returns the north-based azimuth as the angle in the current angular system measured clockwise from the vertical on a point on the line which is either located closest to the given point pos or which is interpolated along the line (from 0..length of line). optional parameter 'dist': distance from located point which is used to measure angle (default 1px).
 | line_interpolate_point | geometry, number | geometry | Returns a point interpolated along a line. 2nd argument is a number between 0 and the length of the line (1st argument).
 | line_part | geometry, number[, number] | geometry | Return a linestring being a substring of the input line starting and ending at the given fractions of total length. 2nd argument ist start location, 3rd argument is end location between 0..length of line. If negative arguments are used the location is calculated from the end. If the 3rd argument is omitted the end of the line is assumed.
 | line | geometry, geometry, [geometry, ...] | geometry | Return a line of all input geometries (points).
 | line | list | geometry | Return a line of all input geometries (points).
-| azimuth | geometry, geometry | number | Returns the north-based azimuth as the angle in degrees measured clockwise from the vertical on point1 to point2 (see http://postgis.net/docs/ST_Azimuth.html)
+| azimuth | geometry, geometry | angle | Returns the north-based azimuth as the angle in the current angular system measured clockwise from the vertical on point1 to point2 (see http://postgis.net/docs/ST_Azimuth.html)
 | translate | geometry, X number, Y number | geometry | Translates the geometry to a new location using the numeric parameters as offsets (default px).
-| rotate | geometry, angle number, [center geometry] | geometry | Rotates the geometry around the center geometry (or the centroid of the input geometry) by angle degrees.
+| rotate | geometry, angle angle, [center geometry] | geometry | Rotates the geometry around the center geometry (or the centroid of the input geometry) by the given angle (in the current angular system).
 | area | geometry | number | returns area of polygon in square pixels
 | centroid | geometry | geometry | returns the centroid of the input geometry
 | intersection | geometry A, geometry B | geometry | Returns a geometry that represents the shared portion of A and B (see [[http://postgis.net/docs/manual-2.0/ST_Intersection.html|Postgis: ST_Intersection]])
-| is_closed | [geometry] | checks (return 'true' or 'false') whether the given geometry is a polygon or multipolygon, or a line whose start equals the end. if no parameter is passed, will use the current property 'geo' in the current pseudo element.
+| is_closed | [geometry] | boolean | checks (return 'true' or 'false') whether the given geometry is a polygon or multipolygon, or a line whose start equals the end. if no parameter is passed, will use the current property 'geo' in the current pseudo element.
+| is_left_hand_traffic | [geometry, ["force"]] | boolean | checks if the geometry (default: the geometry of the current object) is in a region with left hand traffic. returns 'true', 'false' or 'partly' (if it crosses boundaries of left/right hand traffic). If the current viewport is in an area with only left-/right hand traffic, this function will only be evaluated once (unless "force" is passed as 2nd parameter).
+| is_right_hand_traffic | [geometry, ["force"]] | boolean | checks if the geometry (default: the geometry of the current object) is in a region with right hand traffic. returns 'true', 'false' or 'partly' (if it crosses boundaries of left/right hand traffic). If the current viewport is in an area with only left-/right hand traffic, this function will only be evaluated once (unless "force" is passed as 2nd parameter).
+
+== Operator Functions ==
+* Functions usually used via their operator(s).
+|= Function |= Parameters |= Return value |= Operator(s) |= Description | Compatibility
+| add, sub, mul, div | number, [number, [number, ...]] | number | add: +, sub: -, mul: *, div: / | arithmetic operations. If any of the input parameters is not a number, returns //none//, with the exception of //none//, which will be converted to 0. | no standard
+| equal | text, [text, [text, ...]] | boolean | ==, = | Equal comparison; perform canonization for numbers prior to comparison, so equal("2", "2.0", "02") => true | no standard
+| differing | text, [text, [text, ...]] | boolean | !=, <> | Not equal comparison; perform canonization for numbers prior to comparison; If more than two values are compared, ALL values must be differing; so differing("2", "2.0", "5") => false | no standard
+| identical | text, [text, [text, ...]] | boolean | eq, === | Equal comparison; string comparison, so identical("2", "2.0", "02") => false | no standard
+| nonidentical | text, [text, [text, ...]] | boolean | ne, !== | Not equal comparison; string comparison; If more than two values are compared, ALL values must be differing; so nonidentical("2", "2", "5") => false | no standard
+| gt, ge, le, lt | number, number | boolean | >, >=, <= or <. | compares two numbers. | no standard
+| and | value, [value, [value, ...]] | boolean | && | logical and | no standard
+| or | value, [value, [value, ...]] | boolean | {{{||}}} | logical or | no standard
+| not | value | boolean | ! (unary) | logical not | no standard
+| neg | value | numeric | - (unary) | negate value | no standard
 
 == Internal functions ==
 |= Function |= Parameters |= Return value |= Description
 | to_dashes | string | a valid dashes string or 'none' | Checks the validity of a dashes definition
+| JOSM_pref | key:string, default:value | value | used in JOSM for advanced preferences. Does nothing, but return the default value
+| JOSM_search | | boolean | always returns false
+| _global_data | [key, [key, [...]]] | value | access a value from global_data
+| tr | str:string, arg0:value, arg1:value | JOSM-compatibility function: In JOSM this function translates English strings to the current language. In pgmapcss this is not supported (yet), but it replaces occurences of "{}" by the arguments. You can also specify the nth argument by using "{n}". Example: tr("Test: {1}{}{0}", "bar", "foo") => "Test: foobarbar")
