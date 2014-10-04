@@ -67,7 +67,7 @@ where {bbox} ( {w} )
         qry = '''
 select * from (
 select 'w' || cast(id as text) as id, version, user_id, (select name from users where id=user_id) as user, tstamp, changeset_id,
-       tags, ST_Transform((CASE WHEN ST_IsClosed(linestring) THEN ST_MakePolygon(linestring) ELSE linestring END), 900913) as geo, ST_IsClosed(linestring) as is_closed, Array['line', 'way'] as types '''
+       tags, ST_Transform((CASE WHEN ST_NPoints(linestring) >= 4 and ST_IsClosed(linestring) THEN ST_MakePolygon(linestring) ELSE linestring END), 900913) as geo, (ST_NPoints(linestring) >= 4) and ST_IsClosed(linestring) as is_closed, Array['line', 'way'] as types '''
 # START db.multipolygons
         qry += '''
 , (select array_agg(has_outer_tags) from relation_members join multipolygons on relation_members.relation_id=multipolygons.id where relation_members.member_id=ways.id and relation_members.member_type='W' and relation_members.member_role in ('outer', 'exclave')) part_of_mp_outer
