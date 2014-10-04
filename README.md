@@ -117,6 +117,7 @@ node[place=city] {
     text: tag('name') . ' (' . tag('population') ')';
     icon: circle;
 }
+```
 
 If you compile this MapCSS style into a standalone executable, running this executable will produce the following GeoJSON output (simplified, there will be more values). If you don't specify a bounding box as parameter the whole database will be queried:
 ```json
@@ -169,8 +170,7 @@ If you compile this MapCSS style into a standalone executable, running this exec
   },
 }
 ]}
-
-
+```
 
 ### Easy to install: ###
 
