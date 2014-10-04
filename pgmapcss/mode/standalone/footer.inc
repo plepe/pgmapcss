@@ -54,7 +54,7 @@ if __name__ == '__main__':
         tags['result'] = result['properties']
         feature = {{
             'type': 'Feature',
-            'geometry': json.loads(res[0]['r']),
+            'geometry': json.loads(res[0]['r']) if res[0]['r'] else None,
             'properties': tags,
         }}
 
