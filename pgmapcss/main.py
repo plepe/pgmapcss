@@ -63,6 +63,11 @@ parser.add_argument('-c', '--config', dest='config', nargs='+',
 parser.add_argument('-D', '--defaults', dest='defaults', nargs='+',
     help='Load specified defaults. These can either be included in the pgmapcss distribution (see doc/defaults.md for a list of available defaults) or local files (specified by trailing .mapcss). You may specify several defaults which will be loaded consecutive (e.g. -D josm local.mapcss)')
 
+parser.add_argument('-m', '--mode', dest='mode',
+    choices=['database-function', 'standalone'],
+    default='database-function',
+    help='Mode of execution. Possible values: "database-function" (default): create function in a PostgreSQL database, e.g. for querying by a renderer like Mapnik. "standalone": create a module/executable which returns resp. prints the data.')
+
 def main():
     print('pgmapcss version %s' % pgmapcss.version.VERSION)
     args = parser.parse_args()
@@ -82,6 +87,8 @@ def main():
         'base_style': args.base_style,
         'icons_dir': style_id + '.icons',
         'global_data': None,
+        'mode': args.mode,
+        'args': args
     })
 
     if args.config:
@@ -170,8 +177,12 @@ def main():
     for i in style:
         debug.write("\n***** " + i + " *****\n" + style[i])
 
-    pgmapcss.db.install(style_id, style, conn)
-    pgmapcss.mapnik.process_mapnik(style_id, args, stat, conn)
+    if stat['mode'] == 'database-function':
+        pgmapcss.db.install(style_id, style, conn)
+        pgmapcss.mapnik.process_mapnik(style_id, args, stat, conn)
+    elif stat['mode'] == 'standalone':
+        open('pgmapcss_' + style_id + '.py', 'w').write(style['function_match'])
+
     pgmapcss.icons.process_icons(style_id, args, stat, conn)
     pgmapcss.symbols.process_symbols(style_id, args, stat, conn)
 

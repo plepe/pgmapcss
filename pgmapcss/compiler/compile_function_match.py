@@ -4,6 +4,7 @@ from .compile_function_get_where import compile_function_get_where
 from .compile_function_check import compile_function_check
 from ..includes import include_text
 import pgmapcss.eval
+import pgmapcss.mode
 import pgmapcss.types
 
 def compile_function_match(stat):
@@ -39,6 +40,10 @@ def compile_function_match(stat):
 
     replacement = {
       'style_id': stat['id'],
+      'host': stat['args'].host,
+      'password': stat['args'].password,
+      'database': stat['args'].database,
+      'user': stat['args'].user,
       'style_element_property': repr({
           k: v['value'].split(';')
           for k, v in stat['defines']['style_element_property'].items()
@@ -55,11 +60,6 @@ include_text()
     }
 
     ret = '''\
-create or replace function pgmapcss_{style_id}(
-  IN bbox                geometry,
-  IN scale_denominator   float,
-  _all_style_elements\ttext[] default Array['default']
-) returns setof pgmapcss_result as $body$
 import pghstore
 import re
 import math
@@ -73,7 +73,15 @@ import datetime
 global current
 global render_context
 current = None
-render_context = {{ 'bbox': bbox, 'scale_denominator': scale_denominator }}
+
+if type(bbox) == list and len(bbox) == 4:
+    plan = plpy.prepare('select ST_Transform(SetSRID(MakeBox2D(ST_Point($1, $2), ST_Point($3, $4)), 4326), 900913) as bounds', ['float', 'float', 'float', 'float'])
+    res = plpy.execute(plan, [float(b) for b in bbox])
+    _bbox = res[0]['bounds']
+else:
+    _bbox = bbox
+
+render_context = {{ 'bbox': _bbox, 'scale_denominator': scale_denominator }}
 '''.format(**replacement)
 
     if 'context' in stat['options']:
@@ -167,8 +175,11 @@ while src:
                 if len(style_elements) == 0:
                     continue
                 shown = True
+    '''.format(**replacement)
 
                 # now build the return columns
+    if stat['mode'] == 'database-function':
+        ret += '''
                 yield {{
                     'id': result['id'],
                     'types': result['types'],
@@ -181,6 +192,26 @@ while src:
                     'style_elements_layer': [ se[2] for se in style_elements ],
                     'style_elements_z_index': [ se[3] for se in style_elements ],
                 }}
+        '''.format(**replacement)
+
+    elif stat['mode'] == 'standalone':
+        ret += '''
+                yield {{
+                    'id': result['id'],
+                    'types': result['types'],
+                    'tags': result['tags'],
+                    'pseudo_element': result['pseudo_element'],
+                    'geo': result['geo'],
+                    'properties': result['properties'],
+                    'style_elements': [ se[0] for se in style_elements ],
+                    'style_elements_index': [ se[1] for se in style_elements ],
+                    'style_elements_layer': [ se[2] for se in style_elements ],
+                    'style_elements_z_index': [ se[3] for se in style_elements ],
+                    'object': object,
+                }}
+        '''.format(**replacement)
+
+    ret += '''
             elif result[0] == 'combine':
                 shown = True
                 if result[1] not in combined_objects:
@@ -210,7 +241,7 @@ while src:
                 }})
 
         combined_objects = []
-'''.format(**replacement)
+    '''.format(**replacement)
 
     if 'profiler' in stat['options']:
         ret += '''
@@ -229,8 +260,16 @@ import resource
 plpy.warning('Resource Usage: ' + str(resource.getrusage(resource.RUSAGE_SELF)) + '\\nsee https://docs.python.org/3/library/resource.html')
 '''.format(**replacement);
 
-    ret += '''\
-$body$ language 'plpython3u' immutable;
-'''.format(**replacement);
+    indent = ''
+    if stat['mode'] == 'standalone':
+        indent = '    '
+
+    header = resource_string(pgmapcss.mode.__name__, stat['mode'] + '/header.inc')
+    header = header.decode('utf-8').format(**replacement)
+
+    footer = resource_string(pgmapcss.mode.__name__, stat['mode'] + '/footer.inc')
+    footer = footer.decode('utf-8').format(**replacement)
+
+    ret = header + indent + ret.replace('\n', '\n' + indent) + '\n' + footer
 
     return ret

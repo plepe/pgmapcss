@@ -14,6 +14,7 @@ setup(
         'pgmapcss.db.eval': [ '*.sql' ],
         'pgmapcss.mapnik': [ '*.mapcss', '*.mapnik' ],
         'pgmapcss.icons': [ 'maki/*' ],
+        'pgmapcss.mode': [ '*/*.inc' ],
         'pgmapcss.symbols': [ '*.svg' ],
         'pgmapcss.data': [ '*.wkt' ],
         'pgmapcss.defaults': [ '*.mapcss' ],

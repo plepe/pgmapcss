@@ -13,8 +13,12 @@ def objects(_bbox, where_clauses, add_columns=[], add_param_type=[], add_param_v
     else:
         add_columns = ''
 
-    param_type = [ 'geometry' ] + add_param_type
-    param_value = [ _bbox ] + add_param_value
+    if _bbox:
+        param_type = [ 'geometry' ] + add_param_type
+        param_value = [ _bbox ] + add_param_value
+    else:
+        param_type = add_param_type
+        param_value = add_param_value
 
     # nodes
     w = []
@@ -39,12 +43,13 @@ where {bbox} ( {w} )
         res = plpy.execute(plan, param_value )
 
         for r in res:
+            r['types'] = list(r['types'])
             r['tags'] = pghstore.loads(r['tags'])
             r['tags']['osm:id'] = str(r['id'])
             r['tags']['osm:version'] = str(r['version'])
             r['tags']['osm:user_id'] = str(r['user_id'])
             r['tags']['osm:user'] = r['user']
-            r['tags']['osm:timestamp'] = r['tstamp']
+            r['tags']['osm:timestamp'] = str(r['tstamp'])
             r['tags']['osm:changeset'] = str(r['changeset_id'])
             yield(r)
 
@@ -62,7 +67,7 @@ where {bbox} ( {w} )
         qry = '''
 select * from (
 select 'w' || cast(id as text) as id, version, user_id, (select name from users where id=user_id) as user, tstamp, changeset_id,
-       tags, ST_Transform((CASE WHEN ST_IsClosed(linestring) THEN ST_MakePolygon(linestring) ELSE linestring END), 900913) as geo, ST_IsClosed(linestring) as is_closed, Array['line', 'way'] as types '''
+       tags, ST_Transform((CASE WHEN ST_NPoints(linestring) >= 4 and ST_IsClosed(linestring) THEN ST_MakePolygon(linestring) ELSE linestring END), 900913) as geo, (ST_NPoints(linestring) >= 4) and ST_IsClosed(linestring) as is_closed, Array['line', 'way'] as types '''
 # START db.multipolygons
         qry += '''
 , (select array_agg(has_outer_tags) from relation_members join multipolygons on relation_members.relation_id=multipolygons.id where relation_members.member_id=ways.id and relation_members.member_type='W' and relation_members.member_role in ('outer', 'exclave')) part_of_mp_outer
@@ -79,6 +84,7 @@ where {bbox} ( {w} ) offset 0) t
         res = plpy.execute(plan, param_value )
 
         for r in res:
+            r['types'] = list(r['types'])
             r['tags'] = pghstore.loads(r['tags'])
             if r['is_closed']:
 # START db.multipolygons
@@ -89,7 +95,7 @@ where {bbox} ( {w} ) offset 0) t
             r['tags']['osm:version'] = str(r['version'])
             r['tags']['osm:user_id'] = str(r['user_id'])
             r['tags']['osm:user'] = r['user']
-            r['tags']['osm:timestamp'] = r['tstamp']
+            r['tags']['osm:timestamp'] = str(r['tstamp'])
             r['tags']['osm:changeset'] = str(r['changeset_id'])
             yield(r)
 
@@ -120,12 +126,13 @@ where {bbox} ( {w} ) offset 0) t
         res = plpy.execute(plan, param_value )
 
         for r in res:
+            r['types'] = list(r['types'])
             r['tags'] = pghstore.loads(r['tags'])
             r['tags']['osm:id'] = str(r['id'])
             r['tags']['osm:version'] = str(r['version'])
             r['tags']['osm:user_id'] = str(r['user_id'])
             r['tags']['osm:user'] = r['user']
-            r['tags']['osm:timestamp'] = r['tstamp']
+            r['tags']['osm:timestamp'] = str(r['tstamp'])
             r['tags']['osm:changeset'] = str(r['changeset_id'])
             if r['has_outer_tags']:
                 r['tags']['osm:has_outer_tags'] = 'yes'
@@ -154,12 +161,13 @@ where ({w}) and not id = ANY(Array[{done}]::bigint[])
         res = plpy.execute(plan, param_value )
 
         for r in res:
+            r['types'] = list(r['types'])
             r['tags'] = pghstore.loads(r['tags'])
             r['tags']['osm:id'] = str(r['id'])
             r['tags']['osm:version'] = str(r['version'])
             r['tags']['osm:user_id'] = str(r['user_id'])
             r['tags']['osm:user'] = r['user']
-            r['tags']['osm:timestamp'] = r['tstamp']
+            r['tags']['osm:timestamp'] = str(r['tstamp'])
             r['tags']['osm:changeset'] = str(r['changeset_id'])
             yield(r)
 
@@ -199,7 +207,7 @@ def objects_by_id(id_list):
         t['tags']['osm:version'] = str(r['version'])
         t['tags']['osm:user_id'] = str(r['user_id'])
         t['tags']['osm:user'] = r['user']
-        t['tags']['osm:timestamp'] = r['tstamp']
+        t['tags']['osm:timestamp'] = str(r['tstamp'])
         t['tags']['osm:changeset'] = str(r['changeset_id'])
         yield(t)
 
@@ -224,7 +232,7 @@ def objects_by_id(id_list):
         t['tags']['osm:version'] = str(r['version'])
         t['tags']['osm:user_id'] = str(r['user_id'])
         t['tags']['osm:user'] = r['user']
-        t['tags']['osm:timestamp'] = r['tstamp']
+        t['tags']['osm:timestamp'] = str(r['tstamp'])
         t['tags']['osm:changeset'] = str(r['changeset_id'])
         yield(t)
 
@@ -248,7 +256,7 @@ def objects_member_of(member_id, parent_type, parent_conditions):
             t['tags']['osm:version'] = str(r['version'])
             t['tags']['osm:user_id'] = str(r['user_id'])
             t['tags']['osm:user'] = r['user']
-            t['tags']['osm:timestamp'] = r['tstamp']
+            t['tags']['osm:timestamp'] = str(r['tstamp'])
             t['tags']['osm:changeset'] = str(r['changeset_id'])
             yield(t)
 
@@ -271,7 +279,7 @@ def objects_member_of(member_id, parent_type, parent_conditions):
             t['tags']['osm:version'] = str(r['version'])
             t['tags']['osm:user_id'] = str(r['user_id'])
             t['tags']['osm:user'] = r['user']
-            t['tags']['osm:timestamp'] = r['tstamp']
+            t['tags']['osm:timestamp'] = str(r['tstamp'])
             t['tags']['osm:changeset'] = str(r['changeset_id'])
             yield(t)
 
