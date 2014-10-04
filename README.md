@@ -6,6 +6,8 @@ MapCSS takes away all this pain. It's simple and declarative: You define what sh
 
 pgmapcss compiles MapCSS styles into a database function. Mapnik just needs to call this database function and render the processed data.
 
+Alternatively there's a standalone mode, where the MapCSS style is compiled into an executable, which can be run from the command line. The executable will not render an image but create GeoJSON output instead. See below for details.
+
 Features
 --------
 ### Writing MapCSS styles is simple, e.g.: ###
@@ -107,6 +109,68 @@ Optimized database queries: Only those map features which are visible in the cur
 The compiled database function uses PL/Python3 database language, which makes execution efficient and powerful.
 
 As Mapnik 2.x can't read symbolizer values (like color, width, ...) from database columns, the mapnik pre-processor has to create style rules for all possible value combinations. The more complex the style sheet, the larger the mapnik style files and therefore rendering can take a long time. The up-coming Mapnik 3.0 should solve these issues.
+
+### Standalone mode ###
+Let's take the following MapCSS style:
+```css
+node[place=city] {
+    text: tag('name') . ' (' . tag('population') ')';
+    icon: circle;
+}
+
+If you compile this MapCSS style into a standalone executable, running this executable will produce the following GeoJSON output (simplified, there will be more values). If you don't specify a bounding box as parameter the whole database will be queried:
+```json
+{ "type": "FeatureCollection", "features": [
+{
+  "type": "Feature"
+  "properties": {
+    "results": [
+      {
+        "icon": "circle",
+        "text": "Salzburg (149201)",
+        "pseudo_element": "default",
+      }
+    ],
+    "place": "city",
+    "name:en": "Salzburg",
+    "name": "Salzburg",
+    "population": "149201",
+  },
+  "geometry": {
+    "type": "Point",
+    "coordinates": [
+      13.041059114220452,
+      47.800197658773016
+    ]
+  },
+}
+,
+{
+  "type": "Feature"
+  "properties": {
+    "results": [
+      {
+        "icon": "circle",
+        "text": "Wien (1626440)",
+        "pseudo_element": "default",
+      }
+    ],
+    "place": "city",
+    "name": "Wien",
+    "name:en": "Vienna",
+    "population": "1626440",
+  },
+  "geometry": {
+    "type": "Point",
+    "coordinates": [
+      16.373090794897276,
+      48.20846703584975
+    ]
+  },
+}
+]}
+
+
 
 ### Easy to install: ###
 
