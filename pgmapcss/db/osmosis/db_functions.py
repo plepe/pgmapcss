@@ -13,8 +13,12 @@ def objects(_bbox, where_clauses, add_columns=[], add_param_type=[], add_param_v
     else:
         add_columns = ''
 
-    param_type = [ 'geometry' ] + add_param_type
-    param_value = [ _bbox ] + add_param_value
+    if _bbox:
+        param_type = [ 'geometry' ] + add_param_type
+        param_value = [ _bbox ] + add_param_value
+    else:
+        param_type = add_param_type
+        param_value = add_param_value
 
     # nodes
     w = []
