@@ -139,7 +139,6 @@ while src:
                 plpy.warning('unknown check result: ', result)
             elif result[0] == 'result':
                 result = result[1]
-                shown = True
 
                 # create a list of all style elements where the current
                 # object/pseudo_element is being shown, with a tuple of
@@ -163,6 +162,11 @@ while src:
                         if k in result['properties'] and result['properties'][k]
                     }})
                 ]
+
+                # TODO: maybe not "continue", but better indent yield instead
+                if len(style_elements) == 0:
+                    continue
+                shown = True
 
                 # now build the return columns
                 yield {{
@@ -209,7 +213,7 @@ while src:
 '''.format(**replacement)
 
     if 'profiler' in stat['options']:
-        ret += '''\
+        ret += '''
 time_stop = datetime.datetime.now() # profiling
 plpy.warning('total run of processing (incl. querying db objects) took %.2fs' % (time_stop - time_start).total_seconds())
 if counter['total'] == 0:
