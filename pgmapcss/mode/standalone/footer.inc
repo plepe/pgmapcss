@@ -11,8 +11,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Executes the compiled map style and prints resulting objects.')
 
     parser.add_argument('-b', '--bounds', dest='bounds',
-        default='16.36,48.20,16.37,48.22',
-        help='Process the map from the specified bounding box as min_lon,min_lat,max_lon,max_lat in WGS-84. (default: 16.36,48.20,16.37,48.22)'
+        help='Process the map from the specified bounding box as min_lon,min_lat,max_lon,max_lat in WGS-84. (default: whole database)'
     )
 
     parser.add_argument('-s', '--scale', dest='scale',
@@ -22,10 +21,13 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    bounds = args.bounds.split(',')
-    if len(bounds) != 4:
-        print("Error parsing bounds, expecting four numbers.")
-        sys.exit(1)
+    if args.bounds:
+        bounds = args.bounds.split(',')
+        if len(bounds) != 4:
+            print("Error parsing bounds, expecting four numbers.")
+            sys.exit(1)
+    else:
+        bounds = None
 
     if args.scale[0] == 'z':
         scale_denom = 559082264.028 / (2 ** int(args.scale[1:]))
