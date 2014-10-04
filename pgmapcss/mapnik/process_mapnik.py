@@ -3,6 +3,8 @@ import re
 from pkg_resources import *
 import pgmapcss.db as db
 import hashlib
+import pgmapcss.eval
+import pgmapcss.compiler
 
 def strtr(s, patterns):
     keys = sorted([ k for k in patterns ], key=len, reverse=True)
@@ -209,15 +211,23 @@ def process_mapnik(style_id, args, stat, conn):
 
     stat['mapnik_columns'] = set()
 
-    # dirty hack - when render_context.bbox is null, pass type 'canvas' instead of style-element
-    res = db.prepare(strtr("select * from pgmapcss_{style_id}(null, 0, Array['canvas']) where pseudo_element='default'", replacement))
-    result = res()
-    if len(result) > 0:
-        canvas_properties = result[0][res.column_names.index('properties')]
-        canvas_properties = pghstore.loads(canvas_properties)
+    # compile check function for canvas, and call to get results
+    canvas = {
+        'id': None,
+        'tags': {},
+        'geo': None,
+        'types': [ 'canvas' ],
+    }
 
-        for (k, v) in canvas_properties.items():
-            replacement['{canvas|' + k + '}'] = v or ''
+    check_code = pgmapcss.compiler.compile_function_check(stat['statements'], 0, 0, stat)
+    for r in pgmapcss.eval.functions(stat).eval('check_0({})'.format(canvas), additional_code=check_code):
+        if r[0] == 'result':
+            result = r[1]
+            if result['pseudo_element'] == 'default':
+                canvas_properties = result['properties']
+
+                for (k, v) in canvas_properties.items():
+                    replacement['{canvas|' + k + '}'] = v or ''
 
     result = process(f1, replacement, stat)
 

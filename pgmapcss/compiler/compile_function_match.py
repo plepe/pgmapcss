@@ -105,26 +105,16 @@ for style_element in all_style_elements:
     if not style_element in style_element_property:
         style_element_property[style_element] = []
 
-# dirty hack - when render_context.bbox is null, pass type of object instead of style-element
-if render_context['bbox'] == None:
-    src = [{{
-        'types': all_style_elements,
-        'tags': {{}},
-        'id': '',
-        'geo': None
-    }}]
-    all_style_elements = ['default']
-else:
 '''.format(**replacement)
 
     func = "objects(render_context.get('bbox'), match_where)"
     if 'profiler' in stat['options']:
-        ret += "    time_qry_start = datetime.datetime.now() # profiling\n"
-        ret += "    src = list(" + func + ")\n"
-        ret += "    time_qry_stop = datetime.datetime.now() # profiling\n"
-        ret += "    plpy.warning('querying db objects took %.2fs' % (time_qry_stop - time_qry_start).total_seconds())\n"
+        ret += "time_qry_start = datetime.datetime.now() # profiling\n"
+        ret += "src = list(" + func + ")\n"
+        ret += "time_qry_stop = datetime.datetime.now() # profiling\n"
+        ret += "plpy.warning('querying db objects took %.2fs' % (time_qry_stop - time_qry_start).total_seconds())\n"
     else:
-        ret += "    src = " + func + "\n"
+        ret += "src = " + func + "\n"
 
     ret += '''\
 
