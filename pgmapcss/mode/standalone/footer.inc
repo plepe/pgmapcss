@@ -40,27 +40,50 @@ if __name__ == '__main__':
     plpy = fake_plpy()
     plan_to_geojson = plpy.prepare('select ST_asGeoJSON(ST_Transform($1, 4326)) as r', [ 'geometry' ])
 
-    first = True
-    for result in pgmapcss_{style_id}(bounds, scale_denom):
-        if first:
-            print('{{ "type": "FeatureCollection", "features": [')
-            first = False
-        else:
-            print(",")
+    def format_result(results):
+        object = results[-1]['object']
 
-        res = plpy.execute(plan_to_geojson, [ result['geo'] ])
+        properties_list = dict(results[-1]['tags'])
+        properties_list['results'] = []
 
-        tags = dict(result['tags'])
-        tags['result'] = result['properties']
+        for result in results:
+            props = result['properties']
+            props['pseudo_element'] = result['pseudo_element']
+            if result['geo'] != object['geo']:
+                g = plpy.execute(plan_to_geojson, [ result['geo'] ])[0]['r']
+                props['geometry'] = json.loads(g) if g else None,
+
+            properties_list['results'].append(props)
+
+        geo = plpy.execute(plan_to_geojson, [ object['geo'] ])[0]['r']
         feature = {{
             'type': 'Feature',
-            'geometry': json.loads(res[0]['r']) if res[0]['r'] else None,
-            'properties': tags,
+            'geometry': json.loads(geo) if geo else None,
+            'properties': properties_list,
         }}
 
-        print(json.dumps(feature, indent=2))
+        return json.dumps(feature, indent=2)
 
-    if first:
+
+    results = []
+    last_object = None
+
+    for result in pgmapcss_{style_id}(bounds, scale_denom):
+        if result['object'] == last_object:
+            results.append(result)
+
+        else:
+            if len(results) == 0:
+                print('{{ "type": "FeatureCollection", "features": [')
+            else:
+                print(format_result(results))
+                print(",")
+
+            results = [result]
+            last_object = result['object']
+
+    if len(results) == 0:
         print('{{ "type": "FeatureCollection", "features": []}}')
     else:
+        print(format_result(results))
         print("]}}\n")

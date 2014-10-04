@@ -203,6 +203,7 @@ while src:
                     'style_elements_index': [ se[1] for se in style_elements ],
                     'style_elements_layer': [ se[2] for se in style_elements ],
                     'style_elements_z_index': [ se[3] for se in style_elements ],
+                    'object': object,
                 }}
         '''.format(**replacement)
 
