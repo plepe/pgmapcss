@@ -9,6 +9,7 @@ from .pixels import pixels
 from .numeric import numeric
 from .dashes import dashes
 from .angle import angle
+from .list_append import list_append
 
 global classes
 classes = {
@@ -23,6 +24,7 @@ classes = {
     'numeric': numeric,
     'dashes': dashes,
     'angle': angle,
+    'list_append': list_append,
 }
 
 properties = {

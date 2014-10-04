@@ -416,6 +416,7 @@ Currently supported types:
 * angle: like numeric, but make sure that value is correctly converted for Mapnik.
 * image: an image. prints a warning on compile when image is not found.
 * image_png: an image. prints a warning on compile when image is not found. if image is an svg, it will be converted to png.
+* list_append: result will be a list (a string, separated by ';'). Any additional value will be added to the list.
 
 == Possible values ==
 The following statement defines possible values for a specific property:
