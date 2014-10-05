@@ -196,7 +196,7 @@ def build_sql_column(props, stat):
 
     return r + ' as "' + sql_as + '"'
 
-def process_mapnik(style_id, args, stat, conn):
+def process_renderer(style_id, args, stat, conn):
     f1 = resource_stream(__name__, args.base_style + '.mapnik')
     f2 = open(style_id + '.mapnik', 'w')
 

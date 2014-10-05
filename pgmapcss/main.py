@@ -43,7 +43,7 @@ parser.add_argument('-H', '--host', dest='host',
 
 parser.add_argument('-t', '--template', dest='base_style',
     required=True,
-    help='mapcss/mapnik base style for the correct mapnik version, e.g. "mapnik-2.0"')
+    help='mapcss/renderer base style for the correct renderer and renderer version, e.g. "mapnik-2.0"')
 
 parser.add_argument('--eval-tests', dest='eval_tests', action='store_const',
     const=True, default=False,
@@ -163,7 +163,7 @@ def main():
     debug.write("***** Structure of parsed MapCSS style *****\n")
     debug.write(pp.pformat(stat) + '\n')
 
-    pgmapcss.mapnik.init(stat)
+    pgmapcss.renderer.init(stat)
     pgmapcss.icons.init(stat)
     pgmapcss.symbols.init(stat)
 
@@ -179,7 +179,7 @@ def main():
 
     if stat['mode'] == 'database-function':
         pgmapcss.db.install(style_id, style, conn)
-        pgmapcss.mapnik.process_mapnik(style_id, args, stat, conn)
+        pgmapcss.renderer.process_renderer(style_id, args, stat, conn)
     elif stat['mode'] == 'standalone':
         open('pgmapcss_' + style_id + '.py', 'w').write(style['function_match'])
 

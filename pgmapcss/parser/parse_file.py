@@ -4,7 +4,7 @@ from .parse_properties import parse_properties
 from .strip_comments import strip_comments
 from .ParseFile import *
 from .ParseError import *
-import pgmapcss.mapnik
+import pgmapcss.renderer
 import copy
 from pkg_resources import *
 import pgmapcss.defaults
@@ -14,7 +14,7 @@ def parse_file(stat, filename=None, base_style=None, content=None, defaults=[]):
         stat['max_prop_id'] = 0
 
     if base_style:
-        parse_file(stat, content=pgmapcss.mapnik.get_base_style(base_style))
+        parse_file(stat, content=pgmapcss.renderer.get_base_style(base_style))
 
     if defaults:
         for d in defaults:

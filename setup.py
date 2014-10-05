@@ -12,7 +12,7 @@ setup(
     package_data = {
         'pgmapcss.db': [ '*.sql', '*/*.sql' ],
         'pgmapcss.db.eval': [ '*.sql' ],
-        'pgmapcss.mapnik': [ '*.mapcss', '*.mapnik' ],
+        'pgmapcss.renderer': [ '*.mapcss', '*.mapnik' ],
         'pgmapcss.icons': [ 'maki/*' ],
         'pgmapcss.mode': [ '*/*.inc' ],
         'pgmapcss.symbols': [ '*.svg' ],
