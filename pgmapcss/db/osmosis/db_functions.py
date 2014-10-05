@@ -40,7 +40,7 @@ where {bbox} ( {w} )
 '''.format(bbox=bbox, w=' or '.join(w), add_columns=add_columns.replace('__geo__', 'geom'))
 
         plan = plpy.prepare(qry, param_type )
-        res = plpy.execute(plan, param_value )
+        res = plpy.cursor(plan, param_value )
 
         for r in res:
             r['types'] = list(r['types'])
@@ -81,7 +81,7 @@ where {bbox} ( {w} ) offset 0) t
 '''.format(bbox=bbox, w=' or '.join(w), add_columns=add_columns.replace('__geo__', 'linestring'))
 
         plan = plpy.prepare(qry, param_type )
-        res = plpy.execute(plan, param_value )
+        res = plpy.cursor(plan, param_value )
 
         for r in res:
             r['types'] = list(r['types'])
@@ -123,7 +123,7 @@ where {bbox} ( {w} ) offset 0) t
 '''.format(bbox=bbox, w=' or '.join(w), add_columns=add_columns.replace('__geo__', 'linestring'))
 
         plan = plpy.prepare(qry, param_type )
-        res = plpy.execute(plan, param_value )
+        res = plpy.cursor(plan, param_value )
 
         for r in res:
             r['types'] = list(r['types'])
@@ -158,7 +158,7 @@ where ({w}) and not id = ANY(Array[{done}]::bigint[])
 '''.format(w=' or '.join(w), add_columns=add_columns, done=','.join({ str(d) for d in done_multipolygons}))
 
         plan = plpy.prepare(qry, param_type )
-        res = plpy.execute(plan, param_value )
+        res = plpy.cursor(plan, param_value )
 
         for r in res:
             r['types'] = list(r['types'])
@@ -177,7 +177,7 @@ where ({w}) and not id = ANY(Array[{done}]::bigint[])
 def objects_by_id(id_list):
     _id_list = [ int(i[1:]) for i in id_list if i[0] == 'n' ]
     plan = plpy.prepare('select id, tags, ST_Transform(geom, 900913) as geom from nodes where id=any($1)', ['bigint[]']);
-    res = plpy.execute(plan, [_id_list])
+    res = plpy.cursor(plan, [_id_list])
     for r in res:
         yield {
             'id': 'n' + str(r['id']),
@@ -189,7 +189,7 @@ def objects_by_id(id_list):
 
     _id_list = [ int(i[1:]) for i in id_list if i[0] == 'w' ]
     plan = plpy.prepare('select id, tags, version, user_id, (select name from users where id=user_id) as user, tstamp, changeset_id, ST_Transform(linestring, 900913) as linestring, array_agg(node_id) as member_ids from (select ways.*, node_id from ways left join way_nodes on ways.id=way_nodes.way_id where ways.id=any($1) order by way_nodes.sequence_id) t group by id, tags, linestring', ['bigint[]']);
-    res = plpy.execute(plan, [_id_list])
+    res = plpy.cursor(plan, [_id_list])
     for r in res:
         t = {
             'id': 'w' + str(r['id']),
@@ -213,7 +213,7 @@ def objects_by_id(id_list):
 
     _id_list = [ int(i[1:]) for i in id_list if i[0] == 'r' ]
     plan = plpy.prepare('select id, tags, version, user_id, (select name from users where id=user_id) as user, tstamp, changeset_id, array_agg(lower(member_type) || member_id) as member_ids, array_agg(member_role) as member_roles from (select relations.*, member_type, member_id, member_role from relations left join relation_members on relations.id=relation_members.relation_id where relations.id=any($1) order by relation_members.sequence_id) t group by id, tags', ['bigint[]']);
-    res = plpy.execute(plan, [_id_list])
+    res = plpy.cursor(plan, [_id_list])
     for r in res:
         t = {
             'id': 'r' + str(r['id']),
@@ -239,7 +239,7 @@ def objects_by_id(id_list):
 def objects_member_of(member_id, parent_type, parent_conditions):
     if parent_type == 'relation':
         plan = plpy.prepare('select *, (select name from users where id=user_id) as user from relation_members join relations on relation_members.relation_id=relations.id where member_id=$1 and member_type=$2', ['bigint', 'text']);
-        res = plpy.execute(plan, [member_id[1:], member_id[0:1].upper()])
+        res = plpy.cursor(plan, [member_id[1:], member_id[0:1].upper()])
         for r in res:
             t = {
                 'id': 'r' + str(r['id']),
@@ -263,7 +263,7 @@ def objects_member_of(member_id, parent_type, parent_conditions):
     if parent_type == 'way' and member_id[0] == 'n':
         num_id = int(member_id[1:])
         plan = plpy.prepare('select *, (select name from users where id=user_id) as user from way_nodes join ways on way_nodes.way_id=ways.id where node_id=$1', ['bigint']);
-        res = plpy.execute(plan, [num_id])
+        res = plpy.cursor(plan, [num_id])
         for r in res:
             t = {
                 'id': 'w' + str(r['id']),

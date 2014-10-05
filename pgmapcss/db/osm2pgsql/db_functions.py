@@ -36,7 +36,7 @@ where {bbox} ( {w} )
 '''.format(bbox=bbox, w=' or '.join(w), add_columns=add_columns)
 
         plan = plpy.prepare(qry, param_type )
-        res = plpy.execute(plan, param_value )
+        res = plpy.cursor(plan, param_value )
 
         for r in res:
             r['tags'] = pghstore.loads(r['tags'])
@@ -59,7 +59,7 @@ where osm_id>0 and {bbox} ( {w} )
 '''.format(bbox=bbox, w=' or '.join(w), add_columns=add_columns)
 
         plan = plpy.prepare(qry, param_type )
-        res = plpy.execute(plan, param_value )
+        res = plpy.cursor(plan, param_value )
 
         for r in res:
             r['tags'] = pghstore.loads(r['tags'])
@@ -82,7 +82,7 @@ where osm_id<0 and {bbox} ( {w} )
 '''.format(bbox=bbox, w=' or '.join(w), add_columns=add_columns)
 
         plan = plpy.prepare(qry, param_type )
-        res = plpy.execute(plan, param_value )
+        res = plpy.cursor(plan, param_value )
 
         for r in res:
             r['tags'] = pghstore.loads(r['tags'])
@@ -105,7 +105,7 @@ where osm_id>0 and {bbox} ( {w} )
 '''.format(bbox=bbox, w=' or '.join(w), add_columns=add_columns)
 
         plan = plpy.prepare(qry, param_type )
-        res = plpy.execute(plan, param_value )
+        res = plpy.cursor(plan, param_value )
 
         for r in res:
             r['tags'] = pghstore.loads(r['tags'])
@@ -128,7 +128,7 @@ where osm_id<0 and {bbox} ( {w} )
 '''.format(bbox=bbox, w=' or '.join(w), add_columns=add_columns)
 
         plan = plpy.prepare(qry, param_type )
-        res = plpy.execute(plan, param_value )
+        res = plpy.cursor(plan, param_value )
 
         for r in res:
             r['tags'] = pghstore.loads(r['tags'])
@@ -138,7 +138,7 @@ where osm_id<0 and {bbox} ( {w} )
 def objects_by_id(id_list):
     _id_list = [ int(i[1:]) for i in id_list if i[0] == 'n' ]
     plan = plpy.prepare('select * from planet_osm_point where osm_id=any($1)', ['bigint[]']);
-    res = plpy.execute(plan, [_id_list])
+    res = plpy.cursor(plan, [_id_list])
     for r in res:
         t = {
             'id': 'n' + str(r['osm_id']),
@@ -152,7 +152,7 @@ def objects_by_id(id_list):
 
     _id_list = [ int(i[1:]) for i in id_list if i[0] == 'w' ]
     plan = plpy.prepare("select t.*, planet_osm_ways.nodes from (select osm_id, tags, way, 'line' as _type from planet_osm_line where osm_id=any($1) union select osm_id, tags, way, 'way' as _type from planet_osm_polygon where osm_id=any($1)) t left join planet_osm_ways on t.osm_id=planet_osm_ways.id", ['bigint[]']);
-    res = plpy.execute(plan, [_id_list])
+    res = plpy.cursor(plan, [_id_list])
     for r in res:
         t = {
             'id': 'w' + str(r['osm_id']),
@@ -171,7 +171,7 @@ def objects_by_id(id_list):
 
     _id_list = [ int(i[1:]) for i in id_list if i[0] == 'r' ]
     plan = plpy.prepare("select id, planet_osm_rels.tags, members, planet_osm_polygon.way from planet_osm_rels left join planet_osm_polygon on -planet_osm_rels.id=planet_osm_polygon.osm_id where id=any($1)", ['bigint[]'])
-    res = plpy.execute(plan, [_id_list])
+    res = plpy.cursor(plan, [_id_list])
     for r in res:
         t = {
             'id': 'r' + str(r['id']),
@@ -204,7 +204,7 @@ def flatarray_to_members(arr):
 def objects_member_of(member_id, parent_type, parent_conditions):
     if parent_type == 'relation':
         plan = plpy.prepare('select * from planet_osm_rels where members @> Array[$1]', ['text']);
-        res = plpy.execute(plan, [member_id])
+        res = plpy.cursor(plan, [member_id])
         for r in res:
             for member in flatarray_to_members(r['members']):
                 if member['member_id'] == member_id:
@@ -221,7 +221,7 @@ def objects_member_of(member_id, parent_type, parent_conditions):
     if parent_type == 'way':
         num_id = int(member_id[1:])
         plan = plpy.prepare('select id, nodes, planet_osm_line.tags, way as geo from planet_osm_ways left join planet_osm_line on planet_osm_ways.id=planet_osm_line.osm_id where nodes::bigint[] @> Array[$1]', ['bigint']);
-        res = plpy.execute(plan, [num_id])
+        res = plpy.cursor(plan, [num_id])
         for r in res:
             for i, member in enumerate(r['nodes']):
                 if member == num_id:

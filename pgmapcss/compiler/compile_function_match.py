@@ -48,6 +48,9 @@ def compile_function_match(stat):
           k: v['value'].split(';')
           for k, v in stat['defines']['style_element_property'].items()
       }),
+      'all_style_elements': repr({ k
+          for k, v in stat['defines']['style_element_property'].items()
+      }),
       'scale_denominators': repr(scale_denominators),
       'match_where': compile_function_get_where(stat['id'], stat),
       'db_query': db.query_functions(stat),
