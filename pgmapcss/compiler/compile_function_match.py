@@ -2,6 +2,7 @@ from pkg_resources import *
 import pgmapcss.db as db
 from .compile_function_get_where import compile_function_get_where
 from .compile_function_check import compile_function_check
+from .compile_build_result import compile_build_result
 from ..includes import include_text
 import pgmapcss.eval
 import pgmapcss.mode
@@ -10,7 +11,7 @@ import pgmapcss.types
 def compile_function_match(stat):
     scale_denominators = sorted(stat.all_scale_denominators(), reverse=True)
 
-    check_functions = ''
+    check_functions = compile_build_result(stat)
     max_scale = None
     for min_scale in scale_denominators:
         check_functions += compile_function_check([
