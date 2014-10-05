@@ -474,3 +474,11 @@ For @default_other, @values: don't process depending values if main property is 
 }}}
 
 A database row for style element 'line' will only be returned when the properties 'width' and 'color' are set.
+
+== Special configuration for certain properties ==
+{{{
+@property_config key "options;as;list";
+}}}
+
+Currently possible options:
+* 'return_after_statement': if the specified property appears in the current statement, all properties of the current statement (and previous statements) will be returned as separate result. The properties will be reset to the state before the current statement.

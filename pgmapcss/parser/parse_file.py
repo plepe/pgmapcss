@@ -36,6 +36,7 @@ def parse_file(stat, filename=None, base_style=None, content=None, defaults=[]):
             'depend_property': {},
             'postprocess': {},
             'style_element_property': {},
+            'property_config': {},
         }
 
     media = None # !None while in a media query

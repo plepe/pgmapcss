@@ -51,6 +51,20 @@ def compile_statement(statement, stat, indent=''):
         statement['current_pseudo_element'] = repr(object_selector['pseudo_element'])
         ret['body'] += indent + "current['pseudo_element'] = " + statement['current_pseudo_element'] + '\n'
 
+    # Check if a property with 'return_after_statement' appears in the statement
+    return_after_statement = False
+    if True in [
+        'return_after_statement' in stat['defines']['property_config'].get(prop['key'], {'value': ''})['value'].split(';')
+        for prop in statement['properties']
+        if prop['assignment_type'] == 'P'
+    ]:
+        return_after_statement = True
+
+    # if a 'return_each_statement' property appears, first save current properties and create a copy (so we don't overwrite current properties)
+    if return_after_statement:
+        ret['body'] += indent + "prop_save = current['properties']\n"
+        ret['body'] += indent + "current['properties'] = copy.deepcopy(prop_save)\n"
+
 # TODO: prop_type
     ret['body'] += compile_properties(statement, stat, indent)
 
@@ -65,5 +79,9 @@ def compile_statement(statement, stat, indent=''):
     if not 'create_pseudo_element' in object_selector or \
         object_selector['create_pseudo_element']:
         ret['body'] += indent + "current['has_pseudo_element'][" + statement['current_pseudo_element'] + '] = True\n'
+
+    if return_after_statement:
+        ret['body'] += indent + "yield ( 'result', build_result(current, current['pseudo_element']) )\n"
+        ret['body'] += indent + "current['properties'] = prop_save\n"
 
     return ret
