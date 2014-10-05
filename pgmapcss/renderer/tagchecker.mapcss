@@ -6,3 +6,7 @@
 @type suggestAlternative list_append;
 
 @style_element_property default "throwError;throwWarning;throwOther;fixAdd;fixRemove;fixChangeKey;suggestAlternative";
+
+@property_config throwError return_after_statement;
+@property_config throwWarning return_after_statement;
+@property_config throwOther return_after_statement;

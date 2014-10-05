@@ -17,12 +17,18 @@ fixRemove     | list_append | The tag key "key" should be removed.
 fixChangeKey  | list_append | A tag key should be changed to another key, e.g. "old=>new".
 suggestAlternative | list_append | An arbitrary message, suggesting changes.
 
+* All statements with 'throwError', 'throwWarning' or 'throwOther' will produce a separate entry in the results array, see example below.
 * Type 'list_append': If the property appears multiple times, it will be collected in a list (a string, separated by ';').
 
 An example tagchecker mapcss file:
 ```css
 way[highway][!ref] {
   throwOther: tr("highway without a reference");
+  fixAdd: "ref";
+  fixAdd: "int_ref";
+}
+way[highway=wrong] {
+  throwError: tr("highway with wrong value");
 }
 ```
 
@@ -33,11 +39,16 @@ An example GeoJSON output:
   "type": "Feature",
   "properties": {
     "osm:id": "w30323046",
-    "highway": "tertiary",
+    "highway": "wrong",
     "name": "Rotenturmstra\u00dfe",
     "results": [
       {
         "throwOther": "highway without a reference",
+        "fixAdd": "ref;int_ref",
+        "pseudo_element": "default",
+      },
+      {
+        "throwError": "highway with wrong value",
         "pseudo_element": "default",
       }
     ],
