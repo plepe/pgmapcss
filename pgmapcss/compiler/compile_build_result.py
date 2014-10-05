@@ -10,8 +10,8 @@ def build_result(current, pseudo_element):
 
     # Finally build return value(s)
     ret = {
-        'id': object['id'],
-        'types': list(object['types']),
+        'id': current['object']['id'],
+        'types': list(current['object']['types']),
         'tags': current['tags'],
         'pseudo_element': pseudo_element
     }

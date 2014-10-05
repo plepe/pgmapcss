@@ -219,7 +219,10 @@ def process_renderer(style_id, args, stat, conn):
         'types': [ 'canvas' ],
     }
 
-    check_code = pgmapcss.compiler.compile_function_check(stat['statements'], 0, 0, stat)
+    check_code = \
+        pgmapcss.compiler.compile_function_check(stat['statements'], 0, 0, stat) +\
+        pgmapcss.compiler.compile_build_result(stat)
+
     for r in pgmapcss.eval.functions(stat).eval('check_0({})'.format(canvas), additional_code=check_code):
         if r[0] == 'result':
             result = r[1]
