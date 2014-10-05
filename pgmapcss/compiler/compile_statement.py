@@ -52,13 +52,11 @@ def compile_statement(statement, stat, indent=''):
         ret['body'] += indent + "current['pseudo_element'] = " + statement['current_pseudo_element'] + '\n'
 
     # Check if a property with 'return_after_statement' appears in the statement
-    return_after_statement = False
-    if True in [
+    return_after_statement = True in [
         'return_after_statement' in stat['defines']['property_config'].get(prop['key'], {'value': ''})['value'].split(';')
         for prop in statement['properties']
         if prop['assignment_type'] == 'P'
-    ]:
-        return_after_statement = True
+    ]
 
     # if a 'return_each_statement' property appears, first save current properties and create a copy (so we don't overwrite current properties)
     if return_after_statement:

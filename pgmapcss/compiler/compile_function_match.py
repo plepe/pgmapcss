@@ -68,6 +68,7 @@ import pghstore
 import re
 import math
 import datetime
+import copy
 '''.format(**replacement)
 
     if 'profiler' in stat['options']:
