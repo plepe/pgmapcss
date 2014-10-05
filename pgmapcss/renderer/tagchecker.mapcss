@@ -1,0 +1,8 @@
+@config josm_classes true;
+
+@type fixAdd list_append;
+@type fixRemove list_append;
+@type fixChangeKey list_append;
+@type suggestAlternative list_append;
+
+@style_element_property default "throwError;throwWarning;throwOther;fixAdd;fixRemove;fixChangeKey;suggestAlternative";
