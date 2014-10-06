@@ -8,7 +8,8 @@ class tag_value(default):
         # TODO: first priority should name "name:" + LANG
         if prop['value'] == 'auto' and \
             (prop['key'] == 'text' or prop['key'][-5:] == '-text'):
-            return "current['tags'].get('name') or " +\
+            return "current['tags'].get('name:' + parameters['lang']) or " +\
+                   "current['tags'].get('name') or " +\
                    "current['tags'].get('int_name') or " +\
                    "current['tags'].get('ref') or " +\
                    "current['tags'].get('operator') or " +\
