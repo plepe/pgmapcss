@@ -62,6 +62,7 @@ If you read a number, unit conversion takes place. The following units are suppo
 | scale_denominator | | number | Returns current scale denominator, e.g. '17061.8366708' (at zoom level 15) | no standard
 | viewport | | geometry | Returns the bounding box of the current viewport | no standard
 | parameter | key | string | Return the chosen parameter (e.g. from the -p/--parameter argument in standalone mode) or //none//.
+| lang | | string | The currently active language. This is either the language from the active locale in standalone mode or the active locale when the style was compiled.
 
 == String Functions ==
 |= Function |= Parameters |= Return value |= Description | Compatibility
