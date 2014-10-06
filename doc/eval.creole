@@ -61,6 +61,7 @@ If you read a number, unit conversion takes place. The following units are suppo
 | zoom | | number | Returns current zoom level, e.g. '15' | no standard
 | scale_denominator | | number | Returns current scale denominator, e.g. '17061.8366708' (at zoom level 15) | no standard
 | viewport | | geometry | Returns the bounding box of the current viewport | no standard
+| parameter | key | string | Return the chosen parameter (e.g. from the -p/--parameter argument in standalone mode) or //none//.
 
 == String Functions ==
 |= Function |= Parameters |= Return value |= Description | Compatibility
