@@ -2,6 +2,7 @@ if __name__ == '__main__':
     import argparse
     import re
     import json
+    import os
 
     # Handle negative values in --bounds parameter
     # thanks to http://stackoverflow.com/a/21446783
@@ -78,6 +79,15 @@ if __name__ == '__main__':
             p[0:p.find('=')]: p[p.find('=')+1:]
             for p in args.parameters
         }}
+
+    if 'lang' not in parameters:
+        lang = os.environ.get('LANG')
+        m = re.match('(.*)_', lang)
+        if m:
+            parameters['lang'] = m.group(1)
+        else:
+            # default: english
+            parameters['lang'] = 'en'
 
     for result in pgmapcss_{style_id}(bounds, scale_denom, parameters):
         if result['object'] == last_object:

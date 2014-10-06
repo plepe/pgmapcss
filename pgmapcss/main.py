@@ -80,6 +80,14 @@ def main():
 
     file_name = style_id + '.mapcss'
 
+    lang = os.environ.get('LANG')
+    m = re.match('(.*)_', lang)
+    if m:
+        lang = m.group(1)
+    else:
+        # default: english
+        lang = 'en'
+
     stat = pgmapcss.compiler.stat._stat({
         'id': style_id,
         'options': set(args.options) if args.options else set(),
@@ -88,7 +96,8 @@ def main():
         'icons_dir': style_id + '.icons',
         'global_data': None,
         'mode': args.mode,
-        'args': args
+        'args': args,
+        'lang': lang
     })
 
     if args.config:
