@@ -68,7 +68,9 @@ if __name__ == '__main__':
     results = []
     last_object = None
 
-    for result in pgmapcss_{style_id}(bounds, scale_denom):
+    parameters = {{ }}
+
+    for result in pgmapcss_{style_id}(bounds, scale_denom, parameters):
         if result['object'] == last_object:
             results.append(result)
 

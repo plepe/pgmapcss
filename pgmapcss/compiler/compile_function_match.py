@@ -63,7 +63,6 @@ include_text()
     }
 
     ret = '''\
-import pghstore
 import re
 import math
 import datetime
