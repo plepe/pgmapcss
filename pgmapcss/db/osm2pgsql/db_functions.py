@@ -266,8 +266,10 @@ def objects_members(relation_id, parent_type, parent_conditions):
 def objects_near(max_distance, ob, parent_selector, where_clause, check_geo=None):
     if ob:
         geom = ob['geo']
-    else:
+    elif 'geo' in current['properties'][current['pseudo_element']]:
         geom = current['properties'][current['pseudo_element']]['geo']
+    else:
+        geom = current['object']['geo']
 
     if where_clause == '':
         where_clause = 'true'
