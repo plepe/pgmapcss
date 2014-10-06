@@ -24,6 +24,10 @@ if __name__ == '__main__':
         help='Pass the following parameters as key-value pairs to the MapCSS code, e.g. "-p foo=bar test=\'Hello World!\''
     )
 
+    parser.add_argument('--lang', dest='lang',
+        help='Use the given language code (e.g. "en" or "de") for language dependend instruction (e.g. function lang(), text:auto, ...). Default: language from current locale $LANG (or "en").'
+    )
+
     args = parser.parse_args()
 
     if args.bounds:
@@ -80,7 +84,11 @@ if __name__ == '__main__':
             for p in args.parameters
         }}
 
-    if 'lang' not in parameters:
+    if args.lang:
+        parameters['lang'] = args.lang
+    elif 'lang' in parameters:
+        pass
+    else:
         lang = os.environ.get('LANG')
         m = re.match('(.*)_', lang)
         if m:
