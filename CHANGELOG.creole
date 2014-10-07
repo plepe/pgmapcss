@@ -1,5 +1,6 @@
 0.9-dev
-* support osmosis pgsnapshot as alternative database backend, see doc/database.md for details
+* support osmosis pgsnapshot as alternative database backend, see [[doc/database.md|database docu]] for details
+* pseudo tags 'osm:id' (osm2pgsql and osmosis), 'osm:version', 'osm:user_id', 'osm:user', 'osm:timestamp', 'osm:changeset' (osmosis only), see [[doc/database.md|database docu]] for details
 * new option 'rusage' to show resource usage
 * new 'standalone' mode, which compiles mapcss into a python executable which can be used from command line
 * if no bounding box is given (to the database function or the standalone executable), the whole database will be queried

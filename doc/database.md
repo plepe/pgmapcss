@@ -17,7 +17,7 @@ osmosis pgsnapshot (short: osmosis)
 * All closed ways are considered 'area's and their geometry converted to polygons.
 * No native multipolygon support (see below).
 * No geometry or bounding box for relations, queries for relation will return all available relations in the database.
-* Additionally the tags "osm:id", "osm:version", "osm:user_id", "osm:user", "osm:timestasmpe", "osm:changeset" will be set, but they cannot (yet) be used for conditions (like `node[osm:user=skunk]`). Alternatively you may use `node[eval(tag("osm:user")=="skunk")]`, but it will not be as efficient.
+* Additionally the tags "osm:id", "osm:version", "osm:user_id", "osm:user", "osm:timestamp", "osm:changeset" will be set, but they cannot (yet) be used for conditions (like `node[osm:user=skunk]`). Alternatively you may use `node[eval(tag("osm:user")=="skunk")]`, but it will not be as efficient.
 
 Multipolygon support
 --------------------
