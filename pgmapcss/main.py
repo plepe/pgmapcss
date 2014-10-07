@@ -68,6 +68,10 @@ parser.add_argument('-m', '--mode', dest='mode',
     default='database-function',
     help='Mode of execution. Possible values: "database-function" (default): create function in a PostgreSQL database, e.g. for querying by a renderer like Mapnik. "standalone": create a module/executable which returns resp. prints the data.')
 
+parser.add_argument('--lang', dest='lang',
+    help='Use the given language code (e.g. "en" or "de") for language dependend instruction (e.g. function lang(), text:auto, ...). Default: language from current locale $LANG (or "en").'
+)
+
 def main():
     print('pgmapcss version %s' % pgmapcss.version.VERSION)
     args = parser.parse_args()
@@ -80,6 +84,19 @@ def main():
 
     file_name = style_id + '.mapcss'
 
+    if args.lang:
+        lang = args.lang
+    elif 'lang' in parameters:
+        pass
+    else:
+        lang = os.environ.get('LANG')
+        m = re.match('(.*)_', lang)
+        if m:
+            lang = m.group(1)
+        else:
+            # default: english
+            lang = 'en'
+
     stat = pgmapcss.compiler.stat._stat({
         'id': style_id,
         'options': set(args.options) if args.options else set(),
@@ -88,7 +105,8 @@ def main():
         'icons_dir': style_id + '.icons',
         'global_data': None,
         'mode': args.mode,
-        'args': args
+        'args': args,
+        'lang': lang
     })
 
     if args.config:

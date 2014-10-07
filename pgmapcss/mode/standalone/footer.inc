@@ -2,6 +2,7 @@ if __name__ == '__main__':
     import argparse
     import re
     import json
+    import os
 
     # Handle negative values in --bounds parameter
     # thanks to http://stackoverflow.com/a/21446783
@@ -17,6 +18,14 @@ if __name__ == '__main__':
     parser.add_argument('-s', '--scale', dest='scale',
         default='2000',
         help='Process map at a specified scale denominator. If z<zoom> syntax (e.g. "z15") is used, the zoom levels of projection 900913 are used.'
+    )
+
+    parser.add_argument('-p', '--parameters', dest='parameters', nargs='+',
+        help='Pass the following parameters as key-value pairs to the MapCSS code, e.g. "-p foo=bar test=\'Hello World!\''
+    )
+
+    parser.add_argument('--lang', dest='lang',
+        help='Use the given language code (e.g. "en" or "de") for language dependend instruction (e.g. function lang(), text:auto, ...). Default: language from current locale $LANG (or "en").'
     )
 
     args = parser.parse_args()
@@ -68,7 +77,27 @@ if __name__ == '__main__':
     results = []
     last_object = None
 
-    for result in pgmapcss_{style_id}(bounds, scale_denom):
+    parameters = {{ }}
+    if args.parameters is None:
+        parameters = {{
+            p[0:p.find('=')]: p[p.find('=')+1:]
+            for p in args.parameters
+        }}
+
+    if args.lang:
+        parameters['lang'] = args.lang
+    elif 'lang' in parameters:
+        pass
+    else:
+        lang = os.environ.get('LANG')
+        m = re.match('(.*)_', lang)
+        if m:
+            parameters['lang'] = m.group(1)
+        else:
+            # default: english
+            parameters['lang'] = 'en'
+
+    for result in pgmapcss_{style_id}(bounds, scale_denom, parameters):
         if result['object'] == last_object:
             results.append(result)
 

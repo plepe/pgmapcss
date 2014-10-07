@@ -44,6 +44,7 @@ def compile_function_match(stat):
       'host': stat['args'].host,
       'password': stat['args'].password,
       'database': stat['args'].database,
+      'default_lang': repr(stat['lang']),
       'user': stat['args'].user,
       'style_element_property': repr({
           k: v['value'].split(';')
@@ -64,7 +65,6 @@ include_text()
     }
 
     ret = '''\
-import pghstore
 import re
 import math
 import datetime
@@ -78,6 +78,9 @@ import copy
 global current
 global render_context
 current = None
+
+if not 'lang' in parameters:
+    parameters['lang'] = {default_lang}
 
 if type(bbox) == list and len(bbox) == 4:
     plan = plpy.prepare('select ST_Transform(SetSRID(MakeBox2D(ST_Point($1, $2), ST_Point($3, $4)), 4326), 900913) as bounds', ['float', 'float', 'float', 'float'])

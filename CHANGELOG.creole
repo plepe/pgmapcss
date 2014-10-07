@@ -3,6 +3,7 @@
 * new option 'rusage' to show resource usage
 * new 'standalone' mode, which compiles mapcss into a python executable which can be used from command line
 * if no bounding box is given (to the database function or the standalone executable), the whole database will be queried
+* Language support (see chapter "Language support" in [[doc/MapCSS.creole|MapCSS docu]]
 * enable usage for tag checking, see [[doc/tagchecker.md|tagchecker docu]] for details
 
 0.8.0 release 2014-09-14
