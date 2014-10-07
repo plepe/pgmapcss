@@ -39,5 +39,6 @@ class fake_plpy:
         for r in plan(*param):
             yield dict(r)
 
-def pgmapcss_{style_id}(bbox=None, scale_denominator=2000, _all_style_elements={all_style_elements}):
+def pgmapcss_{style_id}(bbox=None, scale_denominator=2000, parameters={{}}, _all_style_elements={all_style_elements}):
+    import pghstore
     plpy = fake_plpy()

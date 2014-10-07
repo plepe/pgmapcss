@@ -144,6 +144,7 @@ The following pseudo classes are supported:
 | :tagged | what is considered tagged, i.e. an object that with a tag key other than the following: source*, source_ref, note, comment, converted_by, created_by, watch*, fixme, FIXME, description, attribution (in this list, * is a glob). Note: osm2pgsql does not even import those object into the database.
 | :righthandtraffic | true if there is right-hand traffic at the current location
 | :lefthandtraffic | true if there is left-hand traffic at the current locatiown
+| :lang(fr) | true when the active language equals the one in brackets (e.g. french in this example). Combined languages codes (like "fr-ca") are not supported.
 
 === Pseudo elements ===
 After the pseudo class(es), separated by '::'. Optional.
@@ -392,6 +393,17 @@ Examples:
     /* something */
 }
 }}}
+
+== Language support ==
+pgmapcss implements language support at different levels:
+* Properties like {{{text}}} can read localized names, e.g. {{{text: auto}}}.
+* The eval function {{{localized_tag()}}} will either return a localized version of the tag or the tag itself.
+* The pseudo class {{{:lang(fr)}}} evaluates statements only when the current locale matches the one passed as parameter.
+
+=== Which language will be used? ===
+If you use pgmapcss in database function mode (e.g. when rendering with Mapnik), the language to use will be decided at compile time, depending on the current locale or the value of the {{{--lang}}} parameter.
+
+When using pgmapcss in standalone mode, the language will be decided at run time, depending on the current locale or the value of the {{{--lang}}} parameter.
 
 == Config option ==
 Config options can be set by using {{{@config config_option config_value;}}}. The following config options are supported:

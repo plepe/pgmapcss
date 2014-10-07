@@ -1,4 +1,5 @@
 from .parse_condition import parse_condition
+from .parse_string import parse_string
 from .ParseError import *
 import re
 
@@ -70,6 +71,17 @@ def parse_selector_part(to_parse, object_class_selector='\*|[a-z_]+'):
 
             if to_parse.match_group(1) == '!':
                 condition['op'] = '! pseudo_class'
+
+# ... additionally check if there is a parameter to the pseudo class
+            if to_parse.match('\('):
+                m = parse_string(to_parse)
+                if m:
+                    condition['value'] = m
+                    to_parse.match('\)')
+                elif to_parse.match('([^\)]*)\)'):
+                    condition['value'] = to_parse.match_group(1)
+                else:
+                    raise ParseError(to_parse, 'Can\'t parse parameter to pseudo class')
 
             current['conditions'].append(condition)
 
