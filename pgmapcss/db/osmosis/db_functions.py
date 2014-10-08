@@ -29,7 +29,7 @@ def objects(_bbox, where_clauses, add_columns=[], add_param_type=[], add_param_v
     if len(w):
         bbox = ''
         if _bbox is not None:
-            bbox = 'geom && ST_Transform($1, 4326) and'
+            bbox = 'geom && ST_Transform($1, 4326) and ST_Intersects(geom, ST_Transform($1, 4326)) and'
 
         qry = '''
 select 'n' || cast(id as text) as id, version, user_id, (select name from users where id=user_id) as user, tstamp, changeset_id,
@@ -62,7 +62,7 @@ where {bbox} ( {w} )
     if len(w):
         bbox = ''
         if _bbox is not None:
-            bbox = 'linestring && ST_Transform($1, 4326) and'
+            bbox = 'linestring && ST_Transform($1, 4326) and ST_Intersects(linestring, ST_Transform($1, 4326)) and'
 
         qry = '''
 select * from (
@@ -110,7 +110,7 @@ where {bbox} ( {w} ) offset 0) t
     if len(w):
         bbox = ''
         if _bbox is not None:
-            bbox = 'geom && ST_Transform($1, 4326) and'
+            bbox = 'geom && ST_Transform($1, 4326) and ST_Intersects(geom, ST_Transform($1, 4326)) and'
 
         qry = '''
 select * from (
