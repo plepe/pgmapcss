@@ -119,7 +119,7 @@ node[place=city] {
 }
 ```
 
-If you compile this MapCSS style into a standalone executable, running this executable will produce the following GeoJSON output (simplified, there will be more values). If you don't specify a bounding box as parameter the whole database will be queried:
+If you compile this MapCSS style into a standalone executable, running this executable (either from command line or as CGI script) will produce the following GeoJSON output (simplified, there will be more values). If you don't specify a bounding box as parameter the whole database will be queried:
 ```json
 { "type": "FeatureCollection", "features": [
 {

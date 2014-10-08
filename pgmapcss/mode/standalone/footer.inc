@@ -1,50 +1,103 @@
 if __name__ == '__main__':
-    import argparse
     import re
     import json
     import os
 
-    # Handle negative values in --bounds parameter
-    # thanks to http://stackoverflow.com/a/21446783
-    for i, arg in enumerate(sys.argv):
-        if (arg[0] == '-') and arg[1].isdigit(): sys.argv[i] = ' ' + arg
+    if 'GATEWAY_INTERFACE' in os.environ:
+        import cgi
+        params = cgi.FieldStorage()
 
-    parser = argparse.ArgumentParser(description='Executes the compiled map style and prints resulting objects.')
+        bounds = params.getvalue("bbox")
+        if bounds:
+            bounds = bounds.split(',')
+            if len(bounds) != 4:
+                print("Error parsing bounds, expecting four numbers.")
+                sys.exit(1)
 
-    parser.add_argument('-b', '--bounds', dest='bounds',
-        help='Process the map from the specified bounding box as min_lon,min_lat,max_lon,max_lat in WGS-84. (default: whole database)'
-    )
+        scale_denom = 2000
+        if params.getvalue("zoom"):
+            scale_denom = 559082264.028 / (2 ** int(params.getvalue("zoom")))
+        if params.getvalue("scale"):
+            scale_denom = float(params.getvalue("scale"))
 
-    parser.add_argument('-s', '--scale', dest='scale',
-        default='2000',
-        help='Process map at a specified scale denominator. If z<zoom> syntax (e.g. "z15") is used, the zoom levels of projection 900913 are used.'
-    )
+        parameters = {{ }}
+        for key in params.keys():
+            if key not in ('bbox', 'scale', 'zoom'):
+                parameters[key] = params.getvalue(key)
 
-    parser.add_argument('-P', '--parameters', dest='parameters', nargs='+',
-        help='Pass the following parameters as key-value pairs to the MapCSS code, e.g. "-P foo=bar test=\'Hello World!\''
-    )
+        if not 'lang' in parameters:
+            accept_lang = os.getenv('HTTP_ACCEPT_LANGUAGE')
+            parameters['lang'] = accept_lang.split(',')[0].split(';')[0].split('_')[0]
 
-    parser.add_argument('--lang', dest='lang',
-        help='Use the given language code (e.g. "en" or "de") for language dependend instruction (e.g. function lang(), text:auto, ...). Default: language from current locale $LANG (or "en").'
-    )
+        # print HTML headers
+        print("content-type: text/javascript, charset-utf8")
+        print()
 
-    args = parser.parse_args()
+    else:
+        import argparse
 
-    if args.bounds:
-        bounds = args.bounds.split(',')
-        if len(bounds) != 4:
-            print("Error parsing bounds, expecting four numbers.")
+        # Handle negative values in --bounds parameter
+        # thanks to http://stackoverflow.com/a/21446783
+        for i, arg in enumerate(sys.argv):
+            if (arg[0] == '-') and arg[1].isdigit(): sys.argv[i] = ' ' + arg
+
+        parser = argparse.ArgumentParser(description='Executes the compiled map style and prints resulting objects.')
+
+        parser.add_argument('-b', '--bounds', dest='bounds',
+            help='Process the map from the specified bounding box as min_lon,min_lat,max_lon,max_lat in WGS-84. (default: whole database)'
+        )
+
+        parser.add_argument('-s', '--scale', dest='scale',
+            default='2000',
+            help='Process map at a specified scale denominator. If z<zoom> syntax (e.g. "z15") is used, the zoom levels of projection 900913 are used.'
+        )
+
+        parser.add_argument('-P', '--parameters', dest='parameters', nargs='+',
+            help='Pass the following parameters as key-value pairs to the MapCSS code, e.g. "-P foo=bar test=\'Hello World!\''
+        )
+
+        parser.add_argument('--lang', dest='lang',
+            help='Use the given language code (e.g. "en" or "de") for language dependend instruction (e.g. function lang(), text:auto, ...). Default: language from current locale $LANG (or "en").'
+        )
+
+        args = parser.parse_args()
+
+        if args.bounds:
+            bounds = args.bounds.split(',')
+            if len(bounds) != 4:
+                print("Error parsing bounds, expecting four numbers.")
+                sys.exit(1)
+        else:
+            bounds = None
+
+        if args.scale[0] == 'z':
+            scale_denom = 559082264.028 / (2 ** int(args.scale[1:]))
+        elif re.match('[0-9]+(\.[0-9]+)?$', args.scale):
+            scale_denom = float(args.scale)
+        else:
+            print("Error parsing scale.")
             sys.exit(1)
-    else:
-        bounds = None
 
-    if args.scale[0] == 'z':
-        scale_denom = 559082264.028 / (2 ** int(args.scale[1:]))
-    elif re.match('[0-9]+(\.[0-9]+)?$', args.scale):
-        scale_denom = float(args.scale)
-    else:
-        print("Error parsing scale.")
-        sys.exit(1)
+        parameters = {{ }}
+        if args.parameters is not None:
+            parameters = {{
+                p[0:p.find('=')]: p[p.find('=')+1:]
+                for p in args.parameters
+            }}
+
+        if args.lang:
+            parameters['lang'] = args.lang
+        elif 'lang' in parameters:
+            pass
+        else:
+            lang = os.environ.get('LANG')
+            if lang:
+                m = re.match('(.*)_', lang)
+                if m:
+                    parameters['lang'] = m.group(1)
+            else:
+                # default: english
+                parameters['lang'] = 'en'
 
     plpy = fake_plpy()
     plan_to_geojson = plpy.prepare('select ST_asGeoJSON(ST_Transform($1, 4326)) as r', [ 'geometry' ])
@@ -76,27 +129,6 @@ if __name__ == '__main__':
 
     results = []
     last_object = None
-
-    parameters = {{ }}
-    if args.parameters is not None:
-        parameters = {{
-            p[0:p.find('=')]: p[p.find('=')+1:]
-            for p in args.parameters
-        }}
-
-    if args.lang:
-        parameters['lang'] = args.lang
-    elif 'lang' in parameters:
-        pass
-    else:
-        lang = os.environ.get('LANG')
-        if lang:
-            m = re.match('(.*)_', lang)
-            if m:
-                parameters['lang'] = m.group(1)
-        else:
-            # default: english
-            parameters['lang'] = 'en'
 
     for result in pgmapcss_{style_id}(bounds, scale_denom, parameters):
         if result['object'] == last_object:

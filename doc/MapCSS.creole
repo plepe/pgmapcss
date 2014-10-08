@@ -403,7 +403,7 @@ pgmapcss implements language support at different levels:
 === Which language will be used? ===
 If you use pgmapcss in database function mode (e.g. when rendering with Mapnik), the language to use will be decided at compile time, depending on the current locale or the value of the {{{--lang}}} parameter.
 
-When using pgmapcss in standalone mode, the language will be decided at run time, depending on the current locale or the value of the {{{--lang}}} parameter.
+When using pgmapcss in standalone mode, the language will be decided at run time, depending on the current locale or the value of the {{{--lang}}} parameter. If the compiled script is used as CGI script, the language will be used from the "Accept-Language" HTTP header or the parameter lang (e.g. file.cgi?lang=ru).
 
 == Config option ==
 Config options can be set by using {{{@config config_option config_value;}}}. The following config options are supported:
