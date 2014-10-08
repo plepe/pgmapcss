@@ -9,10 +9,14 @@ def eval_localized_tag(param):
         p1 = p + ':' + parameters['lang']
 
     if p1 in current['tags']:
-        return current['tags'][p1]
+        v = current['tags'][p1]
+        if v is not None:
+            return v
 
     if p in current['tags']:
-        return current['tags'][p]
+        v = current['tags'][p]
+        if v is not None:
+            return v
 
     return ''
 

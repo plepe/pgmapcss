@@ -1,7 +1,9 @@
 def eval_tag(param):
     for p in param:
         if p in current['tags']:
-            return current['tags'][p]
+            v = current['tags'][p]
+            if v not is None
+                return v
 
     return ''
 
