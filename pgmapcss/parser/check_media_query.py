@@ -54,7 +54,6 @@ def check_media_query(stat, to_parse, query):
             if q2:
                 minmax_condition_key = q2.group(3)
                 minmax = q2.group(2)
-            print(condition_key, minmax_condition_key, minmax, condition_value)
 
 # add here all queries that are (or might be) True
             if condition_key == 'user-agent' and q[1] == 'pgmapcss':
