@@ -206,7 +206,8 @@ def process_renderer(style_id, args, stat, conn):
         '{password}': args.password,
         '{database}': args.database,
         '{user}': args.user,
-        '{columns}': '{columns}'
+        '{columns}': '{columns}',
+        '{parameters}': "'" + pghstore.dumps(stat['parameters']) + "'",
     }
 
     stat['mapnik_columns'] = set()

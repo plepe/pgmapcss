@@ -218,7 +218,7 @@
         from pgmapcss_{style_id}(
             !bbox!,
             !scale_denominator!,
-            null,
+            {parameters},
             Array['fill', 'casing', 'side-casing', 'line', 'point', 'point-text', 'line-text', 'shield']
         ) offset 0) t
     ) t

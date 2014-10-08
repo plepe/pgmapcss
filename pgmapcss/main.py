@@ -68,6 +68,10 @@ parser.add_argument('-m', '--mode', dest='mode',
     default='database-function',
     help='Mode of execution. Possible values: "database-function" (default): create function in a PostgreSQL database, e.g. for querying by a renderer like Mapnik. "standalone": create a module/executable which returns resp. prints the data.')
 
+parser.add_argument('-P', '--parameters', dest='parameters', nargs='+',
+    help='Pass the following parameters as default key-value pairs to the compiled MapCSS code, e.g. "-P foo=bar test=\'Hello World!\'. Only in database-function mode; on standalone mode you can set this at run time.'
+)
+
 parser.add_argument('--lang', dest='lang',
     help='Use the given language code (e.g. "en" or "de") for language dependend instruction (e.g. function lang(), text:auto, ...). Default: language from current locale $LANG (or "en").'
 )
@@ -83,6 +87,13 @@ def main():
         style_id = m.group(1)
 
     file_name = style_id + '.mapcss'
+
+    parameters = { }
+    if args.parameters is not None:
+        parameters = {
+            p[0:p.find('=')]: p[p.find('=')+1:]
+            for p in args.parameters
+        }
 
     if args.lang:
         lang = args.lang
@@ -106,7 +117,8 @@ def main():
         'global_data': None,
         'mode': args.mode,
         'args': args,
-        'lang': lang
+        'lang': lang,
+        'parameters': parameters,
     })
 
     if args.config:
