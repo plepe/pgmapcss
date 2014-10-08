@@ -20,8 +20,8 @@ if __name__ == '__main__':
         help='Process map at a specified scale denominator. If z<zoom> syntax (e.g. "z15") is used, the zoom levels of projection 900913 are used.'
     )
 
-    parser.add_argument('-p', '--parameters', dest='parameters', nargs='+',
-        help='Pass the following parameters as key-value pairs to the MapCSS code, e.g. "-p foo=bar test=\'Hello World!\''
+    parser.add_argument('-P', '--parameters', dest='parameters', nargs='+',
+        help='Pass the following parameters as key-value pairs to the MapCSS code, e.g. "-P foo=bar test=\'Hello World!\''
     )
 
     parser.add_argument('--lang', dest='lang',
@@ -78,7 +78,7 @@ if __name__ == '__main__':
     last_object = None
 
     parameters = {{ }}
-    if args.parameters is None:
+    if args.parameters is not None:
         parameters = {{
             p[0:p.find('=')]: p[p.find('=')+1:]
             for p in args.parameters
