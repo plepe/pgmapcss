@@ -90,9 +90,10 @@ if __name__ == '__main__':
         pass
     else:
         lang = os.environ.get('LANG')
-        m = re.match('(.*)_', lang)
-        if m:
-            parameters['lang'] = m.group(1)
+        if lang:
+            m = re.match('(.*)_', lang)
+            if m:
+                parameters['lang'] = m.group(1)
         else:
             # default: english
             parameters['lang'] = 'en'
