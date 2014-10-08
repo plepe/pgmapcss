@@ -10,12 +10,12 @@ def eval_localized_tag(param):
 
     if p1 in current['tags']:
         v = current['tags'][p1]
-        if v is not None:
+        if not v is None:
             return v
 
     if p in current['tags']:
         v = current['tags'][p]
-        if v is not None:
+        if not v is None:
             return v
 
     return ''
