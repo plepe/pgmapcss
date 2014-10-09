@@ -29,7 +29,10 @@ if __name__ == '__main__':
 
         scale_denom = 2000
         if params.getvalue("zoom"):
-            scale_denom = 559082264.028 / (2 ** int(params.getvalue("zoom")))
+            zoom = int(params.getvalue("zoom"))
+            if params.getvalue("tilesize"):
+                zoom = zoom + int(math.log(int(params.getvalue("tilesize")) / 256, 2))
+            scale_denom = 559082264.028 / (2 ** zoom)
         if params.getvalue("scale"):
             scale_denom = float(params.getvalue("scale"))
 
