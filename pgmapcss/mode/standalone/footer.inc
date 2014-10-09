@@ -14,6 +14,19 @@ if __name__ == '__main__':
                 print("Error parsing bounds, expecting four numbers.")
                 sys.exit(1)
 
+        # using zoom/x/y
+        if params.getvalue('x') and params.getvalue('y') and params.getvalue('zoom'):
+            import math
+            x = int(params.getvalue('x'))
+            y = int(params.getvalue('y'))
+            n = 2.0 ** int(params.getvalue('zoom'))
+            bounds = [
+                x / n * 360.0 - 180.0,
+                math.degrees(math.atan(math.sinh(math.pi * (1 - 2 * y / n)))),
+                (x + 1) / n * 360.0 - 180.0,
+                math.degrees(math.atan(math.sinh(math.pi * (1 - 2 * (y + 1) / n))))
+            ]
+
         scale_denom = 2000
         if params.getvalue("zoom"):
             scale_denom = 559082264.028 / (2 ** int(params.getvalue("zoom")))
