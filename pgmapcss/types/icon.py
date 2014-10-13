@@ -1,6 +1,5 @@
 from .default import default
 import os
-from wand.image import Image
 
 class icon(default):
     def __init__(self, key, stat):
@@ -25,6 +24,7 @@ class icon(default):
                 # TODO: check if icon is part of Maki
                 pass
             elif os.path.exists(prop['value']):
+                from wand.image import Image
                 img = Image(filename=prop['value'])
                 self.data[prop['value']] = img.size
             else:

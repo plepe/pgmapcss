@@ -21,8 +21,12 @@ setup(
     },
     scripts = [ 'bin/pgmapcss' ],
     install_requires = [
-      "pghstore",
-      "py-postgresql",
-      "wand",
-    ]
+        "pghstore",
+        "py-postgresql",
+    ],
+    extras_require = {
+        'icons-and-images': [
+            'wand'
+        ],
+    }
 )

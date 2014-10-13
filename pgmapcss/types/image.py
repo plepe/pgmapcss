@@ -1,7 +1,6 @@
 from .default import default
 import os
 import re
-from wand.image import Image
 
 class image(default):
     def __init__(self, key, stat):
@@ -19,6 +18,7 @@ class image(default):
             return prop['value']
 
         if os.path.exists(prop['value']):
+            from wand.image import Image
             img = Image(filename=prop['value'])
             self.data[prop['value']] = img.size
             if not prop['key'] in self.stat['global_data']:
