@@ -103,31 +103,46 @@ def compile_condition_column(condition, statement, tag_type, stat, prefix, filte
     return ret
 
 def compile_condition_sql(condition, statement, stat, prefix='current.', filter={}):
-    # ignore generated tags (identified by leading .)
-    if condition['key'][0] == '.':
-        f = filter.copy()
-        f['has_set_tag'] = condition['key']
-        f['max_id'] = statement['id']
-        set_statements = stat.filter_statements(f)
+    ret = set()
 
-        if len(set_statements) == 0:
-            return 'false'
+    # assignments: map conditions which are based on a (possible) set-statement
+    # back to their original selectors:
+    f = filter.copy()
+    f['has_set_tag'] = condition['key']
+    f['max_id'] = statement['id']
+    set_statements = stat.filter_statements(f)
 
-        return '((' + ') or ('.join([
+    if len(set_statements) > 0:
+        ret.add('((' + ') or ('.join([
             compile_selector_sql(s, stat, prefix, filter)
             for s in set_statements
-        ]) + '))'
+        ]) + '))')
 
+    # ignore generated tags (identified by leading .)
+    if condition['key'][0] == '.':
+        if len(ret) == 0:
+            return 'false'
+        return ''.join(ret)
+
+    # depending on the tag type compile the specified condition
     tag_type = stat['database'].tag_type(condition['key'])
 
     if tag_type is None:
-        return None
+        pass
     elif tag_type[0] == 'hstore-value':
-        return compile_condition_hstore_value(condition, statement, tag_type, stat, prefix, filter)
+        ret.add(compile_condition_hstore_value(condition, statement, tag_type, stat, prefix, filter))
     elif tag_type[0] == 'column':
-        return compile_condition_column(condition, statement, tag_type, stat, prefix, filter)
+        ret.add(compile_condition_column(condition, statement, tag_type, stat, prefix, filter))
     else:
         raise CompileError('unknown tag type {}'.format(tag_type))
+
+    if None in ret:
+        ret.remove(None)
+    if len(ret) == 0:
+        return None
+
+    # merge conditions together, return
+    return '(' + ' or '.join(ret) + ')'
 
 def compile_selector_sql(statement, stat, prefix='current.', filter={}):
     ret = {

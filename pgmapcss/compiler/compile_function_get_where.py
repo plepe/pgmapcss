@@ -41,24 +41,6 @@ def get_where_selectors(filter, stat):
             (v['selector']['max_scale'] == None or v['selector']['max_scale'] >= filter['max_scale'])
     ]
 
-    # assignments: map conditions which are based on a (possible) set-statement
-    # back to their original selectors:
-    where_selectors += [
-        j[2]
-        for j in list_tag_assignments
-        for i, v in enumerate(stat['statements'])
-        for s in v['selector']['conditions']
-        for w in v['properties']
-        if ((w['key'] in style_element_properties and
-            w['assignment_type'] == 'P') or
-            w['assignment_type'] == 'C') and
-            j[2] < i and s['key'] == j[0] and
-            (j[1] == True or not 'value' in s or s['value'] == j[1]) and
-            v['selector']['min_scale'] <= filter['min_scale'] and
-            (v['selector']['max_scale'] == None or v['selector']['max_scale'] >= filter['max_scale']) and
-            not 'create_pseudo_element' in v['selector']
-    ]
-
     # uniq list
     return list(set(where_selectors))
 
