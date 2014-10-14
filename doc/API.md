@@ -49,6 +49,7 @@ bbox          | Process the map from the specified bounding box as min_lon,min_l
 scale         | Process map at a specified scale denominator.
 zoom          | zoom level of standard tile based map (projection 900913)
 x, y          | x/y tiles as with images (jpg/png)
+z             | zoom level in combination with x/y tiles. If a different tilesize (e.g. 512 or 1024) is used, the zoom level will be adapted automatically. With tilesize 256, zoom and z are equal.
 tilesize      | the tilesize when using x/y tiles (default: 256)
 lang          | Use the given language code (e.g. "en" or "de") for language dependend instructions. Default: the first value of the HTTP Accept-Language header.
 srs           | ID of projection of output coordinates (default: 4326).
