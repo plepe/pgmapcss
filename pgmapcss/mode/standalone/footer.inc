@@ -14,9 +14,29 @@ if __name__ == '__main__':
                 print("Error parsing bounds, expecting four numbers.")
                 sys.exit(1)
 
+        # using zoom/x/y
+        if params.getvalue('x') and params.getvalue('y') and params.getvalue('zoom'):
+            import math
+            x = int(params.getvalue('x'))
+            y = int(params.getvalue('y'))
+            n = 2.0 ** int(params.getvalue('zoom'))
+            bounds = [
+                x / n * 360.0 - 180.0,
+                math.degrees(math.atan(math.sinh(math.pi * (1 - 2 * y / n)))),
+                (x + 1) / n * 360.0 - 180.0,
+                math.degrees(math.atan(math.sinh(math.pi * (1 - 2 * (y + 1) / n))))
+            ]
+
         scale_denom = 2000
         if params.getvalue("zoom"):
-            scale_denom = 559082264.028 / (2 ** int(params.getvalue("zoom")))
+            zoom = int(params.getvalue("zoom"))
+
+            scale_denom = 559082264.028 / (2 ** zoom)
+        if params.getvalue("z"):
+            zoom = int(params.getvalue("z"))
+            if params.getvalue("tilesize"):
+                zoom = zoom + int(math.log(int(params.getvalue("tilesize")) / 256, 2))
+            scale_denom = 559082264.028 / (2 ** zoom)
         if params.getvalue("scale"):
             scale_denom = float(params.getvalue("scale"))
 
@@ -28,6 +48,9 @@ if __name__ == '__main__':
         if not 'lang' in parameters:
             accept_lang = os.getenv('HTTP_ACCEPT_LANGUAGE')
             parameters['lang'] = accept_lang.split(',')[0].split(';')[0].split('_')[0]
+        srs = 4326
+        if params.getvalue('srs'):
+            srs = int(params.getvalue('srs'))
 
         # print HTML headers
         print("content-type: text/javascript, charset-utf8")
@@ -60,6 +83,11 @@ if __name__ == '__main__':
             help='Use the given language code (e.g. "en" or "de") for language dependend instruction (e.g. function lang(), text:auto, ...). Default: language from current locale $LANG (or "en").'
         )
 
+        parser.add_argument('--srs', dest='srs',
+            default='4326',
+            help='Use the specified spatial reference system for returned geometries (default: 4326).'
+        )
+
         args = parser.parse_args()
 
         if args.bounds:
@@ -77,6 +105,8 @@ if __name__ == '__main__':
         else:
             print("Error parsing scale.")
             sys.exit(1)
+
+        srs = int(args.srs)
 
         parameters = {{ }}
         if args.parameters is not None:
@@ -100,7 +130,7 @@ if __name__ == '__main__':
                 parameters['lang'] = 'en'
 
     plpy = fake_plpy()
-    plan_to_geojson = plpy.prepare('select ST_asGeoJSON(ST_Transform($1, 4326)) as r', [ 'geometry' ])
+    plan_to_geojson = plpy.prepare('select ST_asGeoJSON(ST_Transform($1, $2)) as r', [ 'geometry', 'integer' ])
 
     def format_result(results):
         object = results[-1]['object']
@@ -112,12 +142,12 @@ if __name__ == '__main__':
             props = result['properties']
             props['pseudo_element'] = result['pseudo_element']
             if result['geo'] != object['geo']:
-                g = plpy.execute(plan_to_geojson, [ result['geo'] ])[0]['r']
+                g = plpy.execute(plan_to_geojson, [ result['geo'], srs ])[0]['r']
                 props['geometry'] = json.loads(g) if g else None,
 
             properties_list['results'].append(props)
 
-        geo = plpy.execute(plan_to_geojson, [ object['geo'] ])[0]['r']
+        geo = plpy.execute(plan_to_geojson, [ object['geo'], srs ])[0]['r']
         feature = {{
             'type': 'Feature',
             'geometry': json.loads(geo) if geo else None,
@@ -136,7 +166,9 @@ if __name__ == '__main__':
 
         else:
             if len(results) == 0:
-                print('{{ "type": "FeatureCollection", "features": [')
+                print('{{ "type": "FeatureCollection",')
+                print('"crs": {{ "type": "name", "properties": {{ "name": "EPSG:' + str(srs) + '" }} }},')
+                print('"features": [')
             else:
                 print(format_result(results))
                 print(",")
