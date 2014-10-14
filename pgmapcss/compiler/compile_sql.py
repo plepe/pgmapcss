@@ -144,9 +144,8 @@ def compile_condition_sql(condition, statement, stat, prefix='current.', filter=
     # merge conditions together, return
     return '(' + ' or '.join(ret) + ')'
 
-def compile_selector_sql(statement, stat, prefix='current.', filter={}):
-    if statement['selector']['type'] != True:
-        filter['object_type'] = statement['selector']['type']
+def compile_selector_sql(statement, stat, prefix='current.', filter={}, object_type=None):
+    filter['object_type'] = object_type
 
     ret = {
         compile_condition_sql(c, statement, stat, prefix, filter) or 'true'

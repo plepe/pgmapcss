@@ -55,19 +55,15 @@ def compile_function_get_where(id, stat):
         where_selectors = get_where_selectors(filter, stat)
 
         # compile all selectors
+        # TODO: define list of possible object_types
         conditions = {
             (
-                stat['statements'][i]['selector']['type'],
-                compile_selector_sql(stat['statements'][i], stat, prefix='', filter=filter)
+                object_type,
+                compile_selector_sql(stat['statements'][i], stat, prefix='', filter=filter, object_type=object_type)
             )
             for i in where_selectors
+            for object_type in ({'node', 'way', 'area'} if stat['statements'][i]['selector']['type'] == True else { stat['statements'][i]['selector']['type'] })
         }
-
-        # Move all conditions with * as type selector to all other types
-        all_types_conditions = []
-        for c in conditions:
-            if c[0] == True:
-                all_types_conditions.append(c[1])
 
         types = [ t for t, cs in conditions if t != True ]
 
@@ -78,7 +74,7 @@ def compile_function_get_where(id, stat):
                     for t2, cs in conditions
                     if t == t2
                     if cs != 'false'
-                ] + all_types_conditions ) + ')'
+                ]) + ')'
             for t in types
         }
         conditions = {
