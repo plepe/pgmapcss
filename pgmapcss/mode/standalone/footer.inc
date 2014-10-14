@@ -1,3 +1,11 @@
+    sys.stderr.write('Print database query explains and statistics:\n')
+    for k, v in plpy.explained_queries.items():
+        sys.stderr.write('* {{}}\n'.format(k))
+        sys.stderr.write('- Executed {{count}} time(s)\n'.format(**v))
+        sys.stderr.write('- Explain:\n')
+        for e in v['explain']:
+            sys.stderr.write('    ' + e[0] + '\n')
+
 if __name__ == '__main__':
     import re
     import json
