@@ -25,6 +25,13 @@ Executes the compiled map style and prints resulting objects.
 
 optional arguments:
   -h, --help            show this help message and exit
+  -d DATABASE, --database DATABASE
+                        Name of database (default: as set at compile time)
+  -u USER, --user USER  User for database (default: as set at compile time)
+  -p PASSWORD, --password PASSWORD
+                        Password for database (default: as set at compile
+                        time)
+  -H HOST, --host HOST  Host for database (default: as set at compile time)
   -b BOUNDS, --bounds BOUNDS
                         Process the map from the specified bounding box as
                         min_lon,min_lat,max_lon,max_lat in WGS-84. (default:
