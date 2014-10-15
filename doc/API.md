@@ -5,10 +5,26 @@
 ### Mode 'database-function': pgmapcss_{style_id}()
 Returns all matching objects and resulting properties in the current render context. Pseudo elements will add additional rows in the output. Every row will be returned multiple times, for each element in the style-element array. The result will be ordered by 'index of style-element', 'z-index' (asc, default 0).
 
-Example:
+* Example:
 ```sql
 select * from pgmapcss_test(!bbox!, !scale_denominator!, Array['fill', 'line', 'text']);
 ```
+
+* Return:
+This function will return a row for each feature and each pseudo element. The structure will contain the following columns:
+
+Column name | Type | Description
+------------|------|-------------
+id          | text | The ID of the feature, e.g. 'n1234'.
+tags        | hstore   | Key/Value of the (modified) tags of the feature.
+geo         | geometry | The geometry of the object
+types       | text[]   | Types for selectors the feature belongs too, e.g. Array['way', 'area'].
+pseudo_element | text  | The pseudo element for which properties have been calculated, default 'default'.
+properties  | hstore   | How the feature should be styled, with colors, widths, dashes, texts, ...
+style_elements         | text[] | On which style elements the feature will be shown, e.g. casing, line, point-text, ...
+style_elements_index   | int[]  | Index of all style elements in the all_style_elements array (from calling the function).
+style_elements_layer   | float[] | Layer where each style element should be shown.
+style_elements_z_index | float[] | z-index for each style element.
 
 Notes:
 * `!bbox!` and `!scale_denominator!` will be replaced by Mapnik by the current bounding box resp. scale denominator. See [zoom-to-scale.txt](https://trac.openstreetmap.org/browser/subversion/applications/rendering/mapnik/zoom-to-scale.txt) for valid values.
