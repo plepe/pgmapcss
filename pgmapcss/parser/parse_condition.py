@@ -6,7 +6,7 @@ import re
 def parse_condition(to_parse):
     condition = { 'op': '', 'value_type': 'value' }
 
-    if to_parse.match('!'):
+    if to_parse.match('\s*!'):
         condition['op'] += '! '
 
     r = parse_string(to_parse)
@@ -24,10 +24,10 @@ def parse_condition(to_parse):
 
         return condition
 
-    elif to_parse.match('([a-zA-Z_0-9\\-\.:]+)'):
+    elif to_parse.match('\s*([a-zA-Z_0-9\\-\.:]+)'):
         condition['key'] = to_parse.match_group(1)
 
-    elif to_parse.match('\/([^\]]*)\/(i?)\]'):
+    elif to_parse.match('\s*\/([^\]]*)\/(i?)\]'):
         condition['op'] += 'key_regexp'
         condition['key'] = to_parse.match_group(1)
 
@@ -39,7 +39,7 @@ def parse_condition(to_parse):
     else:
         raise ParseError(to_parse, 'parse condition: Can\'t parse condition key')
 
-    if to_parse.match('(=~|!=|!~|<=|>=|<|>|\^=|\$=|\*=|~=|@=|=)'):
+    if to_parse.match('\s*(=~|!=|!~|<=|>=|<|>|\^=|\$=|\*=|~=|@=|=)\s*'):
         condition['op'] += to_parse.match_group(1)
 
     elif to_parse.match('\?\]'):
@@ -93,7 +93,7 @@ def parse_condition(to_parse):
             raise ParseError(to_parse, 'parse condition: expecting ]')
 
     else:
-        m = to_parse.match('([^\]]*)\]')
+        m = to_parse.match('([^\]]*)\s*\]')
         if m:
             condition['value'] = to_parse.match_group(1)
         else:

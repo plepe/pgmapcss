@@ -8,11 +8,11 @@ def parse_string(to_parse, delim=("'", '"')):
     if type(delim) == str:
         delim = { delim }
 
-    if not to_parse.to_parse()[0] in delim:
+    if not to_parse.match("\s*(" + "|".join(delim) + ")"):
         return None
+    else:
+        c = to_parse.match_group(1)
 
-    c = to_parse.to_parse()[0]
-    to_parse.wind(1)
     esc = False
     parsed += c
 
