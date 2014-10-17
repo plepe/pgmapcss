@@ -6,7 +6,7 @@ def objects(_bbox, where_clauses, add_columns=[], add_param_type=[], add_param_v
 
     bbox = ''
     if _bbox is not None:
-        bbox = 'way && $1 and ST_Intersects(way, $1) and'
+        bbox = 'way && $1 and ST_Intersects(way, $1::geometry) and'
 
     if len(add_columns):
         add_columns = ', ' + ', '.join(add_columns)
