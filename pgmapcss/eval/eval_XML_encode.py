@@ -1,7 +1,7 @@
 class config_eval_XML_encode(config_base):
     mutable = 3
 
-def eval_XML_encode(param):
+def eval_XML_encode(param, current):
     if len(param) == 0:
         return ''
 

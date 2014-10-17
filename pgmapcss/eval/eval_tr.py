@@ -1,7 +1,7 @@
 class config_eval_tr(config_base):
     mutable = 3
 
-def eval_tr(param):
+def eval_tr(param, current):
     if len(param) == 0:
         return ''
 

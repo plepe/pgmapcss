@@ -22,7 +22,7 @@ class config_eval_prop(config_base):
 
         return ( values, 0 )
 
-def eval_prop(param):
+def eval_prop(param, current):
     if len(param) == 0:
         return ''
 

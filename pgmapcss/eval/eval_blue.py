@@ -1,7 +1,7 @@
 class config_eval_blue(config_base):
     mutable = 3
 
-def eval_blue(param):
+def eval_blue(param, current):
     if len(param) == 0:
         return ''
 

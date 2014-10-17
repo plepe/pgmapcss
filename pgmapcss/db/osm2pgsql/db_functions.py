@@ -263,7 +263,7 @@ def objects_members(relation_id, parent_type, parent_conditions):
         ret['link_tags'] = member
         yield ret
 
-def objects_near(max_distance, ob, parent_selector, where_clause, check_geo=None):
+def objects_near(max_distance, ob, parent_selector, where_clause, current, check_geo=None):
     if ob:
         geom = ob['geo']
     elif 'geo' in current['properties'][current['pseudo_element']]:
@@ -274,7 +274,7 @@ def objects_near(max_distance, ob, parent_selector, where_clause, check_geo=None
     if where_clause == '':
         where_clause = 'true'
 
-    max_distance = to_float(eval_metric([ max_distance, 'u' ]))
+    max_distance = to_float(eval_metric([ max_distance, 'u' ], current))
     if max_distance is None:
         return []
     elif max_distance == 0:
@@ -301,7 +301,7 @@ def objects_near(max_distance, ob, parent_selector, where_clause, check_geo=None
     ):
         if ob['id'] != current['object']['id'] and ob['__distance'] <= max_distance:
             ob['link_tags'] = {
-                'distance': eval_metric([ str(ob['__distance']) + 'u', 'px' ])
+                'distance': eval_metric([ str(ob['__distance']) + 'u', 'px' ], current)
             }
             obs.append(ob)
 

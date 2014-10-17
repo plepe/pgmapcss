@@ -1,7 +1,7 @@
 class config_eval_alpha(config_base):
     mutable = 3
 
-def eval_alpha(param):
+def eval_alpha(param, current):
     if len(param) == 0:
         return ''
 

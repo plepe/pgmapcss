@@ -1,7 +1,7 @@
 class config_eval_sinh(config_base):
     mutable = 3
 
-def eval_sinh(param):
+def eval_sinh(param, current):
     if len(param) == 0:
         return ''
 

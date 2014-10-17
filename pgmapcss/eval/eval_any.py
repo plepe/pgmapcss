@@ -13,7 +13,7 @@ class config_eval_any(config_base):
 
         return ( ret, 3 )
 
-def eval_any(param):
+def eval_any(param, current):
     for p in param:
         if p is not None and p != '':
             return p

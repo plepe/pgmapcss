@@ -14,7 +14,6 @@ def compile_function_check(statements, min_scale, max_scale, stat):
     ret = '''
 def check_{min_scale_esc}(object):
 # initialize variables
-    global current
     current = {{
         'object': object,
         'pseudo_elements': {pseudo_elements},

@@ -3,9 +3,9 @@ class config_eval_and(config_base):
     op = '&&'
     mutable = 3
 
-def eval_and(param):
+def eval_and(param, current):
   for p in param:
-      if eval_boolean([p]) == 'false':
+      if eval_boolean([p], current) == 'false':
           return 'false'
 
   return 'true'

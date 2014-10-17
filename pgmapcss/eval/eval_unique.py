@@ -1,7 +1,7 @@
 class config_eval_unique(config_base):
     mutable = 3
 
-def eval_unique(param):
+def eval_unique(param, current):
     if len(param) == 0:
         return ''
 

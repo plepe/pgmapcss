@@ -1,7 +1,7 @@
 class config_eval_sin(config_base):
     mutable = 3
 
-def eval_sin(param):
+def eval_sin(param, current):
     if len(param) == 0:
         return ''
 

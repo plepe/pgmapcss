@@ -1,7 +1,7 @@
 class config_eval_round(config_base):
     mutable = 3
 
-def eval_round(param):
+def eval_round(param, current):
     if len(param) == 0:
         return ''
 
@@ -13,7 +13,7 @@ def eval_round(param):
     i = 0
 
     if len(param) > 1:
-        i = eval_int(param[1:2])
+        i = eval_int(param[1:2], current)
         i = int(i) if i != '' else 0
 
     return float_to_str(round(v, i))

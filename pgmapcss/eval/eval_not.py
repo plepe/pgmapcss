@@ -13,11 +13,11 @@ class config_eval_not(config_base):
         else:
             return config_base.possible_values(self, param_values, prop, stat)
 
-def eval_not(param):
+def eval_not(param, current):
     if len(param) == 0:
         return ''
 
-    if eval_boolean(param[0:1]) == 'true':
+    if eval_boolean(param[0:1], current) == 'true':
         return 'false'
 
     return 'true'

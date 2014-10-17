@@ -1,7 +1,7 @@
 class config_eval_exp(config_base):
     mutable = 3
 
-def eval_exp(param):
+def eval_exp(param, current):
     if len(param) == 0:
         return ''
 

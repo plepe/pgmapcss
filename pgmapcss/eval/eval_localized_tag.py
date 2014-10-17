@@ -1,4 +1,4 @@
-def eval_localized_tag(param):
+def eval_localized_tag(param, current):
     if len(param) == 0:
         return ''
     p = param[0]

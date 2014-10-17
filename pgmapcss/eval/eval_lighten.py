@@ -1,7 +1,7 @@
 class config_eval_lighten(config_base):
     mutable = 3
 
-def eval_lighten(param):
+def eval_lighten(param, current):
     if len(param) < 2:
         return ''
 

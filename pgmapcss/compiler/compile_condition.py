@@ -38,7 +38,7 @@ def compile_condition(condition, stat, var="current['tags']"):
     elif condition['op'] in ('<', '>', '<=', '>='):
         cmp_map = { '<': 'lt', '>': 'gt', '<=': 'le', '>=': 'ge' }
         ret.append(key + ' in ' + var)
-        ret.append('eval_' + cmp_map[condition['op']] + '([ ' + var + '[' + key + '], ' + final_value + " ]) == 'true'")
+        ret.append('eval_' + cmp_map[condition['op']] + '([ ' + var + '[' + key + '], ' + final_value + " ], current) == 'true'")
 
     # ^=
     elif condition['op'] == '^=':

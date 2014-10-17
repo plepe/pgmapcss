@@ -4,11 +4,11 @@ class config_eval_neg(config_base):
     unary = True
     mutable = 3
 
-def eval_neg(param):
+def eval_neg(param, current):
     if len(param) == 0:
         return ''
 
-    v = eval_metric([param[0]])
+    v = eval_metric([param[0]], current)
 
     if v == '':
         return ''

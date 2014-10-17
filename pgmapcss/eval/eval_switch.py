@@ -42,7 +42,7 @@ class config_eval_switch(config_base):
 
         return ( ret, 3 )
 
-def eval_switch(param):
+def eval_switch(param, current):
     if len(param) == 0:
         return ''
 

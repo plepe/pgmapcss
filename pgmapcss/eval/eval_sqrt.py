@@ -5,11 +5,11 @@ class config_eval_sqrt(config_base):
         ret = [ config_metric.mutable([p], stat) for p in param_values ]
         return min(ret)
 
-def eval_sqrt(param):
+def eval_sqrt(param, current):
     if len(param) == 0:
         return ''
 
-    f = eval_metric([param[0]])
+    f = eval_metric([param[0]], current)
     if f == '':
         return ''
 

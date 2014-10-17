@@ -10,7 +10,7 @@ class config_eval_boolean(config_base):
         else:
             return config_base.possible_values(self, param_values, prop, stat)
 
-def eval_boolean(param):
+def eval_boolean(param, current):
     if len(param) == 0:
         return ''
 

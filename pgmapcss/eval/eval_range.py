@@ -1,7 +1,7 @@
 class config_eval_range(config_base):
     mutable = 3
 
-def eval_range(param):
+def eval_range(param, current):
     if len(param) < 2:
         return ''
 

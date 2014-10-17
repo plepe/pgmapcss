@@ -1,7 +1,7 @@
 class config_eval_text_transform(config_base):
     mutable = 3
 
-def eval_text_transform(param):
+def eval_text_transform(param, current):
     if len(param) == 0:
         return ''
 

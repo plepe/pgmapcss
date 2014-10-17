@@ -1,7 +1,7 @@
 class config_eval_rotate(config_base):
     mutable = 3
 
-def eval_rotate(param):
+def eval_rotate(param, current):
     if len(param) == 0:
         return ''
 
@@ -13,7 +13,7 @@ def eval_rotate(param):
         return param[0]
 
     if len(param) == 2:
-        center = eval_centroid([param[0]])
+        center = eval_centroid([param[0]], current)
     else:
         center = param[2]
 

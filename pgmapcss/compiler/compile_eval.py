@@ -1,6 +1,6 @@
 import re
 import pgmapcss.eval
-eval_param = '' #, object, current, render_context'
+eval_param = ', current' #, object, current, render_context'
 
 def valid_func_name(func):
     if re.match('[a-zA-Z_0-9]+$', func):

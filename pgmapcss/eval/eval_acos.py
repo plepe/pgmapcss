@@ -1,7 +1,7 @@
 class config_eval_acos(config_base):
     mutable = 3
 
-def eval_acos(param):
+def eval_acos(param, current):
     if len(param) == 0:
         return ''
 

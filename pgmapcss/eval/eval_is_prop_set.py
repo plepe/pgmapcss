@@ -18,7 +18,7 @@ class config_eval_is_prop_set(config_base):
 
         return ( param_values[0] in keys, 0 )
 
-def eval_is_prop_set(param):
+def eval_is_prop_set(param, current):
     if len(param) == 0:
         return ''
 

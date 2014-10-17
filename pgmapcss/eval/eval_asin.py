@@ -1,7 +1,7 @@
 class config_eval_asin(config_base):
     mutable = 3
 
-def eval_asin(param):
+def eval_asin(param, current):
     if len(param) == 0:
         return ''
 

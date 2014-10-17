@@ -1,7 +1,7 @@
 class config_is_closed(config_base):
     mutable = 1
 
-def eval_is_closed(param):
+def eval_is_closed(param, current):
     if len(param) > 0:
         geo = param[0]
 

@@ -1,7 +1,7 @@
 class config_eval_line_merge(config_base):
     mutable = 3
 
-def eval_line_merge(param):
+def eval_line_merge(param, current):
     if len(param) == 0:
         return ''
 

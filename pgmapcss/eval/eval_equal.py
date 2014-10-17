@@ -16,7 +16,7 @@ class config_eval_equal(config_base):
         else:
             return config_base.possible_values(self, param_values, prop, stat)
 
-def eval_equal(param):
+def eval_equal(param, current):
     # empty parameter list -> all equal
     if len(param) == 0:
         return 'true'
@@ -26,7 +26,7 @@ def eval_equal(param):
         return 'true'
 
     # convert all values to numbers
-    values = [ eval_metric([v]) for v in param ]
+    values = [ eval_metric([v], current) for v in param ]
 
     if not '' in values and len(set(values)) == 1:
         return 'true'

@@ -1,7 +1,7 @@
 class config_eval_cos(config_base):
     mutable = 3
 
-def eval_cos(param):
+def eval_cos(param, current):
     if len(param) == 0:
         return ''
 

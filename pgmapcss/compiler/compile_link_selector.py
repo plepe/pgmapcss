@@ -37,12 +37,12 @@ def compile_link_selector(statement, stat):
 
         return "objects_near(" + distance + ", None, "+\
             repr(statement['parent_selector']['type']) + ", " +\
-            repr(parent_conditions) + ")"
+            repr(parent_conditions) + ", current)"
 
     elif statement['link_selector']['type'] in ('within', 'surrounds', 'overlaps'):
         return "objects_near(\"0\", None, "+\
             repr(statement['parent_selector']['type']) + ", " +\
-            repr(parent_conditions) + ", check_geo=" +\
+            repr(parent_conditions) + ", current, check_geo=" +\
             repr(statement['link_selector']['type']) + ")"
 
     else:

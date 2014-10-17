@@ -1,7 +1,7 @@
 class config_eval_line(config_base):
     mutable = 3
 
-def eval_line(param):
+def eval_line(param, current):
     if len(param) == 0:
         return ''
 

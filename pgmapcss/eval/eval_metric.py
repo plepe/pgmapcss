@@ -16,7 +16,7 @@ class config_eval_metric(config_base):
             return 3
         return 2
 
-def eval_metric(param):
+def eval_metric(param, current):
     if len(param) == 0 or param[0] is None:
         return ''
 

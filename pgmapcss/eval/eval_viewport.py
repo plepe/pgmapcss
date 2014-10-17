@@ -1,7 +1,7 @@
 class config_eval_viewport(config_base):
     mutable = 2
 
-def eval_viewport(param):
+def eval_viewport(param, current):
     return render_context['bbox']
 
 # TESTS

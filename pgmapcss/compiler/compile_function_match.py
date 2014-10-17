@@ -75,9 +75,7 @@ import copy
         ret += 'time_start = datetime.datetime.now() # profiling\n'
 
     ret += '''\
-global current
 global render_context
-current = None
 
 if not 'lang' in parameters:
     parameters['lang'] = {default_lang}
