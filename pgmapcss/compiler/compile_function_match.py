@@ -170,6 +170,11 @@ while src:
             except StopIteration:
                 break
 
+        # check if the object is already a pending_object and the object is new
+        # (no 'state') -> skip
+        if object['id'] in pending_objects and not 'state' in object:
+            break
+
         # for each object the check() function will be called. it is a
         # generator function which we either use via next() or send(). As we
         # might need it for longer, we save the reference to the function in
@@ -178,7 +183,7 @@ while src:
             object_check = object['object_check']
 
         else:
-            object['state'] = ( 'start', )
+            object['state'] = ( 'start', 0 )
             shown = False
             counter['total'] += 1
             object_check = check(object)
@@ -197,13 +202,14 @@ while src:
                 else:
                     result = next(object_check)
             except StopIteration:
-                object['state'] = ( 'finish', )
+                object['state'] = ( 'finish', 999999999999999 )
                 break
 
             if type(result) != tuple or len(result) == 0:
                 plpy.warning('unknown check result: ', result)
             elif result[0] == 'result':
-                object['state'] = ( 'processing', )
+                # TODO: return current statement id
+                object['state'] = ( 'processing', 0 )
                 result = result[1]
 
                 # create a list of all style elements where the current
@@ -293,13 +299,14 @@ while src:
                     src = [
                         r
                         for r in src
-                        if not 'state' in r or r['state'][1] < result[1]
+                        if not 'state' in r or (r['state'][0] != 'finished' and r['state'][1] < result[1])
                     ]
 
             # the current object might used as parent for a relationship. add
             # to pending_objects and cancel processing.
             elif result[0] == 'pending':
                 object['state'] = result
+
                 pending_objects[object['id']] = object
                 object_check = None
                 if result[1] < pending_min_index:
@@ -355,14 +362,13 @@ while src:
         combined_objects = []
 
     # 4th: check if there are still pending_objects, process them next
-    if not src:
+    # pending_min_index always points to the next pending objects -> if it is
+    # 999999999999999, there are no pending_objects any more
+    if not src and pending_min_index != 999999999999999:
         src = [ ]
         for pending_id, pending in pending_objects.items():
             if pending['state'][1] == pending_min_index:
                 src.append(pending)
-
-        for pending in src:
-            del pending_objects[pending['id']]
 
         pending_min_index = 999999999999999
 
