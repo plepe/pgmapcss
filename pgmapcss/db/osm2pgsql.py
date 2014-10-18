@@ -196,7 +196,7 @@ def objects_member_of(member_id, parent_type, parent_conditions):
                     t = {
                         'id': 'r' + str(r['id']),
                         'tags': flatarray_to_tags(r['tags']) if r['tags'] else {},
-                        'type': ['relation'],
+                        'types': ['relation'],
                         'geo': None,
                         'link_tags': member
                     }
@@ -212,7 +212,7 @@ def objects_member_of(member_id, parent_type, parent_conditions):
                     t = {
                         'id': 'w' + str(r['id']),
                         'tags': pghstore.loads(r['tags']) if r['tags'] else {},
-                        'type': ['way'],
+                        'types': ['way'],
                         'geo': r['geo'],
                         'link_tags': {
                             'member_id': member_id,
