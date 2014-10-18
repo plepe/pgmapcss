@@ -244,7 +244,7 @@ def objects_member_of(member_id, parent_type, parent_conditions):
             t = {
                 'id': 'r' + str(r['id']),
                 'tags': pghstore.loads(r['tags']),
-                'type': ['relation'],
+                'types': ['relation'],
                 'geo': None,
                 'link_tags': {
                     'sequence_id': str(r['sequence_id']),
@@ -268,7 +268,7 @@ def objects_member_of(member_id, parent_type, parent_conditions):
             t = {
                 'id': 'w' + str(r['id']),
                 'tags': pghstore.loads(r['tags']),
-                'type': ['way'],
+                'types': ['way'],
                 'geo': r['linestring'],
                 'link_tags': {
                     'member_id': member_id,
