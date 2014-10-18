@@ -27,11 +27,14 @@ def compile_statement(statement, stat, indent=''):
     ret['check'] += compile_selector_part(object_selector, stat)
 
     if 'link_selector' in statement:
-        ret['body'] += indent + 'for parent_index, parent_object in enumerate(' + compile_link_selector(statement, stat) + '):\n'
+        ret['body'] += indent + '# link selector -> get list of objects, but return with "request", so that statements of parent objects up to the current statement can be processed. Remember link tags, add them later-on.\n'
+        ret['body'] += indent + 'link = list(' + compile_link_selector(statement, stat) + ')\n'
+        ret['body'] += indent + 'objects = (yield ("request", ' + str(statement['id']) + ', link))\n'
+        ret['body'] += indent + 'for parent_index, parent_object in enumerate(objects):\n'
 
         indent += '    '
         ret['body'] += indent + "current['parent_object'] = parent_object\n"
-        ret['body'] += indent + "current['link_object'] = { 'tags': parent_object['link_tags'] }\n"
+        ret['body'] += indent + "current['link_object'] = { 'tags': link[parent_index]['link_tags'] }\n"
         ret['body'] += indent + "current['link_object']['tags']['index'] = str(parent_index)\n"
         ret['body'] += indent + 'if (' +\
           and_join(compile_conditions(statement['parent_selector']['conditions'], stat, "current['parent_object']['tags']")) +\

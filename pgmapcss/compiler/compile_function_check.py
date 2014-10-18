@@ -1,4 +1,5 @@
 from .compile_statement import compile_statement
+from .compile_selector_part import compile_selector_part
 import copy
 from collections import Counter
 
@@ -38,6 +39,15 @@ def check_{min_scale_esc}(object):
         i = copy.deepcopy(i)
         i['selector']['min_scale'] = min_scale
         i['selector']['max_scale'] = max_scale
+
+        # if the statement has a parent selector, check if the current object
+        # might be a parent. if yes, return with state "pending"
+        if 'parent_selector' in i:
+            r = {
+                'check': compile_selector_part(i['parent_selector'], stat),
+                'body': "yield (('pending', " + str(i['id']) + "))\n"
+            }
+            compiled_statements.append(r)
 
         compiled_statements.append(compile_statement(i, stat))
 

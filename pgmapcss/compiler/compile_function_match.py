@@ -11,16 +11,16 @@ import pgmapcss.types
 def compile_function_match(stat):
     scale_denominators = sorted(stat.all_scale_denominators(), reverse=True)
 
-    check_functions = compile_build_result(stat)
+    object_checks = compile_build_result(stat)
     max_scale = None
     for min_scale in scale_denominators:
-        check_functions += compile_function_check([
+        object_checks += compile_function_check([
             v
             for v in stat['statements']
             if v['selector']['min_scale'] <= min_scale and
                 (v['selector']['max_scale'] == None or v['selector']['max_scale'] >= (max_scale or 10E+10))
         ], min_scale, max_scale, stat)
-        check_functions += '\n'
+        object_checks += '\n'
         max_scale = min_scale
 
     check_chooser  = "if render_context['scale_denominator'] is None:\n"
@@ -56,7 +56,7 @@ def compile_function_match(stat):
       'scale_denominators': repr(scale_denominators),
       'match_where': compile_function_get_where(stat['id'], stat),
       'db_query': db.query_functions(stat),
-      'function_check': check_functions,
+      'function_check': object_checks,
       'check_chooser': check_chooser,
       'eval_functions': \
 resource_string(pgmapcss.eval.__name__, 'base.py').decode('utf-8') +\
@@ -144,14 +144,66 @@ def dict_merge(dicts):
 
     return ret
 
+# Sources which still need to be processed. If a source is squeezed in (e.g.
+# due to a relationship), the previous source will be pushed to the src_stack.
+src_stack = [ ]
+# Objects which have a request (e.g. from a relationship).
+request_objects = [ ]
+# Objects which are partly processed, but might still be needed at the current
+# state for handling relationships.
+pending_objects = {{ }}
+# Minimal index of a pending object. Decides whether a request for a
+# relationship will be handled right now or later (-> added to request_objects)
+pending_min_index = 999999999999999
+
 while src:
-    for object in src:
-        shown = False
-        counter['total'] += 1
-        for result in check(object):
+    while True:
+        # get the next object from the current source.
+        if type(src) == list:
+            try:
+                object = src.pop(0)
+            except IndexError:
+                break
+        else:
+            try:
+                object = next(src)
+            except StopIteration:
+                break
+
+        # for each object the check() function will be called. it is a
+        # generator function which we either use via next() or send(). As we
+        # might need it for longer, we save the reference to the function in
+        # object['object_check']
+        if 'object_check' in object:
+            object_check = object['object_check']
+
+        else:
+            object['state'] = ( 'start', )
+            shown = False
+            counter['total'] += 1
+            object_check = check(object)
+            object['object_check'] = object_check
+
+        # get the next return value from the check() function, this can be
+        # either a result or a notification about relationship: 'pending',
+        # 'request', 'combine'
+        while object_check:
+            try:
+                if len(object['state']) > 2:
+                    result = object_check.send([
+                        pending_objects[r['id']] if r['id'] in pending_objects else r
+                        for r in object['state'][2]
+                    ])
+                else:
+                    result = next(object_check)
+            except StopIteration:
+                object['state'] = ( 'finish', )
+                break
+
             if type(result) != tuple or len(result) == 0:
                 plpy.warning('unknown check result: ', result)
             elif result[0] == 'result':
+                object['state'] = ( 'processing', )
                 result = result[1]
 
                 # create a list of all style elements where the current
@@ -218,7 +270,44 @@ while src:
         '''.format(**replacement)
 
     ret += '''
+            # 'request' -> function needs other objects, e.g. from
+            # parent->child relation
+            elif result[0] == 'request':
+                object['state'] = result
+                object_check = None
+
+                # remember, that the current object has a request
+                request_objects.append(object)
+
+                if result[1] <= pending_min_index:
+                    # remember to handle rest of 'src'
+                    src_stack.append(src)
+                    # now, process the pending objects ...
+                    src = [
+                        pending_objects[r['id']] if r['id'] in pending_objects else r
+                        for r in result[2]
+                    ]
+
+                    # ... but only those which have not been processed (up to
+                    # the current statement id)
+                    src = [
+                        r
+                        for r in src
+                        if not 'state' in r or r['state'][1] < result[1]
+                    ]
+
+            # the current object might used as parent for a relationship. add
+            # to pending_objects and cancel processing.
+            elif result[0] == 'pending':
+                object['state'] = result
+                pending_objects[object['id']] = object
+                object_check = None
+                if result[1] < pending_min_index:
+                    pending_min_index = result[1]
+
             elif result[0] == 'combine':
+                object['state'] = ( 'processing', )
+
                 shown = True
                 if result[1] not in combined_objects:
                     combined_objects[result[1]] = {{}}
@@ -233,9 +322,26 @@ while src:
 #        else:
 #            plpy.warning('not rendered: ' + object['id'] + ' ' + repr(object['tags']))
 
-    src = None
+    # the current src is empty, lets see, what there is still to be done
+    # 1st: check if there are any requests we can finish / continue
+    if len(request_objects):
+        for object in request_objects:
+            if pending_min_index >= object['state'][1]:
+                src.append(object)
+                request_objects.remove(object)
 
-    if len(combined_objects):
+        if len(src) == 0:
+            src = None
+
+    # 2nd: check if there's still a src in the src_stack
+    if not src:
+        try:
+            src = src_stack.pop()
+        except IndexError:
+            src = None
+
+    # 3rd: maybe object were combined to new objects
+    if not src and len(combined_objects):
         src = []
         for combine_type, items in combined_objects.items():
             for combine_id, obs in items.items():
@@ -247,6 +353,23 @@ while src:
                 }})
 
         combined_objects = []
+
+    # 4th: check if there are still pending_objects, process them next
+    if not src:
+        src = [ ]
+        for pending_id, pending in pending_objects.items():
+            if pending['state'][1] == pending_min_index:
+                src.append(pending)
+
+        for pending in src:
+            del pending_objects[pending['id']]
+
+        pending_min_index = 999999999999999
+
+        if len(src) == 0:
+            src = None
+
+    # final: no sources left
     '''.format(**replacement)
 
     if 'profiler' in stat['options']:
