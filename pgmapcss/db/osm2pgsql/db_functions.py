@@ -295,7 +295,7 @@ def objects_near(max_distance, ob, parent_selector, where_clause, check_geo=None
     for ob in objects(
         bbox,
         { parent_selector: where_clause },
-        [ 'ST_Distance($2, way) as __distance' ],
+        [ 'ST_Distance($2::geometry, way) as __distance' ],
         [ 'geometry' ],
         [ geom ]
     ):
