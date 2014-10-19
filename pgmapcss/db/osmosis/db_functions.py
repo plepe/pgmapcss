@@ -188,7 +188,7 @@ def objects_by_id(id_list):
         }
 
     _id_list = [ int(i[1:]) for i in id_list if i[0] == 'w' ]
-    plan = plpy.prepare('select id, tags, version, user_id, (select name from users where id=user_id) as user, tstamp, changeset_id, ST_Transform(linestring, 900913) as linestring, array_agg(node_id) as member_ids from (select ways.*, node_id from ways left join way_nodes on ways.id=way_nodes.way_id where ways.id=any($1) order by way_nodes.sequence_id) t group by id, tags, linestring', ['bigint[]']);
+    plan = plpy.prepare('select id, tags, version, user_id, (select name from users where id=user_id) as user, tstamp, changeset_id, ST_Transform(linestring, 900913) as linestring, array_agg(node_id) as member_ids from (select ways.*, node_id from ways left join way_nodes on ways.id=way_nodes.way_id where ways.id=any($1) order by way_nodes.sequence_id) t group by id, tags, version, user_id, tstamp, changeset_id, linestring', ['bigint[]']);
     res = plpy.cursor(plan, [_id_list])
     for r in res:
         t = {
@@ -212,7 +212,7 @@ def objects_by_id(id_list):
         yield(t)
 
     _id_list = [ int(i[1:]) for i in id_list if i[0] == 'r' ]
-    plan = plpy.prepare('select id, tags, version, user_id, (select name from users where id=user_id) as user, tstamp, changeset_id, array_agg(lower(member_type) || member_id) as member_ids, array_agg(member_role) as member_roles from (select relations.*, member_type, member_id, member_role from relations left join relation_members on relations.id=relation_members.relation_id where relations.id=any($1) order by relation_members.sequence_id) t group by id, tags', ['bigint[]']);
+    plan = plpy.prepare('select id, tags, version, user_id, (select name from users where id=user_id) as user, tstamp, changeset_id, array_agg(lower(member_type) || member_id) as member_ids, array_agg(member_role) as member_roles from (select relations.*, member_type, member_id, member_role from relations left join relation_members on relations.id=relation_members.relation_id where relations.id=any($1) order by relation_members.sequence_id) t group by id, tags, version, user_id, tstamp, changeset_id', ['bigint[]']);
     res = plpy.cursor(plan, [_id_list])
     for r in res:
         t = {
@@ -239,7 +239,7 @@ def objects_by_id(id_list):
 def objects_member_of(member_id, parent_type, parent_conditions):
     if parent_type == 'relation':
         plan = plpy.prepare('select *, (select name from users where id=user_id) as user from relation_members join relations on relation_members.relation_id=relations.id where member_id=$1 and member_type=$2', ['bigint', 'text']);
-        res = plpy.cursor(plan, [member_id[1:], member_id[0:1].upper()])
+        res = plpy.cursor(plan, [int(member_id[1:]), member_id[0:1].upper()])
         for r in res:
             t = {
                 'id': 'r' + str(r['id']),
