@@ -344,7 +344,7 @@ def objects_near(max_distance, ob, parent_selector, where_clause, check_geo=None
         [ 'geometry' ],
         [ geom ]
     ):
-        if ob['__distance'] <= max_distance:
+        if ob['id'] != current['object']['id'] and ob['__distance'] <= max_distance:
             ob['link_tags'] = {
                 'distance': eval_metric([ str(ob['__distance']) + 'u', 'px' ])
             }

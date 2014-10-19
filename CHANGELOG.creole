@@ -6,6 +6,7 @@
 * if no bounding box is given (to the database function or the standalone executable), the whole database will be queried
 * Language support (see chapter "Language support" in [[doc/MapCSS.creole|MapCSS docu]]
 * enable usage for tag checking, see [[doc/tagchecker.md|tagchecker docu]] for details
+* near selector (e.g. {{{node near node}}}) does no longer include the current object
 
 0.8.0 release 2014-09-14
 * support @media queries, see [[doc/MapCSS.creole|MapCSS docu]]
