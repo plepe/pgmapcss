@@ -6,6 +6,8 @@ MapCSS takes away all this pain. It's simple and declarative: You define what sh
 
 pgmapcss compiles MapCSS styles into a database function. Mapnik just needs to call this database function and render the processed data.
 
+Stable version: [0.8.1](https://github.com/plepe/pgmapcss), development version: [0.9-dev](https://github.com/plepe/pgmapcss/tree/branch-0.9), see [open issues](https://github.com/plepe/pgmapcss/milestones/Version%200.9)
+
 Features
 --------
 ### Writing MapCSS styles is simple, e.g.: ###

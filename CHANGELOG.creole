@@ -1,3 +1,6 @@
+0.8.1 release 2014-10-19
+* Bugfixes
+
 0.8.0 release 2014-09-14
 * support @media queries, see [[doc/MapCSS.creole|MapCSS docu]]
 * a lot of performance improvements, including:
