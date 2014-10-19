@@ -110,14 +110,14 @@ The following map shows how to build relationships to "nearby" objects. Every
 (mountain?) peak is compared to the surrounding peaks (with a distance of up to
 128px) and if the peak is the highest it is highlighted.
 
-&rarr; [Try it online!](http://pgmapcss.openstreetbrowser.org/?style=2956e&zoom=12&lat=48.2618&lon=16.2635)
+&rarr; [Try it online!](http://pgmapcss.openstreetbrowser.org/?style=6e094&zoom=12&lat=48.2618&lon=16.2635)
 
 ![highest_peaks](highest_peaks.png)
 ```css
 /* For every peak find all other peaks in a distance of max. 128px and
    build a list of the other peak's elevation in tag 'near_ele' */
 node[natural=peak] near[distance<128] node[natural=peak] {
-  set near_ele = eval(push(tag(near_ele), parent_tag(ele)));
+  set near_ele = eval(append(tag(near_ele), parent_tag(ele)));
 }
 
 /* For every peak calculate the max elevation of the nearby peaks and save in
@@ -128,7 +128,7 @@ node[natural=peak] {
 
 /* For debugging you could uncomment the following row. It print the elevation
    of nearby peaks into a second second row. */
-// text: eval(concat(tag(name), ' ', tag(ele), '\n(', join(tag(near_ele), ', '), ')'));
+// text: eval(concat(tag(name), ' ', tag(ele), '\n(', join(', ', tag(near_ele)), ')'));
   z-index: 4;
 
   icon-image: triangle;
@@ -160,7 +160,7 @@ Housenumbers
 ============
 Professional maps usually have the housenumbers rotated to be parallel to the associated street. The following mapcss file achieves this, by using an invisible line where the housenumber is printed on. The right image shows a "debug" view, where the construction of the "invisible" (here blue) line is shown. You can remove all statements marked with "DEBUG" from the mapcss file.
 
-&rarr; Try it online: [final solution](http://pgmapcss.openstreetbrowser.org/?style=7f913&zoom=18&lat=47.0693&lon=15.4530), [debug view](http://pgmapcss.openstreetbrowser.org/?style=9e088&zoom=18&lat=47.0693&lon=15.4530)
+&rarr; Try it online: [final solution](http://pgmapcss.openstreetbrowser.org/?style=4545c&zoom=18&lat=47.0693&lon=15.4530), [debug view](http://pgmapcss.openstreetbrowser.org/?style=606a2&zoom=18&lat=47.0693&lon=15.4530)
 
 ![housenumbers](housenumbers.png)
 ```css
@@ -170,7 +170,7 @@ area|z16-[addr:housenumber] {
   text-color: #000000;
   text-halo-color: #ffffffaf;
   text-halo-radius: 1;
-  text: eval(tag(addr:housenumber));
+  text: eval(tag('addr:housenumber'));
   z-index: 4;
 }
 
@@ -322,7 +322,7 @@ Also most stations consist of many individual stops for all the busses and trams
 
 This is something that usually needs quite some database magic, but can be achieved with some pgmapcss magic.
 
-&rarr; [Try it online!](http://pgmapcss.openstreetbrowser.org/?style=dc018&zoom=15&lat=47.0691&lon=15.4468)
+&rarr; [Try it online!](http://pgmapcss.openstreetbrowser.org/?style=472a0&zoom=15&lat=47.0691&lon=15.4468)
 
 ![tramway_network](tramway_network.png)
 ```css
@@ -335,7 +335,7 @@ line[route=tram] {
 /* For every route iterate over all members to save their 'ref' tag
    to the child tag 'ref_list' */
 relation[route=tram] > line|z14-[railway] {
-  set ref_list = eval(push(tag(ref_list), parent_tag(ref)));
+  set ref_list = eval(append(tag(ref_list), parent_tag(ref)));
 }
 
 /* Remove duplicate refs from list, sort the list. Combine all lines
@@ -350,7 +350,7 @@ line|z14-[railway] {
    merge with a colon. Repeat labels every ~128px. */
 tram_routes::label {
   geo: eval(line_merge(prop(geo)));
-  text: eval(join(natsort(tag(ref_list)), ', '));
+  text: eval(join(', ', natsort(tag(ref_list))));
   text-color: #ff0000;
   text-halo-color: #ffffff;
   text-halo-radius: 1;

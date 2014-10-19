@@ -4,7 +4,7 @@ area|z16-[addr:housenumber] {
   text-color: #000000;
   text-halo-color: #ffffffaf;
   text-halo-radius: 1;
-  text: eval(tag(addr:housenumber));
+  text: eval(tag('addr:housenumber'));
   z-index: 4;
 }
 
