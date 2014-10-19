@@ -44,7 +44,9 @@ An example GeoJSON output:
     "results": [
       {
         "throwOther": "highway without a reference",
-        "fixAdd": "ref;int_ref",
+        "fixAdd": "ref;int_ref", // currently, multiple values will be
+                                 // concatenated by ';' to a string. A later
+                                 // version might produce an array instead.
         "pseudo_element": "default",
       },
       {
