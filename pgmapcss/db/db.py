@@ -10,6 +10,15 @@ conn = None
 def connection():
     return conn
 
+class NullDB():
+    def prepare(self, query, param_type=None):
+        return NullDB_Plan()
+
+class NullDB_Plan():
+    column_names = []
+    def __call__(self, param=[]):
+        return []
+
 def connect(args, stat):
     global conn
 
@@ -17,12 +26,15 @@ def connect(args, stat):
         print('* Database type "{}" not supported right now'.format(args.database_type))
         exit(1)
 
-    conn = postgresql.open(
-        host=args.host,
-        password=args.password,
-        database=args.database,
-        user=args.user
-    )
+    if not 'offline' in args.options:
+        conn = postgresql.open(
+            host=args.host,
+            password=args.password,
+            database=args.database,
+            user=args.user
+        )
+    else:
+        conn = NullDB()
 
     conn.database_type=args.database_type
 

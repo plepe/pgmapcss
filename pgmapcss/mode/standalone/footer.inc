@@ -6,6 +6,7 @@ if __name__ == '__main__':
     if 'GATEWAY_INTERFACE' in os.environ:
         import cgi
         params = cgi.FieldStorage()
+        args = {{ }}
 
         bounds = params.getvalue("bbox")
         if bounds:
@@ -65,6 +66,18 @@ if __name__ == '__main__':
             if (arg[0] == '-') and arg[1].isdigit(): sys.argv[i] = ' ' + arg
 
         parser = argparse.ArgumentParser(description='Executes the compiled map style and prints resulting objects.')
+
+        parser.add_argument('-d', '--database', dest='database',
+            help='Name of database (default: as set at compile time)')
+
+        parser.add_argument('-u', '--user', dest='user',
+            help='User for database (default: as set at compile time)')
+
+        parser.add_argument('-p', '--password', dest='password',
+            help='Password for database (default: as set at compile time)')
+
+        parser.add_argument('-H', '--host', dest='host',
+            help='Host for database (default: as set at compile time)')
 
         parser.add_argument('-b', '--bounds', dest='bounds',
             help='Process the map from the specified bounding box as min_lon,min_lat,max_lon,max_lat in WGS-84. (default: whole database)'
@@ -129,7 +142,7 @@ if __name__ == '__main__':
                 # default: english
                 parameters['lang'] = 'en'
 
-    plpy = fake_plpy()
+    plpy = fake_plpy(args)
     plan_to_geojson = plpy.prepare('select ST_asGeoJSON(ST_Transform($1, $2)) as r', [ 'geometry', 'integer' ])
 
     def format_result(results):

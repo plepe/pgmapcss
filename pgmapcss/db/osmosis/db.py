@@ -40,6 +40,10 @@ class db(default):
         return format(value[1:])
 
     def compile_user_id(self, key, value):
+        if 'offline' in self.stat['options']:
+            print("Warning compiling tag 'osm:user': Can't optimize query, as user-ids can't be resolved at compile time.")
+            return None
+
         plan = self.conn.prepare('select * from users where name=$1')
         res = plan(value)
 
@@ -47,4 +51,4 @@ class db(default):
             return str(res[0][0])
 
         print("Warning compiling tag 'osm:user': User '{1}' not found.".format(key, value))
-        return None
+        return False
