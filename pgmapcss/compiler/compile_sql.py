@@ -75,9 +75,12 @@ def compile_condition_column(condition, statement, tag_type, stat, prefix, filte
 
     # =
     if condition['op'] == '=':
-        # if value_format returns None -> return false as result
+        # if value_format returns None -> can't resolve, discard condition
+        # if value_format returns False -> return false as result
         f = value_format(key, condition['value'])
-        if f:
+        if f is None:
+            return None
+        elif f:
             ret += prefix + db.ident(key) + ' = ' + f
         else:
             ret += 'false'
@@ -88,8 +91,11 @@ def compile_condition_column(condition, statement, tag_type, stat, prefix, filte
             value_format(key, v)
             for v in condition['value'].split(';')
         }
-        # if value_format returns None -> return false as result
+        # if value_format returns None -> can't resolve, discard condition
+        # if value_format returns False -> return false as result
         if None in f:
+            return None
+        if False in f:
             f.remove(None)
 
         if len(f):

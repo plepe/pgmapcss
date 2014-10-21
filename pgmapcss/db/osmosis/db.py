@@ -47,4 +47,4 @@ class db(default):
             return str(res[0][0])
 
         print("Warning compiling tag 'osm:user': User '{1}' not found.".format(key, value))
-        return None
+        return False
