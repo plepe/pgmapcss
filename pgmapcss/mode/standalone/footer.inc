@@ -6,6 +6,7 @@ if __name__ == '__main__':
     if 'GATEWAY_INTERFACE' in os.environ:
         import cgi
         params = cgi.FieldStorage()
+        args = {{ }}
 
         bounds = params.getvalue("bbox")
         if bounds:

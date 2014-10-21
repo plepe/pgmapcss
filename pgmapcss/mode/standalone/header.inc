@@ -5,8 +5,6 @@ import sys
 
 class fake_plpy:
     def __init__(self, args=None):
-        print('ARGS', args)
-        sys.stderr.write('ARGS: ' + repr(args) + '\n')
         self.conn = postgresql.open(
             host=(args.host if args and args.host else '{host}'),
             password=(args.password if args and args.password else '{password}'),
