@@ -62,7 +62,7 @@ where {bbox} ( {w} )
     if len(w):
         bbox = ''
         if _bbox is not None:
-            bbox = 'linestring && ST_Transform($1, 4326) and ST_Intersects(linestring, ST_Transform($1, 4326)) and'
+            bbox = 'linestring && ST_Transform($1, 4326) and (ST_NPoints(linestring) = 1 or ST_Intersects(linestring, ST_Transform($1, 4326))) and'
 
         qry = '''
 select * from (
