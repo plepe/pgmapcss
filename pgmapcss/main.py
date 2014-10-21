@@ -54,8 +54,8 @@ parser.add_argument('-r', '--database-update', dest='database_update',
     help='Whether the database should be updated to the current version. Possible values: "re-init": re-initializes the database, need to re-compile all pgmapcss styles, "update": update all database functions, "none": do not update, "auto": if necessary a database functions update will be performed.')
 
 parser.add_argument('-o', '--options', dest='options', nargs='+',
-    choices=['profiler', 'context', 'rusage'],
-    help='Additional options. Currently supported options: "profiler": during execution, show some statistics about query/processing time and count of objects. "context": show bounding box and scale denominator of requests. "rusage": show resource usage at end of processing.')
+    choices=['profiler', 'context', 'rusage', 'offline'],
+    help='Additional options. Currently supported options: "profiler": during execution, show some statistics about query/processing time and count of objects. "context": show bounding box and scale denominator of requests. "rusage": show resource usage at end of processing. "offline": When compiling standalone mode, do not make any requests to the database.')
 
 parser.add_argument('-c', '--config', dest='config', nargs='+',
     help='Set configuration options, e.g. -c foo=bar. See doc/MapCSS.creole for available configuration options.')
@@ -131,30 +131,34 @@ def main():
 
     stat['database'] = conn.database
 
-    if args.database_update == 're-init':
+    if not 'offline' in args.options and args.database_update == 're-init':
         print('* Re-initializing database')
         pgmapcss.db.db_init(conn)
 
-    db_version = pgmapcss.db.db_version()
-    if db_version == None:
-        print('* DB functions not installed; installing')
-        pgmapcss.db.db_init(conn)
+    if 'offline' in args.options:
+        print('* Using offline mode. Attention! Some functionality might be missing.')
+
     else:
-        db_check = pgmapcss.db.db_version_check()
-        if db_check == 1 and args.database_update == 'auto':
-            print('* Current DB version: {version} -> updating DB functions'.format(**db_version))
-            pgmapcss.db.db_update(conn)
-
-        elif db_check == 2:
-            print('* Current DB version: {version}'.format(**db_version))
-            print('pgmapcss version too new. Database needs to be re-initialized. Please re-run pgmapcss with parameter "-r re-init". All Mapnik styles need to be re-compiled afterwards.')
-            sys.exit(1)
-
-        elif args.database_update == 'update':
-            pgmapcss.db.db_update(conn)
-
+        db_version = pgmapcss.db.db_version()
+        if db_version == None:
+            print('* DB functions not installed; installing')
+            pgmapcss.db.db_init(conn)
         else:
-            print('* Current DB version: {version}'.format(**db_version))
+            db_check = pgmapcss.db.db_version_check()
+            if db_check == 1 and args.database_update == 'auto':
+                print('* Current DB version: {version} -> updating DB functions'.format(**db_version))
+                pgmapcss.db.db_update(conn)
+
+            elif db_check == 2:
+                print('* Current DB version: {version}'.format(**db_version))
+                print('pgmapcss version too new. Database needs to be re-initialized. Please re-run pgmapcss with parameter "-r re-init". All Mapnik styles need to be re-compiled afterwards.')
+                sys.exit(1)
+
+            elif args.database_update == 'update':
+                pgmapcss.db.db_update(conn)
+
+            else:
+                print('* Current DB version: {version}'.format(**db_version))
 
     if args.eval_tests:
         pgmapcss.eval.functions().test_all()
