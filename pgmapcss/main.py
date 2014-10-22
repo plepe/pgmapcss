@@ -54,8 +54,8 @@ parser.add_argument('-r', '--database-update', dest='database_update',
     help='Whether the database should be updated to the current version. Possible values: "re-init": re-initializes the database, need to re-compile all pgmapcss styles, "update": update all database functions, "none": do not update, "auto": if necessary a database functions update will be performed.')
 
 parser.add_argument('-o', '--options', dest='options', nargs='+',
-    choices=['profiler', 'context', 'rusage', 'offline'],
-    help='Additional options. Currently supported options: "profiler": during execution, show some statistics about query/processing time and count of objects. "context": show bounding box and scale denominator of requests. "rusage": show resource usage at end of processing. "offline": When compiling standalone mode, do not make any requests to the database.')
+    choices=['profiler', 'context', 'rusage', 'offline', 'explain_queries'],
+    help='Additional options. Currently supported options: "profiler": during execution, show some statistics about query/processing time and count of objects. "context": show bounding box and scale denominator of requests. "rusage": show resource usage at end of processing. "offline": When compiling standalone mode, do not make any requests to the database. "explain_queries": Print queries, their plans and count of executions to stderr (standalone mode only).')
 
 parser.add_argument('-c', '--config', dest='config', nargs='+',
     help='Set configuration options, e.g. -c foo=bar. See doc/MapCSS.creole for available configuration options.')

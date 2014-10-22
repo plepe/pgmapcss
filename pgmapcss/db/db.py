@@ -5,6 +5,7 @@ from pkg_resources import *
 from .version import *
 import pgmapcss.db.osm2pgsql
 import pgmapcss.db.osmosis
+from pgmapcss.misc import strip_includes
 conn = None
 
 def connection():
@@ -85,29 +86,4 @@ def prepare(sql):
     return conn.prepare(sql)
 
 def query_functions(stat):
-    f = resource_stream(__name__, conn.database_type + '/db_functions.py')
-    ret = ''
-    selectors = set()
-    include = True
-
-    while True:
-        r = f.readline()
-        if not r:
-            return ret
-        r = r.decode('utf-8')
-
-        m = re.match('# (START|END) (.*)', r)
-        if m:
-            if m.group(1) == 'END':
-                selectors.remove(m.group(2))
-            elif m.group(1) == 'START':
-                selectors.add(m.group(2))
-
-            include = not len({
-                True
-                for s in selectors
-                if not s in stat['config'] or stat['config'][s] in ('false', False, 'no')
-            })
-
-        if include:
-            ret += r
+    return strip_includes(resource_stream(__name__, conn.database_type + '/db_functions.py'), stat)

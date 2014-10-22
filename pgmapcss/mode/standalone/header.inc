@@ -11,6 +11,9 @@ class fake_plpy:
             database=(args.database if args and args.database else '{database}'),
             user=(args.user if args and args.user else '{user}'),
         )
+# START explain_queries
+        self.explain_queries = {{ }}
+# END explain_queries
 
     def notice(self, *arg):
         sys.stderr.write('NOTICE: ' + ' '.join([repr(a) for a in arg]) + '\n')
@@ -27,15 +30,36 @@ class fake_plpy:
                 t = 'text[]'
             query = query.replace('$' + str(i1), '$' + str(i1) + '::' + t)
 
-        return self.conn.prepare(query)
+        plan = self.conn.prepare(query)
+        plan.query = query
+
+        return plan
 
     def execute(self, plan, param=[]):
+# START explain_queries
+        if not plan.query in self.explain_queries:
+            self.explain_queries[plan.query] = {{ 'count': 0 }}
+            explain = self.conn.prepare('explain ' + plan.query)
+            sys.stderr.write(plan.query)
+            self.explain_queries[plan.query]['explain'] = explain(*param)
+
+        self.explain_queries[plan.query]['count'] += 1
+# END explain_queries
         return [
             dict(r)
             for r in plan(*param)
         ]
 
     def cursor(self, plan, param=[]):
+# START explain_queries
+        if not plan.query in self.explain_queries:
+            self.explain_queries[plan.query] = {{ 'count': 0 }}
+            explain = self.conn.prepare('explain ' + plan.query)
+            sys.stderr.write(plan.query)
+            self.explain_queries[plan.query]['explain'] = explain(*param)
+
+        self.explain_queries[plan.query]['count'] += 1
+# END explain_queries
         for r in plan(*param):
             yield dict(r)
 
