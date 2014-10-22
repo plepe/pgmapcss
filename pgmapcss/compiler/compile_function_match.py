@@ -7,6 +7,7 @@ from ..includes import include_text
 import pgmapcss.eval
 import pgmapcss.mode
 import pgmapcss.types
+from pgmapcss.misc import strip_includes
 
 def compile_function_match(stat):
     scale_denominators = sorted(stat.all_scale_denominators(), reverse=True)
@@ -272,11 +273,11 @@ plpy.warning('Resource Usage: ' + str(resource.getrusage(resource.RUSAGE_SELF)) 
     if stat['mode'] == 'standalone':
         indent = '    '
 
-    header = resource_string(pgmapcss.mode.__name__, stat['mode'] + '/header.inc')
-    header = header.decode('utf-8').format(**replacement)
+    header = strip_includes(resource_stream(pgmapcss.mode.__name__, stat['mode'] + '/header.inc'), stat)
+    header = header.format(**replacement)
 
-    footer = resource_string(pgmapcss.mode.__name__, stat['mode'] + '/footer.inc')
-    footer = footer.decode('utf-8').format(**replacement)
+    footer = strip_includes(resource_stream(pgmapcss.mode.__name__, stat['mode'] + '/footer.inc'), stat)
+    footer = footer.format(**replacement)
 
     ret = header + indent + ret.replace('\n', '\n' + indent) + '\n' + footer
 
