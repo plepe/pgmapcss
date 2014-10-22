@@ -47,6 +47,7 @@ def compile_function_match(stat):
       'database': stat['args'].database,
       'default_lang': repr(stat['lang']),
       'user': stat['args'].user,
+      'db_srs': stat['config']['db.srs'],
       'style_element_property': repr({
           k: v['value'].split(';')
           for k, v in stat['defines']['style_element_property'].items()
@@ -82,15 +83,19 @@ current = None
 
 if not 'lang' in parameters:
     parameters['lang'] = {default_lang}
+if not 'srs' in parameters:
+    parameters['srs' ] = 4326
 
 if type(bbox) == list and len(bbox) == 4:
-    plan = plpy.prepare('select ST_Transform(SetSRID(MakeBox2D(ST_Point($1, $2), ST_Point($3, $4)), 4326), 900913) as bounds', ['float', 'float', 'float', 'float'])
-    res = plpy.execute(plan, [float(b) for b in bbox])
+    plan = plpy.prepare('select SetSRID(MakeBox2D(ST_Point($1, $2), ST_Point($3, $4)), $5) as bounds', ['float', 'float', 'float', 'float', 'int'])
+    res = plpy.execute(plan, [float(b) for b in bbox] + [ parameters['in.srs'] if 'in.srs' in parameters else parameters['srs'] ])
     _bbox = res[0]['bounds']
 else:
     _bbox = bbox
 
-render_context = {{ 'bbox': _bbox, 'scale_denominator': scale_denominator }}
+plan = plpy.prepare('select ST_Transform($1, {db_srs}) as bounds', ['geometry'])
+res = plpy.execute(plan, [_bbox])
+render_context = {{ 'bbox': res[0]['bounds'], 'scale_denominator': scale_denominator }}
 '''.format(**replacement)
 
     if 'context' in stat['options']:
