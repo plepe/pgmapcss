@@ -10,7 +10,7 @@ def eval_translate(param):
     x = to_float(eval_metric([param[1], 'u']))
     y = to_float(eval_metric([param[2], 'u']))
 
-    plan = plpy.prepare('select ST_Translate($1, $2, $3) as r', ['geometry', 'float', 'float'])
+    plan = plpy.prepare('select ST_Transform(ST_Translate(ST_Transform($1, {unit.srs}), $2, $3), {db.srs}) as r', ['geometry', 'float', 'float'])
     res = plpy.execute(plan, [param[0], x, y ])
 
     return res[0]['r']

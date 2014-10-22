@@ -10,7 +10,7 @@ def eval_buffer(param):
     if radius == '':
         return ''
 
-    plan = plpy.prepare('select ST_Buffer($1, $2) as r', ['geometry', 'float'])
+    plan = plpy.prepare('select ST_Transform(ST_Buffer(ST_Transform($1, 900913), $2), {db.srs}) as r', ['geometry', 'float'])
     res = plpy.execute(plan, [ param[0], float(radius) ])
 
     return res[0]['r']

@@ -1,6 +1,7 @@
 from pkg_resources import *
 from ..includes import *
 from .base import config_base
+import re
 
 class Functions:
     def __init__(self, stat):
@@ -32,6 +33,10 @@ class Functions:
             ret = ret.replace("FROM_RADIANS", "")
             ret = ret.replace("TO_DEGREES", "math.degrees")
             ret = ret.replace("TO_RADIANS", "")
+
+        for k, v in self.stat['config'].items():
+            if re.match('^[a-zA-Z\._0-9]+$', k):
+                ret = ret.replace('{' + k + '}', str(v))
 
         # indent all lines
         ret = indent + ret.replace('\n', '\n' + indent)
