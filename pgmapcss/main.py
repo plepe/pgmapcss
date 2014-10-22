@@ -131,6 +131,14 @@ def main():
 
     stat['database'] = conn.database
 
+    if not 'unit.srs' in stat['config']:
+        stat['config']['unit.srs'] = 900913
+    if not 'srs' in stat['config']:
+        if stat['mode'] == 'database-function':
+            stat['config']['srs'] = 900913
+        else:
+            stat['config']['srs'] = 4326
+
     if not 'offline' in args.options and args.database_update == 're-init':
         print('* Re-initializing database')
         pgmapcss.db.db_init(conn)

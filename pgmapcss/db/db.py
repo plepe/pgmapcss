@@ -86,4 +86,10 @@ def prepare(sql):
     return conn.prepare(sql)
 
 def query_functions(stat):
-    return strip_includes(resource_stream(__name__, conn.database_type + '/db_functions.py'), stat)
+    ret = strip_includes(resource_stream(__name__, conn.database_type + '/db_functions.py'), stat)
+
+    for k, v in stat['config'].items():
+        if re.match('^[a-zA-Z\._0-9]+$', k):
+            ret = ret.replace('{' + k + '}', str(v))
+
+    return ret

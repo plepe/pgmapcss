@@ -61,7 +61,7 @@ if __name__ == '__main__':
         if not 'lang' in parameters:
             accept_lang = os.getenv('HTTP_ACCEPT_LANGUAGE')
             parameters['lang'] = accept_lang.split(',')[0].split(';')[0].split('_')[0]
-        parameters['srs'] = 4326
+        parameters['srs'] = {srs}
         if params.getvalue('srs'):
             parameters['srs'] = int(params.getvalue('srs'))
 
@@ -155,7 +155,7 @@ if __name__ == '__main__':
                 parameters['lang'] = 'en'
 
     plpy = fake_plpy(args)
-    plan_to_geojson = plpy.prepare('select ST_asGeoJSON(ST_Transform($1, $2)) as r', [ 'geometry', 'integer' ])
+    plan_to_geojson = plpy.prepare('select ST_asGeoJSON($1) as r', [ 'geometry' ])
 
     def format_result(results):
         object = results[-1]['object']
@@ -167,12 +167,12 @@ if __name__ == '__main__':
             props = result['properties']
             props['pseudo_element'] = result['pseudo_element']
             if result['geo'] != object['geo']:
-                g = plpy.execute(plan_to_geojson, [ result['geo'], parameters['srs'] ])[0]['r']
+                g = plpy.execute(plan_to_geojson, [ result['geo'] ])[0]['r']
                 props['geometry'] = json.loads(g) if g else None,
 
             properties_list['results'].append(props)
 
-        geo = plpy.execute(plan_to_geojson, [ object['geo'], parameters['srs'] ])[0]['r']
+        geo = plpy.execute(plan_to_geojson, [ object['geo'] ])[0]['r']
         feature = {{
             'type': 'Feature',
             'geometry': json.loads(geo) if geo else None,

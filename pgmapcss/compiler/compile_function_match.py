@@ -48,6 +48,7 @@ def compile_function_match(stat):
       'default_lang': repr(stat['lang']),
       'user': stat['args'].user,
       'db_srs': stat['config']['db.srs'],
+      'srs': stat['config']['srs'],
       'style_element_property': repr({
           k: v['value'].split(';')
           for k, v in stat['defines']['style_element_property'].items()
@@ -84,7 +85,7 @@ current = None
 if not 'lang' in parameters:
     parameters['lang'] = {default_lang}
 if not 'srs' in parameters:
-    parameters['srs' ] = 4326
+    parameters['srs' ] = {srs}
 
 if type(bbox) == list and len(bbox) == 4:
     plan = plpy.prepare('select SetSRID(MakeBox2D(ST_Point($1, $2), ST_Point($3, $4)), $5) as bounds', ['float', 'float', 'float', 'float', 'int'])
@@ -135,6 +136,11 @@ for style_element in all_style_elements:
 def ST_Collect(geometries):
     plan = plpy.prepare('select ST_Collect($1) as r', ['geometry[]'])
     res = plpy.execute(plan, [geometries])
+    return res[0]['r']
+
+def convert_srs(geom):
+    plan = plpy.prepare('select ST_Transform($1, $2) as r', ['geometry', 'integer'])
+    res = plpy.execute(plan, [geom, parameters['srs']])
     return res[0]['r']
 
 def dict_merge(dicts):
@@ -199,7 +205,7 @@ while src:
                     'types': result['types'],
                     'tags': pghstore.dumps(result['tags']),
                     'pseudo_element': result['pseudo_element'],
-                    'geo': result['geo'],
+                    'geo': convert_srs(result['geo']),
                     'properties': pghstore.dumps(result['properties']),
                     'style_elements': [ se[0] for se in style_elements ],
                     'style_elements_index': [ se[1] for se in style_elements ],
@@ -215,7 +221,7 @@ while src:
                     'types': result['types'],
                     'tags': result['tags'],
                     'pseudo_element': result['pseudo_element'],
-                    'geo': result['geo'],
+                    'geo': convert_srs(result['geo']),
                     'properties': result['properties'],
                     'style_elements': [ se[0] for se in style_elements ],
                     'style_elements_index': [ se[1] for se in style_elements ],
