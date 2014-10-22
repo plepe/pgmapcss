@@ -1,7 +1,4 @@
-# TODO: currently all ways are returned as line and area - and as linestring, not polygon
-# TODO: objects_near: distance to ways are calculated to linestring (inside not working)
 # Use this functions only with a database based on an import with osmosis
-
 def objects(_bbox, where_clauses, add_columns=[], add_param_type=[], add_param_value=[]):
     import pghstore
     time_start = datetime.datetime.now() # profiling
