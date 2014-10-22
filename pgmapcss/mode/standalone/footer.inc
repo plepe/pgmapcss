@@ -1,10 +1,12 @@
-    sys.stderr.write('Print database query explains and statistics:\n')
-    for k, v in plpy.explained_queries.items():
+# START explain_queries
+    sys.stderr.write('Database queries. Explained plans and statistics:\n')
+    for k, v in plpy.explain_queries.items():
         sys.stderr.write('* {{}}\n'.format(k))
         sys.stderr.write('- Executed {{count}} time(s)\n'.format(**v))
         sys.stderr.write('- Explain:\n')
         for e in v['explain']:
             sys.stderr.write('    ' + e[0] + '\n')
+# END explain_queries
 
 if __name__ == '__main__':
     import re
