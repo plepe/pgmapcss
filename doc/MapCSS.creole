@@ -411,6 +411,7 @@ Config options can be set by using {{{@config config_option config_value;}}}. Th
 |= Config option |= Description |= Possible values
 | josm_classes | when 'true', a {{{set foo;}}} statement will also set the class foo (synonymous to {{{set .foo;}}}) | 'true' or 'false' (default)
 | angular_system | choose which angular system will be used for trigonometric functions | 'degrees' (default), 'radians'
+| db.srs | Spatial Reference System used in the database. Autodetected. | Usual values: 4326 (WGS-84), 900913 resp. 3857 (Spherical Mercator for Web Maps)
 
 Config options can also be set as parameters to pgmapcss, by using {{{-c}}} or {{{--config}}}, e.g. {{{pgmapcss --config option1=value1 option2=value2}}}.
 

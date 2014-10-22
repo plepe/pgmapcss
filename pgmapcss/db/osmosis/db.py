@@ -17,6 +17,16 @@ class db(default):
             except postgresql.exceptions.UndefinedTableError:
                 self.stat['config']['db.multipolygons'] = False
 
+        if not 'db.srs' in self.stat['config']:
+            if 'offline' in self.stat['options']:
+                print('- Assuming SRS ID 4326. Specify -c db.srs=<value> if different')
+                self.stat['config']['db.srs'] = 4326
+            else:
+                plan = self.conn.prepare('select ST_SRID(geom) from nodes limit 1')
+                res = plan()
+                self.stat['config']['db.srs'] = res[0][0]
+                print('- Database SRS ID {} detected'.format(self.stat['config']['db.srs']))
+
     def tag_type(self, key):
         if key[0:4] == 'osm:':
             if key == 'osm:id':
