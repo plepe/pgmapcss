@@ -162,6 +162,7 @@ def main():
 
     if args.eval_tests:
         pgmapcss.eval.functions().test_all()
+        print('* All tests completed successfully.')
 
     try:
         os.mkdir(stat['icons_dir'])
