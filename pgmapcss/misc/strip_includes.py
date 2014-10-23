@@ -23,7 +23,7 @@ def strip_includes(stream, stat):
                 if (not s in stat['config'] or stat['config'][s] in ('false', False, 'no')) and (not s in stat['options'])
             })
 
-        if include:
+        elif include:
             ret += r
 
     return ret
