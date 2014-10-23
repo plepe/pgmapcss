@@ -5,4 +5,4 @@ def eval_number_of_tags(param):
     return str(len(current['tags']))
 
 # IN []
-# OUT '3'
+# OUT '5'

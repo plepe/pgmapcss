@@ -5,4 +5,4 @@ def eval_keys_of_tags(param):
     return ';'.join(current['tags'])
 
 # IN []
-# OUT 'cuisine;amenity;name'
+# OUT 'cuisine;amenity;name:en;name;name:de'
