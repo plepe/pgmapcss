@@ -169,7 +169,7 @@ def main():
                 print('* Current DB version: {version}'.format(**db_version))
 
     if args.eval_tests:
-        pgmapcss.eval.functions().test_all()
+        pgmapcss.eval.functions(stat).test_all()
         print('* All tests completed successfully.')
 
     try:
