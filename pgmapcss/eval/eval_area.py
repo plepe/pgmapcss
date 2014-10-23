@@ -5,7 +5,7 @@ def eval_area(param):
     if len(param) == 0:
         return ''
 
-    plan = plpy.prepare('select ST_Area($1) as area', ['geometry'])
+    plan = plpy.prepare('select ST_Area(ST_Transform($1, 900913)) as area', ['geometry'])
     res = plpy.execute(plan, param)
 
     zoom = eval_metric(['1u'])

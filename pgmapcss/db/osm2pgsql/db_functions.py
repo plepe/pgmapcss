@@ -280,7 +280,7 @@ def objects_near(max_distance, ob, parent_selector, where_clause, check_geo=None
     elif max_distance == 0:
         bbox = geom
     else:
-        plan = plpy.prepare('select ST_Buffer(ST_Envelope($1), $2) as r', ['geometry', 'float'])
+        plan = plpy.prepare('select ST_Transform(ST_Buffer(ST_Transform(ST_Envelope($1), {unit.srs}), $2), {db.srs}) as r', ['geometry', 'float'])
         res = plpy.execute(plan, [ geom, max_distance ])
         bbox = res[0]['r']
 
@@ -295,7 +295,7 @@ def objects_near(max_distance, ob, parent_selector, where_clause, check_geo=None
     for ob in objects(
         bbox,
         { parent_selector: where_clause },
-        [ 'ST_Distance($2::geometry, way) as __distance' ],
+        [ 'ST_Distance(ST_Transform($2::geometry, {unit.srs}), ST_Transform(way, {unit.srs})) as __distance' ],
         [ 'geometry' ],
         [ geom ]
     ):

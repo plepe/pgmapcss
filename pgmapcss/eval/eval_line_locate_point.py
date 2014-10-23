@@ -8,7 +8,7 @@ def eval_line_locate_point(param):
     if not param[0] or not param[1]:
         return ''
 
-    plan = plpy.prepare('select ST_Line_Locate_Point($1, $2) * ST_Length($1) as r', ['geometry', 'geometry'])
+    plan = plpy.prepare('select ST_Line_Locate_Point($1, $2) * ST_Length(ST_Transform($1, {unit.srs})) as r', ['geometry', 'geometry'])
     res = plpy.execute(plan, [ param[0], param[1] ])
 
     return eval_metric([ repr(res[0]['r']) + 'u' ])

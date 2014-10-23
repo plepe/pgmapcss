@@ -54,7 +54,7 @@ def db_update(conn):
     db_version_update()
     conn.database.update()
 
-def db_init(conn):
+def db_init(conn, stat):
     files = [ 'pgmapcss_types.sql', conn.database_type + '/init.sql' ]
 
     for f in files:
@@ -65,7 +65,7 @@ def db_init(conn):
 
     # populate _pgmapcss_left_right_hand_traffic table
     f = resource_stream(pgmapcss.data.__name__, 'left-right-hand-traffic.wkt')
-    res = conn.prepare("insert into _pgmapcss_left_right_hand_traffic values (ST_Transform(ST_SetSRID($1::text, 4326), 900913))")
+    res = conn.prepare("insert into _pgmapcss_left_right_hand_traffic values (ST_Transform(ST_SetSRID($1::text, 4326), {}))".format(stat['config']['db.srs']))
     while True:
         r = f.readline().decode('utf-8')
         if not r:
@@ -86,4 +86,10 @@ def prepare(sql):
     return conn.prepare(sql)
 
 def query_functions(stat):
-    return strip_includes(resource_stream(__name__, conn.database_type + '/db_functions.py'), stat)
+    ret = strip_includes(resource_stream(__name__, conn.database_type + '/db_functions.py'), stat)
+
+    for k, v in stat['config'].items():
+        if re.match('^[a-zA-Z\._0-9]+$', k):
+            ret = ret.replace('{' + k + '}', str(v))
+
+    return ret

@@ -76,6 +76,7 @@ z             | zoom level in combination with x/y tiles. If a different tilesiz
 tilesize      | the tilesize when using x/y tiles (default: 256)
 lang          | Use the given language code (e.g. "en" or "de") for language dependend instructions. Default: the first value of the HTTP Accept-Language header.
 srs           | ID of projection of output coordinates (default: 4326).
+in.srs        | Per default the coordinates of the bounding box are assumed to be in 'srs'. Use this to override this value.
 OTHER         | all other parameters will be available via the parameters() function.
 
 #### GeoJSON output
