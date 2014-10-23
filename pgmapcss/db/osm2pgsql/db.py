@@ -16,6 +16,37 @@ class db(default):
                 self.stat['config']['db.srs'] = res[0][0]
                 print('- Database SRS ID {} detected'.format(self.stat['config']['db.srs']))
 
+        # check database layout
+        if 'db.hstore-only' in self.stat['config']:
+            self.stat['config']['db.columns'] = False
+            self.stat['config']['db.has-hstore'] = True
+
+        elif 'db.columns' in self.stat['config']:
+            self.stat['config']['db.columns'] = self.stat['config']['db.columns'].split(',')
+
+        if not 'offline' in self.stat['options'] and not 'db.hstore-only' in self.stat['config']:
+            plan = self.conn.prepare('select * from planet_osm_point limit 0')
+
+            if not 'db.columns' in self.stat['config']:
+                self.stat['config']['db.columns'] = [
+                        k
+                        for k in plan.column_names
+                        if k not in ('osm_id', 'tags', 'way', 'z_order')
+                    ]
+                if len(self.stat['config']['db.columns']) == 0:
+                    self.stat['config']['db.columns'] = False
+                    self.stat['config']['db.hstore-only'] = True
+
+            if not 'db.has-hstore' in self.stat['config']:
+                self.stat['config']['db.has-hstore'] = 'tags' in plan.column_names
+
+        self.stat['config']['sql.columns'] = ''
+        if self.stat['config']['db.columns']:
+            self.stat['config']['sql.columns'] = ',' + ', '.join([
+                    '"' + k.replace('"', '_') + '"'
+                    for k in self.stat['config']['db.columns']
+                ])
+
     def tag_type(self, key):
         if key[0:4] == 'osm:':
             if key == 'osm:id':
