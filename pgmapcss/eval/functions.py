@@ -11,6 +11,13 @@ class Functions:
         self._eval_global_data = None
         self.stat = stat
 
+    def convert_srs(self, geom, srs):
+        #print(geom, srs)
+        plan = self.stat['database'].conn.prepare('select ST_Transform($1::text, $2::int) as r')
+        res = plan(geom, srs)
+        #print('  =>', res[0]['r'])
+        return res[0]['r']
+
     def list(self):
         if not self.eval_functions:
             self.resolve_config()
@@ -149,9 +156,18 @@ render_context = {'bbox': '010300002031BF0D000100000005000000DBF1839BB5DC3B41E70
             if m:
                 param_in = eval(m.group(1))
 
+                param_in = [
+                        p if len(p) < 16 or not re.match('[0-9A-F]+$', p) else self.convert_srs(p, self.stat['config']['db.srs'])
+                        for p in param_in
+                    ]
+
             m = re.match('# OUT(_ROUND)? (.*)$', r)
             if m:
                 return_out = eval(m.group(2))
+
+                if len(return_out) > 16 and re.match('[0-9A-F]+$', return_out):
+                    return_out = self.convert_srs(return_out, self.stat['config']['db.srs'])
+
                 shall_round = m.group(1) == '_ROUND'
 
                 ret += 'ret = ' + config.compiler([ repr(p) for p in param_in ], '', {}) + '\n'
