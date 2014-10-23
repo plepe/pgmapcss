@@ -141,7 +141,7 @@ def main():
 
     if not 'offline' in args.options and args.database_update == 're-init':
         print('* Re-initializing database')
-        pgmapcss.db.db_init(conn)
+        pgmapcss.db.db_init(conn, stat)
 
     if 'offline' in args.options:
         print('* Using offline mode. Attention! Some functionality might be missing.')
@@ -150,7 +150,7 @@ def main():
         db_version = pgmapcss.db.db_version()
         if db_version == None:
             print('* DB functions not installed; installing')
-            pgmapcss.db.db_init(conn)
+            pgmapcss.db.db_init(conn, stat)
         else:
             db_check = pgmapcss.db.db_version_check()
             if db_check == 1 and args.database_update == 'auto':

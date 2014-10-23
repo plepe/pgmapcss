@@ -54,7 +54,7 @@ def db_update(conn):
     db_version_update()
     conn.database.update()
 
-def db_init(conn):
+def db_init(conn, stat):
     files = [ 'pgmapcss_types.sql', conn.database_type + '/init.sql' ]
 
     for f in files:
