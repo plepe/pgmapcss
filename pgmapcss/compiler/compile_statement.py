@@ -10,6 +10,26 @@ def and_join(lst):
 
     return ' and '.join(lst)
 
+def list_eval_functions_prop(prop, stat):
+    ret = set()
+
+    for p in prop:
+        if type(p) == list:
+            ret = ret.union(list_eval_functions_prop(p, stat))
+        elif p[0:2] in ( 'f:', 'o:' ):
+            ret.add(p)
+
+    return ret
+
+def list_eval_functions(statement, stat):
+    ret = set()
+
+    for prop in statement['properties']:
+        if prop['value_type'] == 'eval':
+            ret = ret.union(list_eval_functions_prop(prop['value'], stat))
+
+    return ret
+
 # returns
 # {
 #   'check': Check as list, e.g. ['highway=foo', '...'],
@@ -28,10 +48,11 @@ def compile_statement(statement, stat, indent=''):
 
     # for tr() function -> replace {0.tag} and similar
     # TODO: include only in body, when tr() is being used
-    ret['body'] += indent + "current['condition-keys'] = " + repr([
-            c['key'] if 'key' in c else None
-            for c in object_selector['conditions']
-        ]) + '\n'
+    if 'f:tr' in list_eval_functions(statement, stat):
+        ret['body'] += indent + "current['condition-keys'] = " + repr([
+                c['key'] if 'key' in c else None
+                for c in object_selector['conditions']
+            ]) + '\n'
 
     if 'link_selector' in statement:
         ret['body'] += indent + 'for parent_index, parent_object in enumerate(' + compile_link_selector(statement, stat) + '):\n'
