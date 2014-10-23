@@ -113,6 +113,10 @@ The compiled database function uses PL/Python3 database language, which makes ex
 As Mapnik 2.x can't read symbolizer values (like color, width, ...) from database columns, the mapnik pre-processor has to create style rules for all possible value combinations. The more complex the style sheet, the larger the mapnik style files and therefore rendering can take a long time. The up-coming Mapnik 3.0 should solve these issues.
 
 ### Standalone mode ###
+Version 0.9 introduces the option, to compile a MapCSS style into a standalone
+executable. Running this executable (either from command line or as CGI script)
+will produce GeoJSON output.
+
 Let's take the following MapCSS style:
 ```css
 node[place=city] {
@@ -121,7 +125,7 @@ node[place=city] {
 }
 ```
 
-If you compile this MapCSS style into a standalone executable, running this executable (either from command line or as CGI script) will produce the following GeoJSON output (simplified, there will be more values). If you don't specify a bounding box as parameter the whole database will be queried:
+The compiled executable will produced an output similar to this (it has been shortened for readability):
 ```json
 { "type": "FeatureCollection", "features": [
 {
@@ -130,7 +134,7 @@ If you compile this MapCSS style into a standalone executable, running this exec
     "results": [
       {
         "icon": "circle",
-        "text": "Salzburg (149201)",
+        "text": "Salzburg (149201)", // <- here's the result of property "text"
         "pseudo_element": "default",
       }
     ],
@@ -154,7 +158,7 @@ If you compile this MapCSS style into a standalone executable, running this exec
     "results": [
       {
         "icon": "circle",
-        "text": "Wien (1626440)",
+        "text": "Wien (1626440)", // <- here's the result of property "text"
         "pseudo_element": "default",
       }
     ],
