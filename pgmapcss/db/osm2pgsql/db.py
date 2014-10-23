@@ -54,7 +54,14 @@ class db(default):
             else:
                 return None
 
-        return ( 'hstore-value', key, 'tags' )
+        if self.stat['config']['db.columns']:
+            if key in self.stat['config']['db.columns']:
+                return ( 'column', key )
+
+        if self.stat['config']['db.has-hstore']:
+            return ( 'hstore-value', key, 'tags' )
+
+        return None
 
     def compile_modify_id(self, key, value):
         if value[0] == 'r':
