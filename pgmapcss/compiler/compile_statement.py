@@ -26,6 +26,13 @@ def compile_statement(statement, stat, indent=''):
 
     ret['check'] += compile_selector_part(object_selector, stat)
 
+    # for tr() function -> replace {0.tag} and similar
+    # TODO: include only in body, when tr() is being used
+    ret['body'] += indent + "current['condition-keys'] = " + repr([
+            c['key'] if 'key' in c else None
+            for c in object_selector['conditions']
+        ]) + '\n'
+
     if 'link_selector' in statement:
         ret['body'] += indent + 'for parent_index, parent_object in enumerate(' + compile_link_selector(statement, stat) + '):\n'
 
