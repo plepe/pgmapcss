@@ -139,11 +139,11 @@ def main():
         else:
             stat['config']['srs'] = 4326
 
-    if not 'offline' in args.options and args.database_update == 're-init':
+    if not 'offline' in stat['options'] and args.database_update == 're-init':
         print('* Re-initializing database')
         pgmapcss.db.db_init(conn, stat)
 
-    if 'offline' in args.options:
+    if 'offline' in stat['options']:
         print('* Using offline mode. Attention! Some functionality might be missing.')
 
     else:
