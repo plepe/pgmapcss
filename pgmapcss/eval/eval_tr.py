@@ -1,11 +1,18 @@
 class config_eval_tr(config_base):
-    mutable = 3
+    mutable = 0
 
 def eval_tr(param):
     if len(param) == 0:
         return ''
 
     ret = param[0]
+
+    for i, v in enumerate(param):
+        for j, w in enumerate(current['condition-keys']):
+            if w is not None:
+                param[i] = param[i].replace("{" + str(j) + ".key}", w)
+                param[i] = param[i].replace("{" + str(j) + ".value}", current['tags'][w] if w in current['tags'] else '')
+                param[i] = param[i].replace("{" + str(j) + ".tag}", w + '=' + current['tags'][w] if w in current['tags'] else '')
 
     for i, v in enumerate(param[1:]):
         ret = ret.replace("{}", v, 1)
