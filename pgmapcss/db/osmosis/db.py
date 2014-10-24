@@ -18,7 +18,7 @@ class db(default):
                 self.stat['config']['db.multipolygons'] = False
 
         if not 'db.srs' in self.stat['config']:
-            if 'offline' in self.stat['options']:
+            if stat['config'].get('offline', False):
                 print('- Assuming SRS ID 4326. Specify -c db.srs=<value> if different')
                 self.stat['config']['db.srs'] = 4326
             else:
@@ -50,7 +50,7 @@ class db(default):
         return format(value[1:])
 
     def compile_user_id(self, key, value):
-        if 'offline' in self.stat['options']:
+        if stat['config'].get('offline', False):
             print("Warning compiling tag 'osm:user': Can't optimize query, as user-ids can't be resolved at compile time.")
             return None
 

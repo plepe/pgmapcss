@@ -7,7 +7,7 @@ class db(default):
         default.__init__(self, conn, stat)
 
         if not 'db.srs' in self.stat['config']:
-            if 'offline' in self.stat['options']:
+            if stat['config'].get('offline', False):
                 print('- Assuming SRS ID 900913. Specify -c db.srs=<value> if different')
                 self.stat['config']['db.srs'] = 900913
             else:
@@ -26,7 +26,7 @@ class db(default):
             self.stat['config']['db.columns.node'] = self.stat['config']['db.columns'].split(',')
             self.stat['config']['db.columns.way'] = self.stat['config']['db.columns'].split(',')
 
-        if not 'offline' in self.stat['options'] and not 'db.hstore-only' in self.stat['config']:
+        if self.stat.['config'].get('offline', False) and not 'db.hstore-only' in self.stat['config']:
             # detect layout of planet_osm_point for nodes
             plan = self.conn.prepare('select * from planet_osm_point limit 0')
             if not 'db.columns.node' in self.stat['config']:

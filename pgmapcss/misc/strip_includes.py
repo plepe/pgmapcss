@@ -20,7 +20,7 @@ def strip_includes(stream, stat):
             include = not len({
                 True
                 for s in selectors
-                if (not s in stat['config'] or stat['config'][s] in ('false', False, 'no')) and (not s in stat['options'])
+                if not s in stat['config'] or stat['config'][s] in ('false', False, 'no')
             })
 
         elif include:

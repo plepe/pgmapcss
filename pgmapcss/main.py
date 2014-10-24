@@ -53,12 +53,8 @@ parser.add_argument('-r', '--database-update', dest='database_update',
     default='auto',
     help='Whether the database should be updated to the current version. Possible values: "re-init": re-initializes the database, need to re-compile all pgmapcss styles, "update": update all database functions, "none": do not update, "auto": if necessary a database functions update will be performed.')
 
-parser.add_argument('-o', '--options', dest='options', nargs='+',
-    choices=['profiler', 'context', 'rusage', 'offline', 'explain_queries'],
-    help='Additional options. Currently supported options: "profiler": during execution, show some statistics about query/processing time and count of objects. "context": show bounding box and scale denominator of requests. "rusage": show resource usage at end of processing. "offline": When compiling standalone mode, do not make any requests to the database. "explain_queries": Print queries, their plans and count of executions to stderr (standalone mode only).')
-
 parser.add_argument('-c', '--config', dest='config', nargs='+',
-    help='Set configuration options, e.g. -c foo=bar. See doc/MapCSS.creole for available configuration options.')
+    help='Set configuration options, e.g. -c foo=bar. See doc/config_options.md for available configuration options.')
 
 parser.add_argument('-D', '--defaults', dest='defaults', nargs='+',
     help='Load specified defaults. These can either be included in the pgmapcss distribution (see doc/defaults.md for a list of available defaults) or local files (specified by trailing .mapcss). You may specify several defaults which will be loaded consecutive (e.g. -D josm local.mapcss)')
@@ -111,7 +107,6 @@ def main():
 
     stat = pgmapcss.compiler.stat._stat({
         'id': style_id,
-        'options': set(args.options) if args.options else set(),
         'config': {},
         'base_style': args.base_style,
         'icons_dir': style_id + '.icons',
@@ -125,7 +120,10 @@ def main():
     if args.config:
         for v in args.config:
             v = v.split("=")
-            stat['config'][v[0]] = v[1]
+            if len(v) > 1:
+                stat['config'][v[0]] = v[1]
+            else:
+                stat['config'][v[0]] = True
 
     conn = pgmapcss.db.connect(args, stat)
 
@@ -139,11 +137,11 @@ def main():
         else:
             stat['config']['srs'] = 4326
 
-    if not 'offline' in args.options and args.database_update == 're-init':
+    if stat['config'].get('offline', False) and args.database_update == 're-init':
         print('* Re-initializing database')
         pgmapcss.db.db_init(conn, stat)
 
-    if 'offline' in args.options:
+    if stat['config'].get('offline', False):
         print('* Using offline mode. Attention! Some functionality might be missing.')
 
     else:
