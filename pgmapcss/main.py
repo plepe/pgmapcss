@@ -58,7 +58,7 @@ parser.add_argument('-o', '--options', dest='options', nargs='+',
     help='Additional options. Currently supported options: "profiler": during execution, show some statistics about query/processing time and count of objects. "context": show bounding box and scale denominator of requests. "rusage": show resource usage at end of processing. "offline": When compiling standalone mode, do not make any requests to the database. "explain_queries": Print queries, their plans and count of executions to stderr (standalone mode only).')
 
 parser.add_argument('-c', '--config', dest='config', nargs='+',
-    help='Set configuration options, e.g. -c foo=bar. See doc/MapCSS.creole for available configuration options.')
+    help='Set configuration options, e.g. -c foo=bar. See doc/config_options.md for available configuration options.')
 
 parser.add_argument('-D', '--defaults', dest='defaults', nargs='+',
     help='Load specified defaults. These can either be included in the pgmapcss distribution (see doc/defaults.md for a list of available defaults) or local files (specified by trailing .mapcss). You may specify several defaults which will be loaded consecutive (e.g. -D josm local.mapcss)')
