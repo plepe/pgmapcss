@@ -131,7 +131,7 @@ def compile_condition_sql(condition, statement, stat, prefix='current.', filter=
         return ''.join(ret)
 
     # depending on the tag type compile the specified condition
-    tag_type = stat['database'].tag_type(condition['key'])
+    tag_type = stat['database'].tag_type(condition['key'], condition, statement['selector'], statement)
 
     if tag_type is None:
         pass

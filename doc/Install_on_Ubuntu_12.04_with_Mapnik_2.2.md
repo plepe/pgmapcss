@@ -37,7 +37,7 @@ psql -d "dbname=test user=user host=localhost password=PASSWORD" -f /usr/share/p
 
 Download an OSM file and import to database:
 ```sh
-osm2pgsql -dtest -Uuser -Hlocalhost -W -s -S /usr/share/osm2pgsql/default.style --hstore --hstore-all -G azores-latest.osm.bz2
+osm2pgsql -dtest -Uuser -Hlocalhost -W -s -S /usr/share/osm2pgsql/default.style --hstore -G azores-latest.osm.bz2
 ```
 
 Clone pgmapcss:
