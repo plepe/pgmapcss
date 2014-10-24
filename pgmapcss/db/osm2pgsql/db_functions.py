@@ -33,7 +33,7 @@ select 'n' || cast(osm_id as text) as id,
 # START db.has-hstore
        , tags
 # END db.has-hstore
-       {sql.columns}
+       {sql.columns.node}
        {add_columns}
 from planet_osm_point
 where {bbox} ( {w} )
@@ -49,7 +49,7 @@ where {bbox} ( {w} )
                 'types': r['types'],
             }
 
-# START db.columns
+# START db.columns.node
             t['tags'] = {
                 k: r[k]
                 for k in r
@@ -59,7 +59,7 @@ where {bbox} ( {w} )
 # START db.has-hstore
             t['tags'] = dict(pghstore.loads(r['tags']).items() | t['tags'].items())
 # END db.has-hstore
-# END db.columns
+# END db.columns.node
 # START db.hstore-only
             t['tags'] = pghstore.loads(r['tags'])
 # END db.hstore-only
@@ -79,7 +79,7 @@ select 'w' || cast(osm_id as text) as id,
 # START db.has-hstore
        , tags
 # END db.has-hstore
-       {sql.columns}
+       {sql.columns.way}
        {add_columns}
 from planet_osm_line
 where osm_id>0 and {bbox} ( {w} )
@@ -95,7 +95,7 @@ where osm_id>0 and {bbox} ( {w} )
                 'types': r['types'],
             }
 
-# START db.columns
+# START db.columns.way
             t['tags'] = {
                 k: r[k]
                 for k in r
@@ -105,7 +105,7 @@ where osm_id>0 and {bbox} ( {w} )
 # START db.has-hstore
             t['tags'] = dict(pghstore.loads(r['tags']).items() | t['tags'].items())
 # END db.has-hstore
-# END db.columns
+# END db.columns.way
 # START db.hstore-only
             t['tags'] = pghstore.loads(r['tags'])
 # END db.hstore-only
@@ -125,7 +125,7 @@ select 'r' || cast(-osm_id as text) as id,
 # START db.has-hstore
        , tags
 # END db.has-hstore
-       {sql.columns}
+       {sql.columns.way}
        {add_columns}
 from planet_osm_line
 where osm_id<0 and {bbox} ( {w} )
@@ -141,7 +141,7 @@ where osm_id<0 and {bbox} ( {w} )
                 'types': r['types'],
             }
 
-# START db.columns
+# START db.columns.way
             t['tags'] = {
                 k: r[k]
                 for k in r
@@ -151,7 +151,7 @@ where osm_id<0 and {bbox} ( {w} )
 # START db.has-hstore
             t['tags'] = dict(pghstore.loads(r['tags']).items() | t['tags'].items())
 # END db.has-hstore
-# END db.columns
+# END db.columns.way
 # START db.hstore-only
             t['tags'] = pghstore.loads(r['tags'])
 # END db.hstore-only
@@ -171,7 +171,7 @@ select 'w' || cast(osm_id as text) as id,
 # START db.has-hstore
        , tags
 # END db.has-hstore
-       {sql.columns}
+       {sql.columns.way}
        {add_columns}
 from planet_osm_polygon
 where osm_id>0 and {bbox} ( {w} )
@@ -187,7 +187,7 @@ where osm_id>0 and {bbox} ( {w} )
                 'types': r['types'],
             }
 
-# START db.columns
+# START db.columns.way
             t['tags'] = {
                 k: r[k]
                 for k in r
@@ -197,7 +197,7 @@ where osm_id>0 and {bbox} ( {w} )
 # START db.has-hstore
             t['tags'] = dict(pghstore.loads(r['tags']).items() | t['tags'].items())
 # END db.has-hstore
-# END db.columns
+# END db.columns.way
 # START db.hstore-only
             t['tags'] = pghstore.loads(r['tags'])
 # END db.hstore-only
@@ -217,7 +217,7 @@ select 'r' || cast(-osm_id as text) as id,
 # START db.has-hstore
        , tags
 # END db.has-hstore
-       {sql.columns}
+       {sql.columns.way}
        {add_columns}
 from planet_osm_polygon
 where osm_id<0 and {bbox} ( {w} )
@@ -233,7 +233,7 @@ where osm_id<0 and {bbox} ( {w} )
                 'types': r['types'],
             }
 
-# START db.columns
+# START db.columns.way
             t['tags'] = {
                 k: r[k]
                 for k in r
@@ -243,7 +243,7 @@ where osm_id<0 and {bbox} ( {w} )
 # START db.has-hstore
             t['tags'] = dict(pghstore.loads(r['tags']).items() | t['tags'].items())
 # END db.has-hstore
-# END db.columns
+# END db.columns.way
 # START db.hstore-only
             t['tags'] = pghstore.loads(r['tags'])
 # END db.hstore-only
@@ -261,7 +261,7 @@ def objects_by_id(id_list):
             'geo': r['way'],
             'types': ['node', 'point']
         }
-# START db.columns
+# START db.columns.node
         t['tags'] = {
             k: r[k]
             for k in r
@@ -271,7 +271,7 @@ def objects_by_id(id_list):
 # START db.has-hstore
         t['tags'] = dict(pghstore.loads(r['tags']).items() | t['tags'].items())
 # END db.has-hstore
-# END db.columns
+# END db.columns.node
 # START db.hstore-only
         t['tags'] = pghstore.loads(r['tags'])
 # END db.hstore-only
@@ -293,7 +293,7 @@ def objects_by_id(id_list):
             'geo': r['way'],
             'types': ['way', r['_type']]
         }
-# START db.columns
+# START db.columns.way
         t['tags'] = {
             k: r[k]
             for k in r
@@ -303,7 +303,7 @@ def objects_by_id(id_list):
 # START db.has-hstore
         t['tags'] = dict(pghstore.loads(r['tags']).items() | t['tags'].items())
 # END db.has-hstore
-# END db.columns
+# END db.columns.way
 # START db.hstore-only
         t['tags'] = pghstore.loads(r['tags'])
 # END db.hstore-only
