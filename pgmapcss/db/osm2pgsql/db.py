@@ -26,7 +26,7 @@ class db(default):
             self.stat['config']['db.columns.node'] = self.stat['config']['db.columns'].split(',')
             self.stat['config']['db.columns.way'] = self.stat['config']['db.columns'].split(',')
 
-        if not self.stat.['config'].get('offline', False) and not 'db.hstore-only' in self.stat['config']:
+        if not self.stat['config'].get('offline', False) and not 'db.hstore-only' in self.stat['config']:
             # detect layout of planet_osm_point for nodes
             plan = self.conn.prepare('select * from planet_osm_point limit 0')
             if not 'db.columns.node' in self.stat['config']:
