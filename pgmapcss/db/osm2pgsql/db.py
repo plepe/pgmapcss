@@ -47,7 +47,7 @@ class db(default):
                     for k in self.stat['config']['db.columns']
                 ])
 
-    def tag_type(self, key):
+    def tag_type(self, key, condition, selector, statement):
         if key[0:4] == 'osm:':
             if key == 'osm:id':
                 return ( 'column', 'osm_id', self.compile_modify_id )
