@@ -7,7 +7,7 @@ class db(default):
         default.__init__(self, conn, stat)
 
         if not 'db.srs' in self.stat['config']:
-            if 'offline' in self.stat['options']:
+            if stat['config'].get('offline', False):
                 print('- Assuming SRS ID 900913. Specify -c db.srs=<value> if different')
                 self.stat['config']['db.srs'] = 900913
             else:

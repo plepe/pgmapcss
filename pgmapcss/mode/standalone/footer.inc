@@ -1,4 +1,4 @@
-# START explain_queries
+# START debug.explain_queries
     sys.stderr.write('Database queries. Explained plans and statistics:\n')
     for k, v in plpy.explain_queries.items():
         sys.stderr.write('* {{}}\n'.format(k))
@@ -6,7 +6,7 @@
         sys.stderr.write('- Explain:\n')
         for e in v['explain']:
             sys.stderr.write('    ' + e[0] + '\n')
-# END explain_queries
+# END debug.explain_queries
 
 if __name__ == '__main__':
     import re

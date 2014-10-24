@@ -74,7 +74,7 @@ import datetime
 import copy
 '''.format(**replacement)
 
-    if 'profiler' in stat['options']:
+    if stat['config'].get('debug.profiler', False):
         ret += 'time_start = datetime.datetime.now() # profiling\n'
 
     ret += '''\
@@ -99,7 +99,7 @@ res = plpy.execute(plan, [_bbox])
 render_context = {{ 'bbox': res[0]['bounds'], 'scale_denominator': scale_denominator }}
 '''.format(**replacement)
 
-    if 'context' in stat['options']:
+    if stat['config'].get('debug.context', False):
         ret += 'plpy.warning(render_context)\n'
 
     ret += 'global_data = ' + repr(stat['global_data']) + '\n'
@@ -123,7 +123,7 @@ for style_element in all_style_elements:
 '''.format(**replacement)
 
     func = "objects(render_context.get('bbox'), match_where)"
-    if 'profiler' in stat['options']:
+    if stat['config'].get('debug.profiler', False):
         ret += "time_qry_start = datetime.datetime.now() # profiling\n"
         ret += "src = list(" + func + ")\n"
         ret += "time_qry_stop = datetime.datetime.now() # profiling\n"
@@ -263,7 +263,7 @@ while src:
         combined_objects = []
     '''.format(**replacement)
 
-    if 'profiler' in stat['options']:
+    if stat['config'].get('debug.profiler', False):
         ret += '''
 time_stop = datetime.datetime.now() # profiling
 plpy.warning('total run of processing (incl. querying db objects) took %.2fs' % (time_stop - time_start).total_seconds())
@@ -274,7 +274,7 @@ else:
 plpy.warning('rendered map features: {{rendered}} / {{total}}, {{perc:.2f}}%'.format(**counter))
 '''.format(**replacement);
 
-    if 'rusage' in stat['options']:
+    if stat['config'].get('debug.rusage', False):
         ret += '''\
 import resource
 plpy.warning('Resource Usage: ' + str(resource.getrusage(resource.RUSAGE_SELF)) + '\\nsee https://docs.python.org/3/library/resource.html')
