@@ -21,3 +21,4 @@ Advances options:
 | db.columns.way | osm2pgsql only: Specify comma-separated list of database tag columns for planet_osm_line and planet_osm_polygon. Usually autodetected. Needed when using offline mode. |
 | db.columns | osm2pgsql only: Use the specified list for db.columns.node and db.columns.way |
 | db.has-hstore | osm2pgsql only: Additional tags can be read from the 'tags' column (of type hstore). Usually autodetected. Needed when using offline mode. |
+| db.multipolygons | osmosis only: Specify whether the multipolygons table is present and should be used. Usually autodected. Needed when using offline mode (default: false) | true/false
