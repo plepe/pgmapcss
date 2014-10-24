@@ -244,9 +244,15 @@ while src:
 
         if shown:
             counter['rendered'] += 1
-#        else:
-#            plpy.warning('not rendered: ' + object['id'] + ' ' + repr(object['tags']))
+'''.format(**replacement)
 
+    if stat['config'].get('debug.counter', False) == 'verbose':
+        ret += '''
+        else:
+            plpy.warning('not rendered: ' + object['id'] + ' ' + repr(object['tags']))
+'''.format(**replacement)
+
+    ret += '''
     src = None
 
     if len(combined_objects):
@@ -267,18 +273,22 @@ while src:
         ret += '''
 time_stop = datetime.datetime.now() # profiling
 plpy.warning('total run of processing (incl. querying db objects) took %.2fs' % (time_stop - time_start).total_seconds())
+'''.format(**replacement)
+
+    if stat['config'].get('debug.counter', False):
+        ret += '''
 if counter['total'] == 0:
     counter['perc'] = 100.0
 else:
     counter['perc'] = counter['rendered'] / counter['total'] * 100.0
 plpy.warning('rendered map features: {{rendered}} / {{total}}, {{perc:.2f}}%'.format(**counter))
-'''.format(**replacement);
+'''.format(**replacement)
 
     if stat['config'].get('debug.rusage', False):
-        ret += '''\
+        ret += '''
 import resource
 plpy.warning('Resource Usage: ' + str(resource.getrusage(resource.RUSAGE_SELF)) + '\\nsee https://docs.python.org/3/library/resource.html')
-'''.format(**replacement);
+'''.format(**replacement)
 
     indent = ''
     if stat['mode'] == 'standalone':

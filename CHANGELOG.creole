@@ -4,7 +4,7 @@
 * pseudo tags 'osm:id' (osm2pgsql and osmosis), 'osm:version', 'osm:user_id', 'osm:user', 'osm:timestamp', 'osm:changeset' (osmosis only), see [[doc/database.md|database docu]] for details
 * removed command line options (-o, --options) and merged them into config options (-c, --config). See [[doc/config_options.md]] for a full list.
 * new eval functions: parameter(), lang(), localized_tag()
-* Debugging: new option 'debug.rusage' to show resource usage; 'debug.explain_queries' to list and count queries and show their plans (standalone mode only).
+* Debugging: new option 'debug.rusage' to show resource usage; 'debug.explain_queries' to list and count queries and show their plans (standalone mode only); 'debug.counter' shows how many map features were rendered - set to 'verbose' to list each map feature which was read from the database but not rendered.
 * Support databases with geometries in a different Spatial Reference System, see config db.srs in [[doc/config_options.md]].
 * if no bounding box is given (to the database function or the standalone executable), the whole database will be queried
 * Language support (see chapter "Language support" in [[doc/MapCSS.creole|MapCSS docu]]

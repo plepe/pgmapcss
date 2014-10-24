@@ -12,6 +12,7 @@ The following config options are supported:
 | offline | When compiling standalone mode, do not make any requests to the database. | true/**false**
 | debug.profiler | during execution, show some statistics about query/processing time and count of objects. | true/**false**
 | debug.context | show bounding box and scale denominator of requests. | true/**false**
+| debug.counter | Count of rendered map features in comparison to map features loaded from the database. If 'verbose', print each map feature which was not rendered. | true/**false**/verbose
 | debug.rusage | show resource usage at end of processing. | true/**false**
 | debug.explain_queries | Print queries, their plans and count of executions to stderr (standalone mode only). | true/**false**
 
