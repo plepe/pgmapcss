@@ -1,5 +1,5 @@
 # Use this functions only with a database based on an import with osm2pgsql
-def objects(_bbox, where_clauses, add_columns=[], add_param_type=[], add_param_value=[]):
+def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_value=[]):
     import pghstore
 
     qry = ''
@@ -9,9 +9,12 @@ def objects(_bbox, where_clauses, add_columns=[], add_param_type=[], add_param_v
         bbox = 'way && $1 and ST_Intersects(way, $1::geometry) and'
 
     if len(add_columns):
-        add_columns = ', ' + ', '.join(add_columns)
+        add_columns_qry = ', ' + ', '.join([
+                q + ' as "' + k + '"'
+                for k, q in add_columns.items()
+            ])
     else:
-        add_columns = ''
+        add_columns_qry = ''
 
     if _bbox:
         param_type = [ 'geometry' ] + add_param_type
@@ -37,7 +40,7 @@ select 'n' || cast(osm_id as text) as id,
        {add_columns}
 from planet_osm_point
 where {bbox} ( {w} )
-'''.format(bbox=bbox, w=' or '.join(w), add_columns=add_columns)
+'''.format(bbox=bbox, w=' or '.join(w), add_columns=add_columns_qry)
 
         plan = plpy.prepare(qry, param_type )
         res = plpy.cursor(plan, param_value )
@@ -53,7 +56,7 @@ where {bbox} ( {w} )
             t['tags'] = {
                 k: r[k]
                 for k in r
-                if k not in ['id', 'geo', 'types', 'tags'] # TODO: add_columns?
+                if k not in ['id', 'geo', 'types', 'tags'] and k not in add_columns
                 if r[k] is not None
             }
 # START db.has-hstore
@@ -64,6 +67,10 @@ where {bbox} ( {w} )
             t['tags'] = pghstore.loads(r['tags'])
 # END db.hstore-only
             t['tags']['osm:id'] = str(r['id'])
+
+            for k in add_columns:
+                t[k] = r[k]
+
             yield(t)
 
     # planet_osm_line - ways
@@ -83,7 +90,7 @@ select 'w' || cast(osm_id as text) as id,
        {add_columns}
 from planet_osm_line
 where osm_id>0 and {bbox} ( {w} )
-'''.format(bbox=bbox, w=' or '.join(w), add_columns=add_columns)
+'''.format(bbox=bbox, w=' or '.join(w), add_columns=add_columns_qry)
 
         plan = plpy.prepare(qry, param_type )
         res = plpy.cursor(plan, param_value )
@@ -99,7 +106,7 @@ where osm_id>0 and {bbox} ( {w} )
             t['tags'] = {
                 k: r[k]
                 for k in r
-                if k not in ['id', 'geo', 'types', 'tags'] # TODO: add_columns?
+                if k not in ['id', 'geo', 'types', 'tags'] and k not in add_columns
                 if r[k] is not None
             }
 # START db.has-hstore
@@ -110,6 +117,10 @@ where osm_id>0 and {bbox} ( {w} )
             t['tags'] = pghstore.loads(r['tags'])
 # END db.hstore-only
             t['tags']['osm:id'] = str(r['id'])
+
+            for k in add_columns:
+                t[k] = r[k]
+
             yield(t)
 
     # planet_osm_line - relations
@@ -129,7 +140,7 @@ select 'r' || cast(-osm_id as text) as id,
        {add_columns}
 from planet_osm_line
 where osm_id<0 and {bbox} ( {w} )
-'''.format(bbox=bbox, w=' or '.join(w), add_columns=add_columns)
+'''.format(bbox=bbox, w=' or '.join(w), add_columns=add_columns_qry)
 
         plan = plpy.prepare(qry, param_type )
         res = plpy.cursor(plan, param_value )
@@ -145,7 +156,7 @@ where osm_id<0 and {bbox} ( {w} )
             t['tags'] = {
                 k: r[k]
                 for k in r
-                if k not in ['id', 'geo', 'types', 'tags'] # TODO: add_columns?
+                if k not in ['id', 'geo', 'types', 'tags'] and k not in add_columns
                 if r[k] is not None
             }
 # START db.has-hstore
@@ -156,6 +167,10 @@ where osm_id<0 and {bbox} ( {w} )
             t['tags'] = pghstore.loads(r['tags'])
 # END db.hstore-only
             t['tags']['osm:id'] = str(r['id'])
+
+            for k in add_columns:
+                t[k] = r[k]
+
             yield(t)
 
     # planet_osm_polygon - ways
@@ -175,7 +190,7 @@ select 'w' || cast(osm_id as text) as id,
        {add_columns}
 from planet_osm_polygon
 where osm_id>0 and {bbox} ( {w} )
-'''.format(bbox=bbox, w=' or '.join(w), add_columns=add_columns)
+'''.format(bbox=bbox, w=' or '.join(w), add_columns=add_columns_qry)
 
         plan = plpy.prepare(qry, param_type )
         res = plpy.cursor(plan, param_value )
@@ -191,7 +206,7 @@ where osm_id>0 and {bbox} ( {w} )
             t['tags'] = {
                 k: r[k]
                 for k in r
-                if k not in ['id', 'geo', 'types', 'tags'] # TODO: add_columns?
+                if k not in ['id', 'geo', 'types', 'tags'] and k not in add_columns
                 if r[k] is not None
             }
 # START db.has-hstore
@@ -202,6 +217,10 @@ where osm_id>0 and {bbox} ( {w} )
             t['tags'] = pghstore.loads(r['tags'])
 # END db.hstore-only
             t['tags']['osm:id'] = str(r['id'])
+
+            for k in add_columns:
+                t[k] = r[k]
+
             yield(t)
 
 # planet_osm_polygon - relations
@@ -221,7 +240,7 @@ select 'r' || cast(-osm_id as text) as id,
        {add_columns}
 from planet_osm_polygon
 where osm_id<0 and {bbox} ( {w} )
-'''.format(bbox=bbox, w=' or '.join(w), add_columns=add_columns)
+'''.format(bbox=bbox, w=' or '.join(w), add_columns=add_columns_qry)
 
         plan = plpy.prepare(qry, param_type )
         res = plpy.cursor(plan, param_value )
@@ -237,7 +256,7 @@ where osm_id<0 and {bbox} ( {w} )
             t['tags'] = {
                 k: r[k]
                 for k in r
-                if k not in ['id', 'geo', 'types', 'tags'] # TODO: add_columns?
+                if k not in ['id', 'geo', 'types', 'tags'] and k not in add_columns
                 if r[k] is not None
             }
 # START db.has-hstore
@@ -248,6 +267,10 @@ where osm_id<0 and {bbox} ( {w} )
             t['tags'] = pghstore.loads(r['tags'])
 # END db.hstore-only
             t['tags']['osm:id'] = str(r['id'])
+
+            for k in add_columns:
+                t[k] = r[k]
+
             yield(t)
 
 def objects_by_id(id_list):
@@ -265,7 +288,7 @@ def objects_by_id(id_list):
         t['tags'] = {
             k: r[k]
             for k in r
-            if k not in ['id', 'geo', 'types', 'tags'] # TODO: add_columns?
+            if k not in ['id', 'geo', 'types', 'tags']
             if r[k] is not None
         }
 # START db.has-hstore
@@ -297,7 +320,7 @@ def objects_by_id(id_list):
         t['tags'] = {
             k: r[k]
             for k in r
-            if k not in ['id', 'geo', 'types', 'tags'] # TODO: add_columns?
+            if k not in ['id', 'geo', 'types', 'tags']
             if r[k] is not None
         }
 # START db.has-hstore
@@ -379,7 +402,7 @@ def objects_member_of(member_id, parent_type, parent_conditions):
                     t['tags'] = {
                         k: r[k]
                         for k in r
-                        if k not in ['id', 'geo', 'types', 'tags'] # TODO: add_columns?
+                        if k not in ['id', 'geo', 'types', 'tags']
                         if r[k] is not None
                     }
 # START db.has-hstore
@@ -449,7 +472,9 @@ def objects_near(max_distance, ob, parent_selector, where_clause, check_geo=None
     for ob in objects(
         bbox,
         { parent_selector: where_clause },
-        [ 'ST_Distance(ST_Transform($2::geometry, {unit.srs}), ST_Transform(way, {unit.srs})) as __distance' ],
+        { # add_columns
+            '__distance': 'ST_Distance(ST_Transform($2::geometry, {unit.srs}), ST_Transform(way, {unit.srs}))'
+        },
         [ 'geometry' ],
         [ geom ]
     ):
