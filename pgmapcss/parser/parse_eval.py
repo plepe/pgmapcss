@@ -30,7 +30,8 @@ def read_eval_operators():
 def ops_to_regexp(ops):
     return '|'.join([re.sub(r'([\?\.\+\*\^\$\|\\\(\)\[\]])', r'\\\1', k) for k in ops ])
 
-def parse_eval(to_parse, math_level=0, current_op=None, rek=0):
+# end_chars: list of characters which may appear after an eval expression
+def parse_eval(to_parse, math_level=0, current_op=None, rek=0, end_chars=set()):
     if eval_operators == None:
         read_eval_operators()
 
@@ -94,7 +95,7 @@ def parse_eval(to_parse, math_level=0, current_op=None, rek=0):
 
                 j = int(unary_operators[current]['math_level'])
 
-                result = parse_eval(to_parse, math_level=j, rek=rek+1)
+                result = parse_eval(to_parse, math_level=j, rek=rek+1, end_chars=end_chars)
 
                 current_result.append([ 'u:' + current, result ])
                 current = ''
@@ -140,7 +141,7 @@ def parse_eval(to_parse, math_level=0, current_op=None, rek=0):
             if to_parse.match('\s+'):
                 pass
 
-            elif to_parse.match('^(\)|,|;|:)', wind=None) or to_parse.to_parse() == '':
+            elif to_parse.match(ops_to_regexp(end_chars.union({')', ',', ';', ':'})), wind=None) or to_parse.to_parse() == '':
                 if len(current_result) == 1:
                     return current_result[0]
                 else:
@@ -150,7 +151,7 @@ def parse_eval(to_parse, math_level=0, current_op=None, rek=0):
                 x = parse_eval(to_parse, rek=rek+1)
 
                 if to_parse.match(':'):
-                    y = parse_eval(to_parse, rek=rek+1)
+                    y = parse_eval(to_parse, rek=rek+1, end_chars=end_chars)
                 else:
                     raise ParseError(to_parse, 'Error parsing eval(...), excepting ":", at')
 
@@ -172,7 +173,7 @@ def parse_eval(to_parse, math_level=0, current_op=None, rek=0):
                     else:
                         current_result = [ 'o:' + current_op, current_result ]
 
-                    result = parse_eval(to_parse, math_level, current_op, rek=rek+1)
+                    result = parse_eval(to_parse, math_level, current_op, rek=rek+1, end_chars=end_chars)
                     current_result.append(result)
                     mode = 21
 
@@ -186,7 +187,7 @@ def parse_eval(to_parse, math_level=0, current_op=None, rek=0):
             if to_parse.match('\s+'):
                 pass
 
-            elif to_parse.match('(\)|,|;)', wind=None) or to_parse.to_parse() == '':
+            elif to_parse.match(ops_to_regexp(end_chars.union({')', ',', ';', ':'})), wind=None) or to_parse.to_parse() == '':
               if len(current_result) == 1:
                   return current_result[0]
               else:
@@ -198,7 +199,7 @@ def parse_eval(to_parse, math_level=0, current_op=None, rek=0):
                 if current == current_op:
                       to_parse.wind(len(to_parse.match_group(0)))
 
-                      result = parse_eval(to_parse, math_level, current_op, rek=rek+1)
+                      result = parse_eval(to_parse, math_level, current_op, rek=rek+1, end_chars=end_chars)
                       current_result.append(result)
 
                 else:
@@ -215,7 +216,7 @@ def parse_eval(to_parse, math_level=0, current_op=None, rek=0):
                       else:
                         current_result = [ 'o:' + current_op, current_result ]
 
-                      result = parse_eval(to_parse, math_level, current_op, rek=rek+1)
+                      result = parse_eval(to_parse, math_level, current_op, rek=rek+1, end_chars=end_chars)
                       current_result.append(result)
 
                   else:
