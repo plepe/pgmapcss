@@ -1,14 +1,17 @@
 # Use this functions only with a database based on an import with osmosis
-def objects(_bbox, where_clauses, add_columns=[], add_param_type=[], add_param_value=[]):
+def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_value=[]):
     import pghstore
     time_start = datetime.datetime.now() # profiling
 
     qry = ''
 
     if len(add_columns):
-        add_columns = ', ' + ', '.join(add_columns)
+        add_columns_qry = ', ' + ', '.join([
+                q + ' as "' + k + '"'
+                for k, q in add_columns.items()
+            ])
     else:
-        add_columns = ''
+        add_columns_qry = ''
 
     if _bbox:
         param_type = [ 'geometry' ] + add_param_type
@@ -34,7 +37,7 @@ select 'n' || cast(id as text) as id, version, user_id, (select name from users 
        {add_columns}
 from nodes
 where {bbox} ( {w} )
-'''.format(bbox=bbox, w=' or '.join(w), add_columns=add_columns.replace('__geo__', 'geom'))
+'''.format(bbox=bbox, w=' or '.join(w), add_columns=add_columns_qry.replace('__geo__', 'geom'))
 
         plan = plpy.prepare(qry, param_type )
         res = plpy.cursor(plan, param_value )
@@ -75,7 +78,7 @@ select 'w' || cast(id as text) as id, version, user_id, (select name from users 
 from ways
 where {bbox} ( {w} ) offset 0) t
        {add_columns}
-'''.format(bbox=bbox, w=' or '.join(w), add_columns=add_columns.replace('__geo__', 'linestring'))
+'''.format(bbox=bbox, w=' or '.join(w), add_columns=add_columns_qry.replace('__geo__', 'linestring'))
 
         plan = plpy.prepare(qry, param_type )
         res = plpy.cursor(plan, param_value )
@@ -117,7 +120,7 @@ select (CASE WHEN has_outer_tags THEN 'm' ELSE 'r' END) || cast(id as text) as i
 from (select multipolygons.*, relations.version, relations.user_id, relations.tstamp, relations.changeset_id from multipolygons left join relations on multipolygons.id = relations.id) t
 where {bbox} ( {w} ) offset 0) t
        {add_columns}
-'''.format(bbox=bbox, w=' or '.join(w), add_columns=add_columns.replace('__geo__', 'linestring'))
+'''.format(bbox=bbox, w=' or '.join(w), add_columns=add_columns_qry.replace('__geo__', 'linestring'))
 
         plan = plpy.prepare(qry, param_type )
         res = plpy.cursor(plan, param_value )
@@ -152,7 +155,7 @@ select 'r' || cast(id as text) as id, version, user_id, (select name from users 
        {add_columns}
 from relations
 where ({w}) and not id = ANY(Array[{done}]::bigint[])
-'''.format(w=' or '.join(w), add_columns=add_columns, done=','.join({ str(d) for d in done_multipolygons}))
+'''.format(w=' or '.join(w), add_columns=add_columns_qry, done=','.join({ str(d) for d in done_multipolygons}))
 
         plan = plpy.prepare(qry, param_type )
         res = plpy.cursor(plan, param_value )
@@ -337,7 +340,9 @@ def objects_near(max_distance, ob, parent_selector, where_clause, check_geo=None
     for ob in objects(
         bbox,
         { parent_selector: where_clause },
-        [ 'ST_Distance(ST_Transform($2::geometry, {unit.srs}), ST_Transform(__geo__, {unit.srs})) as __distance' ],
+        { # add_columns
+            '__distance': 'ST_Distance(ST_Transform($2::geometry, {unit.srs}), ST_Transform(__geo__, {unit.srs}))'
+        },
         [ 'geometry' ],
         [ geom ]
     ):
