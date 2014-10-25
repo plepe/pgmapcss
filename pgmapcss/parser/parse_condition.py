@@ -52,8 +52,12 @@ def parse_condition(to_parse):
         condition['op'] += '@='
         return condition
 
-    else:
+    elif to_parse.match('\s*\]'):
         condition['op'] += 'has_tag'
+        return condition
+
+    else:
+        raise ParseError(to_parse, 'parse condition: Can\'t parse condition')
 
     r = parse_string(to_parse)
     if r:
