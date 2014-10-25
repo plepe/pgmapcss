@@ -26,15 +26,19 @@ def read_eval_operators():
         for op in v.op
     }
 
+# Build a regular expression from a list of strings; escape characters correctly
+def ops_to_regexp(ops):
+    return '|'.join([re.sub(r'([\?\.\+\*\^\$\|\\\(\)\[\]])', r'\\\1', k) for k in ops ])
+
 def parse_eval(to_parse, math_level=0, current_op=None, rek=0):
     if eval_operators == None:
         read_eval_operators()
 
     # sort eval_operators by length desc (so that e.g. > does not match >=)
     ops = sorted([ k for k in eval_operators ], key=len, reverse=True)
-    eval_op_regexp = '(' + '|'.join([re.sub(r'([\?\.\+\*\^\$\|\\])', r'\\\1', k) for k in ops]) + ')'
+    eval_op_regexp = '(' + ops_to_regexp(ops) + ')'
     ops = sorted([ k for k in unary_operators ], key=len, reverse=True)
-    unary_op_regexp = '(' + '|'.join([re.sub(r'([\?\.\+\*\^\$\|\\])', r'\\\1', k) for k in ops]) + ')'
+    unary_op_regexp = '(' + ops_to_regexp(ops) + ')'
     current = ''
     current_result = []
     mode = 0
