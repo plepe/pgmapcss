@@ -101,6 +101,9 @@ def parse_condition(to_parse):
     elif condition['op'] in ('=~', '!~'):
         condition['value'] = parse_string(to_parse, delim="/")
 
+        if condition['value'] is None:
+            raise ParseError(to_parse, 'parse condition: expecting regular expression in /.../')
+
         m = to_parse.match('([^\]]*)\]')
 
         if m:
