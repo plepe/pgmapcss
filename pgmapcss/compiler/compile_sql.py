@@ -47,6 +47,12 @@ def compile_condition_hstore_value(condition, statement, tag_type, stat, prefix,
             for v in condition['value'].split(';')
             ]) + ')'
 
+    # !=
+    elif condition['op'] == '!=':
+        return '( not ' + prefix + column + ' ? ' + db.format(key) +\
+               'or not ' + prefix + column + ' @> ' +\
+               db.format({ key: condition['value'] }) + ')'
+
     # regexp match =~
     elif condition['op'] == '=~':
         return '(' + prefix + column + ' ? ' + db.format(key) + ' and ' +\
@@ -147,6 +153,12 @@ def compile_condition_column(condition, statement, tag_type, stat, prefix, filte
             ret += prefix + db.ident(key) + ' in (' + ', '.join(f) + ')'
         else:
             ret += 'false'
+
+    # !=
+    elif condition['op'] == '!=':
+        return '(' + prefix + db.ident(key) + 'is null or ' +\
+            prefix + db.ident(key) + '!=' +\
+            db.format(condition['value']) + ')'
 
     # regexp match =~
     elif condition['op'] == '=~':
