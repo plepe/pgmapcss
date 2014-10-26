@@ -12,132 +12,146 @@ def pg_like_escape(s):
     return s
 
 def compile_condition_hstore_value(condition, statement, tag_type, stat, prefix, filter):
-    ret = ''
+    ret = None
+    negate = False
     key = tag_type[1]
     column = tag_type[2]
+    op = condition['op']
 
-    if condition['op'][0:2] == '! ':
-        return None
+    if op[0:2] == '! ':
+        op = op[2:]
+        negate = True
 
     # eval() statements
-    if condition['op'] == 'eval':
+    if op == 'eval':
         return None
 
     # ignore pseudo classes
-    if condition['op'] == 'pseudo_class':
+    if op == 'pseudo_class':
         return None
 
     # regexp on key of tag
-    if condition['op'] in ('key_regexp', 'key_regexp_case'):
+    if op in ('key_regexp', 'key_regexp_case'):
         return None
 
     # value-eval() statements
     if condition['value_type'] == 'eval':
         # treat other conditions as has_key
-        return prefix + column + ' ? ' + db.format(key);
+        ret = prefix + column + ' ? ' + db.format(key);
 
     # =
-    if condition['op'] == '=':
-        ret += prefix + column + ' @> ' + db.format({ key: condition['value'] })
+    elif op == '=':
+        print('here')
+        ret = prefix + column + ' @> ' + db.format({ key: condition['value'] })
 
     # @=
-    elif condition['op'] == '@=' and condition['value_type'] == 'value':
-        ret += '(' + ' or '.join([
+    elif op == '@=' and condition['value_type'] == 'value':
+        ret = '(' + ' or '.join([
             prefix + column + ' @> ' + db.format({ key: v })
             for v in condition['value'].split(';')
             ]) + ')'
 
     # !=
-    elif condition['op'] == '!=':
-        return '( not ' + prefix + column + ' ? ' + db.format(key) +\
+    elif op == '!=':
+        ret = '( not ' + prefix + column + ' ? ' + db.format(key) +\
                'or not ' + prefix + column + ' @> ' +\
                db.format({ key: condition['value'] }) + ')'
 
     # regexp match =~
-    elif condition['op'] == '=~':
-        return '(' + prefix + column + ' ? ' + db.format(key) + ' and ' +\
+    elif op == '=~':
+        ret = '(' + prefix + column + ' ? ' + db.format(key) + ' and ' +\
             prefix + column + '->' + db.format(key) +\
             (' ~* ' if 'i' in condition['regexp_flags'] else ' ~ ') +\
             db.format(condition['value']) + ')'
 
     # negated regexp match !~
-    elif condition['op'] == '!~':
-        return '(' + prefix + column + ' ? ' + db.format(key) + ' and ' +\
+    elif op == '!~':
+        ret = '(' + prefix + column + ' ? ' + db.format(key) + ' and ' +\
             prefix + column + '->' + db.format(key) +\
             (' !~* ' if 'i' in condition['regexp_flags'] else ' !~ ') +\
             db.format(condition['value']) + ')'
 
     # prefix match ^=
-    elif condition['op'] == '^=':
-        return '(' + prefix + column + ' ? ' + db.format(key) + ' and ' +\
+    elif op == '^=':
+        ret = '(' + prefix + column + ' ? ' + db.format(key) + ' and ' +\
             prefix + column + '->' + db.format(key) + ' like ' +\
             db.format(pg_like_escape(condition['value']) + '%') + ')'
 
     # suffix match $=
-    elif condition['op'] == '$=':
-        return '(' + prefix + column + ' ? ' + db.format(key) + ' and ' +\
+    elif op == '$=':
+        ret = '(' + prefix + column + ' ? ' + db.format(key) + ' and ' +\
             prefix + column + '->' + db.format(key) + ' like ' +\
             db.format('%' + pg_like_escape(condition['value'])) + ')'
 
     # substring match *=
-    elif condition['op'] == '*=':
-        return '(' + prefix + column + ' ? ' + db.format(key) + ' and ' +\
+    elif op == '*=':
+        ret = '(' + prefix + column + ' ? ' + db.format(key) + ' and ' +\
             prefix + column + '->' + db.format(key) + ' like ' +\
             db.format('%' + pg_like_escape(condition['value']) + '%') + ')'
 
     # list membership ~=
-    elif condition['op'] == '~=':
-        return '(' + prefix + column + ' ? ' + db.format(key) + ' and ' +\
+    elif op == '~=':
+        ret = '(' + prefix + column + ' ? ' + db.format(key) + ' and ' +\
             db.format(condition['value']) + ' =any(string_to_array(' +\
             prefix + column + '->' + db.format(key) + ', \';\')))'
 
     else:
-        return prefix + column + ' ? ' + db.format(key)
+        ret = prefix + column + ' ? ' + db.format(key)
+
+    if ret is None:
+        return None
+
+    if negate:
+        return '(not ' + prefix + column + ' ? ' + db.format(key) +\
+            ' or not ' + ret + ')'
 
     return ret
 
 def compile_condition_column(condition, statement, tag_type, stat, prefix, filter):
-    ret = ''
+    ret = None
     key = tag_type[1]
+    op = condition['op']
+    negate = False
 
     value_format = value_format_default
     if len(tag_type) > 2:
         value_format = tag_type[2]
 
-    if condition['op'][0:2] == '! ':
-        return None
+    if op[0:2] == '! ':
+        op = op[2:]
+        negate = True
 
     # eval() statements
-    if condition['op'] == 'eval':
+    if op == 'eval':
         return None
 
     # ignore pseudo classes
-    if condition['op'] == 'pseudo_class':
+    if op == 'pseudo_class':
         return None
 
     # regexp on key of tag
-    if condition['op'] in ('key_regexp', 'key_regexp_case'):
+    if op in ('key_regexp', 'key_regexp_case'):
         return None
 
     # value-eval() statements
     if condition['value_type'] == 'eval':
         # treat other conditions as has_key
-        return prefix + db.ident(key) + ' is not null'
+        ret = prefix + db.ident(key) + ' is not null'
 
     # =
-    if condition['op'] == '=':
+    elif op == '=':
         # if value_format returns None -> can't resolve, discard condition
         # if value_format returns False -> return false as result
         f = value_format(key, condition['value'])
         if f is None:
             return None
         elif f:
-            ret += prefix + db.ident(key) + ' = ' + f
+            ret = prefix + db.ident(key) + ' = ' + f
         else:
-            ret += 'false'
+            ret = 'false'
 
     # @=
-    elif condition['op'] == '@=' and condition['value_type'] == 'value':
+    elif op == '@=' and condition['value_type'] == 'value':
         f = {
             value_format(key, v)
             for v in condition['value'].split(';')
@@ -150,51 +164,57 @@ def compile_condition_column(condition, statement, tag_type, stat, prefix, filte
             f.remove(None)
 
         if len(f):
-            ret += prefix + db.ident(key) + ' in (' + ', '.join(f) + ')'
+            ret = prefix + db.ident(key) + ' in (' + ', '.join(f) + ')'
         else:
-            ret += 'false'
+            ret = 'false'
 
     # !=
-    elif condition['op'] == '!=':
-        return '(' + prefix + db.ident(key) + 'is null or ' +\
+    elif op == '!=':
+        ret = '(' + prefix + db.ident(key) + 'is null or ' +\
             prefix + db.ident(key) + '!=' +\
             db.format(condition['value']) + ')'
 
     # regexp match =~
-    elif condition['op'] == '=~':
-        return prefix + db.ident(key) +\
+    elif op == '=~':
+        ret = prefix + db.ident(key) +\
             (' ~* ' if 'i' in condition['regexp_flags'] else ' ~ ') +\
             db.format(condition['value'])
 
     # negated regexp match !~
-    elif condition['op'] == '!~':
-        return prefix + db.ident(key) +\
+    elif op == '!~':
+        ret = prefix + db.ident(key) +\
             (' !~* ' if 'i' in condition['regexp_flags'] else ' !~ ') +\
             db.format(condition['value'])
 
     # prefix match ^=
-    elif condition['op'] == '^=':
-        return prefix + db.ident(key) + ' like ' +\
+    elif op == '^=':
+        ret = prefix + db.ident(key) + ' like ' +\
             db.format(pg_like_escape(condition['value']) + '%')
 
     # suffix match $=
-    elif condition['op'] == '$=':
-        return prefix + db.ident(key) + ' like ' +\
+    elif op == '$=':
+        ret = prefix + db.ident(key) + ' like ' +\
             db.format('%' + pg_like_escape(condition['value']))
 
     # substring match *=
-    elif condition['op'] == '*=':
-        return prefix + db.ident(key) + ' like ' +\
+    elif op == '*=':
+        ret = prefix + db.ident(key) + ' like ' +\
             db.format('%' + pg_like_escape(condition['value']) + '%')
 
     # list membership ~=
-    elif condition['op'] == '~=':
-        return \
+    elif op == '~=':
+        ret = \
             db.format(condition['value']) + ' =any(string_to_array(' +\
             prefix + db.ident(key) + ', \';\'))'
 
     else:
-        return prefix + db.ident(key) + ' is not null'
+        ret = prefix + db.ident(key) + ' is not null'
+
+    if ret is None:
+        return None
+
+    if negate:
+        return '(' + prefix + db.ident(key) + ' is null or not ' + ret + ')'
 
     return ret
 
