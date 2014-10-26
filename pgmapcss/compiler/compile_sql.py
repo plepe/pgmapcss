@@ -41,7 +41,6 @@ def compile_condition_hstore_value(condition, statement, tag_type, stat, prefix,
 
     # =
     elif op == '=':
-        print('here')
         ret = prefix + column + ' @> ' + db.format({ key: condition['value'] })
 
     # @=
