@@ -51,7 +51,7 @@ parser.add_argument('--eval-tests', dest='eval_tests', action='store_const',
 
 parser.add_argument('-r', '--database-update', dest='database_update',
     default='auto',
-    help='Whether the database should be updated to the current version. Possible values: "re-init": re-initializes the database, need to re-compile all pgmapcss styles, "update": update all database functions, "none": do not update, "auto": if necessary a database functions update will be performed.')
+    help='Whether the database should be updated to the current version. Possible values: "init": (re-)initializes the database - you need to re-compile all pgmapcss styles, "update": update all database functions, "none": do not update, "auto": if necessary a database functions update will be performed.')
 
 parser.add_argument('-c', '--config', dest='config', nargs='+',
     help='Set configuration options, e.g. -c foo=bar. See doc/config_options.md for available configuration options.')
@@ -137,11 +137,11 @@ def main():
         else:
             stat['config']['srs'] = 4326
 
-    if stat['config'].get('offline', False) and args.database_update == 're-init':
+    if stat['config'].get('offline', False) in (False, 'false', 'no') and args.database_update in ('init', 're-init'):
         print('* Re-initializing database')
         pgmapcss.db.db_init(conn, stat)
 
-    if stat['config'].get('offline', False):
+    if stat['config'].get('offline', False) not in (False, 'false', 'no'):
         print('* Using offline mode. Attention! Some functionality might be missing.')
 
     else:

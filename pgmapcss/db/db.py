@@ -27,7 +27,7 @@ def connect(args, stat):
         print('* Database type "{}" not supported right now'.format(args.database_type))
         exit(1)
 
-    if not stat['config'].get('offline', False):
+    if stat['config'].get('offline', False) in (False, 'no', 'false'):
         conn = postgresql.open(
             host=args.host,
             password=args.password,
