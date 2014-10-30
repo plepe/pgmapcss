@@ -1,4 +1,4 @@
-Config options can be set by using `@config config_option config_value;` in the MapCSS file or as parameters to pgmapcss, by using `-c` or `--config`, e.g. `pgmapcss --config option1=value1 option2=value2`.
+Config options can be set by using `@config config_option config_value;` in the MapCSS file or as parameters to pgmapcss, by using `-c` or `--config`, e.g. `pgmapcss --config option1=value1 option2=value2 option3` (option3 will be set to 'true').
 
 The following config options are supported:
 
