@@ -9,6 +9,20 @@ osm2pgsql
 * Queries of the type `relation node|way|relation` do work for all relation types as parents; even the type-tag is available. Currently those queries are inefficient, as for every possible member all available relations are queried.
 * Queries of the type `way node` work. Currently those queries are inefficient, as for every possible member all available relations are queried.
 * Additionally the tag "osm:id" will be set (e.g. 'n1234'), but it will not be available for querying (see below at osmosis pgsnapshot for additional tags).
+* The osm2pgsql mode will by default use the tag columns of the database tables, and for other tags the "tags" column (type hstore), if available.
+
+Options
+-------
+Behaviour can be influenced with the following config options:
+
+| Config option    | Description | Possible values
+|------------------|-------------|-----------------
+| db.srs           | Spatial Reference System used in the database. Autodetected. | Usual values: 4326 (WGS-84), 900913 resp. 3857 (Spherical Mercator for Web Maps) |
+| db.hstore-only   | Do not use the separate tag columns, only use the hstore 'tags' column. Might be faster on large databases in combination with a multicolumn index on way and tags: e.g. create index planet_osm_point_way_tags on planet_osm_point using gist(way, tags). Requires --hstore-all on osm2pgsql when importing the database. | true/**false** |
+| db.columns.node  | Specify comma-separated list of database tag columns for planet_osm_point. Usually autodetected. Needed when using offline mode. | |
+| db.columns.way   | Specify comma-separated list of database tag columns for planet_osm_line and planet_osm_polygon. Usually autodetected. Needed when using offline mode. | |
+| db.columns       | Use the specified list for db.columns.node and db.columns.way | |
+| db.has-hstore    | Additional tags can be read from the 'tags' column (of type hstore). Usually autodetected. Needed when using offline mode. | |
 
 osmosis pgsnapshot (short: osmosis)
 ===================================
@@ -27,3 +41,12 @@ There are two "types" of multipolygons, those that have their tags bound to the 
 
 * "Standard" multipolygons get their ID prefixed by 'r' (as they are relations).
 * Multipolygons with tags from their outer members get their ID prefixed by 'm' (for multipolygon) and an additional tag 'osm:has_outer_tags' (set to 'yes'). On the other hand closed ways which are an outer member of a multipolygon relation do not count as 'area', whereas the multipolygon itself does not count as 'relation'.
+
+Options
+-------
+Behaviour can be influenced with the following config options:
+
+| Config option    | Description | Possible values
+|------------------|-------------|-----------------
+| db.srs           | Spatial Reference System used in the database. Autodetected. | Usual values: 4326 (WGS-84), 900913 resp. 3857 (Spherical Mercator for Web Maps) |
+| db.multipolygons | Specify whether the multipolygons table is present and should be used. Usually autodected. Needed when using offline mode (default: false) | true/false
