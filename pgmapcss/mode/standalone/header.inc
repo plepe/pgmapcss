@@ -2,6 +2,7 @@
 
 import postgresql
 import sys
+import math
 
 class fake_plpy:
     def __init__(self, args=None):
