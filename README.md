@@ -8,7 +8,7 @@ pgmapcss compiles MapCSS styles into a database function. Mapnik just needs to c
 
 Alternatively there's a standalone mode, where the MapCSS style is compiled into an executable, which can be run from the command line. The executable will not render an image but create GeoJSON output instead. See below for details.
 
-Stable version: [0.8.1](https://github.com/plepe/pgmapcss), development version: [0.9-dev](https://github.com/plepe/pgmapcss/tree/branch-0.9), see [open issues](https://github.com/plepe/pgmapcss/milestones/Version%200.9)
+Stable version: [0.9.0](https://github.com/plepe/pgmapcss), development version: [0.10-dev](https://github.com/plepe/pgmapcss/tree/branch-0.10), see [open issues](https://github.com/plepe/pgmapcss/milestones/Version%200.10)
 
 Features
 --------

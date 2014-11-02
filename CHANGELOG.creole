@@ -1,4 +1,4 @@
-0.9-dev
+0.9.0 release 2014-11-02
 * support osmosis pgsnapshot as alternative database backend, see [[doc/database.md|database docu]] for details
 * new 'standalone' mode, which compiles mapcss into a python executable which can be used from command line or as CGI script
 * pseudo tags 'osm:id' (osm2pgsql and osmosis), 'osm:version', 'osm:user_id', 'osm:user', 'osm:timestamp', 'osm:changeset' (osmosis only), see [[doc/database.md|database docu]] for details
