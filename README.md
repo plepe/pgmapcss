@@ -180,11 +180,11 @@ The compiled executable will produced an output similar to this (it has been sho
 
 Two possible uses for the standalone mode:
 * Quality assurance by building a tagchecker, see [doc/tagchecker.md](doc/tagchecker.md).
-* Interactive rendering using a JavaScript library frontend, e.g. [https://github.com/plepe/ol4pgm](ol4pgm). See [doc/ol4pgm.md](doc/ol4pgm.md).
+* Interactive rendering using a JavaScript library frontend, e.g. [ol4pgm](https://github.com/plepe/ol4pgm). See [doc/ol4pgm.md](doc/ol4pgm.md).
 
 ### Easy to install: ###
 
-Find installation instructions in [Install pgmapcss with Mapnik 2.2 on Ubuntu 12.04](doc/Install pgmapcss with Mapnik_2.2 on Ubuntu_12.04.md).
+Find installation instructions in [Install pgmapcss with Mapnik 3.0 on Ubuntu 14.04](doc/Install pgmapcss with Mapnik_3.0 on Ubuntu_14.04.md).
 
 There's a file [test.mapcss](./test.mapcss) which you can use to build upon. You can [try it online!](http://pgmapcss.openstreetbrowser.org/?style=f457f&zoom=14&lat=48.2098&lon=16.3725)
 
