@@ -223,7 +223,9 @@ def main():
         pgmapcss.db.install(style_id, style, conn)
         pgmapcss.renderer.process_renderer(style_id, args, stat, conn)
     elif stat['mode'] == 'standalone':
-        open('pgmapcss_' + style_id + '.py', 'w').write(style['function_match'])
+        open(style_id + '.py', 'w').write(style['function_match'])
+        os.chmod(style_id + '.py', 0o755)
+        print('Created executable {}.py'.format(style_id))
 
     pgmapcss.icons.process_icons(style_id, args, stat, conn)
     pgmapcss.symbols.process_symbols(style_id, args, stat, conn)

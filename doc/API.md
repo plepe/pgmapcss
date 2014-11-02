@@ -29,12 +29,12 @@ style_elements_z_index | float[] | z-index for each style element.
 Notes:
 * `!bbox!` and `!scale_denominator!` will be replaced by Mapnik by the current bounding box resp. scale denominator. See [zoom-to-scale.txt](https://trac.openstreetmap.org/browser/subversion/applications/rendering/mapnik/zoom-to-scale.txt) for valid values.
 
-### Mode 'standalone': file pgmapcss_{style_id}.py
-When compiling in 'standalone' mode, a file pgmapcss_{style_id}.py will be created, which can be used either from command line or as CGI script. In any case it will produce GeoJSON output. See below for details.
+### Mode 'standalone': file {style_id}.py
+When compiling in 'standalone' mode, a file {style_id}.py will be created, which can be used either from command line or as CGI script. In any case it will produce GeoJSON output. See below for details.
 
 #### command line
 ```
-usage: pgmapcss_{style_id}.py [-h] [-b BOUNDS] [-s SCALE]
+usage: {style_id}.py [-h] [-b BOUNDS] [-s SCALE]
                        [-P PARAMETERS [PARAMETERS ...]] [--lang LANG]
 
 Executes the compiled map style and prints resulting objects.
