@@ -157,7 +157,7 @@ def main():
 
             elif db_check == 2:
                 print('* Current DB version: {version}'.format(**db_version))
-                print('pgmapcss version too new. Database needs to be re-initialized. Please re-run pgmapcss with parameter "-r re-init". All Mapnik styles need to be re-compiled afterwards.')
+                print('pgmapcss version too new. Database needs to be re-initialized. Please re-run pgmapcss with parameter "-r init". All Mapnik styles need to be re-compiled afterwards.')
                 sys.exit(1)
 
             elif args.database_update == 'update':
