@@ -27,12 +27,12 @@ if __name__ == '__main__':
 
         parameters = {{ }}
 
-        # using zoom/x/y
-        if params.getvalue('x') and params.getvalue('y') and params.getvalue('zoom'):
+        # using z/x/y
+        if params.getvalue('x') and params.getvalue('y') and params.getvalue('z'):
             import math
             x = int(params.getvalue('x'))
             y = int(params.getvalue('y'))
-            n = 2.0 ** int(params.getvalue('zoom'))
+            n = 2.0 ** int(params.getvalue('z'))
             bounds = [
                 x / n * 360.0 - 180.0,
                 math.degrees(math.atan(math.sinh(math.pi * (1 - 2 * y / n)))),
