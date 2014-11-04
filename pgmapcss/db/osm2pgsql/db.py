@@ -1,10 +1,10 @@
-from ..default import default
+from ..postgresql_db import postgresql_db
 from ..pg import format
 from ..pg import ident
 
-class db(default):
+class db(postgresql_db):
     def __init__(self, conn, stat):
-        default.__init__(self, conn, stat)
+        postgresql_db.__init__(self, conn, stat)
 
         if not 'db.srs' in self.stat['config']:
             if stat['config'].get('offline', False):
