@@ -1,12 +1,12 @@
 from pkg_resources import *
 import postgresql
-from ..default import default
+from ..postgresql_db import postgresql_db
 from ..pg import format
 from ..pg import ident
 
-class db(default):
+class db(postgresql_db):
     def __init__(self, conn, stat):
-        default.__init__(self, conn, stat)
+        postgresql_db.__init__(self, conn, stat)
 
         if not 'db.multipolygons' in self.stat['config']:
             try:

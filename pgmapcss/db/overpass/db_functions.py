@@ -52,9 +52,8 @@ def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_v
             w.append(where_clauses[t])
 
     if len(w):
-        q = qry.replace('__QRY__', '(' + ');('.join(w) + ');')
+        q = qry.replace('__QRY__', '(' + ');('.join(w) + ')')
         q = q.replace('__TYPE__', 'node')
-        q = qry.replace('__QRY__', 'node[place]')
 
         #url = 'http://overpass.osm.rambler.ru/cgi/interpreter?' +\
         url = 'http://overpass-api.de/api/interpreter?' +\
@@ -86,9 +85,9 @@ def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_v
             w.append(where_clauses[t])
 
     if len(w):
-        q = qry.replace('__QRY__', '(' + ');('.join(w) + ');')
+        q = qry.replace('__QRY__', '(' + ');('.join(w) + ')')
         q = q.replace('__TYPE__', 'way')
-        q = qry.replace('__QRY__', 'way[highway=residential]')
+        plpy.warning(q)
 
         url = 'http://overpass-api.de/api/interpreter?' +\
             urllib.parse.urlencode({ 'data': q })
