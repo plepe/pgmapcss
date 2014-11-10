@@ -134,16 +134,14 @@ class db(default):
         set_statements = stat.filter_statements(f)
 
         if len(set_statements) > 0:
-            ret.add('((' + ') or ('.join([
-                self.compile_selector(s, stat, prefix, filter)
+            set_statements = {
+                self.compile_selector(s, stat, prefix, filter, no_object_type=True)
                 for s in set_statements
-            ]) + '))')
+            }
 
         # ignore generated tags (identified by leading .)
         if condition['key'][0] == '.':
-            if len(ret) == 0:
-                return 'false'
-            return ''.join(ret)
+            return set_statements
 
         # depending on the tag type compile the specified condition
         tag_type = stat['database'].tag_type(condition['key'], condition, statement['selector'], statement)
@@ -158,22 +156,28 @@ class db(default):
         if None in ret:
             ret.remove(None)
         if len(ret) == 0:
-            return None
+            return set_statements
+
+        if len(set_statements):
+            return {
+                    s + ''.join(ret)
+                    for s in set_statements
+                }
 
         # merge conditions together, return
-        return '' + ''.join(ret) + ''    
+        return ''.join(ret)
 
     def merge_conditions(self, conditions):
         types = [ t for t, cs in conditions if t != True ]
 
         conditions = {
             t:
-                '(\n' + ';\n'.join([
+                '(\n' + '\n'.join([
                     cs
                     for t2, cs in conditions
                     if t == t2
                     if cs != 'false'
-                ]) + ';\n);'
+                ]) + '\n);'
             for t in types
         }
 
@@ -183,18 +187,42 @@ class db(default):
             if cs != '()'
         }
 
-    def compile_selector(self, statement, stat, prefix='current.', filter={}, object_type=None):
+    def compile_selector(self, statement, stat, prefix='current.', filter={}, object_type=None, no_object_type=False):
         filter['object_type'] = object_type
 
-        ret = {
-            self.compile_condition(c, statement, stat, prefix, filter) or 'true'
+        conditions = [
+            self.compile_condition(c, statement, stat, prefix, filter) or None
             for c in statement['selector']['conditions']
-        }
+        ]
 
-        if len(ret) == 0:
-            return 'true'
+        if no_object_type:
+            ret = { '' }
+        else:
+            ret = { '__TYPE__' }
 
-        if 'false' in ret:
-            return 'false'
+        for condition in conditions:
+            if condition is None:
+                continue
 
-        return '__TYPE__' + ''.join(ret)
+            if condition is None:
+                pass
+
+            elif type(condition) == set:
+                ret = [
+                        r + c
+                        for c in condition
+                        for r in ret
+                    ]
+            else:
+                ret = [
+                        r + condition
+                        for r in ret
+                    ]
+
+        if False in ret:
+            return False
+
+        if no_object_type:
+            return ''.join(ret)
+
+        return ';'.join(ret) + ';'
