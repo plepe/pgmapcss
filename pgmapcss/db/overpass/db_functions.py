@@ -1,29 +1,33 @@
 #[out:json][bbox:{{bbox}}];(way[name=Marschnergasse];way[name=Erdbrustgasse]);out geom meta;
 
-global node_geom_plan
-node_geom_plan = None
-global way_geom_plan
-way_geom_plan = None
-
 def node_geom(lat, lon):
-    global node_geom_plan
+    global geom_plan
 
-    if not node_geom_plan:
-        node_geom_plan = plpy.prepare('select ST_SetSRID(ST_Point($1, $2), 4326) as geom', [ 'float', 'float' ])
+    try:
+        geom_plan
+    except NameError:
+        geom_plan = plpy.prepare('select ST_GeomFromText($1, 4326) as geom', [ 'text' ])
 
-    res = plpy.execute(node_geom_plan, [ lon, lat ])
+    res = plpy.execute(geom_plan, [ 'POINT({} {})'.format(lon, lat) ])
 
     return res[0]['geom']
 
-def way_geom(l):
-    global way_geom_plan
+def way_geom(r, is_polygon):
+    global geom_plan
 
-    if not way_geom_plan:
-        way_geom_plan = plpy.prepare('select ST_GeomFromText($1, 4326) as geom', [ 'text' ])
+    try:
+        geom_plan
+    except NameError:
+        geom_plan = plpy.prepare('select ST_GeomFromText($1, 4326) as geom', [ 'text' ])
 
-    res = plpy.execute(way_geom_plan, ['LINESTRING(' + ','.join([
+    if is_polygon:
+        t = 'POLYGON'
+    else:
+        t = 'LINESTRING'
+
+    res = plpy.execute(geom_plan, [t + '(' + ','.join([
         str(p['lon']) + ' ' + str(p['lat'])
-        for p in l
+        for p in r['geometry']
     ]) + ')'])
 
     return res[0]['geom']
@@ -41,7 +45,6 @@ def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_v
         plan = plpy.prepare("select ST_YMin($1::geometry) || ',' || ST_XMIN($1::geometry) || ',' || ST_YMAX($1::geometry) || ',' || ST_XMAX($1::geometry) as bbox_string", [ 'geometry' ])
         res = plpy.execute(plan, [ _bbox ])
         qry += '[bbox:' + res[0]['bbox_string'] + ']'
-        plpy.warning(qry)
 
     qry += ';__QRY__;out meta geom;'
 
@@ -52,7 +55,7 @@ def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_v
             w.append(where_clauses[t])
 
     if len(w):
-        q = qry.replace('__QRY__', '(' + ');('.join(w) + ')')
+        q = qry.replace('__QRY__', '((' + ');('.join(w) + ');)')
         q = q.replace('__TYPE__', 'node')
 
         #url = 'http://overpass.osm.rambler.ru/cgi/interpreter?' +\
@@ -85,9 +88,8 @@ def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_v
             w.append(where_clauses[t])
 
     if len(w):
-        q = qry.replace('__QRY__', '(' + ');('.join(w) + ')')
+        q = qry.replace('__QRY__', '((' + ');('.join(w) + ');)')
         q = q.replace('__TYPE__', 'way')
-        plpy.warning(q)
 
         url = 'http://overpass-api.de/api/interpreter?' +\
             urllib.parse.urlencode({ 'data': q })
@@ -95,11 +97,12 @@ def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_v
         res = json.loads(f)
 
         for r in res['elements']:
+            is_polygon = len(r['nodes']) > 3 and r['nodes'][0] == r['nodes'][-1]
             t = {
-                'id': 'n' + str(r['id']),
-                'types': ['way', 'line'],
+                'id': 'w' + str(r['id']),
+                'types': ['way', 'line', 'area'] if is_polygon else ['way', 'line'],
                 'tags': r['tags'],
-                'geo': way_geom(r['geometry']),
+                'geo': way_geom(r, is_polygon),
             }
             t['tags']['osm:id'] = t['id']
             t['tags']['osm:version'] = t['version'] if 'version' in t else ''
