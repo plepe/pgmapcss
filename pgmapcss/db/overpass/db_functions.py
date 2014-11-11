@@ -47,6 +47,8 @@ def relation_geom(r):
         geom_plan_makepoly = plpy.prepare('select ST_SetSRID(ST_MakePolygon(ST_GeomFromText($1)), 4326) as geom', [ 'text' ])
         geom_plan_collect = plpy.prepare('select ST_Collect($1) as geom', [ 'geometry[]' ])
         geom_plan_substract = plpy.prepare('select ST_Difference($1, $2) as geom', [ 'geometry', 'geometry' ])
+        # merge all lines together, return all closed rings (but remove unconnected lines)
+        geom_plan_linemerge = plpy.prepare('select geom from (select (ST_Dump((ST_LineMerge(ST_Collect(geom))))).geom as geom from (select ST_GeomFromText(unnest($1), 4326) geom) t offset 0) t where ST_NPoints(geom) > 3 and ST_IsClosed(geom)', [ 'text[]' ])
 
     if 'tags' in r and 'type' in r['tags'] and r['tags']['type'] in ('multipolygon', 'boundary'):
         t = 'MULTIPOLYGON'
@@ -75,17 +77,25 @@ def relation_geom(r):
             plpy.execute(geom_plan_makepoly, [ p ])[0]['geom']
             for p in polygons
         ]
+
+    lines = plpy.execute(geom_plan_linemerge, [ lines ])
+    for r in lines:
+        polygons.append(r['geom'])
+
     polygons = plpy.execute(geom_plan_collect, [ polygons ])[0]['geom']
     inner_polygons = [
             plpy.execute(geom_plan_makepoly, [ p ])[0]['geom']
             for p in inner_polygons
         ]
 
+    inner_lines = plpy.execute(geom_plan_linemerge, [ inner_lines ])
+    for r in inner_lines:
+        inner_polygons.append(r['geom'])
+
     for p in inner_polygons:
         polygons = plpy.execute(geom_plan_substract, [ polygons, p ])[0]['geom']
     inner_polygons = None
 
-    #plpy.warning(polygons, lines, inner_polygons, inner_lines)
     return polygons
 
 # Use this functions only with a database based on an import with osmosis
@@ -157,7 +167,6 @@ def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_v
             g = relation_geom(r)
             if not g or not 'tags' in r:
                 continue
-            plpy.warning(g)
             t = {
                 'id': 'n' + str(r['id']),
                 'types': ['area', 'relation'],
@@ -174,7 +183,6 @@ def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_v
 
         #'http://overpass-turbo.eu/?Q=' + q).read()
 
-    return
     # ways
     w = []
     for t in ('*', 'line', 'area', 'way'):
