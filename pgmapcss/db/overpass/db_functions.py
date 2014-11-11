@@ -20,15 +20,17 @@ def way_geom(r, is_polygon):
     except NameError:
         geom_plan = plpy.prepare('select ST_GeomFromText($1, 4326) as geom', [ 'text' ])
 
-    if is_polygon:
-        t = 'POLYGON'
-    else:
-        t = 'LINESTRING'
-
-    res = plpy.execute(geom_plan, [t + '(' + ','.join([
+    geom_str = ','.join([
         str(p['lon']) + ' ' + str(p['lat'])
         for p in r['geometry']
-    ]) + ')'])
+    ])
+
+    if is_polygon:
+        geom_str = 'POLYGON((' + geom_str + '))'
+    else:
+        geom_str = 'LINESTRING('+ geom_str + ')'
+
+    res = plpy.execute(geom_plan, [ geom_str ])
 
     return res[0]['geom']
 
