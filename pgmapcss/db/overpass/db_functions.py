@@ -32,6 +32,62 @@ def way_geom(r, is_polygon):
 
     return res[0]['geom']
 
+def linestring(geom):
+    return 'LINESTRING(' + ','.join([
+                '{} {}'.format(g['lon'], g['lat'])
+                for g in geom
+            ]) + ')'
+
+def relation_geom(r):
+    global geom_plan
+
+    try:
+        geom_plan_makepoly
+    except NameError:
+        geom_plan_makepoly = plpy.prepare('select ST_SetSRID(ST_MakePolygon(ST_GeomFromText($1)), 4326) as geom', [ 'text' ])
+        geom_plan_collect = plpy.prepare('select ST_Collect($1) as geom', [ 'geometry[]' ])
+        geom_plan_substract = plpy.prepare('select ST_Difference($1, $2) as geom', [ 'geometry', 'geometry' ])
+
+    if 'tags' in r and 'type' in r['tags'] and r['tags']['type'] in ('multipolygon', 'boundary'):
+        t = 'MULTIPOLYGON'
+    else:
+        return None
+
+    polygons = []
+    lines = []
+    inner_polygons = []
+    inner_lines = []
+
+    for m in r['members']:
+        if m['role'] in ('outer', ''):
+            if m['geometry'][0] == m['geometry'][-1]:
+                polygons.append(linestring(m['geometry']))
+            else:
+                lines.append(linestring(m['geometry']))
+
+        elif m['role'] in ('inner'):
+            if m['geometry'][0] == m['geometry'][-1]:
+                inner_polygons.append(linestring(m['geometry']))
+            else:
+                inner_lines.append(linestring(m['geometry']))
+
+    polygons = [
+            plpy.execute(geom_plan_makepoly, [ p ])[0]['geom']
+            for p in polygons
+        ]
+    polygons = plpy.execute(geom_plan_collect, [ polygons ])[0]['geom']
+    inner_polygons = [
+            plpy.execute(geom_plan_makepoly, [ p ])[0]['geom']
+            for p in inner_polygons
+        ]
+
+    for p in inner_polygons:
+        polygons = plpy.execute(geom_plan_substract, [ polygons, p ])[0]['geom']
+    inner_polygons = None
+
+    #plpy.warning(polygons, lines, inner_polygons, inner_lines)
+    return polygons
+
 # Use this functions only with a database based on an import with osmosis
 def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_value=[]):
     import urllib.request
@@ -81,6 +137,44 @@ def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_v
 
         #'http://overpass-turbo.eu/?Q=' + q).read()
 
+    # relations
+    w = []
+    for t in ('*', 'relation', 'area'):
+        if t in where_clauses:
+            w.append(where_clauses[t])
+
+    if len(w):
+        q = qry.replace('__QRY__', '((' + ');('.join(w) + ');)')
+        q = q.replace('__TYPE__', 'relation')
+
+        #url = 'http://overpass.osm.rambler.ru/cgi/interpreter?' +\
+        url = 'http://overpass-api.de/api/interpreter?' +\
+            urllib.parse.urlencode({ 'data': q })
+        f = urllib.request.urlopen(url).read().decode('utf-8')
+        res = json.loads(f)
+
+        for r in res['elements']:
+            g = relation_geom(r)
+            if not g or not 'tags' in r:
+                continue
+            plpy.warning(g)
+            t = {
+                'id': 'n' + str(r['id']),
+                'types': ['area', 'relation'],
+                'tags': r['tags'],
+                'geo': g
+            }
+            t['tags']['osm:id'] = t['id']
+            t['tags']['osm:version'] = t['version'] if 'version' in t else ''
+            t['tags']['osm:user_id'] = t['uid'] if 'uid' in t else ''
+            t['tags']['osm:user'] = t['user'] if 'user' in t else ''
+            t['tags']['osm:timestamp'] = t['timestamp'] if 'timestamp' in t else ''
+            t['tags']['osm:changeset'] = t['changeset'] if 'changeset' in t else ''
+            yield(t)
+
+        #'http://overpass-turbo.eu/?Q=' + q).read()
+
+    return
     # ways
     w = []
     for t in ('*', 'line', 'area', 'way'):
