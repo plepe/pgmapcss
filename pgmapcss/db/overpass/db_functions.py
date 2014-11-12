@@ -308,6 +308,47 @@ def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_v
             t['tags']['osm:changeset'] = str(r['changeset']) if 'changeset' in r else ''
             yield(t)
 
+    # areas
+    w = []
+    for t in ('*', 'relation', 'area'):
+        if t in where_clauses:
+            w.append(where_clauses[t])
+
+    if len(w):
+        plan = plpy.prepare("select ST_Y(ST_Centroid($1::geometry)) || ',' || ST_X(ST_Centroid($1::geometry)) as geom", [ 'geometry' ])
+        res = plpy.execute(plan, [ _bbox ])
+
+        q = qry.replace('__QRY__', 'is_in({0});way(pivot);out meta geom;is_in({0});relation(pivot)'.format(res[0]['geom']))
+        plpy.warning(q)
+
+        url = 'http://overpass-api.de/api/interpreter?' +\
+            urllib.parse.urlencode({ 'data': q })
+        f = urllib.request.urlopen(url).read().decode('utf-8')
+        res = json.loads(f)
+
+        for r in res['elements']:
+            if (r['type'] == 'way' and r['id'] in ways_done) or\
+               (r['type'] == 'relation' and r['id'] in rels_done):
+                continue
+
+            t = {
+                'id': 'r' + str(r['id']),
+                'tags': r['tags'] if 'tags' in r else {},
+            }
+            if r['type'] == 'relation':
+                t['types'] = ['area', 'relation']
+                t['geo'] = relation_geom(r)
+            elif r['type'] == 'way':
+                t['types'] = ['area', 'line', 'way']
+                t['geo'] = way_geom(r, True)
+            t['tags']['osm:id'] = t['id']
+            t['tags']['osm:version'] = str(r['version']) if 'version' in r else ''
+            t['tags']['osm:user_id'] = str(r['uid']) if 'uid' in r else ''
+            t['tags']['osm:user'] = r['user'] if 'user' in r else ''
+            t['tags']['osm:timestamp'] = r['timestamp'] if 'timestamp' in r else ''
+            t['tags']['osm:changeset'] = str(r['changeset']) if 'changeset' in r else ''
+            yield(t)
+
     time_stop = datetime.datetime.now() # profiling
     plpy.notice('querying db objects took %.2fs' % (time_stop - time_start).total_seconds())
 
