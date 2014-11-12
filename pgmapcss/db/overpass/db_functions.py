@@ -141,11 +141,11 @@ def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_v
                 'geo': node_geom(r['lat'], r['lon']),
             }
             t['tags']['osm:id'] = t['id']
-            t['tags']['osm:version'] = t['version'] if 'version' in t else ''
-            t['tags']['osm:user_id'] = t['uid'] if 'uid' in t else ''
-            t['tags']['osm:user'] = t['user'] if 'user' in t else ''
-            t['tags']['osm:timestamp'] = t['timestamp'] if 'timestamp' in t else ''
-            t['tags']['osm:changeset'] = t['changeset'] if 'changeset' in t else ''
+            t['tags']['osm:version'] = str(r['version']) if 'version' in r else ''
+            t['tags']['osm:user_id'] = str(r['uid']) if 'uid' in r else ''
+            t['tags']['osm:user'] = r['user'] if 'user' in r else ''
+            t['tags']['osm:timestamp'] = r['timestamp'] if 'timestamp' in r else ''
+            t['tags']['osm:changeset'] = str(r['changeset']) if 'changeset' in r else ''
             yield(t)
 
         #'http://overpass-turbo.eu/?Q=' + q).read()
@@ -220,11 +220,11 @@ def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_v
                         'geo': relation_geom(r),
                     }
                     t['tags']['osm:id'] = t['id']
-                    t['tags']['osm:version'] = t['version'] if 'version' in t else ''
-                    t['tags']['osm:user_id'] = t['uid'] if 'uid' in t else ''
-                    t['tags']['osm:user'] = t['user'] if 'user' in t else ''
-                    t['tags']['osm:timestamp'] = t['timestamp'] if 'timestamp' in t else ''
-                    t['tags']['osm:changeset'] = t['changeset'] if 'changeset' in t else ''
+                    t['tags']['osm:version'] = str(r['version']) if 'version' in r else ''
+                    t['tags']['osm:user_id'] = str(r['uid']) if 'uid' in r else ''
+                    t['tags']['osm:user'] = r['user'] if 'user' in r else ''
+                    t['tags']['osm:timestamp'] = r['timestamp'] if 'timestamp' in r else ''
+                    t['tags']['osm:changeset'] = str(r['changeset']) if 'changeset' in r else ''
 
                     yield(t)
                 else:
@@ -262,11 +262,11 @@ def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_v
                 'geo': way_geom(r, is_polygon),
             }
             t['tags']['osm:id'] = t['id']
-            t['tags']['osm:version'] = t['version'] if 'version' in t else ''
-            t['tags']['osm:user_id'] = t['uid'] if 'uid' in t else ''
-            t['tags']['osm:user'] = t['user'] if 'user' in t else ''
-            t['tags']['osm:timestamp'] = t['timestamp'] if 'timestamp' in t else ''
-            t['tags']['osm:changeset'] = t['changeset'] if 'changeset' in t else ''
+            t['tags']['osm:version'] = str(r['version']) if 'version' in r else ''
+            t['tags']['osm:user_id'] = str(r['uid']) if 'uid' in r else ''
+            t['tags']['osm:user'] = r['user'] if 'user' in r else ''
+            t['tags']['osm:timestamp'] = r['timestamp'] if 'timestamp' in r else ''
+            t['tags']['osm:changeset'] = str(r['changeset']) if 'changeset' in r else ''
 
             yield(t)
 
@@ -301,11 +301,11 @@ def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_v
                 'geo': g
             }
             t['tags']['osm:id'] = t['id']
-            t['tags']['osm:version'] = t['version'] if 'version' in t else ''
-            t['tags']['osm:user_id'] = t['uid'] if 'uid' in t else ''
-            t['tags']['osm:user'] = t['user'] if 'user' in t else ''
-            t['tags']['osm:timestamp'] = t['timestamp'] if 'timestamp' in t else ''
-            t['tags']['osm:changeset'] = t['changeset'] if 'changeset' in t else ''
+            t['tags']['osm:version'] = str(r['version']) if 'version' in r else ''
+            t['tags']['osm:user_id'] = str(r['uid']) if 'uid' in r else ''
+            t['tags']['osm:user'] = r['user'] if 'user' in r else ''
+            t['tags']['osm:timestamp'] = r['timestamp'] if 'timestamp' in r else ''
+            t['tags']['osm:changeset'] = str(r['changeset']) if 'changeset' in r else ''
             yield(t)
 
     time_stop = datetime.datetime.now() # profiling
