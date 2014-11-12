@@ -100,12 +100,14 @@ def relation_geom(r):
 
     return polygons
 
-# Use this functions only with a database based on an import with osmosis
 def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_value=[]):
     import urllib.request
     import urllib.parse
     import json
     time_start = datetime.datetime.now() # profiling
+    non_relevant_tags = {'type', 'source', 'source:ref', 'source_ref', 'note', 'comment', 'created_by', 'converted_by', 'fixme', 'FIXME', 'description', 'attribution', 'osm:id', 'osm:version', 'osm:user_id', 'osm:user', 'osm:timestamp', 'osm:changeset'}
+    ways_done = []
+    rels_done = []
 
     qry = '[out:json]'
 
@@ -126,7 +128,6 @@ def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_v
         q = qry.replace('__QRY__', '((' + ');('.join(w) + ');)')
         q = q.replace('__TYPE__', 'node')
 
-        #url = 'http://overpass.osm.rambler.ru/cgi/interpreter?' +\
         url = 'http://overpass-api.de/api/interpreter?' +\
             urllib.parse.urlencode({ 'data': q })
         f = urllib.request.urlopen(url).read().decode('utf-8')
@@ -149,6 +150,126 @@ def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_v
 
         #'http://overpass-turbo.eu/?Q=' + q).read()
 
+    # way areas and multipolygons based on outer tags
+    w = []
+    for t in ('*', 'area'):
+        if t in where_clauses:
+            w.append(where_clauses[t])
+
+    if len(w):
+        # query for ways which match query, also get their parent relations and
+        # again all child ways. if a way is outer way of a multipolygon, the
+        # multipolygon has no (relevant) tags and all outer ways share the same
+        # tags (save non relevant tags) the ways are discarded and the relation
+        # is used - as type 'multipolygon' and a 'm' prefixed to the ID
+        q = qry.replace('__QRY__',
+                'relation[type=multipolygon] -> .rel;' +
+                '((' + ');('.join(w) + ');) -> .outer;relation(bw.outer)[type=multipolygon]') + '.outer out tags qt;'
+        q = q.replace('__TYPE__', 'way(r.rel:"outer")')
+        plpy.warning(q)
+
+        url = 'http://overpass-api.de/api/interpreter?' +\
+            urllib.parse.urlencode({ 'data': q })
+        f = urllib.request.urlopen(url).read().decode('utf-8')
+        res = json.loads(f)
+
+        _ways = {}
+        _rels = {}
+
+        for r in res['elements']:
+            if r['type'] == 'way':
+                _ways[r['id']] = r
+            elif r['type'] == 'relation':
+                _rels[r['id']] = r
+
+        for rid, r in _rels.items():
+            if r['tags']['type'] in ('multipolygon', 'boundary') and len([
+                    v
+                    for v in r['tags']
+                    if v not in non_relevant_tags
+                ]) == 0:
+                is_valid_mp = True
+                outer_tags = None
+
+                for outer in r['members']:
+                    if outer['role'] in ('', 'outer'):
+                        outer_way = _ways[outer['ref']]
+                        tags = {
+                                vk: vv
+                                for vk, vv in outer_way['tags'].items()
+                                if vk not in non_relevant_tags
+                            } if 'tags' in outer_way else {}
+
+                        if outer_tags is None:
+                            outer_tags = tags
+                        elif outer_tags != tags:
+                            is_valid_mp = True
+
+                if is_valid_mp:
+                    rels_done.append(rid)
+                    for outer in r['members']:
+                        if outer['role'] in ('', 'outer'):
+                            ways_done.append(outer['ref'])
+
+                    t = {
+                        'id': 'm' + str(r['id']),
+                        'types': ['multipolygon', 'area'],
+                        # TODO: merge tags with relation tags and
+                        # (non-relevant) tags of other outer ways
+                        'tags': outer_tags,
+                        'geo': relation_geom(r),
+                    }
+                    t['tags']['osm:id'] = t['id']
+                    t['tags']['osm:version'] = t['version'] if 'version' in t else ''
+                    t['tags']['osm:user_id'] = t['uid'] if 'uid' in t else ''
+                    t['tags']['osm:user'] = t['user'] if 'user' in t else ''
+                    t['tags']['osm:timestamp'] = t['timestamp'] if 'timestamp' in t else ''
+                    t['tags']['osm:changeset'] = t['changeset'] if 'changeset' in t else ''
+
+                    yield(t)
+                else:
+                    plpy.warning('tag-less multipolygon with non-similar outer ways: {}'.format(rid))
+
+        _ways = None
+        _rels = None
+
+    # ways
+    w = []
+    for t in ('*', 'line', 'way', 'area'):
+        if t in where_clauses:
+            w.append(where_clauses[t])
+
+    if len(w):
+        q = qry.replace('__QRY__', '((' + ');('.join(w) + ');)')
+        q = q.replace('__TYPE__', 'way')
+        plpy.warning(q)
+
+        url = 'http://overpass-api.de/api/interpreter?' +\
+            urllib.parse.urlencode({ 'data': q })
+        f = urllib.request.urlopen(url).read().decode('utf-8')
+        res = json.loads(f)
+
+        for r in res['elements']:
+            if r['id'] in ways_done:
+                pass
+            ways_done.append(r['id'])
+
+            is_polygon = len(r['nodes']) > 3 and r['nodes'][0] == r['nodes'][-1]
+            t = {
+                'id': 'w' + str(r['id']),
+                'types': ['way', 'line', 'area'] if is_polygon else ['way', 'line'],
+                'tags': r['tags'] if 'tags' in r else {},
+                'geo': way_geom(r, is_polygon),
+            }
+            t['tags']['osm:id'] = t['id']
+            t['tags']['osm:version'] = t['version'] if 'version' in t else ''
+            t['tags']['osm:user_id'] = t['uid'] if 'uid' in t else ''
+            t['tags']['osm:user'] = t['user'] if 'user' in t else ''
+            t['tags']['osm:timestamp'] = t['timestamp'] if 'timestamp' in t else ''
+            t['tags']['osm:changeset'] = t['changeset'] if 'changeset' in t else ''
+
+            yield(t)
+
     # relations
     w = []
     for t in ('*', 'relation', 'area'):
@@ -158,55 +279,26 @@ def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_v
     if len(w):
         q = qry.replace('__QRY__', '((' + ');('.join(w) + ');)')
         q = q.replace('__TYPE__', 'relation')
+        plpy.warning(q)
 
-        #url = 'http://overpass.osm.rambler.ru/cgi/interpreter?' +\
         url = 'http://overpass-api.de/api/interpreter?' +\
             urllib.parse.urlencode({ 'data': q })
         f = urllib.request.urlopen(url).read().decode('utf-8')
         res = json.loads(f)
 
         for r in res['elements']:
+            if r['id'] in rels_done:
+                pass
+            rels_done.append(r['id'])
+
             g = relation_geom(r)
             if not g or not 'tags' in r:
                 continue
             t = {
-                'id': 'n' + str(r['id']),
+                'id': 'r' + str(r['id']),
                 'types': ['area', 'relation'],
-                'tags': r['tags'],
+                'tags': r['tags'] if 'tags' in r else {},
                 'geo': g
-            }
-            t['tags']['osm:id'] = t['id']
-            t['tags']['osm:version'] = t['version'] if 'version' in t else ''
-            t['tags']['osm:user_id'] = t['uid'] if 'uid' in t else ''
-            t['tags']['osm:user'] = t['user'] if 'user' in t else ''
-            t['tags']['osm:timestamp'] = t['timestamp'] if 'timestamp' in t else ''
-            t['tags']['osm:changeset'] = t['changeset'] if 'changeset' in t else ''
-            yield(t)
-
-        #'http://overpass-turbo.eu/?Q=' + q).read()
-
-    # ways
-    w = []
-    for t in ('*', 'line', 'area', 'way'):
-        if t in where_clauses:
-            w.append(where_clauses[t])
-
-    if len(w):
-        q = qry.replace('__QRY__', '((' + ');('.join(w) + ');)')
-        q = q.replace('__TYPE__', 'way')
-
-        url = 'http://overpass-api.de/api/interpreter?' +\
-            urllib.parse.urlencode({ 'data': q })
-        f = urllib.request.urlopen(url).read().decode('utf-8')
-        res = json.loads(f)
-
-        for r in res['elements']:
-            is_polygon = len(r['nodes']) > 3 and r['nodes'][0] == r['nodes'][-1]
-            t = {
-                'id': 'w' + str(r['id']),
-                'types': ['way', 'line', 'area'] if is_polygon else ['way', 'line'],
-                'tags': r['tags'],
-                'geo': way_geom(r, is_polygon),
             }
             t['tags']['osm:id'] = t['id']
             t['tags']['osm:version'] = t['version'] if 'version' in t else ''
