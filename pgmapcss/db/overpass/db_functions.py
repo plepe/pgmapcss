@@ -332,13 +332,14 @@ def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_v
                 continue
 
             t = {
-                'id': 'r' + str(r['id']),
                 'tags': r['tags'] if 'tags' in r else {},
             }
             if r['type'] == 'relation':
+                t['id'] = 'r' + str(r['id'])
                 t['types'] = ['area', 'relation']
                 t['geo'] = relation_geom(r)
             elif r['type'] == 'way':
+                t['id'] = 'w' + str(r['id'])
                 t['types'] = ['area', 'line', 'way']
                 t['geo'] = way_geom(r, True)
             t['tags']['osm:id'] = t['id']
