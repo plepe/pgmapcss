@@ -100,6 +100,34 @@ def relation_geom(r):
 
     return polygons
 
+def assemble_object(r):
+    t = {
+        'tags': r['tags'] if 'tags' in r else {},
+    }
+    if r['type'] == 'node':
+        t['id'] = 'n' + str(r['id'])
+        t['types'] = ['area', 'line', 'way']
+        t['geo'] = node_geom(r['lat'], r['lon']),
+    elif r['type'] == 'way':
+        is_polygon = len(r['nodes']) > 3 and r['nodes'][0] == r['nodes'][-1]
+        t['id'] = 'w' + str(r['id'])
+        t['types'] = ['line', 'way']
+        if is_polygon:
+            t['types'].append('area')
+        t['geo'] = way_geom(r, is_polygon)
+    elif r['type'] == 'relation':
+        t['id'] = 'r' + str(r['id'])
+        t['types'] = ['area', 'relation']
+        t['geo'] = relation_geom(r)
+    t['tags']['osm:id'] = t['id']
+    t['tags']['osm:version'] = str(r['version']) if 'version' in r else ''
+    t['tags']['osm:user_id'] = str(r['uid']) if 'uid' in r else ''
+    t['tags']['osm:user'] = r['user'] if 'user' in r else ''
+    t['tags']['osm:timestamp'] = r['timestamp'] if 'timestamp' in r else ''
+    t['tags']['osm:changeset'] = str(r['changeset']) if 'changeset' in r else ''
+
+    return t
+
 def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_value=[]):
     import urllib.request
     import urllib.parse
@@ -354,66 +382,32 @@ def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_v
     plpy.notice('querying db objects took %.2fs' % (time_stop - time_start).total_seconds())
 
 def objects_by_id(id_list):
-    _id_list = [ int(i[1:]) for i in id_list if i[0] == 'n' ]
-    plan = plpy.prepare('select id, tags, geom from nodes where id=any($1)', ['bigint[]']);
-    res = plpy.cursor(plan, [_id_list])
-    for r in res:
-        yield {
-            'id': 'n' + str(r['id']),
-            'members': [],
-            'tags': pghstore.loads(r['tags']),
-            'geo': r['geom'],
-            'types': ['node', 'point']
-        }
+    import urllib.request
+    import urllib.parse
+    import json
+    q = ''
+    multipolygons = []
+    for i in id_list:
+        if i[0:1] == 'n':
+            q += 'node({});out meta geom;'.format(i[1:])
+        elif i[0:1] == 'w':
+            q += 'way({});out meta geom;'.format(i[1:])
+        elif i[0:1] == 'r':
+            q += 'relation({});out meta geom;'.format(i[1:])
 
-    _id_list = [ int(i[1:]) for i in id_list if i[0] == 'w' ]
-    plan = plpy.prepare('select id, tags, version, user_id, (select name from users where id=user_id) as user, tstamp, changeset_id, linestring as linestring, array_agg(node_id) as member_ids from (select ways.*, node_id from ways left join way_nodes on ways.id=way_nodes.way_id where ways.id=any($1) order by way_nodes.sequence_id) t group by id, tags, version, user_id, tstamp, changeset_id, linestring', ['bigint[]']);
-    res = plpy.cursor(plan, [_id_list])
-    for r in res:
-        t = {
-            'id': 'w' + str(r['id']),
-            'members': [ {
-                    'member_id': 'n' + str(m),
-                    'sequence_id': str(i)
-                }
-                for i, m in enumerate(r['member_ids'])
-            ],
-            'tags': pghstore.loads(r['tags']),
-            'geo': r['linestring'],
-            'types': ['way', 'line', 'area']
-        }
-        t['tags']['osm:id'] = str(t['id'])
-        t['tags']['osm:version'] = str(r['version'])
-        t['tags']['osm:user_id'] = str(r['user_id'])
-        t['tags']['osm:user'] = r['user']
-        t['tags']['osm:timestamp'] = str(r['tstamp'])
-        t['tags']['osm:changeset'] = str(r['changeset_id'])
-        yield(t)
+    if q == '':
+        return
+    q = '[out:json];' + q
 
-    _id_list = [ int(i[1:]) for i in id_list if i[0] == 'r' ]
-    plan = plpy.prepare('select id, tags, version, user_id, (select name from users where id=user_id) as user, tstamp, changeset_id, array_agg(lower(member_type) || member_id) as member_ids, array_agg(member_role) as member_roles from (select relations.*, member_type, member_id, member_role from relations left join relation_members on relations.id=relation_members.relation_id where relations.id=any($1) order by relation_members.sequence_id) t group by id, tags, version, user_id, tstamp, changeset_id', ['bigint[]']);
-    res = plpy.cursor(plan, [_id_list])
-    for r in res:
-        t = {
-            'id': 'r' + str(r['id']),
-            'tags': pghstore.loads(r['tags']),
-            'members': [ {
-                    'member_id': m[0],
-                    'role': m[1],
-                    'sequence_id': i
-                }
-                for i, m in enumerate(zip(r['member_ids'], r['member_roles']))
-            ],
-            'geo': None,
-            'types': ['relation']
-        }
-        t['tags']['osm:id'] = str(t['id'])
-        t['tags']['osm:version'] = str(r['version'])
-        t['tags']['osm:user_id'] = str(r['user_id'])
-        t['tags']['osm:user'] = r['user']
-        t['tags']['osm:timestamp'] = str(r['tstamp'])
-        t['tags']['osm:changeset'] = str(r['changeset_id'])
-        yield(t)
+    plpy.warning(q)
+
+    url = 'http://overpass-api.de/api/interpreter?' +\
+        urllib.parse.urlencode({ 'data': q })
+    f = urllib.request.urlopen(url).read().decode('utf-8')
+    res = json.loads(f)
+
+    for r in res['elements']:
+        yield(assemble_object(r))
 
 def objects_member_of(member_id, parent_type, parent_conditions):
     if parent_type == 'relation':
