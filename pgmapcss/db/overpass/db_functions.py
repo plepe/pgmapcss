@@ -193,6 +193,9 @@ def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_v
 
                 for outer in r['members']:
                     if outer['role'] in ('', 'outer'):
+                        if not outer['ref'] in _ways:
+                            continue
+
                         outer_way = _ways[outer['ref']]
                         tags = {
                                 vk: vv
