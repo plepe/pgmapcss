@@ -128,7 +128,7 @@ def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_v
         q = qry.replace('__QRY__', '((' + ');('.join(w) + ');)')
         q = q.replace('__TYPE__', 'node')
 
-        url = 'http://overpass-api.de/api/interpreter?' +\
+        url = '{db.overpass-url}?' +\
             urllib.parse.urlencode({ 'data': q })
         f = urllib.request.urlopen(url).read().decode('utf-8')
         res = json.loads(f)
@@ -168,7 +168,7 @@ def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_v
         q = q.replace('__TYPE__', 'way(r.rel:"outer")')
         plpy.warning(q)
 
-        url = 'http://overpass-api.de/api/interpreter?' +\
+        url = '{db.overpass-url}?' +\
             urllib.parse.urlencode({ 'data': q })
         f = urllib.request.urlopen(url).read().decode('utf-8')
         res = json.loads(f)
@@ -244,7 +244,7 @@ def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_v
         q = q.replace('__TYPE__', 'way')
         plpy.warning(q)
 
-        url = 'http://overpass-api.de/api/interpreter?' +\
+        url = '{db.overpass-url}?' +\
             urllib.parse.urlencode({ 'data': q })
         f = urllib.request.urlopen(url).read().decode('utf-8')
         res = json.loads(f)
@@ -281,7 +281,7 @@ def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_v
         q = q.replace('__TYPE__', 'relation')
         plpy.warning(q)
 
-        url = 'http://overpass-api.de/api/interpreter?' +\
+        url = '{db.overpass-url}?' +\
             urllib.parse.urlencode({ 'data': q })
         f = urllib.request.urlopen(url).read().decode('utf-8')
         res = json.loads(f)
@@ -321,7 +321,7 @@ def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_v
         q = qry.replace('__QRY__', 'is_in({0});way(pivot);out meta geom;is_in({0});relation(pivot)'.format(res[0]['geom']))
         plpy.warning(q)
 
-        url = 'http://overpass-api.de/api/interpreter?' +\
+        url = '{db.overpass-url}?' +\
             urllib.parse.urlencode({ 'data': q })
         f = urllib.request.urlopen(url).read().decode('utf-8')
         res = json.loads(f)
