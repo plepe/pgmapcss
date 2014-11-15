@@ -324,7 +324,15 @@ def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_v
         url = '{db.overpass-url}?' +\
             urllib.parse.urlencode({ 'data': q })
         f = urllib.request.urlopen(url).read().decode('utf-8')
-        res = json.loads(f)
+
+        try:
+            res = json.loads(f)
+        except ValueError:
+            print(f)
+            if re.search('osm3s_v[0-9\.]+_areas', f):
+                res = { 'elements': [] }
+            else:
+                raise
 
         for r in res['elements']:
             if (r['type'] == 'way' and r['id'] in ways_done) or\
