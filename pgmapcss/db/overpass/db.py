@@ -32,6 +32,16 @@ class db(default):
 
         return ( 'overpass', key )
 
+    def value_to_regexp(self, s):
+        s = s.replace('\\', '\\\\')
+        s = s.replace('.', '\\.')
+        s = s.replace('|', '\\|')
+        s = s.replace('[', '\\[')
+        s = s.replace(']', '\\]')
+        s = s.replace('(', '\\(')
+        s = s.replace(')', '\\)')
+        return s
+
     def compile_condition_overpass(self, condition, statement, tag_type, stat, prefix, filter):
         ret = None
         negate = False
@@ -57,77 +67,66 @@ class db(default):
         # value-eval() statements
         if condition['value_type'] == 'eval':
             # treat other conditions as has_key
-            ret = prefix + column + ' ? ' + db.format(key);
+            ret = ( 'key', key )
 
         # =
         elif op == '=':
-            ret = '[' + repr(key) + '=' + repr(condition['value']) + ']'
+            ret = ( 'is', key, condition['value'] )
 
         # @=
         elif op == '@=' and condition['value_type'] == 'value':
-            ret = '(' + ' or '.join([
-                prefix + column + ' @> ' + db.format({ key: v })
+            ret = ( 'regexp', key, '^(' + '|'.join([
+                self.value_to_regexp(v)
                 for v in condition['value'].split(';')
-                ]) + ')'
+                ]) + ')$' )
 
         # !=
         elif op == '!=':
-            ret = '( not ' + prefix + column + ' ? ' + db.format(key) +\
-                   'or not ' + prefix + column + ' @> ' +\
-                   db.format({ key: condition['value'] }) + ')'
+            ret = ( 'isnot', key, condition['value'] )
 
         # regexp match =~
         elif op == '=~':
-            ret = '(' + prefix + column + ' ? ' + db.format(key) + ' and ' +\
-                prefix + column + '->' + db.format(key) +\
-                (' ~* ' if 'i' in condition['regexp_flags'] else ' ~ ') +\
-                db.format(condition['value']) + ')'
+            ret = ( 
+                ('iregexp' if condition['regexp_flags'] else 'regexp' ),
+                key, condition['value'])
 
         # negated regexp match !~
         elif op == '!~':
-            ret = '(' + prefix + column + ' ? ' + db.format(key) + ' and ' +\
-                prefix + column + '->' + db.format(key) +\
-                (' !~* ' if 'i' in condition['regexp_flags'] else ' !~ ') +\
-                db.format(condition['value']) + ')'
+            ret = ( 
+                ('notiregexp' if condition['regexp_flags'] else 'notregexp' ),
+                key, condition['value'])
 
         # prefix match ^=
         elif op == '^=':
-            ret = '(' + prefix + column + ' ? ' + db.format(key) + ' and ' +\
-                prefix + column + '->' + db.format(key) + ' like ' +\
-                db.format(pg_like_escape(condition['value']) + '%') + ')'
+            ret = ( 'regexp', key, '^' + self.value_to_regexp(condition['value']) )
 
         # suffix match $=
         elif op == '$=':
-            ret = '(' + prefix + column + ' ? ' + db.format(key) + ' and ' +\
-                prefix + column + '->' + db.format(key) + ' like ' +\
-                db.format('%' + pg_like_escape(condition['value'])) + ')'
+            ret = ( 'regexp', key, self.value_to_regexp(condition['value']) + '$' )
 
         # substring match *=
         elif op == '*=':
-            ret = '(' + prefix + column + ' ? ' + db.format(key) + ' and ' +\
-                prefix + column + '->' + db.format(key) + ' like ' +\
-                db.format('%' + pg_like_escape(condition['value']) + '%') + ')'
+            ret = ( 'regexp', key, self.value_to_regexp(condition['value']) )
 
         # list membership ~=
         elif op == '~=':
-            ret = '(' + prefix + column + ' ? ' + db.format(key) + ' and ' +\
-                db.format(condition['value']) + ' =any(string_to_array(' +\
-                prefix + column + '->' + db.format(key) + ', \';\')))'
+            ret = ( 'regexp', key, self.value_to_regexp(condition['value']) )
 
         else:
-            ret = '[' + repr(key) + ']'
+            ret = ( 'key', key )
 
         if ret is None:
             return None
 
         if negate:
-            return '(not ' + prefix + column + ' ? ' + db.format(key) +\
-                ' or not ' + ret + ')'
+            return None # TODO
+#            return '(not ' + prefix + column + ' ? ' + db.format(key) +\
+#                ' or not ' + ret + ')'
 
         return ret
 
     def compile_condition(self, condition, statement, stat, prefix='current.', filter={}):
-        ret = set()
+        ret = []
 
         # assignments: map conditions which are based on a (possible) set-statement
         # back to their original selectors:
@@ -137,10 +136,10 @@ class db(default):
         set_statements = stat.filter_statements(f)
 
         if len(set_statements) > 0:
-            set_statements = {
+            set_statements = [
                 self.compile_selector(s, stat, prefix, filter, no_object_type=True)
                 for s in set_statements
-            }
+            ]
 
         # ignore generated tags (identified by leading .)
         if condition['key'][0] == '.':
@@ -152,7 +151,7 @@ class db(default):
         if tag_type is None:
             pass
         elif tag_type[0] == 'overpass':
-            ret.add(self.compile_condition_overpass(condition, statement, tag_type, stat, prefix, filter))
+            ret = self.compile_condition_overpass(condition, statement, tag_type, stat, prefix, filter)
         else:
             raise CompileError('unknown tag type {}'.format(tag_type))
 
@@ -162,32 +161,59 @@ class db(default):
             return set_statements
 
         if len(set_statements):
-            return {
-                    s + ''.join(ret)
+            return [
+                    s + [ ret ]
                     for s in set_statements
-                }
+                ]
 
-        # merge conditions together, return
-        return ''.join(ret)
+        # return
+        return ret
+
+    def conditions_to_query(self, conditions):
+        ret = '__TYPE__';
+
+        for c in conditions:
+            if c[0] == 'type':
+                pass
+            elif c[0] == 'key':
+                ret += '[' + repr(c[1]) + ']'
+            elif c[0] == 'is':
+                ret += '[' + repr(c[1]) + '=' + repr(c[2]) + ']'
+            elif c[0] == 'isnot':
+                ret += '[' + repr(c[1]) + '!=' + repr(c[2]) + ']'
+            elif c[0] == 'regexp':
+                ret += '[' + repr(c[1]) + '~' + repr(c[2]) + ']'
+            elif c[0] == 'iregexp':
+                ret += '[' + repr(c[1]) + '~' + repr(c[2]) + ', i]'
+            elif c[0] == 'notregexp':
+                ret += '[' + repr(c[1]) + '!~' + repr(c[2]) + ']'
+            elif c[0] == 'notiregexp':
+                ret += '[' + repr(c[1]) + '!~' + repr(c[2]) + ', i]'
+            else:
+                print('Unknown Overpass operator "{}"'.format(c[0]))
+
+        return ret
 
     def merge_conditions(self, conditions):
         types = [ t for t, cs in conditions if t != True ]
 
         conditions = {
-            t:
-                '(\n' + '\n'.join([
-                    cs
+            t: [
+                    c
                     for t2, cs in conditions
                     if t == t2
-                    if cs != 'false'
-                ]) + '\n);'
+                    if cs != False
+                    for c in cs
+                ]
             for t in types
         }
 
         return {
-            t: cs
+            t: ';\n'.join([
+                self.conditions_to_query(c)
+                for c in cs
+            ]) + ';\n'
             for t, cs in conditions.items()
-            if cs != '()'
         }
 
     def compile_selector(self, statement, stat, prefix='current.', filter={}, object_type=None, no_object_type=False):
@@ -198,27 +224,23 @@ class db(default):
             for c in statement['selector']['conditions']
         ]
 
-        if no_object_type:
-            ret = { '' }
-        else:
-            ret = { '__TYPE__' }
+        ret = [ [] ]
 
         for condition in conditions:
             if condition is None:
                 continue
 
-            if condition is None:
-                pass
+            elif type(condition) == list:
+                ret = [
+                    r + c
+                    for r in ret
+                    for cs in condition
+                    for c in cs
+                ]
 
-            elif type(condition) == set:
+            elif type(condition) == tuple:
                 ret = [
-                        r + c
-                        for c in condition
-                        for r in ret
-                    ]
-            else:
-                ret = [
-                        r + condition
+                        r + [ condition ]
                         for r in ret
                     ]
 
@@ -226,6 +248,6 @@ class db(default):
             return False
 
         if no_object_type:
-            return ''.join(ret)
+            return ret
 
-        return ';'.join(ret) + ';'
+        return ret
