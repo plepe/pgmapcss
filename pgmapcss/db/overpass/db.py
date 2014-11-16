@@ -194,6 +194,19 @@ class db(default):
 
         return ret
 
+    def simplify_conditions(self, conditions):
+        for i1, c1 in enumerate(conditions):
+            for i2, c2 in enumerate(conditions):
+                if i1 != i2 and c1 is not None and c2 is not None:
+                    # check if query c1 is a subset of query c2 -> replace by c1
+                    if len([ e1 for e1 in c1 if e1 not in c2 ]) == 0:
+                        conditions[i1] = c1
+                        conditions[i2] = None
+
+        conditions = [ c for c in conditions if c is not None ]
+
+        return conditions
+
     def merge_conditions(self, conditions):
         types = [ t for t, cs in conditions if t != True ]
 
@@ -206,6 +219,11 @@ class db(default):
                     for c in cs
                 ]
             for t in types
+        }
+
+        conditions = {
+            t: self.simplify_conditions(cs)
+            for t, cs in conditions.items()
         }
 
         return {
