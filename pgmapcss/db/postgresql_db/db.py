@@ -9,6 +9,7 @@ class postgresql_db(default):
         self.ident = pgmapcss.db.pg.ident
 
     def merge_conditions(self, conditions):
+        conditions = set(conditions)
         types = [ t for t, cs in conditions if t != True ]
 
         conditions = {
