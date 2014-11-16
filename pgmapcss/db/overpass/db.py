@@ -200,9 +200,42 @@ class db(default):
 
         return ret
 
-    def is_subset(self, c1, c2):
-        merge = []
+    def merge_regexp(self, c1, c2):
+        if c1[0] != 'regexp' or c2[0] != 'regexp':
+            return None
+        if c1[1] != c2[1]:
+            return None
 
+        r1 = c1[2]
+        r2 = c2[2]
+        r = ''
+        r_end = ''
+
+        if r1[0] == '^' or r2[0] == '^':
+            r += '^'
+            if r1[0] == '^':
+                r1 = r1[1:]
+            else:
+                r1 = '.*' + r1
+            if r2[0] == '^':
+                r2 = r2[1:]
+            else:
+                r2 = '.*' + r2
+
+        if r1[-1] == '$' or r2[-1] == '$':
+            r_end = '$'
+            if r1[-1] == '$':
+                r1 = r1[:-1]
+            else:
+                r1 += '.*'
+            if r2[-1] == '$':
+                r2 = r2[:-1]
+            else:
+                r2 += '.*'
+
+        return r + r1 + '|' + r2 + r_end
+
+    def is_subset(self, c1, c2):
         # check if query c1 is a subset of query c2 -> replace by c1
         if len([ e1 for e1 in c1 if e1 not in c2 ]) == 0:
             return c1
@@ -219,11 +252,27 @@ class db(default):
                         if c != d1[0]
                     ] + [ ( 'key', d1[0][1] ) ]
 
+    def check_merge_regexp(self, c1, c2):
+        # c1 and c2 only differ in one condition and it has the same key
+        d1 = [ e1 for e1 in c1 if e1 not in c2 ]
+        d2 = [ e2 for e2 in c2 if e2 not in c1 ]
+        if len(d1) == 1 and len(d2) == 1 and d1[0][1] == d2[0][1]:
+# check if we can merge the regular expressions
+            m = self.merge_regexp(self.convert_to_regexp(d1[0]), self.convert_to_regexp(d2[0]))
+            if m is not None:
+                x = [
+                        c
+                        for c in c1
+                        if c != d1[0]
+                    ] + [ ( 'regexp', d1[0][1], m ) ]
+                return x
+
     def simplify_conditions(self, conditions):
         for i1 in range(0, len(conditions)):
             for i2 in range(0, len(conditions)):
                 c1 = conditions[i1]
                 c2 = conditions[i2]
+
                 if i1 != i2 and c1 is not None and c2 is not None:
                     s = self.is_subset(c1, c2)
                     if s:
@@ -231,6 +280,20 @@ class db(default):
                         conditions[i2] = None
 
         conditions = [ c for c in conditions if c is not None ]
+
+        for i1 in range(0, len(conditions)):
+            for i2 in range(0, len(conditions)):
+                c1 = conditions[i1]
+                c2 = conditions[i2]
+
+                if i1 != i2 and c1 is not None and c2 is not None:
+                    s = self.check_merge_regexp(c1, c2)
+                    if s:
+                        conditions[i1] = s
+                        conditions[i2] = None
+
+        conditions = [ c for c in conditions if c is not None ]
+
         return conditions
 
     def merge_conditions(self, conditions):
