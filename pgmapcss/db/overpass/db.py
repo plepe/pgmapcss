@@ -220,8 +220,10 @@ class db(default):
                     ] + [ ( 'key', d1[0][1] ) ]
 
     def simplify_conditions(self, conditions):
-        for i1, c1 in enumerate(conditions):
-            for i2, c2 in enumerate(conditions):
+        for i1 in range(0, len(conditions)):
+            for i2 in range(0, len(conditions)):
+                c1 = conditions[i1]
+                c2 = conditions[i2]
                 if i1 != i2 and c1 is not None and c2 is not None:
                     s = self.is_subset(c1, c2)
                     if s:
