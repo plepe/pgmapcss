@@ -42,6 +42,12 @@ class db(default):
         s = s.replace(')', '\\)')
         return s
 
+    def convert_to_regexp(self, s):
+        if s[0] in ('regexp', 'iregexp', 'isnot', 'notregexp', 'notiregexp'):
+            return s
+        if s[0] == 'is':
+            return ('regexp', s[1], '^' + self.value_to_regexp(s[2]) + '$')
+
     def compile_condition_overpass(self, condition, statement, tag_type, stat, prefix, filter):
         ret = None
         negate = False
@@ -194,17 +200,35 @@ class db(default):
 
         return ret
 
+    def is_subset(self, c1, c2):
+        merge = []
+
+        # check if query c1 is a subset of query c2 -> replace by c1
+        if len([ e1 for e1 in c1 if e1 not in c2 ]) == 0:
+            return c1
+
+        # c1 and c2 only differ in one condition and it has the same key
+        d1 = [ e1 for e1 in c1 if e1 not in c2 ]
+        d2 = [ e2 for e2 in c2 if e2 not in c1 ]
+        if len(d1) == 1 and len(d2) == 1 and d1[0][1] == d2[0][1]:
+            # one of the differing conditions queries for key -> ignore other condition
+            if d1[0][0] == 'key' or d2[0][0] == 'key':
+                return [
+                        c
+                        for c in c1
+                        if c != d1[0]
+                    ] + [ ( 'key', d1[0][1] ) ]
+
     def simplify_conditions(self, conditions):
         for i1, c1 in enumerate(conditions):
             for i2, c2 in enumerate(conditions):
                 if i1 != i2 and c1 is not None and c2 is not None:
-                    # check if query c1 is a subset of query c2 -> replace by c1
-                    if len([ e1 for e1 in c1 if e1 not in c2 ]) == 0:
-                        conditions[i1] = c1
+                    s = self.is_subset(c1, c2)
+                    if s:
+                        conditions[i1] = s
                         conditions[i2] = None
 
         conditions = [ c for c in conditions if c is not None ]
-
         return conditions
 
     def merge_conditions(self, conditions):
