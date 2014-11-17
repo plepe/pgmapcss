@@ -276,12 +276,12 @@ class postgresql_db(default):
         # merge conditions together, return
         return '(' + ' or '.join(ret) + ')'    
 
-    def compile_selector(self, statement, stat, prefix='current.', filter={}, object_type=None):
+    def compile_selector(self, statement, stat, prefix='current.', filter={}, object_type=None, selector='selector'):
         filter['object_type'] = object_type
 
         ret = {
             self.compile_condition(c, statement, stat, prefix, filter) or 'true'
-            for c in statement['selector']['conditions']
+            for c in statement[selector]['conditions']
         }
 
         if len(ret) == 0:
