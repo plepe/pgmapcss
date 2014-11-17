@@ -115,10 +115,25 @@ def assemble_object(r):
         if is_polygon:
             t['types'].append('area')
         t['geo'] = way_geom(r, is_polygon)
+        t['members'] = [
+                {
+                    'member_id': 'n' + str(m),
+                    'sequence_id': str(i),
+                }
+                for i, m in enumerate(r['nodes'])
+            ]
     elif r['type'] == 'relation':
         t['id'] = 'r' + str(r['id'])
         t['types'] = ['area', 'relation']
         t['geo'] = relation_geom(r)
+        t['members'] = [
+                {
+                    'member_id': m['type'][0] + str(m['ref']),
+                    'role': m['role'],
+                    'sequence_id': str(i),
+                }
+                for i, m in enumerate(r['members'])
+            ]
     t['tags']['osm:id'] = t['id']
     t['tags']['osm:version'] = str(r['version']) if 'version' in r else ''
     t['tags']['osm:user_id'] = str(r['uid']) if 'uid' in r else ''
