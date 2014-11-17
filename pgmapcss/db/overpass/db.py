@@ -316,12 +316,12 @@ class db(default):
             for t, cs in conditions.items()
         }
 
-    def compile_selector(self, statement, stat, prefix='current.', filter={}, object_type=None, no_object_type=False):
+    def compile_selector(self, statement, stat, prefix='current.', filter={}, object_type=None, selector='selector', no_object_type=False):
         filter['object_type'] = object_type
 
         conditions = [
             self.compile_condition(c, statement, stat, prefix, filter) or None
-            for c in statement['selector']['conditions']
+            for c in statement[selector]['conditions']
         ]
 
         ret = [ [] ]
