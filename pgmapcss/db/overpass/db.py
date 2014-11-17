@@ -84,7 +84,8 @@ class db(default):
 
         # =
         elif op == '=':
-            ret = ( 'is', key, condition['value'] )
+            #ret = ( 'is', key, condition['value'] )
+            ret = ( 'regexp', key, { '^' + self.value_to_regexp(condition['value']) + '$' })
 
         # @=
         elif op == '@=' and condition['value_type'] == 'value':
@@ -95,7 +96,8 @@ class db(default):
 
         # !=
         elif op == '!=':
-            ret = ( 'isnot', key, condition['value'] )
+            #ret = ( 'isnot', key, condition['value'] )
+            ret = ( 'notregexp', key, { '^' + self.value_to_regexp(condition['value']) + '$' })
 
         # regexp match =~
         elif op == '=~':
