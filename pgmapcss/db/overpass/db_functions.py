@@ -162,19 +162,7 @@ def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_v
         res = json.loads(f)
 
         for r in res['elements']:
-            t = {
-                'id': 'n' + str(r['id']),
-                'types': ['node', 'point'],
-                'tags': r['tags'],
-                'geo': node_geom(r['lat'], r['lon']),
-            }
-            t['tags']['osm:id'] = t['id']
-            t['tags']['osm:version'] = str(r['version']) if 'version' in r else ''
-            t['tags']['osm:user_id'] = str(r['uid']) if 'uid' in r else ''
-            t['tags']['osm:user'] = r['user'] if 'user' in r else ''
-            t['tags']['osm:timestamp'] = r['timestamp'] if 'timestamp' in r else ''
-            t['tags']['osm:changeset'] = str(r['changeset']) if 'changeset' in r else ''
-            yield(t)
+            yield(assemble_object(r))
 
         #'http://overpass-turbo.eu/?Q=' + q).read()
 
@@ -242,20 +230,9 @@ def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_v
                         if outer['role'] in ('', 'outer'):
                             ways_done.append(outer['ref'])
 
-                    t = {
-                        'id': 'm' + str(r['id']),
-                        'types': ['multipolygon', 'area'],
-                        # TODO: merge tags with relation tags and
-                        # (non-relevant) tags of other outer ways
-                        'tags': outer_tags,
-                        'geo': relation_geom(r),
-                    }
-                    t['tags']['osm:id'] = t['id']
-                    t['tags']['osm:version'] = str(r['version']) if 'version' in r else ''
-                    t['tags']['osm:user_id'] = str(r['uid']) if 'uid' in r else ''
-                    t['tags']['osm:user'] = r['user'] if 'user' in r else ''
-                    t['tags']['osm:timestamp'] = r['timestamp'] if 'timestamp' in r else ''
-                    t['tags']['osm:changeset'] = str(r['changeset']) if 'changeset' in r else ''
+                    t = assemble_object(r)
+                    t['types'] = ['multipolygon', 'area']
+                    t['tags'] = outer_tags
 
                     yield(t)
                 else:
@@ -285,21 +262,7 @@ def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_v
                 pass
             ways_done.append(r['id'])
 
-            is_polygon = len(r['nodes']) > 3 and r['nodes'][0] == r['nodes'][-1]
-            t = {
-                'id': 'w' + str(r['id']),
-                'types': ['way', 'line', 'area'] if is_polygon else ['way', 'line'],
-                'tags': r['tags'] if 'tags' in r else {},
-                'geo': way_geom(r, is_polygon),
-            }
-            t['tags']['osm:id'] = t['id']
-            t['tags']['osm:version'] = str(r['version']) if 'version' in r else ''
-            t['tags']['osm:user_id'] = str(r['uid']) if 'uid' in r else ''
-            t['tags']['osm:user'] = r['user'] if 'user' in r else ''
-            t['tags']['osm:timestamp'] = r['timestamp'] if 'timestamp' in r else ''
-            t['tags']['osm:changeset'] = str(r['changeset']) if 'changeset' in r else ''
-
-            yield(t)
+            yield(assemble_object(r))
 
     # relations
     w = []
@@ -322,22 +285,7 @@ def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_v
                 pass
             rels_done.append(r['id'])
 
-            g = relation_geom(r)
-            if not g or not 'tags' in r:
-                continue
-            t = {
-                'id': 'r' + str(r['id']),
-                'types': ['area', 'relation'],
-                'tags': r['tags'] if 'tags' in r else {},
-                'geo': g
-            }
-            t['tags']['osm:id'] = t['id']
-            t['tags']['osm:version'] = str(r['version']) if 'version' in r else ''
-            t['tags']['osm:user_id'] = str(r['uid']) if 'uid' in r else ''
-            t['tags']['osm:user'] = r['user'] if 'user' in r else ''
-            t['tags']['osm:timestamp'] = r['timestamp'] if 'timestamp' in r else ''
-            t['tags']['osm:changeset'] = str(r['changeset']) if 'changeset' in r else ''
-            yield(t)
+            yield(assemble_object(r))
 
     # areas
     w = []
@@ -370,24 +318,7 @@ def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_v
                (r['type'] == 'relation' and r['id'] in rels_done):
                 continue
 
-            t = {
-                'tags': r['tags'] if 'tags' in r else {},
-            }
-            if r['type'] == 'relation':
-                t['id'] = 'r' + str(r['id'])
-                t['types'] = ['area', 'relation']
-                t['geo'] = relation_geom(r)
-            elif r['type'] == 'way':
-                t['id'] = 'w' + str(r['id'])
-                t['types'] = ['area', 'line', 'way']
-                t['geo'] = way_geom(r, True)
-            t['tags']['osm:id'] = t['id']
-            t['tags']['osm:version'] = str(r['version']) if 'version' in r else ''
-            t['tags']['osm:user_id'] = str(r['uid']) if 'uid' in r else ''
-            t['tags']['osm:user'] = r['user'] if 'user' in r else ''
-            t['tags']['osm:timestamp'] = r['timestamp'] if 'timestamp' in r else ''
-            t['tags']['osm:changeset'] = str(r['changeset']) if 'changeset' in r else ''
-            yield(t)
+            yield(assemble_object(r))
 
     time_stop = datetime.datetime.now() # profiling
     plpy.notice('querying db objects took %.2fs' % (time_stop - time_start).total_seconds())
