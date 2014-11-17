@@ -1,5 +1,27 @@
 #[out:json][bbox:{{bbox}}];(way[name=Marschnergasse];way[name=Erdbrustgasse]);out geom meta;
 
+def overpass_query(query):
+    import urllib.request
+    import urllib.parse
+    import json
+
+    plpy.warning(query)
+    url = '{db.overpass-url}?' +\
+        urllib.parse.urlencode({ 'data': query })
+    f = urllib.request.urlopen(url).read().decode('utf-8')
+
+    try:
+        res = json.loads(f)
+    except ValueError:
+        # areas not initialized -> ignore
+        if re.search('osm3s_v[0-9\.]+_areas', f):
+            return
+        else:
+            raise
+
+    for r in res['elements']:
+        yield(r)
+
 def node_geom(lat, lon):
     global geom_plan
 
@@ -144,9 +166,6 @@ def assemble_object(r):
     return t
 
 def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_value=[]):
-    import urllib.request
-    import urllib.parse
-    import json
     time_start = datetime.datetime.now() # profiling
     non_relevant_tags = {'type', 'source', 'source:ref', 'source_ref', 'note', 'comment', 'created_by', 'converted_by', 'fixme', 'FIXME', 'description', 'attribution', 'osm:id', 'osm:version', 'osm:user_id', 'osm:user', 'osm:timestamp', 'osm:changeset'}
     ways_done = []
@@ -171,12 +190,7 @@ def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_v
         q = qry.replace('__QRY__', '((' + ');('.join(w) + ');)')
         q = q.replace('__TYPE__', 'node')
 
-        url = '{db.overpass-url}?' +\
-            urllib.parse.urlencode({ 'data': q })
-        f = urllib.request.urlopen(url).read().decode('utf-8')
-        res = json.loads(f)
-
-        for r in res['elements']:
+        for r in overpass_query(q):
             yield(assemble_object(r))
 
         #'http://overpass-turbo.eu/?Q=' + q).read()
@@ -197,17 +211,11 @@ def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_v
                 'relation[type=multipolygon] -> .rel;' +
                 '((' + ');('.join(w) + ');) -> .outer;relation(bw.outer)[type=multipolygon]') + '.outer out tags qt;'
         q = q.replace('__TYPE__', 'way(r.rel:"outer")')
-        plpy.warning(q)
-
-        url = '{db.overpass-url}?' +\
-            urllib.parse.urlencode({ 'data': q })
-        f = urllib.request.urlopen(url).read().decode('utf-8')
-        res = json.loads(f)
 
         _ways = {}
         _rels = {}
 
-        for r in res['elements']:
+        for r in overpass_query(q):
             if r['type'] == 'way':
                 _ways[r['id']] = r
             elif r['type'] == 'relation':
@@ -265,14 +273,8 @@ def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_v
     if len(w):
         q = qry.replace('__QRY__', '((' + ');('.join(w) + ');)')
         q = q.replace('__TYPE__', 'way')
-        plpy.warning(q)
 
-        url = '{db.overpass-url}?' +\
-            urllib.parse.urlencode({ 'data': q })
-        f = urllib.request.urlopen(url).read().decode('utf-8')
-        res = json.loads(f)
-
-        for r in res['elements']:
+        for r in overpass_query(q):
             if r['id'] in ways_done:
                 pass
             ways_done.append(r['id'])
@@ -288,14 +290,8 @@ def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_v
     if len(w):
         q = qry.replace('__QRY__', '((' + ');('.join(w) + ');)')
         q = q.replace('__TYPE__', 'relation')
-        plpy.warning(q)
 
-        url = '{db.overpass-url}?' +\
-            urllib.parse.urlencode({ 'data': q })
-        f = urllib.request.urlopen(url).read().decode('utf-8')
-        res = json.loads(f)
-
-        for r in res['elements']:
+        for r in overpass_query(q):
             if r['id'] in rels_done:
                 pass
             rels_done.append(r['id'])
@@ -313,22 +309,8 @@ def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_v
         res = plpy.execute(plan, [ _bbox ])
 
         q = qry.replace('__QRY__', 'is_in({0});way(pivot);out meta geom;is_in({0});relation(pivot)'.format(res[0]['geom']))
-        plpy.warning(q)
 
-        url = '{db.overpass-url}?' +\
-            urllib.parse.urlencode({ 'data': q })
-        f = urllib.request.urlopen(url).read().decode('utf-8')
-
-        try:
-            res = json.loads(f)
-        except ValueError:
-            print(f)
-            if re.search('osm3s_v[0-9\.]+_areas', f):
-                res = { 'elements': [] }
-            else:
-                raise
-
-        for r in res['elements']:
+        for r in overpass_query(q):
             if (r['type'] == 'way' and r['id'] in ways_done) or\
                (r['type'] == 'relation' and r['id'] in rels_done):
                 continue
@@ -339,9 +321,6 @@ def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_v
     plpy.notice('querying db objects took %.2fs' % (time_stop - time_start).total_seconds())
 
 def objects_by_id(id_list):
-    import urllib.request
-    import urllib.parse
-    import json
     q = ''
     multipolygons = []
     for i in id_list:
@@ -356,21 +335,10 @@ def objects_by_id(id_list):
         return
     q = '[out:json];' + q
 
-    plpy.warning(q)
-
-    url = 'http://overpass-api.de/api/interpreter?' +\
-        urllib.parse.urlencode({ 'data': q })
-    f = urllib.request.urlopen(url).read().decode('utf-8')
-    res = json.loads(f)
-
-    for r in res['elements']:
+    for r in overpass_query(q):
         yield(assemble_object(r))
 
 def objects_member_of(member_id, parent_type, parent_conditions, child_conditions):
-    import urllib.request
-    import urllib.parse
-    import json
-
     q = '[out:json];'
 
     if member_id[0] == 'n':
@@ -390,15 +358,7 @@ def objects_member_of(member_id, parent_type, parent_conditions, child_condition
             member_id[0] + '.a)') + ');'
     q += 'out meta qt geom;'
 
-    plpy.warning(q)
-
-    url = 'http://overpass-api.de/api/interpreter?' +\
-        urllib.parse.urlencode({ 'data': q })
-    f = urllib.request.urlopen(url).read().decode('utf-8')
-    plpy.warning(f)
-    res = json.loads(f)
-
-    for r in res['elements']:
+    for r in overpass_query(q):
         t = assemble_object(r)
         if parent_type == 'relation':
             for i, m in enumerate(r['members']):
@@ -420,10 +380,6 @@ def objects_member_of(member_id, parent_type, parent_conditions, child_condition
                     yield(t)
 
 def objects_members(relation_id, parent_type, parent_conditions, child_conditions):
-    import urllib.request
-    import urllib.parse
-    import json
-
     q = '[out:json];'
 
     if relation_id[0] == 'n':
@@ -444,16 +400,10 @@ def objects_members(relation_id, parent_type, parent_conditions, child_condition
     q += '.a out meta qt geom;out meta qt geom;'
     # TODO: .a out body qt; would be sufficient, but need to adapt assemble_object
 
-    url = 'http://overpass-api.de/api/interpreter?' +\
-        urllib.parse.urlencode({ 'data': q })
-    f = urllib.request.urlopen(url).read().decode('utf-8')
-    plpy.warning(f)
-    res = json.loads(f)
-
     relation = None
     relation_type = None
 
-    for r in res['elements']:
+    for r in overpass_query(q):
         t = assemble_object(r)
 
         if t['id'] == relation_id:
