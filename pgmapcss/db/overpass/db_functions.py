@@ -420,29 +420,57 @@ def objects_member_of(member_id, parent_type, parent_conditions):
                     yield(t)
 
 def objects_members(relation_id, parent_type, parent_conditions):
-    ob = list(objects_by_id([relation_id]))
+    import urllib.request
+    import urllib.parse
+    import json
 
-    if not len(ob):
-        return
+    q = '[out:json];'
 
-    ob = ob[0]
+    if relation_id[0] == 'n':
+        ob_type = 'node'
+        ob_id = int(relation_id[1:])
+        q += 'node(' + relation_id[1:] + ')->.a;'
+    elif relation_id[0] == 'w':
+        ob_type = 'way'
+        ob_id = int(relation_id[1:])
+        q += 'way(' + relation_id[1:] + ')->.a;'
+    elif relation_id[0] == 'r':
+        ob_type = 'relation'
+        ob_id = int(relation_id[1:])
+        q += 'relation(' + relation_id[1:] + ')->.a;'
 
-    link_obs_ids = [ i['member_id'] for i in ob['members'] ]
-    link_obs = {}
-    for o in objects_by_id(link_obs_ids):
-        link_obs[o['id']] = o
+    q += '(' + parent_conditions.replace('__TYPE__', parent_type + '(' +
+            relation_id[0] + '.a)') + ');'
+    q += '.a out meta qt geom;out meta qt geom;'
+    # TODO: .a out body qt; would be sufficient, but need to adapt assemble_object
 
-    for member in ob['members']:
-        if not member['member_id'] in link_obs:
-            continue
+    url = 'http://overpass-api.de/api/interpreter?' +\
+        urllib.parse.urlencode({ 'data': q })
+    f = urllib.request.urlopen(url).read().decode('utf-8')
+    plpy.warning(f)
+    res = json.loads(f)
 
-        ret = link_obs[member['member_id']]
+    relation = None
+    relation_type = None
 
-        if parent_type not in ret['types']:
-            continue
+    for r in res['elements']:
+        t = assemble_object(r)
 
-        ret['link_tags'] = member
-        yield ret
+        if t['id'] == relation_id:
+            relation = t
+            relation_type = r['type']
+
+        else:
+            for m in relation['members']:
+                if m['member_id'] == t['id']:
+                    t['link_tags'] = {
+                            'sequence_id': m['sequence_id'],
+                            'member_id': m['member_id'],
+                    }
+                    if 'role' in m:
+                        t['link_tags']['role'] = m['role']
+
+                    yield(t)
 
 def objects_near(max_distance, ob, parent_selector, where_clause, check_geo=None):
     if ob:
