@@ -268,7 +268,7 @@ class db(default):
 
                 if i1 != i2 and c1 is not None and c2 is not None:
                     s = self.is_subset(c1, c2)
-                    if s:
+                    if s is not None:
                         conditions[i1] = s
                         conditions[i2] = None
 
@@ -281,7 +281,7 @@ class db(default):
 
                 if i1 != i2 and c1 is not None and c2 is not None:
                     s = self.check_merge_regexp(c1, c2)
-                    if s:
+                    if s is not None:
                         conditions[i1] = s
                         conditions[i2] = None
 
