@@ -236,7 +236,7 @@ def objects_by_id(id_list):
         t['tags']['osm:changeset'] = str(r['changeset_id'])
         yield(t)
 
-def objects_member_of(member_id, parent_type, parent_conditions):
+def objects_member_of(member_id, parent_type, parent_conditions, child_conditions):
     if parent_type == 'relation':
         plan = plpy.prepare('select *, (select name from users where id=user_id) as user from relation_members join relations on relation_members.relation_id=relations.id where member_id=$1 and member_type=$2', ['bigint', 'text']);
         res = plpy.cursor(plan, [int(member_id[1:]), member_id[0:1].upper()])
@@ -283,7 +283,7 @@ def objects_member_of(member_id, parent_type, parent_conditions):
             t['tags']['osm:changeset'] = str(r['changeset_id'])
             yield(t)
 
-def objects_members(relation_id, parent_type, parent_conditions):
+def objects_members(relation_id, parent_type, parent_conditions, child_conditions):
     ob = list(objects_by_id([relation_id]))
 
     if not len(ob):
@@ -308,7 +308,7 @@ def objects_members(relation_id, parent_type, parent_conditions):
         ret['link_tags'] = member
         yield ret
 
-def objects_near(max_distance, ob, parent_selector, where_clause, check_geo=None):
+def objects_near(max_distance, ob, parent_selector, where_clause, child_conditions, check_geo=None):
     if ob:
         geom = ob['geo']
     elif 'geo' in current['properties'][current['pseudo_element']]:

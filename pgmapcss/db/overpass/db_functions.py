@@ -366,7 +366,7 @@ def objects_by_id(id_list):
     for r in res['elements']:
         yield(assemble_object(r))
 
-def objects_member_of(member_id, parent_type, parent_conditions):
+def objects_member_of(member_id, parent_type, parent_conditions, child_conditions):
     import urllib.request
     import urllib.parse
     import json
@@ -419,7 +419,7 @@ def objects_member_of(member_id, parent_type, parent_conditions):
                     }
                     yield(t)
 
-def objects_members(relation_id, parent_type, parent_conditions):
+def objects_members(relation_id, parent_type, parent_conditions, child_conditions):
     import urllib.request
     import urllib.parse
     import json
@@ -472,7 +472,7 @@ def objects_members(relation_id, parent_type, parent_conditions):
 
                     yield(t)
 
-def objects_near(max_distance, ob, parent_selector, where_clause, check_geo=None):
+def objects_near(max_distance, ob, parent_selector, where_clause, child_conditions, check_geo=None):
     if ob:
         geom = ob['geo']
     elif 'geo' in current['properties'][current['pseudo_element']]:
