@@ -165,6 +165,14 @@ def assemble_object(r):
 
     return t
 
+def get_bbox(_bbox=None):
+    if _bbox is None:
+        _bbox = render_context['bbox']
+
+    plan = plpy.prepare("select ST_YMin($1::geometry) || ',' || ST_XMIN($1::geometry) || ',' || ST_YMAX($1::geometry) || ',' || ST_XMAX($1::geometry) as bbox_string", [ 'geometry' ])
+    res = plpy.execute(plan, [ _bbox ])
+    return '[bbox:' + res[0]['bbox_string'] + ']'
+
 def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_value=[]):
     time_start = datetime.datetime.now() # profiling
     non_relevant_tags = {'type', 'source', 'source:ref', 'source_ref', 'note', 'comment', 'created_by', 'converted_by', 'fixme', 'FIXME', 'description', 'attribution', 'osm:id', 'osm:version', 'osm:user_id', 'osm:user', 'osm:timestamp', 'osm:changeset'}
@@ -174,9 +182,7 @@ def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_v
     qry = '[out:json]'
 
     if _bbox:
-        plan = plpy.prepare("select ST_YMin($1::geometry) || ',' || ST_XMIN($1::geometry) || ',' || ST_YMAX($1::geometry) || ',' || ST_XMAX($1::geometry) as bbox_string", [ 'geometry' ])
-        res = plpy.execute(plan, [ _bbox ])
-        qry += '[bbox:' + res[0]['bbox_string'] + ']'
+        qry += get_bbox(_bbox)
 
     qry += ';__QRY__;out meta geom;'
 
@@ -339,88 +345,109 @@ def objects_by_id(id_list):
         yield(assemble_object(r))
 
 def objects_member_of(member_id, parent_type, parent_conditions, child_conditions):
-    q = '[out:json];'
+    global member_of_cache
+    try:
+        member_of_cache
+    except:
+        member_of_cache = {}
 
     if member_id[0] == 'n':
         ob_type = 'node'
         ob_id = int(member_id[1:])
-        q += 'node(' + member_id[1:] + ')->.a;'
     elif member_id[0] == 'w':
         ob_type = 'way'
         ob_id = int(member_id[1:])
-        q += 'way(' + member_id[1:] + ')->.a;'
     elif member_id[0] == 'r':
         ob_type = 'relation'
         ob_id = int(member_id[1:])
-        q += 'relation(' + member_id[1:] + ')->.a;'
 
-    q += '(' + parent_conditions.replace('__TYPE__', parent_type + '(b' +
-            member_id[0] + '.a)') + ');'
-    q += 'out meta qt geom;'
+    member_of_cache_id = parent_type + '|' + ob_type + '|' + repr(parent_conditions) + '|' + repr(child_conditions)
 
-    for r in overpass_query(q):
-        t = assemble_object(r)
-        if parent_type == 'relation':
-            for i, m in enumerate(r['members']):
-                if m['type'] == ob_type and m['ref'] == ob_id:
-                    t['link_tags'] = {
-                            'sequence_id': str(i),
-                            'role': m['role'],
-                            'member_id': m['type'][0] + str(m['ref']),
-                    }
-                    yield(t)
+    if member_of_cache_id not in member_of_cache:
+        member_of_cache[member_of_cache_id] = []
+        q = '[out:json]' + get_bbox() + ';'
 
-        elif parent_type == 'way':
-            for i, m in enumerate(r['nodes']):
-                if m == ob_id:
-                    t['link_tags'] = {
-                            'sequence_id': str(i),
-                            'member_id': 'n' + str(m),
-                    }
-                    yield(t)
+        q += '(' + child_conditions.replace('__TYPE__', ob_type) + ')->.a;'
+
+        q += '(' + parent_conditions.replace('__TYPE__', parent_type + '(b' +
+                ob_type[0] + '.a)') + ');'
+        q += 'out meta qt geom;'
+
+        for r in overpass_query(q):
+            t = assemble_object(r)
+            member_of_cache[member_of_cache_id].append(t)
+
+    for t in member_of_cache[member_of_cache_id]:
+        for m in t['members']:
+            if m['member_id'] == member_id:
+                t['link_tags'] = {
+                        'sequence_id': m['sequence_id'],
+                        'member_id': m['member_id'],
+                }
+                if 'role' in m:
+                    t['link_tags']['role'] = m['role']
+
+                yield(t)
 
 def objects_members(relation_id, parent_type, parent_conditions, child_conditions):
+    global members_cache
+    try:
+        members_cache
+    except:
+        members_cache = {}
+
     q = '[out:json];'
 
     if relation_id[0] == 'n':
         ob_type = 'node'
         ob_id = int(relation_id[1:])
-        q += 'node(' + relation_id[1:] + ')->.a;'
     elif relation_id[0] == 'w':
         ob_type = 'way'
         ob_id = int(relation_id[1:])
-        q += 'way(' + relation_id[1:] + ')->.a;'
     elif relation_id[0] == 'r':
         ob_type = 'relation'
         ob_id = int(relation_id[1:])
-        q += 'relation(' + relation_id[1:] + ')->.a;'
 
-    q += '(' + parent_conditions.replace('__TYPE__', parent_type + '(' +
-            relation_id[0] + '.a)') + ');'
-    q += '.a out meta qt geom;out meta qt geom;'
-    # TODO: .a out body qt; would be sufficient, but need to adapt assemble_object
+    members_cache_id = parent_type + '|' + ob_type + '|' + repr(parent_conditions) + '|' + repr(child_conditions)
 
-    relation = None
-    relation_type = None
+    if members_cache_id not in members_cache:
+        members_cache[members_cache_id] = { 'parents': {}, 'children': [] }
+        q = '[out:json]' + get_bbox() + ';'
 
-    for r in overpass_query(q):
-        t = assemble_object(r)
+        q += '(' + child_conditions.replace('__TYPE__', ob_type) + ');'
+        q += 'out meta qt geom;'
+        # TODO: out body qt; would be sufficient, but need to adapt assemble_object
 
-        if t['id'] == relation_id:
-            relation = t
-            relation_type = r['type']
+        for r in overpass_query(q):
+            t = assemble_object(r)
+            t['type'] = r['type']
+            members_cache[members_cache_id]['parents'][t['id']] = t
 
-        else:
-            for m in relation['members']:
-                if m['member_id'] == t['id']:
-                    t['link_tags'] = {
-                            'sequence_id': m['sequence_id'],
-                            'member_id': m['member_id'],
-                    }
-                    if 'role' in m:
-                        t['link_tags']['role'] = m['role']
+        q = '[out:json]' + get_bbox() + ';'
 
-                    yield(t)
+        q += '(' + child_conditions.replace('__TYPE__', ob_type) + ')->.a;'
+        q += '(' + parent_conditions.replace('__TYPE__', parent_type + '(' +
+                relation_id[0] + '.a)') + ');'
+        q += 'out meta qt geom;'
+        # TODO: .a out body qt; would be sufficient, but need to adapt assemble_object
+
+        for r in overpass_query(q):
+            t = assemble_object(r)
+            members_cache[members_cache_id]['children'].append(t)
+
+    relation = members_cache[members_cache_id]['parents'][relation_id]
+
+    for t in members_cache[members_cache_id]['children']:
+        for m in relation['members']:
+            if m['member_id'] == t['id']:
+                t['link_tags'] = {
+                        'sequence_id': m['sequence_id'],
+                        'member_id': m['member_id'],
+                }
+                if 'role' in m:
+                    t['link_tags']['role'] = m['role']
+
+                yield(t)
 
 def objects_near(max_distance, ob, parent_selector, where_clause, child_conditions, check_geo=None):
     if ob:
