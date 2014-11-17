@@ -46,7 +46,7 @@ class db(default):
         if s[0] in ('regexp', 'iregexp', 'isnot', 'notregexp', 'notiregexp'):
             return s
         if s[0] == 'is':
-            return ('regexp', s[1], '^' + self.value_to_regexp(s[2]) + '$')
+            return ('regexp', s[1], { '^' + self.value_to_regexp(s[2]) + '$' })
 
     def compile_condition_overpass(self, condition, statement, tag_type, stat, prefix, filter):
         ret = None
@@ -81,10 +81,10 @@ class db(default):
 
         # @=
         elif op == '@=' and condition['value_type'] == 'value':
-            ret = ( 'regexp', key, '^(' + '|'.join([
-                self.value_to_regexp(v)
+            ret = ( 'regexp', key, {
+                '^' + self.value_to_regexp(v) + '$'
                 for v in condition['value'].split(';')
-                ]) + ')$' )
+                } )
 
         # !=
         elif op == '!=':
@@ -92,31 +92,31 @@ class db(default):
 
         # regexp match =~
         elif op == '=~':
-            ret = ( 
+            ret = (
                 ('iregexp' if condition['regexp_flags'] else 'regexp' ),
-                key, condition['value'])
+                key, { condition['value'] })
 
         # negated regexp match !~
         elif op == '!~':
             ret = ( 
                 ('notiregexp' if condition['regexp_flags'] else 'notregexp' ),
-                key, condition['value'])
+                key, { condition['value'] })
 
         # prefix match ^=
         elif op == '^=':
-            ret = ( 'regexp', key, '^' + self.value_to_regexp(condition['value']) )
+            ret = ( 'regexp', key, { '^' + self.value_to_regexp(condition['value']) } )
 
         # suffix match $=
         elif op == '$=':
-            ret = ( 'regexp', key, self.value_to_regexp(condition['value']) + '$' )
+            ret = ( 'regexp', key, { self.value_to_regexp(condition['value']) + '$' } )
 
         # substring match *=
         elif op == '*=':
-            ret = ( 'regexp', key, self.value_to_regexp(condition['value']) )
+            ret = ( 'regexp', key, { self.value_to_regexp(condition['value']) })
 
         # list membership ~=
         elif op == '~=':
-            ret = ( 'regexp', key, self.value_to_regexp(condition['value']) )
+            ret = ( 'regexp', key, { self.value_to_regexp(condition['value']) })
 
         else:
             ret = ( 'key', key )
@@ -188,52 +188,37 @@ class db(default):
             elif c[0] == 'isnot':
                 ret += '[' + repr(c[1]) + '!=' + repr(c[2]) + ']'
             elif c[0] == 'regexp':
-                ret += '[' + repr(c[1]) + '~' + repr(c[2]) + ']'
+                ret += '[' + repr(c[1]) + '~' + self.merge_regexp(c[2]) + ']'
             elif c[0] == 'iregexp':
-                ret += '[' + repr(c[1]) + '~' + repr(c[2]) + ', i]'
+                ret += '[' + repr(c[1]) + '~' + self.merge_regexp(c[2]) + ', i]'
             elif c[0] == 'notregexp':
-                ret += '[' + repr(c[1]) + '!~' + repr(c[2]) + ']'
+                ret += '[' + repr(c[1]) + '!~' + self.merge_regexp(c[2]) + ']'
             elif c[0] == 'notiregexp':
-                ret += '[' + repr(c[1]) + '!~' + repr(c[2]) + ', i]'
+                ret += '[' + repr(c[1]) + '!~' + self.merge_regexp(c[2]) + ', i]'
             else:
                 print('Unknown Overpass operator "{}"'.format(c[0]))
 
         return ret
 
-    def merge_regexp(self, c1, c2):
-        if c1[0] != 'regexp' or c2[0] != 'regexp':
-            return None
-        if c1[1] != c2[1]:
-            return None
-
-        r1 = c1[2]
-        r2 = c2[2]
+    def merge_regexp(self, regexps):
         r = ''
         r_end = ''
 
-        if r1[0] == '^' or r2[0] == '^':
+        if len([ r for r in regexps if r[0] == '^' ]):
             r += '^'
-            if r1[0] == '^':
-                r1 = r1[1:]
-            else:
-                r1 = '.*' + r1
-            if r2[0] == '^':
-                r2 = r2[1:]
-            else:
-                r2 = '.*' + r2
+            regexps = {
+                    r[1:] if r[0] == '^' else '.*' + r
+                    for r in regexps
+                }
 
-        if r1[-1] == '$' or r2[-1] == '$':
+        if len([ r for r in regexps if r[-1] == '$' ]):
             r_end = '$'
-            if r1[-1] == '$':
-                r1 = r1[:-1]
-            else:
-                r1 += '.*'
-            if r2[-1] == '$':
-                r2 = r2[:-1]
-            else:
-                r2 += '.*'
+            regexps = {
+                    r[:-1] if r[-1] == '$' else r + '.*'
+                    for r in regexps
+                }
 
-        return r + r1 + '|' + r2 + r_end
+        return repr(r + '|'.join(regexps) + r_end)
 
     def is_subset(self, c1, c2):
         # check if query c1 is a subset of query c2 -> replace by c1
@@ -257,15 +242,16 @@ class db(default):
         d1 = [ e1 for e1 in c1 if e1 not in c2 ]
         d2 = [ e2 for e2 in c2 if e2 not in c1 ]
         if len(d1) == 1 and len(d2) == 1 and d1[0][1] == d2[0][1]:
-# check if we can merge the regular expressions
-            m = self.merge_regexp(self.convert_to_regexp(d1[0]), self.convert_to_regexp(d2[0]))
-            if m is not None:
-                x = [
+            # check if we can merge the regular expressions
+            m1 = self.convert_to_regexp(d1[0])
+            m2 = self.convert_to_regexp(d2[0])
+
+            if m1[0] == m2[0]:
+                return [
                         c
                         for c in c1
                         if c != d1[0]
-                    ] + [ ( 'regexp', d1[0][1], m ) ]
-                return x
+                    ] + [ ( m1[0], d1[0][1], m1[2].union(m2[2]) ) ]
 
     def simplify_conditions(self, conditions):
         for i1 in range(0, len(conditions)):
