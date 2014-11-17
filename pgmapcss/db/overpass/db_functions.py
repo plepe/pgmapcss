@@ -421,51 +421,57 @@ def objects_by_id(id_list):
         yield(assemble_object(r))
 
 def objects_member_of(member_id, parent_type, parent_conditions):
-    if parent_type == 'relation':
-        plan = plpy.prepare('select *, (select name from users where id=user_id) as user from relation_members join relations on relation_members.relation_id=relations.id where member_id=$1 and member_type=$2', ['bigint', 'text']);
-        res = plpy.cursor(plan, [int(member_id[1:]), member_id[0:1].upper()])
-        for r in res:
-            t = {
-                'id': 'r' + str(r['id']),
-                'tags': pghstore.loads(r['tags']),
-                'types': ['relation'],
-                'geo': None,
-                'link_tags': {
-                    'sequence_id': str(r['sequence_id']),
-                    'role': str(r['member_role']),
-                    'member_id': r['member_type'].lower() + str(r['member_id']),
-                }
-            }
-            t['tags']['osm:id'] = str(t['id'])
-            t['tags']['osm:version'] = str(r['version'])
-            t['tags']['osm:user_id'] = str(r['user_id'])
-            t['tags']['osm:user'] = r['user']
-            t['tags']['osm:timestamp'] = str(r['tstamp'])
-            t['tags']['osm:changeset'] = str(r['changeset_id'])
-            yield(t)
+    import urllib.request
+    import urllib.parse
+    import json
 
-    if parent_type == 'way' and member_id[0] == 'n':
-        num_id = int(member_id[1:])
-        plan = plpy.prepare('select *, (select name from users where id=user_id) as user from way_nodes join ways on way_nodes.way_id=ways.id where node_id=$1', ['bigint']);
-        res = plpy.cursor(plan, [num_id])
-        for r in res:
-            t = {
-                'id': 'w' + str(r['id']),
-                'tags': pghstore.loads(r['tags']),
-                'types': ['way'],
-                'geo': r['linestring'],
-                'link_tags': {
-                    'member_id': member_id,
-                    'sequence_id': str(r['sequence_id'])
-                }
-            }
-            t['tags']['osm:id'] = str(t['id'])
-            t['tags']['osm:version'] = str(r['version'])
-            t['tags']['osm:user_id'] = str(r['user_id'])
-            t['tags']['osm:user'] = r['user']
-            t['tags']['osm:timestamp'] = str(r['tstamp'])
-            t['tags']['osm:changeset'] = str(r['changeset_id'])
-            yield(t)
+    q = '[out:json];'
+
+    if member_id[0] == 'n':
+        ob_type = 'node'
+        ob_id = int(member_id[1:])
+        q += 'node(' + member_id[1:] + ')->.a;'
+    elif member_id[0] == 'w':
+        ob_type = 'way'
+        ob_id = int(member_id[1:])
+        q += 'way(' + member_id[1:] + ')->.a;'
+    elif member_id[0] == 'r':
+        ob_type = 'relation'
+        ob_id = int(member_id[1:])
+        q += 'relation(' + member_id[1:] + ')->.a;'
+
+    q += '(' + parent_conditions.replace('__TYPE__', parent_type + '(b' +
+            member_id[0] + '.a)') + ');'
+    q += 'out meta qt geom;'
+
+    plpy.warning(q)
+
+    url = 'http://overpass-api.de/api/interpreter?' +\
+        urllib.parse.urlencode({ 'data': q })
+    f = urllib.request.urlopen(url).read().decode('utf-8')
+    plpy.warning(f)
+    res = json.loads(f)
+
+    for r in res['elements']:
+        t = assemble_object(r)
+        if parent_type == 'relation':
+            for i, m in enumerate(r['members']):
+                if m['type'] == ob_type and m['ref'] == ob_id:
+                    t['link_tags'] = {
+                            'sequence_id': str(i),
+                            'role': m['role'],
+                            'member_id': m['type'][0] + str(m['ref']),
+                    }
+                    yield(t)
+
+        elif parent_type == 'way':
+            for i, m in enumerate(r['nodes']):
+                if m == ob_id:
+                    t['link_tags'] = {
+                            'sequence_id': str(i),
+                            'member_id': 'n' + str(m),
+                    }
+                    yield(t)
 
 def objects_members(relation_id, parent_type, parent_conditions):
     ob = list(objects_by_id([relation_id]))
