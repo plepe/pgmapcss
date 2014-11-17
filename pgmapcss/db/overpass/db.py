@@ -40,6 +40,13 @@ class db(default):
         s = s.replace(']', '\\]')
         s = s.replace('(', '\\(')
         s = s.replace(')', '\\)')
+        s = s.replace('{', '\\{')
+        s = s.replace('}', '\\}')
+        s = s.replace('?', '\\?')
+        s = s.replace('+', '\\+')
+        s = s.replace('*', '\\*')
+        s = s.replace('^', '\\^')
+        s = s.replace('$', '\\$')
         return s
 
     def convert_to_regexp(self, s):
