@@ -208,4 +208,5 @@ if __name__ == '__main__':
         print(format_result(results))
         print("]}}\n")
 
+    plpy.execute(plpy.prepare('truncate _pgmapcss_PGCache', []), [])
     plpy.execute(plpy.prepare('commit', []), [])
