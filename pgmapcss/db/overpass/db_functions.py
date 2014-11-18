@@ -449,7 +449,25 @@ def objects_members(relation_id, parent_type, parent_conditions, child_condition
 
                 yield(t)
 
-def objects_near(max_distance, ob, parent_selector, where_clause, child_conditions, check_geo=None):
+def objects_near(max_distance, ob, parent_type, parent_conditions, child_conditions, check_geo=None):
+    cache_id = 'objects_near' + '|' + parent_type + '|' + repr(parent_conditions)
+
+    max_distance = to_float(eval_metric([ max_distance, 'u' ]))
+    if max_distance is None:
+        return
+
+    try:
+        cache = get_PGCache(cache_id)
+    except:
+        cache = PGCache(cache_id, read_geo=True)
+
+        plan = plpy.prepare('select ST_Transform(ST_Envelope(ST_Buffer(ST_Transform(ST_Envelope($1::geometry), {unit.srs}), $2)), {db.srs}) as r', ['geometry', 'float'])
+        res = plpy.execute(plan, [ render_context['bbox'], max_distance ])
+        bbox = res[0]['r']
+
+        for t in objects(bbox, { parent_type: parent_conditions }):
+            cache.add(t)
+
     if ob:
         geom = ob['geo']
     elif 'geo' in current['properties'][current['pseudo_element']]:
@@ -457,13 +475,7 @@ def objects_near(max_distance, ob, parent_selector, where_clause, child_conditio
     else:
         geom = current['object']['geo']
 
-    if where_clause == '':
-        where_clause = 'true'
-
-    max_distance = to_float(eval_metric([ max_distance, 'u' ]))
-    if max_distance is None:
-        return []
-    elif max_distance == 0:
+    if max_distance == 0:
         bbox = geom
     else:
         plan = plpy.prepare('select ST_Transform(ST_Buffer(ST_Transform(ST_Envelope($1), {unit.srs}), $2), {db.srs}) as r', ['geometry', 'float'])
@@ -471,27 +483,19 @@ def objects_near(max_distance, ob, parent_selector, where_clause, child_conditio
         bbox = res[0]['r']
 
     if check_geo == 'within':
-        where_clause += " and ST_DWithin(way, $2, 0.0)"
+        where_clause += " and ST_DWithin(geo, $1, 0.0)"
     elif check_geo == 'surrounds':
-        where_clause += " and ST_DWithin($2, way, 0.0)"
+        where_clause += " and ST_DWithin($1, geo, 0.0)"
     elif check_geo == 'overlaps':
-        where_clause += " and ST_Overlaps($2, way)"
+        where_clause += " and ST_Overlaps($1, geo)"
 
-    obs = []
-    for ob in objects(
-        bbox,
-        { parent_selector: where_clause },
-        { # add_columns
-            '__distance': 'ST_Distance(ST_Transform($2::geometry, {unit.srs}), ST_Transform(__geo__, {unit.srs}))'
-        },
-        [ 'geometry' ],
-        [ geom ]
-    ):
-        if ob['id'] != current['object']['id'] and ob['__distance'] <= max_distance:
+    plan = cache.prepare('select * from (select *, ST_Distance(ST_Transform($1, {unit.srs}), ST_Transform(geo, {unit.srs})) dist from {table} where geo && $2 offset 0) t order by dist asc', [ 'geometry', 'geometry' ])
+    for t in cache.cursor(plan, [ geom, bbox ]):
+        ob = t['data']
+
+        if ob['id'] != current['object']['id'] and t['dist'] <= max_distance:
             ob['link_tags'] = {
-                'distance': eval_metric([ str(ob['__distance']) + 'u', 'px' ])
+                'distance': eval_metric([ str(t['dist']) + 'u', 'px' ])
             }
-            obs.append(ob)
 
-    obs = sorted(obs, key=lambda ob: ob['__distance'] )
-    return obs
+            yield ob
