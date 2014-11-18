@@ -1,3 +1,19 @@
+# Example code:
+#    try:
+#        cache = get_PGCache('foo', read_id=True)
+#    except:
+#        cache = PGCache('foo', read_id=True)
+#        cache.add({{'id': '1', 'foo': 'bar' }})
+#        cache.add({{'id': '2', 'foo': 'foo' }})
+#        cache.add({{'id': '3', 'foo': 'bla' }})
+#
+#    for r in cache.get(['1', '2']):
+#        print(r)
+#
+#    plan = cache.prepare('select * from {table}', [])
+#    for r in cache.cursor(plan):
+#        print(r)
+
 class PGCache:
     def __init__(self, id, read_id=False, read_geo=False):
         global PGCaches
