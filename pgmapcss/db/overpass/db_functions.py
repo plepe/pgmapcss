@@ -253,13 +253,14 @@ def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_v
                         elif outer_tags != tags:
                             is_valid_mp = True
 
-                if is_valid_mp:
+                if is_valid_mp and outer_tags is not None:
                     rels_done.append(rid)
                     for outer in r['members']:
                         if outer['role'] in ('', 'outer'):
                             ways_done.append(outer['ref'])
 
                     t = assemble_object(r)
+                    t['id'] = 'm' + str(r['id'])
                     t['types'] = ['multipolygon', 'area']
                     t['tags'] = outer_tags
 
