@@ -1,6 +1,6 @@
 # Example code:
 #    try:
-#        cache = get_PGCache('foo', read_id=True)
+#        cache = get_PGCache('foo')
 #    except:
 #        cache = PGCache('foo', read_id=True)
 #        cache.add({{'id': '1', 'foo': 'bar' }})
@@ -13,6 +13,11 @@
 #    plan = cache.prepare('select * from {table}', [])
 #    for r in cache.cursor(plan):
 #        print(r)
+#
+# The cache database table has the following columns:
+# * data: the data of the object in serialized form
+# * id: id of the object (see add() for details)
+# * geo: geometry of the object (see add() for details)
 
 class PGCache:
 ### __init__(): initialize a new cache
