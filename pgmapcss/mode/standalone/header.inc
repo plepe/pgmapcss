@@ -46,10 +46,14 @@ class fake_plpy:
 
         self.explain_queries[plan.query]['count'] += 1
 # END debug.explain_queries
-        return [
-            dict(r)
-            for r in plan(*param)
-        ]
+        ret = []
+        for r in plan(*param):
+            if type(r) != postgresql.types.Row:
+                return r
+
+            ret.append(dict(r))
+
+        return ret
 
     def cursor(self, plan, param=[]):
 # START debug.explain_queries

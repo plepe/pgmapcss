@@ -23,3 +23,14 @@ create table _pgmapcss_left_right_hand_traffic (
   geo                   geometry
 );
 create index _pgmapcss_left_right_hand_traffic_geo on _pgmapcss_left_right_hand_traffic using gist(geo);
+
+drop table if exists _pgmapcss_PGCache cascade;
+create table _pgmapcss_PGCache (
+  cache_id      int,
+  data          bytea,
+  id            text,
+  geo           geometry
+);
+create index _pgmapcss_PGCache_cache_id on _pgmapcss_PGCache(cache_id);
+create index _pgmapcss_PGCache_id on _pgmapcss_PGCache(id);
+create index _pgmapcss_PGCache_geo on _pgmapcss_PGCache using gist(geo);

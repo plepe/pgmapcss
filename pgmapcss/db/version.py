@@ -3,7 +3,7 @@ import pgmapcss.db
 import postgresql
 from pkg_resources import parse_version
 
-db_version_table_layout = 2
+db_version_table_layout = 3
 
 def db_version():
     try:
