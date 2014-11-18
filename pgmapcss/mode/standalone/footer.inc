@@ -155,6 +155,7 @@ if __name__ == '__main__':
                 parameters['lang'] = 'en'
 
     plpy = fake_plpy(args)
+    plpy.execute(plpy.prepare('begin', []), [])
     plan_to_geojson = plpy.prepare('select ST_asGeoJSON($1) as r', [ 'geometry' ])
 
     def format_result(results):
@@ -206,3 +207,5 @@ if __name__ == '__main__':
     else:
         print(format_result(results))
         print("]}}\n")
+
+    plpy.execute(plpy.prepare('commit', []), [])
