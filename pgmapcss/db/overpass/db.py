@@ -157,14 +157,12 @@ class db(default):
         else:
             raise CompileError('unknown tag type {}'.format(tag_type))
 
-        if None in ret:
-            ret.remove(None)
-        if len(ret) == 0:
+        if ret is None:
             return set_statements
 
         if len(set_statements):
             return [
-                    s + [ ret ]
+                    s + [[ ret ]]
                     for s in set_statements
                 ]
 
