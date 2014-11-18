@@ -128,8 +128,8 @@ def assemble_object(r):
     }
     if r['type'] == 'node':
         t['id'] = 'n' + str(r['id'])
-        t['types'] = ['area', 'line', 'way']
-        t['geo'] = node_geom(r['lat'], r['lon']),
+        t['types'] = ['node', 'point']
+        t['geo'] = node_geom(r['lat'], r['lon'])
     elif r['type'] == 'way':
         is_polygon = len(r['nodes']) > 3 and r['nodes'][0] == r['nodes'][-1]
         t['id'] = 'w' + str(r['id'])
