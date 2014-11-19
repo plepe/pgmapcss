@@ -1,4 +1,4 @@
-PGCache implements a database cache with a postgis geometry column and the possibility to do queries into the database:
+PGCache implements a database cache with a postgis geometry column and the possibility to do queries into the database. PGCache comes in two flavours: *table*, where the data is written into a real postgresql database table or *virtual*, where the data is kept in memory and - if necessary - a virtual database table is used. Which flavour is used is decided by PGCache (usually *table*, only if the database happens to be read-only, *virtual* is used).
 
 Example code:
 ```python

@@ -8,7 +8,24 @@ def get_PGCache(id):
     return PGCaches[id]
 
 def PGCache(id, read_id=False, read_geo=False):
-    return PGCache_table(id, read_id, read_geo)
+    global PGCache_type
+    try:
+        PGCache_type
+    except:
+        try:
+            plan = plpy.prepare('insert into _pgmapcss_PGCache values (null, null, null, null)', [])
+            plpy.execute(plan)
+            plan = plpy.prepare('delete from _pgmapcss_PGCache where cache_id is null', [])
+            plpy.execute(plan)
+
+            PGCache_type = 1
+        except:
+            PGCache_type = 2
+
+    if PGCache_type == 1:
+        return PGCache_table(id, read_id, read_geo)
+    elif PGCache_type == 2:
+        return PGCache_virtual(id, read_id, read_geo)
 
 class PGCache_base:
     def __init__(self, id, read_id=False, read_geo=False):
