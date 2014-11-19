@@ -85,14 +85,17 @@ def relation_geom(r):
     inner_lines = []
 
     for m in r['members']:
+        if not 'geometry' in m:
+          continue
+
         if m['role'] in ('outer', ''):
-            if m['geometry'][0] == m['geometry'][-1]:
+            if len(m['geometry']) > 3 and m['geometry'][0] == m['geometry'][-1]:
                 polygons.append(linestring(m['geometry']))
             else:
                 lines.append(linestring(m['geometry']))
 
         elif m['role'] in ('inner'):
-            if m['geometry'][0] == m['geometry'][-1]:
+            if len(m['geometry']) > 3 and m['geometry'][0] == m['geometry'][-1]:
                 inner_polygons.append(linestring(m['geometry']))
             else:
                 inner_lines.append(linestring(m['geometry']))
@@ -117,7 +120,12 @@ def relation_geom(r):
         inner_polygons.append(r['geom'])
 
     for p in inner_polygons:
-        polygons = plpy.execute(geom_plan_substract, [ polygons, p ])[0]['geom']
+        try:
+            polygons = plpy.execute(geom_plan_substract, [ polygons, p ])[0]['geom']
+        except:
+            plpy.warning('DB/Overpass::relation_geom({}): error substracting inner polygons'.format(r['id']))
+            pass
+
     inner_polygons = None
 
     return polygons
