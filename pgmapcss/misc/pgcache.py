@@ -1,4 +1,16 @@
-class PGCache:
+def get_PGCache(id):
+    global PGCaches
+    try:
+        PGCaches
+    except:
+        PGCaches = {}
+
+    return PGCaches[id]
+
+def PGCache(id, read_id=False, read_geo=False):
+    return PGCache_table(id, read_id, read_geo)
+
+class PGCache_table:
     def __init__(self, id, read_id=False, read_geo=False):
         global PGCaches
         try:
@@ -72,12 +84,3 @@ class PGCache:
             if 'data' in r:
                 r['data'] = pickle.loads(r['data'])
             yield r
-
-def get_PGCache(id):
-    global PGCaches
-    try:
-        PGCaches
-    except:
-        PGCaches = {}
-
-    return PGCaches[id]
