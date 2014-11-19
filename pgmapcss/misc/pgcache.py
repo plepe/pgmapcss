@@ -104,3 +104,64 @@ class PGCache_table(PGCache_base):
             if 'data' in r:
                 r['data'] = pickle.loads(r['data'])
             yield r
+
+class PGCache_virtual(PGCache_base):
+    def __init__(self, id, read_id=False, read_geo=False):
+        super().__init__(id, read_id, read_geo)
+        self.cache = []
+        self.db_param = None
+
+    def add(self, data, id=None, geo=None):
+        if id is None and self.read_id and type(data) is dict and 'id' in data:
+            id = data['id']
+        if geo is None and self.read_geo and type(data) is dict and 'geo' in data:
+            geo = data['geo']
+
+        self.cache.append(( data, id, geo, ))
+        self.db_param = None
+
+    def get(self, id=None):
+        if id is None:
+            for r in self.cache:
+                yield r[0]
+
+        else:
+            if type(id) == str:
+                id = [ id ]
+
+            for r in self.cache:
+                if r[1] in id:
+                    yield r[0]
+
+    def prepare(self, query, param_type=[]):
+        l = len(param_type)
+        return plpy.prepare(query.replace('{table}', '(select unnest(${}) as data, unnest(${}) as id, unnest(${}) as geo) t'.format(l+1, l+2, l+3)), param_type + [ 'int[]', 'text[]', 'geometry[]' ])
+
+    def get_db_param(self):
+        if self.db_param is None:
+            self.db_param = [
+                    list(range(0, len(self.cache))),
+                    [ r[1] for r in self.cache ],
+                    [ r[2] for r in self.cache ],
+                ]
+
+        return self.db_param
+
+    def execute(self, plan, param=[]):
+        param += self.get_db_param()
+
+        ret = []
+        for r in plpy.execute(plan, param):
+            if 'data' in r:
+                r['data'] = self.cache[r['data']][0]
+            ret.append(r)
+
+        return ret
+
+    def cursor(self, plan, param=[]):
+        param += self.get_db_param()
+
+        for r in plpy.cursor(plan, param):
+            if 'data' in r:
+                r['data'] = self.cache[r['data']][0]
+            yield(r)
