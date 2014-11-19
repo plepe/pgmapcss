@@ -10,7 +10,7 @@ def get_PGCache(id):
 def PGCache(id, read_id=False, read_geo=False):
     return PGCache_table(id, read_id, read_geo)
 
-class PGCache_table:
+class PGCache_base:
     def __init__(self, id, read_id=False, read_geo=False):
         global PGCaches
         try:
@@ -22,6 +22,26 @@ class PGCache_table:
         self.id = id
         self.read_id = read_id
         self.read_geo = read_geo
+
+    def add(self, data, id=None, geo=None):
+        pass
+
+    def get(self, id=None):
+        pass
+
+    def prepare(self, query, param_type=[]):
+        pass
+
+    def execute(self, plan, param=[]):
+        pass
+
+    def cursor(self, plan, param=[]):
+        pass
+
+class PGCache_table(PGCache_base):
+    def __init__(self, id, read_id=False, read_geo=False):
+        global PGCaches
+        super().__init__(id, read_id, read_geo)
         self.cache_id = len(PGCaches)
 
     def add(self, data, id=None, geo=None):
