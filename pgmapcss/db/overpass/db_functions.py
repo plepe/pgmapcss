@@ -5,7 +5,9 @@ def overpass_query(query):
     import urllib.parse
     import json
 
+# START debug.overpass_queries
     plpy.warning(query)
+# END debug.overpass_queries
     url = '{db.overpass-url}/interpreter?' +\
         urllib.parse.urlencode({ 'data': query })
 

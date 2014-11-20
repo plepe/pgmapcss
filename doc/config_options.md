@@ -17,6 +17,7 @@ The following config options are supported:
 | debug.counter    | Count of rendered map features in comparison to map features loaded from the database. If 'verbose', print each map feature which was not rendered. | true/**false**/verbose |
 | debug.rusage     | show resource usage at end of processing. | true/**false** |
 | debug.explain_queries | Print queries, their plans and count of executions to stderr (standalone mode only). | true/**false** |
+| debug.overpass_queries | overpass only: Print a debug message for each query posted to the Overpass API | true/**false** |
 
 Advances options:
 
