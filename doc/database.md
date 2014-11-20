@@ -1,4 +1,4 @@
-pgmapcss supports different kind of database layouts, currently osm2pgsql and osmosis pgsnapshot. Here's a short description of advantages and disadvantages.
+pgmapcss supports different kind of database layouts, currently osm2pgsql, osmosis pgsnapshot and overpass. Here's a short description of advantages and disadvantages.
 
 osm2pgsql
 =========
@@ -50,3 +50,27 @@ Behaviour can be influenced with the following config options:
 |------------------|-------------|-----------------
 | db.srs           | Spatial Reference System used in the database. Autodetected. | Usual values: 4326 (WGS-84), 900913 resp. 3857 (Spherical Mercator for Web Maps) |
 | db.multipolygons | Specify whether the multipolygons table is present and should be used. Usually autodected. Needed when using offline mode (default: false) | true/false
+
+Overpass API (short: overpass)
+==============================
+In contrast to osm2pgsql and osmosis, Overpass API is an external database which is queried by HTTP requests. Also, the query language is very different from SQL. By default, the API on overpass-api.de will be used, therefore it is not necessary to import a local copy. For sure, if you want to render on a regular base the admins of overpass-api.de will be happy if you change to a local copy. You still need local PostgreSQL database, as it is used for connecting to Mapnik and for accessing the PostGIS functions.
+
+* Overpass API is faster then PostgreSQL/PostGIS on larger areas
+* Full multipolygon support (handled similar to Osmosis pgsnapshot)
+* In Overpass API, bounding box queries do not include ways and relations which cross the bounding box without having a node inside the bounding box, with the exception of [areas](http://wiki.openstreetmap.org/wiki/Overpass_API/Areas). Therefore very large objects might be missing in the output.
+
+Options
+-------
+Behaviour can be influenced with the following config options:
+
+| Config option    | Description | Possible values
+|------------------|-------------|-----------------
+| db.overpass-url  | overpass only: Use this alternative Overpass API url. default: http://overpass-api.de/api | |
+| debug.overpass_queries | overpass only: Print a debug message for each query posted to the Overpass API | true/**false** |
+
+Example usage:
+```sh
+pgmapcss --database-type=overpass -c db.overpass-url=http://overpass.osm.rambler.ru/cgi -d LOCAL_DB -u USER -p PASSWORD test.mapcss
+```
+
+* -d, -u and -p are the parameters of your local PostgreSQL database
