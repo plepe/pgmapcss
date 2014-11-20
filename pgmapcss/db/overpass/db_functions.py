@@ -347,7 +347,10 @@ def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_v
         plan = plpy.prepare("select ST_Y(ST_Centroid($1::geometry)) || ',' || ST_X(ST_Centroid($1::geometry)) as geom", [ 'geometry' ])
         res = plpy.execute(plan, [ _bbox ])
 
-        q = qry.replace('__QRY__', 'is_in({0});way(pivot);out meta geom;is_in({0});relation(pivot)'.format(res[0]['geom']))
+        q1 = ');('.join(w).replace('__TYPE__', 'relation(pivot.a)')
+        q2 = ');('.join(w).replace('__TYPE__', 'way(pivot.a)')
+
+        q = ('[out:json];is_in({})->.a;(' + q1 + q2 + ');out meta geom;').format(res[0]['geom'])
 
         for r in overpass_query(q):
             if (r['type'] == 'way' and r['id'] in ways_done) or\
