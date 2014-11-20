@@ -8,19 +8,41 @@ def overpass_query(query):
     plpy.warning(query)
     url = '{db.overpass-url}?' +\
         urllib.parse.urlencode({ 'data': query })
-    f = urllib.request.urlopen(url).read().decode('utf-8')
 
-    try:
-        res = json.loads(f)
-    except ValueError:
-        # areas not initialized -> ignore
-        if re.search('osm3s_v[0-9\.]+_areas', f):
-            return
-        else:
-            raise
+    f = urllib.request.urlopen(url)
 
-    for r in res['elements']:
-        yield(r)
+    block = ''
+    mode = 0
+    while True:
+        r = f.readline().decode('utf-8')
+        if r == '':
+            raise Exception('Connection closed early from Overpass API')
+
+        if mode == 0:
+            if re.search('"elements":', r):
+                mode = 1
+
+            # areas not initialized -> ignore
+            if re.search('osm3s_v[0-9\.]+_areas', r):
+                f.close()
+                return
+
+        elif mode == 1:
+            if re.match('}', r):
+                block += '}'
+                yield json.loads(block)
+
+                block = ''
+
+            elif re.match('\s*$', block) and re.match('.*\]', r):
+                f.close()
+                return
+
+            else:
+                block += r
+
+    if mode == 0:
+        raise Exception('Could not parse Overpass API result')
 
 def node_geom(lat, lon):
     global geom_plan
