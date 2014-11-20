@@ -1,7 +1,4 @@
-import pgmapcss.db as db
-from .compile_sql import *
-
-def get_where_selectors(filter, stat):
+def filter_selectors(filter, stat):
     # where_selectors contains indexes of all selectors which we need for match queries
     where_selectors = []
 
@@ -44,7 +41,7 @@ def get_where_selectors(filter, stat):
     # uniq list
     return list(set(where_selectors))
 
-def compile_function_get_where(id, stat):
+def compile_db_selects(id, stat):
     ret = ''
 
     scale_denominators = stat.all_scale_denominators()
@@ -52,36 +49,20 @@ def compile_function_get_where(id, stat):
     max_scale = None
     for min_scale in scale_denominators:
         filter = { 'min_scale': min_scale, 'max_scale': max_scale or 10E+10}
-        where_selectors = get_where_selectors(filter, stat)
+        current_selectors = filter_selectors(filter, stat)
 
         # compile all selectors
         # TODO: define list of possible object_types
         conditions = {
             (
                 object_type,
-                compile_selector_sql(stat['statements'][i], stat, prefix='', filter=filter, object_type=object_type)
+                stat['database'].compile_selector(stat['statements'][i], stat, prefix='', filter=filter, object_type=object_type)
             )
-            for i in where_selectors
+            for i in current_selectors
             for object_type in ({'node', 'way', 'area'} if stat['statements'][i]['selector']['type'] == True else { stat['statements'][i]['selector']['type'] })
         }
 
-        types = [ t for t, cs in conditions if t != True ]
-
-        conditions = {
-            t:
-                '(' + ') or ('.join([
-                    cs
-                    for t2, cs in conditions
-                    if t == t2
-                    if cs != 'false'
-                ]) + ')'
-            for t in types
-        }
-        conditions = {
-            t: cs
-            for t, cs in conditions.items()
-            if cs != '()'
-        }
+        conditions = stat['database'].merge_conditions(conditions)
 
         max_scale = min_scale
 
@@ -92,6 +73,6 @@ def compile_function_get_where(id, stat):
 
         ret += \
             ' render_context[\'scale_denominator\'] >= ' + str(min_scale) + ':\n' +\
-            '    match_where = ' + repr(conditions) + '\n'
+            '    db_selects = ' + repr(conditions) + '\n'
 
     return ret

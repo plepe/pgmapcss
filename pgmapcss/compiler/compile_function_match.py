@@ -1,6 +1,6 @@
 from pkg_resources import *
 import pgmapcss.db as db
-from .compile_function_get_where import compile_function_get_where
+from .compile_db_selects import compile_db_selects
 from .compile_function_check import compile_function_check
 from .compile_build_result import compile_build_result
 from ..includes import include_text
@@ -57,7 +57,7 @@ def compile_function_match(stat):
           for k, v in stat['defines']['style_element_property'].items()
       }),
       'scale_denominators': repr(scale_denominators),
-      'match_where': compile_function_get_where(stat['id'], stat),
+      'db_selects': compile_db_selects(stat['id'], stat),
       'db_query': db.query_functions(stat),
       'function_check': check_functions,
       'check_chooser': check_chooser,
@@ -108,8 +108,8 @@ render_context = {{ 'bbox': res[0]['bounds'], 'scale_denominator': scale_denomin
 {db_query}
 {eval_functions}
 {function_check}
-match_where = None
-{match_where}
+db_selects = None
+{db_selects}
 counter = {{ 'rendered': 0, 'total': 0 }}
 
 {check_chooser}
@@ -122,7 +122,7 @@ for style_element in all_style_elements:
 
 '''.format(**replacement)
 
-    func = "objects(render_context.get('bbox'), match_where)"
+    func = "objects(render_context.get('bbox'), db_selects)"
     if stat['config'].get('debug.profiler', False):
         ret += "time_qry_start = datetime.datetime.now() # profiling\n"
         ret += "src = list(" + func + ")\n"
