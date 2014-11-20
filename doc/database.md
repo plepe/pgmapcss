@@ -60,6 +60,7 @@ By default, the API on overpass-api.de will be used, therefore it is not necessa
 * In contrast to osm2pgsql/osmosis the geometries need to be constructed on the fly which causes some additional overhead.
 * Full multipolygon support (handled similar to Osmosis pgsnapshot).
 * In Overpass API, bounding box queries do not include ways and relations which cross the bounding box without having a node inside the bounding box, with the exception of [areas](http://wiki.openstreetmap.org/wiki/Overpass_API/Areas). Therefore very large objects might be missing in the output.
+* Additionally the tags "osm:id", "osm:version", "osm:user_id", "osm:user", "osm:timestamp", "osm:changeset" will be set from OpenStreetMap meta info. Filtering for meta information is currently not possible on Overpass API, therefore these filters will not be applied to queries (in short: a condition for forests of user abc will be compiled into a query of all forests in the current viewport regardless of the user).
 
 Options
 -------
