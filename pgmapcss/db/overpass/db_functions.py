@@ -214,6 +214,7 @@ def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_v
     non_relevant_tags = {'type', 'source', 'source:ref', 'source_ref', 'note', 'comment', 'created_by', 'converted_by', 'fixme', 'FIXME', 'description', 'attribution', 'osm:id', 'osm:version', 'osm:user_id', 'osm:user', 'osm:timestamp', 'osm:changeset'}
     ways_done = []
     rels_done = []
+    area_ways_done = []
 
     qry = '[out:json]'
 
@@ -295,7 +296,7 @@ def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_v
                     rels_done.append(rid)
                     for outer in r['members']:
                         if outer['role'] in ('', 'outer'):
-                            ways_done.append(outer['ref'])
+                            area_ways_done.append(outer['ref'])
 
                     t = assemble_object(r)
                     t['id'] = 'm' + str(r['id'])
@@ -328,7 +329,16 @@ def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_v
                 if r['id'] in ways_done:
                     continue
 
-                t = assemble_object(r, way_polygon=types['way_polygon'])
+                # check, if way was part of multipolygon (with tags from outer
+                # ways) -> may not be area
+                way_polygon = types['way_polygon']
+                if r['id'] in area_ways_done:
+                    if types['way_polygon'] == True:
+                        continue
+                    else:
+                        way_polygon = False
+
+                t = assemble_object(r, way_polygon=way_polygon)
                 if t:
                     ways_done.append(r['id'])
                     yield t
