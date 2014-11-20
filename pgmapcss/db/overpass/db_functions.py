@@ -130,8 +130,8 @@ def relation_geom(r):
         ]
 
     lines = plpy.execute(geom_plan_linemerge, [ lines ])
-    for r in lines:
-        polygons.append(r['geom'])
+    for p in lines:
+        polygons.append(p['geom'])
 
     polygons = plpy.execute(geom_plan_collect, [ polygons ])[0]['geom']
     inner_polygons = [
@@ -140,8 +140,8 @@ def relation_geom(r):
         ]
 
     inner_lines = plpy.execute(geom_plan_linemerge, [ inner_lines ])
-    for r in inner_lines:
-        inner_polygons.append(r['geom'])
+    for p in inner_lines:
+        inner_polygons.append(p['geom'])
 
     for p in inner_polygons:
         try:
