@@ -53,10 +53,12 @@ Behaviour can be influenced with the following config options:
 
 Overpass API (short: overpass)
 ==============================
-In contrast to osm2pgsql and osmosis, Overpass API is an external database which is queried by HTTP requests. Also, the query language is very different from SQL. By default, the API on overpass-api.de will be used, therefore it is not necessary to import a local copy. For sure, if you want to render on a regular base the admins of overpass-api.de will be happy if you change to a local copy. You still need local PostgreSQL database, as it is used for connecting to Mapnik and for accessing the PostGIS functions.
+In contrast to osm2pgsql and osmosis, Overpass API is an external database which is queried by HTTP requests. Also, the query language is very different from SQL. Overpass API is faster then PostgreSQL/PostGIS on large viewports.
 
-* Overpass API is faster then PostgreSQL/PostGIS on larger areas
-* Full multipolygon support (handled similar to Osmosis pgsnapshot)
+By default, the API on overpass-api.de will be used, therefore it is not necessary to import a local copy. For sure, if you want to render on a regular base the admins of overpass-api.de will be happy if you change to a local copy. Additionally, you still need a local PostgreSQL database, as it is used for connecting to Mapnik and accessing the PostGIS functions.
+
+* In contrast to osm2pgsql/osmosis the geometries need to be constructed on the fly which causes some additional overhead.
+* Full multipolygon support (handled similar to Osmosis pgsnapshot).
 * In Overpass API, bounding box queries do not include ways and relations which cross the bounding box without having a node inside the bounding box, with the exception of [areas](http://wiki.openstreetmap.org/wiki/Overpass_API/Areas). Therefore very large objects might be missing in the output.
 
 Options
