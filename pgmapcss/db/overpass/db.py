@@ -11,7 +11,7 @@ class db(default):
             self.stat['config']['db.srs'] = 4326
 
         if not 'db.overpass-url' in self.stat['config']:
-            self.stat['config']['db.overpass-url'] = 'http://overpass-api.de/api/interpreter'
+            self.stat['config']['db.overpass-url'] = 'http://overpass-api.de/api'
 
     def tag_type(self, key, condition, selector, statement):
         if key[0:4] == 'osm:':

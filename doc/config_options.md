@@ -10,7 +10,7 @@ The following config options are supported:
 | unit.srs         | Spatial Reference System to use for distances. If other values than 900913 are used, unexpected behaviour might happen. | 900913 |
 | srs              | Default Spatial Reference System to use on the frontend side | 900913 when using with renderer (mode 'database-function'), 4326 otherwise |
 | db.hstore-only   | osm2pgsql only: Do not use the separate tag columns, only use the hstore 'tags' column. Might be faster on large databases in combination with a multicolumn index on way and tags: e.g. create index planet_osm_point_way_tags on planet_osm_point using gist(way, tags). Requires --hstore-all on osm2pgsql when importing the database. | true/**false** |
-| db.overpass-url  | overpass only: Use this alternative Overpass API url. default: http://overpass-api.de/api/interpreter | |
+| db.overpass-url  | overpass only: Use this alternative Overpass API url. default: http://overpass-api.de/api | |
 | offline          | When compiling standalone mode, do not make any requests to the database. | true/**false** |
 | debug.profiler   | during execution, show some statistics about query/processing time and count of objects. | true/**false** |
 | debug.context    | show bounding box and scale denominator of requests. | true/**false** |
