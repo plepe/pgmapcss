@@ -300,14 +300,14 @@ def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_v
                         area_ways_done.append(outer['ref'])
 
                 t = assemble_object(r)
-                t['id'] = 'm' + str(r['id'])
-                t['types'] = ['multipolygon', 'area']
-                t['tags'] = outer_tags
-                t['tags']['osm:id'] = t['id']
+                if len(mp_tags) == 0:
+                    t['id'] = 'm' + str(r['id'])
+                    t['types'] = ['multipolygon', 'area']
+                    t['tags'] = outer_tags
+                    t['tags']['osm:id'] = t['id']
+                    t['tags']['osm:has_outer_tags'] = 'yes'
 
                 yield(t)
-            else:
-                plpy.warning('tag-less multipolygon with non-similar outer ways: {}'.format(rid))
 
         _ways = None
         _rels = None
