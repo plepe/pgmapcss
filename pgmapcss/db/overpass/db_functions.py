@@ -267,45 +267,47 @@ def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_v
                 _rels[r['id']] = r
 
         for rid, r in _rels.items():
-            if r['tags']['type'] in ('multipolygon', 'boundary') and len([
-                    v
-                    for v in r['tags']
-                    if v not in non_relevant_tags
-                ]) == 0:
-                is_valid_mp = True
-                outer_tags = None
+            mp_tags = {
+                    vk: vv
+                    for vk, vv in r['tags'].items()
+                    if vk not in non_relevant_tags
+                }
+            is_valid_mp = True
+            outer_tags = None
 
+            for outer in r['members']:
+                if outer['role'] in ('', 'outer'):
+                    if not outer['ref'] in _ways:
+                        continue
+
+                    outer_way = _ways[outer['ref']]
+                    tags = {
+                            vk: vv
+                            for vk, vv in outer_way['tags'].items()
+                            if vk not in non_relevant_tags
+                        } if 'tags' in outer_way else {}
+
+                    if outer_tags is None:
+                        outer_tags = tags
+                    elif outer_tags != tags:
+                        is_valid_mp = True
+
+            if (len(mp_tags) == 0 or mp_tags == outer_tags) and \
+                is_valid_mp and outer_tags is not None:
+                rels_done.append(rid)
                 for outer in r['members']:
                     if outer['role'] in ('', 'outer'):
-                        if not outer['ref'] in _ways:
-                            continue
+                        area_ways_done.append(outer['ref'])
 
-                        outer_way = _ways[outer['ref']]
-                        tags = {
-                                vk: vv
-                                for vk, vv in outer_way['tags'].items()
-                                if vk not in non_relevant_tags
-                            } if 'tags' in outer_way else {}
+                t = assemble_object(r)
+                t['id'] = 'm' + str(r['id'])
+                t['types'] = ['multipolygon', 'area']
+                t['tags'] = outer_tags
+                t['tags']['osm:id'] = t['id']
 
-                        if outer_tags is None:
-                            outer_tags = tags
-                        elif outer_tags != tags:
-                            is_valid_mp = True
-
-                if is_valid_mp and outer_tags is not None:
-                    rels_done.append(rid)
-                    for outer in r['members']:
-                        if outer['role'] in ('', 'outer'):
-                            area_ways_done.append(outer['ref'])
-
-                    t = assemble_object(r)
-                    t['id'] = 'm' + str(r['id'])
-                    t['types'] = ['multipolygon', 'area']
-                    t['tags'] = outer_tags
-
-                    yield(t)
-                else:
-                    plpy.warning('tag-less multipolygon with non-similar outer ways: {}'.format(rid))
+                yield(t)
+            else:
+                plpy.warning('tag-less multipolygon with non-similar outer ways: {}'.format(rid))
 
         _ways = None
         _rels = None
@@ -355,7 +357,7 @@ def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_v
 
         for r in overpass_query(q):
             if r['id'] in rels_done:
-                pass
+                continue
             rels_done.append(r['id'])
 
             yield(assemble_object(r))
