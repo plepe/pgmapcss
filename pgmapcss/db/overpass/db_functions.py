@@ -375,7 +375,7 @@ def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_v
 
     # areas
     w = []
-    for t in ('*', 'relation', 'area'):
+    for t in ('*', 'area'):
         if t in where_clauses:
             w.append(where_clauses[t])
 
