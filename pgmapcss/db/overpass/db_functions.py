@@ -101,7 +101,7 @@ def linestring(geom):
                 for g in geom
             ]) + ')'
 
-def relation_geom(r):
+def multipolygon_geom(r):
     global geom_plan
 
     try:
@@ -113,10 +113,7 @@ def relation_geom(r):
         # merge all lines together, return all closed rings (but remove unconnected lines)
         geom_plan_linemerge = plpy.prepare('select geom from (select (ST_Dump((ST_LineMerge(ST_Collect(geom))))).geom as geom from (select ST_GeomFromText(unnest($1), 4326) geom) t offset 0) t where ST_NPoints(geom) > 3 and ST_IsClosed(geom)', [ 'text[]' ])
 
-    if 'tags' in r and 'type' in r['tags'] and r['tags']['type'] in ('multipolygon', 'boundary'):
-        t = 'MULTIPOLYGON'
-    else:
-        return None
+    t = 'MULTIPOLYGON'
 
     polygons = []
     lines = []
@@ -169,6 +166,26 @@ def relation_geom(r):
 
     return polygons
 
+def relation_geom(r):
+    global geom_plan_collect
+
+    try:
+        geom_plan_collect
+    except NameError:
+        geom_plan_collect = plpy.prepare('select ST_Collect($1) as geom', [ 'geometry[]' ])
+
+    l = []
+
+    for m in r['members']:
+        if m['type'] == 'node':
+            l.append(node_geom(m['lat'], m['lon']))
+        if m['type'] == 'way':
+            l.append(way_geom(m, None))
+
+    res = plpy.execute(geom_plan_collect, [ l ])
+
+    return res[0]['geom']
+
 def assemble_object(r):
     t = {
         'tags': r['tags'] if 'tags' in r else {},
@@ -194,7 +211,10 @@ def assemble_object(r):
     elif r['type'] == 'relation':
         t['id'] = 'r' + str(r['id'])
         t['types'] = ['area', 'relation']
-        t['geo'] = relation_geom(r)
+        if 'tags' in r and 'type' in r['tags'] and r['tags']['type'] in ('multipolygon', 'boundary'):
+            t['geo'] = multipolygon_geom(r)
+        else:
+            t['geo'] = relation_geom(r)
         t['members'] = [
                 {
                     'member_id': m['type'][0] + str(m['ref']),
