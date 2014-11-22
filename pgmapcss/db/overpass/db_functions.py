@@ -8,6 +8,10 @@ def overpass_query(query):
 # START debug.overpass_queries
     plpy.warning(query)
 # END debug.overpass_queries
+# START debug.profiler
+    ret = []
+    time_start = datetime.datetime.now()
+# END debug.profiler
     url = '{db.overpass-url}/interpreter?' +\
         urllib.parse.urlencode({ 'data': query })
 
@@ -32,12 +36,23 @@ def overpass_query(query):
         elif mode == 1:
             if re.match('}', r):
                 block += '}'
+# START debug.profiler
+                ret.append(json.loads(block))
+# ELSE debug.profiler
                 yield json.loads(block)
+# END debug.profiler
 
                 block = ''
 
             elif re.match('\s*$', block) and re.match('.*\]', r):
                 f.close()
+
+# START debug.profiler
+                plpy.warning('%s\nquery took %.2fs for %d features' % (query, (datetime.datetime.now() - time_start).total_seconds(), len(ret)))
+                for r in ret:
+                    yield r
+# END debug.profiler
+
                 return
 
             else:
