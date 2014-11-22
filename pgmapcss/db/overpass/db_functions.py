@@ -264,8 +264,8 @@ def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_v
         q2 = ');('.join(w).replace('__TYPE__', 'way(r.rel:"")')
 
         q = qry.replace('__QRY__',
-                'relation[type=multipolygon] -> .rel;' +
-                '((' + q1 + q2 + ');) -> .outer;relation(bw.outer)[type=multipolygon]') + '.outer out tags qt;'
+                "relation[type~'^multipolygon|boundary$'] -> .rel;" +
+                '((' + q1 + q2 + ");) -> .outer;relation(bw.outer)[type~'^multipolygon|boundary$']") + '.outer out tags qt;'
 
         _ways = {}
         _rels = {}
@@ -339,7 +339,7 @@ def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_v
 
     # relations
     w = []
-    for t, type_condition in {'*': '', 'relation': '', 'area': '[type=multipolygon]'}.items():
+    for t, type_condition in {'*': '', 'relation': '', 'area': "[type~'^multipolygon|boundary$']"}.items():
         if t in where_clauses:
             w.append(where_clauses[t].replace('__TYPE__', 'relation' + type_condition))
 
