@@ -324,13 +324,12 @@ def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_v
 
     # relations
     w = []
-    for t in ('*', 'relation', 'area'):
+    for t, type_condition in {'*': '', 'relation': '', 'area': '[type=multipolygon]'}.items():
         if t in where_clauses:
-            w.append(where_clauses[t])
+            w.append(where_clauses[t].replace('__TYPE__', 'relation' + type_condition))
 
     if len(w):
         q = qry.replace('__QRY__', '((' + ');('.join(w) + ');)')
-        q = q.replace('__TYPE__', 'relation')
 
         for r in overpass_query(q):
             if r['id'] in rels_done:
