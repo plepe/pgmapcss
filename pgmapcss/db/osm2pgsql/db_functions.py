@@ -365,7 +365,7 @@ def flatarray_to_members(arr):
 
     return ret
 
-def objects_member_of(member_id, parent_type, parent_conditions):
+def objects_member_of(member_id, parent_type, parent_conditions, child_conditions):
     if parent_type == 'relation':
         plan = plpy.prepare('select * from planet_osm_rels where members @> Array[$1]', ['text']);
         res = plpy.cursor(plan, [member_id])
@@ -415,7 +415,7 @@ def objects_member_of(member_id, parent_type, parent_conditions):
                     t['tags']['osm:id'] = t['id']
                     yield(t)
 
-def objects_members(relation_id, parent_type, parent_conditions):
+def objects_members(relation_id, parent_type, parent_conditions, child_conditions):
     ob = list(objects_by_id([relation_id]))
 
     if not len(ob):
@@ -440,7 +440,7 @@ def objects_members(relation_id, parent_type, parent_conditions):
         ret['link_tags'] = member
         yield ret
 
-def objects_near(max_distance, ob, parent_selector, where_clause, check_geo=None):
+def objects_near(max_distance, ob, parent_selector, where_clause, child_conditions, check_geo=None):
     if ob:
         geom = ob['geo']
     elif 'geo' in current['properties'][current['pseudo_element']]:

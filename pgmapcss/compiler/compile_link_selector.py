@@ -10,15 +10,23 @@ def compile_link_selector(statement, stat):
             statement, stat, prefix='', selector='parent_selector')
     )])[statement['parent_selector']['type']]
 
+    child_conditions = stat['database'].merge_conditions([(
+        statement['selector']['type'],
+        stat['database'].compile_selector(
+            statement, stat, prefix='')
+    )])[statement['selector']['type']]
+
     if statement['link_selector']['type'] in ('>', ''):
         return "objects_member_of(object['id'], " +\
             repr(statement['parent_selector']['type']) + ", " +\
-            repr(parent_conditions) + ")"
+            repr(parent_conditions) + ", " +\
+            repr(child_conditions) + ")"
 
     elif statement['link_selector']['type'] == '<':
         return "objects_members(object['id'], " +\
             repr(statement['parent_selector']['type']) + ", " +\
-            repr(parent_conditions) + ")"
+            repr(parent_conditions) + ", " +\
+            repr(child_conditions) + ")"
 
     elif statement['link_selector']['type'] == 'near':
         distance = { 'value': '100' }
@@ -37,12 +45,14 @@ def compile_link_selector(statement, stat):
 
         return "objects_near(" + distance + ", None, "+\
             repr(statement['parent_selector']['type']) + ", " +\
-            repr(parent_conditions) + ")"
+            repr(parent_conditions) + ", " +\
+            repr(child_conditions) + ")"
 
     elif statement['link_selector']['type'] in ('within', 'surrounds', 'overlaps'):
         return "objects_near(\"0\", None, "+\
             repr(statement['parent_selector']['type']) + ", " +\
-            repr(parent_conditions) + ", check_geo=" +\
+            repr(parent_conditions) + ", " +\
+            repr(child_conditions) + ", check_geo=" +\
             repr(statement['link_selector']['type']) + ")"
 
     else:

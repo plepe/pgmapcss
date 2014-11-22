@@ -53,14 +53,14 @@ def compile_db_selects(id, stat):
 
         # compile all selectors
         # TODO: define list of possible object_types
-        conditions = {
+        conditions = [
             (
                 object_type,
                 stat['database'].compile_selector(stat['statements'][i], stat, prefix='', filter=filter, object_type=object_type)
             )
             for i in current_selectors
             for object_type in ({'node', 'way', 'area'} if stat['statements'][i]['selector']['type'] == True else { stat['statements'][i]['selector']['type'] })
-        }
+        ]
 
         conditions = stat['database'].merge_conditions(conditions)
 
