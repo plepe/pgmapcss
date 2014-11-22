@@ -186,7 +186,7 @@ def relation_geom(r):
 
     return res[0]['geom']
 
-def assemble_object(r):
+def assemble_object(r, way_polygon=None):
     t = {
         'tags': r['tags'] if 'tags' in r else {},
     }
@@ -195,11 +195,15 @@ def assemble_object(r):
         t['types'] = ['node', 'point']
         t['geo'] = node_geom(r['lat'], r['lon'])
     elif r['type'] == 'way':
-        is_polygon = len(r['nodes']) > 3 and r['nodes'][0] == r['nodes'][-1]
+        is_polygon = way_polygon in (True, None) and len(r['nodes']) > 3 and r['nodes'][0] == r['nodes'][-1]
+        if way_polygon is True and not is_polygon:
+            return None
         t['id'] = 'w' + str(r['id'])
-        t['types'] = ['line', 'way']
+        t['types'] = ['way']
         if is_polygon:
             t['types'].append('area')
+        else:
+            t['types'].append('line')
         t['geo'] = way_geom(r, is_polygon)
         t['members'] = [
                 {
@@ -245,6 +249,7 @@ def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_v
     non_relevant_tags = {'type', 'source', 'source:ref', 'source_ref', 'note', 'comment', 'created_by', 'converted_by', 'fixme', 'FIXME', 'description', 'attribution', 'osm:id', 'osm:version', 'osm:user_id', 'osm:user', 'osm:timestamp', 'osm:changeset'}
     ways_done = []
     rels_done = []
+    area_ways_done = []
 
     qry = '[out:json]'
 
@@ -297,65 +302,83 @@ def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_v
                 _rels[r['id']] = r
 
         for rid, r in _rels.items():
-            if r['tags']['type'] in ('multipolygon', 'boundary') and len([
-                    v
-                    for v in r['tags']
-                    if v not in non_relevant_tags
-                ]) == 0:
-                is_valid_mp = True
-                outer_tags = None
+            mp_tags = {
+                    vk: vv
+                    for vk, vv in r['tags'].items()
+                    if vk not in non_relevant_tags
+                }
+            is_valid_mp = True
+            outer_tags = None
 
+            for outer in r['members']:
+                if outer['role'] in ('', 'outer'):
+                    if not outer['ref'] in _ways:
+                        continue
+
+                    outer_way = _ways[outer['ref']]
+                    tags = {
+                            vk: vv
+                            for vk, vv in outer_way['tags'].items()
+                            if vk not in non_relevant_tags
+                        } if 'tags' in outer_way else {}
+
+                    if outer_tags is None:
+                        outer_tags = tags
+                    elif outer_tags != tags:
+                        is_valid_mp = True
+
+            if (len(mp_tags) == 0 or mp_tags == outer_tags) and \
+                is_valid_mp and outer_tags is not None:
+                rels_done.append(rid)
                 for outer in r['members']:
                     if outer['role'] in ('', 'outer'):
-                        if not outer['ref'] in _ways:
-                            continue
+                        area_ways_done.append(outer['ref'])
 
-                        outer_way = _ways[outer['ref']]
-                        tags = {
-                                vk: vv
-                                for vk, vv in outer_way['tags'].items()
-                                if vk not in non_relevant_tags
-                            } if 'tags' in outer_way else {}
-
-                        if outer_tags is None:
-                            outer_tags = tags
-                        elif outer_tags != tags:
-                            is_valid_mp = True
-
-                if is_valid_mp and outer_tags is not None:
-                    rels_done.append(rid)
-                    for outer in r['members']:
-                        if outer['role'] in ('', 'outer'):
-                            ways_done.append(outer['ref'])
-
-                    t = assemble_object(r)
+                t = assemble_object(r)
+                if len(mp_tags) == 0:
                     t['id'] = 'm' + str(r['id'])
                     t['types'] = ['multipolygon', 'area']
                     t['tags'] = outer_tags
+                    t['tags']['osm:id'] = t['id']
+                    t['tags']['osm:has_outer_tags'] = 'yes'
 
-                    yield(t)
-                else:
-                    plpy.warning('tag-less multipolygon with non-similar outer ways: {}'.format(rid))
+                yield(t)
 
         _ways = None
         _rels = None
 
-    # ways
-    w = []
-    for t in ('*', 'line', 'way', 'area'):
-        if t in where_clauses:
-            w.append(where_clauses[t])
+    # ways - will be run 3 times, first for areas, then lines and finally for not specified ways
+    for types in [
+            { 'types': ('area',), 'way_polygon': True },
+            { 'types': ('line',), 'way_polygon': False },
+            { 'types': ('*', 'way'), 'way_polygon': None },
+        ]:
+        w = []
+        for t in types['types']:
+            if t in where_clauses:
+                w.append(where_clauses[t])
 
-    if len(w):
-        q = qry.replace('__QRY__', '((' + ');('.join(w) + ');)')
-        q = q.replace('__TYPE__', 'way')
+        if len(w):
+            q = qry.replace('__QRY__', '((' + ');('.join(w) + ');)')
+            q = q.replace('__TYPE__', 'way')
 
-        for r in overpass_query(q):
-            if r['id'] in ways_done:
-                pass
-            ways_done.append(r['id'])
+            for r in overpass_query(q):
+                if r['id'] in ways_done:
+                    continue
 
-            yield(assemble_object(r))
+                # check, if way was part of multipolygon (with tags from outer
+                # ways) -> may not be area
+                way_polygon = types['way_polygon']
+                if r['id'] in area_ways_done:
+                    if types['way_polygon'] == True:
+                        continue
+                    else:
+                        way_polygon = False
+
+                t = assemble_object(r, way_polygon=way_polygon)
+                if t:
+                    ways_done.append(r['id'])
+                    yield t
 
     # relations
     w = []
@@ -368,7 +391,7 @@ def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_v
 
         for r in overpass_query(q):
             if r['id'] in rels_done:
-                pass
+                continue
             rels_done.append(r['id'])
 
             yield(assemble_object(r))
