@@ -405,17 +405,15 @@ def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_v
 
     # relations
     w = []
+    parent_query = ''
     for t, type_condition in {'*': '', 'relation': '', 'area': "[type~'^multipolygon|boundary$']"}.items():
         if t in where_clauses:
-            w.append(where_clauses[t].replace('__TYPE__', 'relation' + type_condition))
+            w.append(where_clauses[t]['query'].replace('__TYPE__', 'relation' + type_condition))
+            if 'parent_query' in where_clauses[t]:
+                parent_query += where_clauses[t]['parent_query']
 
     if len(w):
-        parent_query = ''
-        for w1 in w:
-            if 'parent_query' in w1:
-                parent_query += w1['parent_query']
-
-        q = qry.replace('__QRY__', parent_query + '((' + ');('.join([ w1['query'] for w1 in w ]) + ');)')
+        q = qry.replace('__QRY__', parent_query + '((' + ');('.join(w) + ');)')
         for r1, r2 in replacements.items():
             q = q.replace(r1, r2)
 
