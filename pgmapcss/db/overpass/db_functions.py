@@ -242,7 +242,7 @@ def get_bbox(_bbox=None):
 
     plan = plpy.prepare("select ST_YMin($1::geometry) || ',' || ST_XMIN($1::geometry) || ',' || ST_YMAX($1::geometry) || ',' || ST_XMAX($1::geometry) as bbox_string", [ 'geometry' ])
     res = plpy.execute(plan, [ _bbox ])
-    return '[bbox:' + res[0]['bbox_string'] + ']'
+    return res[0]['bbox_string']
 
 def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_value=[]):
     time_start = datetime.datetime.now() # profiling
@@ -254,7 +254,7 @@ def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_v
     qry = '[out:json]'
 
     if _bbox:
-        qry += get_bbox(_bbox)
+        qry += '[bbox:' + get_bbox(_bbox) + ']'
 
     qry += ';__QRY__;out meta geom;'
 
@@ -480,7 +480,7 @@ def objects_member_of(member_id, parent_type, parent_conditions, child_condition
 
     if member_of_cache_id not in member_of_cache:
         member_of_cache[member_of_cache_id] = []
-        q = '[out:json]' + get_bbox() + ';'
+        q = '[out:json][bbox:' + get_bbox() + '];'
 
         q += '(' + child_conditions['query'].replace('__TYPE__', ob_type) + ')->.a;'
 
@@ -527,7 +527,7 @@ def objects_members(relation_id, parent_type, parent_conditions, child_condition
 
     if members_cache_id not in members_cache:
         members_cache[members_cache_id] = { 'parents': {}, 'children': [] }
-        q = '[out:json]' + get_bbox() + ';'
+        q = '[out:json][bbox:' + get_bbox() + '];'
 
         q += '(' + child_conditions['query'].replace('__TYPE__', ob_type) + ');'
         q += 'out meta qt geom;'
@@ -538,7 +538,7 @@ def objects_members(relation_id, parent_type, parent_conditions, child_condition
             t['type'] = r['type']
             members_cache[members_cache_id]['parents'][t['id']] = t
 
-        q = '[out:json]' + get_bbox() + ';'
+        q = '[out:json][bbox:' + get_bbox() + '];'
 
         q += '(' + child_conditions['query'].replace('__TYPE__', ob_type) + ')->.a;'
         q += '(' + parent_conditions['query'].replace('__TYPE__', parent_type + '(' +
