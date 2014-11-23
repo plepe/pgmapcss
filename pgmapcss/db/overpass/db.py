@@ -13,6 +13,8 @@ class db(default):
         if not 'db.overpass-url' in self.stat['config']:
             self.stat['config']['db.overpass-url'] = 'http://overpass-api.de/api'
 
+        self.parent_queries = []
+
     def tag_type(self, key, condition, selector, statement):
         if key[0:4] == 'osm:':
             return None
@@ -171,13 +173,7 @@ class db(default):
 
     def conditions_to_query(self, conditions):
         parent_ret = ''
-        parent = [ c for c in conditions if c[0] == 'parent' ]
-        if len(parent):
-            parent_ret = parent[0][1]
-            ret = '__TYPE__(r.a)'
-
-        else:
-            ret = '__TYPE__';
+        ret = ''
 
         for c in conditions:
             if c[0] == 'type':
@@ -217,10 +213,25 @@ class db(default):
             else:
                 print('Unknown Overpass operator "{}"'.format(c[0]))
 
-        r = { 'query': ret }
+        r = { }
 
-        if parent_ret != '':
-            r['parent_query'] = parent_ret + '->.a'
+        parent = [ c for c in conditions if c[0] == 'parent' ]
+        if len(parent):
+            parent_ret = parent[0][1] + parent_ret
+
+            try:
+                pq = self.parent_queries.index(parent_ret)
+            except ValueError:
+                pq = len(self.parent_queries)
+                self.parent_queries.append(parent_ret)
+
+            ret = '__TYPE__(r.pq' + str(pq) + ')' + ret
+            r['parent_query'] = parent_ret + '->.pq' + str(pq)
+
+        else:
+            ret = '__TYPE__' + ret
+
+        r['query'] = ret
 
         return r
 
