@@ -482,6 +482,11 @@ def objects_member_of(member_id, parent_type, parent_conditions, child_condition
         member_of_cache[member_of_cache_id] = []
         q = '[out:json][bbox:' + get_bbox() + '];'
 
+        if 'parent_query' in child_conditions:
+            q += child_conditions['parent_query']
+        if 'parent_query' in parent_conditions:
+            q += parent_conditions['parent_query']
+
         q += '(' + child_conditions['query'].replace('__TYPE__', ob_type) + ')->.a;'
 
         q += '(' + parent_conditions['query'].replace('__TYPE__', parent_type + '(b' +
@@ -529,6 +534,8 @@ def objects_members(relation_id, parent_type, parent_conditions, child_condition
         members_cache[members_cache_id] = { 'parents': {}, 'children': [] }
         q = '[out:json][bbox:' + get_bbox() + '];'
 
+        if 'parent_query' in child_conditions:
+            q += child_conditions['parent_query']
         q += '(' + child_conditions['query'].replace('__TYPE__', ob_type) + ');'
         q += 'out meta qt geom;'
         # TODO: out body qt; would be sufficient, but need to adapt assemble_object
@@ -539,6 +546,11 @@ def objects_members(relation_id, parent_type, parent_conditions, child_condition
             members_cache[members_cache_id]['parents'][t['id']] = t
 
         q = '[out:json][bbox:' + get_bbox() + '];'
+
+        if 'parent_query' in child_conditions:
+            q += child_conditions['parent_query']
+        if 'parent_query' in parent_conditions:
+            q += parent_conditions['parent_query']
 
         q += '(' + child_conditions['query'].replace('__TYPE__', ob_type) + ')->.a;'
         q += '(' + parent_conditions['query'].replace('__TYPE__', parent_type + '(' +
