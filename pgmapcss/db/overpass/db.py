@@ -225,7 +225,7 @@ class db(default):
                 pq = len(self.parent_queries)
                 self.parent_queries.append(parent_ret)
 
-            ret = '__TYPE__(r.pq' + str(pq) + ')' + ret
+            ret = '__TYPE__(r.pq' + str(pq) + ')__BBOX__' + ret
             r['parent_query'] = parent_ret + '->.pq' + str(pq)
 
         else:
