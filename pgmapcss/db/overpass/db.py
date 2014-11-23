@@ -192,7 +192,7 @@ class db(default):
             else:
                 print('Unknown Overpass operator "{}"'.format(c[0]))
 
-        return ret
+        return { 'query': ret }
 
     def merge_regexp(self, regexps):
         r = ''
@@ -295,13 +295,24 @@ class db(default):
             for t, cs in conditions.items()
         }
 
-        return {
-            t: { 'query': ';\n'.join([
-                self.conditions_to_query(c)
-                for c in cs
-            ]) + ';\n' }
-            for t, cs in conditions.items()
-        }
+        ret = {}
+        for t, cs in conditions.items():
+            if not t in ret:
+                ret[t] = {}
+
+            for c in cs:
+                c = self.conditions_to_query(c)
+                for c1, c2 in c.items():
+                    if not c1 in ret[t]:
+                        ret[t][c1] = []
+
+                    ret[t][c1].append(c2)
+
+        for t in ret:
+            if 'query' in ret[t]:
+                ret[t]['query'] = ';\n'.join(ret[t]['query']) + ';\n'
+
+        return ret
 
     def compile_selector(self, statement, stat, prefix='current.', filter={}, object_type=None, selector='selector', no_object_type=False):
         filter['object_type'] = object_type
