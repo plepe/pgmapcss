@@ -345,9 +345,9 @@ class db(default):
                 c = self.conditions_to_query(c)
                 for c1, c2 in c.items():
                     if not c1 in ret[t]:
-                        ret[t][c1] = []
+                        ret[t][c1] = set()
 
-                    ret[t][c1].append(c2)
+                    ret[t][c1].add(c2)
 
         for t in ret:
             if 'query' in ret[t]:
