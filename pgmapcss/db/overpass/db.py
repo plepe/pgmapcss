@@ -217,7 +217,8 @@ class db(default):
 
         parent = [ c for c in conditions if c[0] == 'parent' ]
         if len(parent):
-            parent_ret = parent[0][1] + parent_ret
+            parent_selector = parent[0]
+            parent_ret = parent_selector[1] + parent_ret
 
             try:
                 pq = self.parent_queries.index(parent_ret)
@@ -225,7 +226,12 @@ class db(default):
                 pq = len(self.parent_queries)
                 self.parent_queries.append(parent_ret)
 
-            ret = '__TYPE__(r.pq' + str(pq) + ')__BBOX__' + ret
+            if parent_selector[2] in ('>', ''):
+                parent_sel = parent_selector[1][0]
+            elif parent_selector[2] in ('<'):
+                parent_sel = 'b' + parent_selector[1][0]
+
+            ret = '__TYPE__(' + parent_sel + '.pq' + str(pq) + ')__BBOX__' + ret
             r['parent_query'] = parent_ret + '->.pq' + str(pq)
 
         else:
@@ -366,13 +372,13 @@ class db(default):
         ]
 
         parent_conditions = None
-        if 'parent_selector' in statement and selector == 'selector' and statement['link_selector']['type'] in ('', '>'):
+        if 'parent_selector' in statement and selector == 'selector' and statement['link_selector']['type'] in ('', '>', '<'):
             parent_conditions = [
                 self.compile_condition(c, statement, stat, prefix, filter) or None
                 for c in statement['parent_selector']['conditions']
             ]
 
-            conditions.append(( 'parent', statement['parent_selector']['type'] ))
+            conditions.append(( 'parent', statement['parent_selector']['type'], statement['link_selector']['type'] ))
             for condition in parent_conditions:
                 if condition is None:
                     continue
