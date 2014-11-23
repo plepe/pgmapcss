@@ -296,10 +296,10 @@ class db(default):
         }
 
         return {
-            t: ';\n'.join([
+            t: { 'query': ';\n'.join([
                 self.conditions_to_query(c)
                 for c in cs
-            ]) + ';\n'
+            ]) + ';\n' }
             for t, cs in conditions.items()
         }
 

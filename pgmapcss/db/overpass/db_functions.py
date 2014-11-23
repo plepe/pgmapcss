@@ -265,7 +265,7 @@ def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_v
             w.append(where_clauses[t])
 
     if len(w):
-        q = qry.replace('__QRY__', '((' + ');('.join(w) + ');)')
+        q = qry.replace('__QRY__', '((' + ');('.join([ w1['query'] for w1 in w ]) + ');)')
         q = q.replace('__TYPE__', 'node')
 
         for r in overpass_query(q):
@@ -285,8 +285,8 @@ def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_v
         # multipolygon has no (relevant) tags and all outer ways share the same
         # tags (save non relevant tags) the ways are discarded and the relation
         # is used - as type 'multipolygon' and a 'm' prefixed to the ID
-        q1 = ');('.join(w).replace('__TYPE__', 'way(r.rel:"outer")')
-        q2 = ');('.join(w).replace('__TYPE__', 'way(r.rel:"")')
+        q1 = ');('.join([ w1['query'] for w1 in w ]).replace('__TYPE__', 'way(r.rel:"outer")')
+        q2 = ');('.join([ w1['query'] for w1 in w ]).replace('__TYPE__', 'way(r.rel:"")')
 
         q = qry.replace('__QRY__',
                 "relation[type~'^multipolygon|boundary$'] -> .rel;" +
@@ -359,7 +359,7 @@ def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_v
                 w.append(where_clauses[t])
 
         if len(w):
-            q = qry.replace('__QRY__', '((' + ');('.join(w) + ');)')
+            q = qry.replace('__QRY__', '((' + ');('.join([ w1['query'] for w1 in w ]) + ');)')
             q = q.replace('__TYPE__', 'way')
 
             for r in overpass_query(q):
@@ -387,7 +387,7 @@ def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_v
             w.append(where_clauses[t].replace('__TYPE__', 'relation' + type_condition))
 
     if len(w):
-        q = qry.replace('__QRY__', '((' + ');('.join(w) + ');)')
+        q = qry.replace('__QRY__', '((' + ');('.join([ w1['query'] for w1 in w ]) + ');)')
 
         for r in overpass_query(q):
             if r['id'] in rels_done:
@@ -406,8 +406,8 @@ def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_v
         plan = plpy.prepare("select ST_Y(ST_Centroid($1::geometry)) || ',' || ST_X(ST_Centroid($1::geometry)) as geom", [ 'geometry' ])
         res = plpy.execute(plan, [ _bbox ])
 
-        q1 = ');('.join(w).replace('__TYPE__', 'relation(pivot.a)')
-        q2 = ');('.join(w).replace('__TYPE__', 'way(pivot.a)')
+        q1 = ');('.join([ w1['query'] for w1 in w ]).replace('__TYPE__', 'relation(pivot.a)')
+        q2 = ');('.join([ w1['query'] for w1 in w ]).replace('__TYPE__', 'way(pivot.a)')
 
         q = ('[out:json];is_in({})->.a;(' + q1 + q2 + ');out meta geom;').format(res[0]['geom'])
 
@@ -462,9 +462,9 @@ def objects_member_of(member_id, parent_type, parent_conditions, child_condition
         member_of_cache[member_of_cache_id] = []
         q = '[out:json]' + get_bbox() + ';'
 
-        q += '(' + child_conditions.replace('__TYPE__', ob_type) + ')->.a;'
+        q += '(' + child_conditions['query'].replace('__TYPE__', ob_type) + ')->.a;'
 
-        q += '(' + parent_conditions.replace('__TYPE__', parent_type + '(b' +
+        q += '(' + parent_conditions['query'].replace('__TYPE__', parent_type + '(b' +
                 ob_type[0] + '.a)') + ');'
         q += 'out meta qt geom;'
 
@@ -509,7 +509,7 @@ def objects_members(relation_id, parent_type, parent_conditions, child_condition
         members_cache[members_cache_id] = { 'parents': {}, 'children': [] }
         q = '[out:json]' + get_bbox() + ';'
 
-        q += '(' + child_conditions.replace('__TYPE__', ob_type) + ');'
+        q += '(' + child_conditions['query'].replace('__TYPE__', ob_type) + ');'
         q += 'out meta qt geom;'
         # TODO: out body qt; would be sufficient, but need to adapt assemble_object
 
@@ -520,8 +520,8 @@ def objects_members(relation_id, parent_type, parent_conditions, child_condition
 
         q = '[out:json]' + get_bbox() + ';'
 
-        q += '(' + child_conditions.replace('__TYPE__', ob_type) + ')->.a;'
-        q += '(' + parent_conditions.replace('__TYPE__', parent_type + '(' +
+        q += '(' + child_conditions['query'].replace('__TYPE__', ob_type) + ')->.a;'
+        q += '(' + parent_conditions['query'].replace('__TYPE__', parent_type + '(' +
                 relation_id[0] + '.a)') + ');'
         q += 'out meta qt geom;'
         # TODO: .a out body qt; would be sufficient, but need to adapt assemble_object
