@@ -265,7 +265,12 @@ def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_v
             w.append(where_clauses[t])
 
     if len(w):
-        q = qry.replace('__QRY__', '((' + ');('.join([ w1['query'] for w1 in w ]) + ');)')
+        parent_query = ''
+        for w1 in w:
+            if 'parent_query' in w1:
+                parent_query += w1['parent_query']
+
+        q = qry.replace('__QRY__', parent_query + '((' + ');('.join([ w1['query'] for w1 in w ]) + ');)')
         q = q.replace('__TYPE__', 'node')
 
         for r in overpass_query(q):
@@ -285,10 +290,15 @@ def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_v
         # multipolygon has no (relevant) tags and all outer ways share the same
         # tags (save non relevant tags) the ways are discarded and the relation
         # is used - as type 'multipolygon' and a 'm' prefixed to the ID
+        parent_query = ''
+        for w1 in w:
+            if 'parent_query' in w1:
+                parent_query += w1['parent_query']
+
         q1 = ');('.join([ w1['query'] for w1 in w ]).replace('__TYPE__', 'way(r.rel:"outer")')
         q2 = ');('.join([ w1['query'] for w1 in w ]).replace('__TYPE__', 'way(r.rel:"")')
 
-        q = qry.replace('__QRY__',
+        q = qry.replace('__QRY__', parent_query +\
                 "relation[type~'^multipolygon|boundary$'] -> .rel;" +
                 '((' + q1 + q2 + ");) -> .outer;relation(bw.outer)[type~'^multipolygon|boundary$']") + '.outer out tags qt;'
 
@@ -359,7 +369,12 @@ def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_v
                 w.append(where_clauses[t])
 
         if len(w):
-            q = qry.replace('__QRY__', '((' + ');('.join([ w1['query'] for w1 in w ]) + ');)')
+            parent_query = ''
+            for w1 in w:
+                if 'parent_query' in w1:
+                    parent_query += w1['parent_query']
+
+            q = qry.replace('__QRY__', parent_query + '((' + ');('.join([ w1['query'] for w1 in w ]) + ');)')
             q = q.replace('__TYPE__', 'way')
 
             for r in overpass_query(q):
@@ -387,7 +402,12 @@ def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_v
             w.append(where_clauses[t].replace('__TYPE__', 'relation' + type_condition))
 
     if len(w):
-        q = qry.replace('__QRY__', '((' + ');('.join([ w1['query'] for w1 in w ]) + ');)')
+        parent_query = ''
+        for w1 in w:
+            if 'parent_query' in w1:
+                parent_query += w1['parent_query']
+
+        q = qry.replace('__QRY__', parent_query + '((' + ');('.join([ w1['query'] for w1 in w ]) + ');)')
 
         for r in overpass_query(q):
             if r['id'] in rels_done:
