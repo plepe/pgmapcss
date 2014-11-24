@@ -216,6 +216,7 @@ while src:
 
     elif stat['mode'] == 'standalone':
         ret += '''
+                object['geo'] = convert_srs(object['geo'])
                 yield {{
                     'id': result['id'],
                     'types': result['types'],
