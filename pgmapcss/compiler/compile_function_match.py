@@ -162,6 +162,10 @@ while src:
     for object in src:
         shown = False
         counter['total'] += 1
+
+        orig_geo_src = object['geo']
+        orig_geo_out = convert_srs(object['geo'])
+
         for result in check(object):
             if type(result) != tuple or len(result) == 0:
                 plpy.warning('unknown check result: ', result)
@@ -205,7 +209,7 @@ while src:
                     'types': result['types'],
                     'tags': pghstore.dumps(result['tags']),
                     'pseudo_element': result['pseudo_element'],
-                    'geo': convert_srs(result['geo']),
+                    'geo': orig_geo_out if result['geo'] == orig_geo_src else convert_srs(result['geo']),
                     'properties': pghstore.dumps(result['properties']),
                     'style_elements': [ se[0] for se in style_elements ],
                     'style_elements_index': [ se[1] for se in style_elements ],
@@ -216,13 +220,13 @@ while src:
 
     elif stat['mode'] == 'standalone':
         ret += '''
-                object['geo'] = convert_srs(object['geo'])
+                object['geo'] = orig_geo_out
                 yield {{
                     'id': result['id'],
                     'types': result['types'],
                     'tags': result['tags'],
                     'pseudo_element': result['pseudo_element'],
-                    'geo': convert_srs(result['geo']),
+                    'geo': orig_geo_out if result['geo'] == orig_geo_src else convert_srs(result['geo']),
                     'properties': result['properties'],
                     'style_elements': [ se[0] for se in style_elements ],
                     'style_elements_index': [ se[1] for se in style_elements ],
