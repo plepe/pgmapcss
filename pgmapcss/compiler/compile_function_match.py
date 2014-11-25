@@ -167,6 +167,8 @@ pending_objects = {{ }}
 # Minimal index of a pending object. Decides whether a request for a
 # relationship will be handled right now or later (-> added to request_objects)
 pending_min_index = 999999999999999
+# List of objects which are already finished
+done_objects = {{ }}
 
 while src:
     while True:
@@ -184,7 +186,7 @@ while src:
 
         # check if the object is already a pending_object and the object is new
         # (no 'state') -> skip
-        if object['id'] in pending_objects and not 'state' in object:
+        if object['id'] in pending_objects and not 'state' in object and not object['id'] in done_objects:
             break
 
         # for each object the check() function will be called. it is a
@@ -215,6 +217,9 @@ while src:
                     result = next(object_check)
             except StopIteration:
                 object['state'] = ( 'finish', 999999999999999 )
+                if object['id'] in pending_objects:
+                    del pending_objects[object['id']]
+                    done_objects[object['id']] = True
                 break
 
             if type(result) != tuple or len(result) == 0:
@@ -392,7 +397,7 @@ while src:
                 pending_min_index = pending['state'][1]
 
         for pending_id, pending in pending_objects.items():
-            if pending['state'][0] != 'finish' and pending['state'][1] == pending_min_index:
+            if pending['state'][1] == pending_min_index:
                 src.append(pending)
 
         pending_min_index = 999999999999999
