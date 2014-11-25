@@ -311,7 +311,7 @@ while src:
                     src = [
                         r
                         for r in src
-                        if not 'state' in r or (r['state'][0] != 'finished' and r['state'][1] < result[1])
+                        if not 'state' in r or (r['state'][0] != 'finish' and r['state'][1] < result[1])
                     ]
 
             # the current object might used as parent for a relationship. add
@@ -342,7 +342,7 @@ while src:
 
     if stat['config'].get('debug.counter', False) == 'verbose':
         ret += '''
-        elif object['state'][0] == 'finished':
+        elif object['state'][0] == 'finish':
             plpy.warning('not rendered: ' + object['id'] + ' ' + repr(object['tags']))
 '''.format(**replacement)
 
