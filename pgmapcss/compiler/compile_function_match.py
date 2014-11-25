@@ -383,10 +383,16 @@ while src:
     # 4th: check if there are still pending_objects, process them next
     # pending_min_index always points to the next pending objects -> if it is
     # 999999999999999, there are no pending_objects any more
-    if not src and pending_min_index != 999999999999999:
+    if not src:
         src = [ ]
+        pending_min_index = 999999999999999
+
         for pending_id, pending in pending_objects.items():
-            if pending['state'][1] == pending_min_index:
+            if pending['state'][1] < pending_min_index:
+                pending_min_index = pending['state'][1]
+
+        for pending_id, pending in pending_objects.items():
+            if pending['state'][0] != 'finish' and pending['state'][1] == pending_min_index:
                 src.append(pending)
 
         pending_min_index = 999999999999999
