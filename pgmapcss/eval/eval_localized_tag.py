@@ -22,6 +22,7 @@ def eval_localized_tag(param, current):
 
 # IN ['name']
 # OUT 'English Foobar'
+# IN ['name', 'de']
+# OUT 'German Foobar'
 # IN ['name', 'fr']
 # OUT 'Foobar'
-

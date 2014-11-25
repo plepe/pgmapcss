@@ -107,9 +107,10 @@ You can test whether the value of a tag is logical truth value ("yes", "true", "
 | {{{[!tag?!]}}} | Testing for any value which is not falsehood value (very useful, as many tags in OSM allow either 'yes' or a custom value like 'bridge=swing' | {{{[!bridge?!]}}}| no standard, JOSM
 
 ==== Eval expression ====
-Additionally you can use an eval()-statement as selector, e.g.
+Additionally you can use an eval()-statement as selector. You should wrap the statement in eval(), but since 0.9 this is no longer necessary, e.g.
 {{{
 line[eval(tag('name') == 'bar')] { ... }
+line[tag('name') == 'bar'] { ... }
 }}}
 
 For sure, this simple example can be written as line[name=bar], which also has the advantage, that an efficient database query can be constructed. The above selector would need to load all lines for the given bounding box and evaluate the statement for each. On the other hand, using eval() statements more powerful comparisions are possible, e.g. about the geometry of the object.
@@ -319,7 +320,7 @@ You can compute values using an eval instrucion:
 }}}
 }
 
-Either set a property for the current pseudo element or set a tag for the current object.
+Either set a property for the current pseudo element or set a tag for the current object. You don't need to wrap the function in eval(), you can also just write: {{{opacity: tag(population)/100000;}}}.
 
 See file [[eval.creole]] for details.
 
@@ -406,13 +407,9 @@ If you use pgmapcss in database function mode (e.g. when rendering with Mapnik),
 When using pgmapcss in standalone mode, the language will be decided at run time, depending on the current locale or the value of the {{{--lang}}} parameter. If the compiled script is used as CGI script, the language will be used from the "Accept-Language" HTTP header or the parameter lang (e.g. file.cgi?lang=ru).
 
 == Config option ==
-Config options can be set by using {{{@config config_option config_value;}}}. The following config options are supported:
+Config options can be set by using {{{@config config_option config_value;}}}. They can also be set as parameters to pgmapcss, by using {{{-c}}} or {{{--config}}}, e.g. {{{pgmapcss --config option1=value1 option2=value2}}}.
 
-|= Config option |= Description |= Possible values
-| josm_classes | when 'true', a {{{set foo;}}} statement will also set the class foo (synonymous to {{{set .foo;}}}) | 'true' or 'false' (default)
-| angular_system | choose which angular system will be used for trigonometric functions | 'degrees' (default), 'radians'
-
-Config options can also be set as parameters to pgmapcss, by using {{{-c}}} or {{{--config}}}, e.g. {{{pgmapcss --config option1=value1 option2=value2}}}.
+See the file doc/config_options.md for a list of config options.
 
 == Define Type of property ==
 The type of a property is specified by:

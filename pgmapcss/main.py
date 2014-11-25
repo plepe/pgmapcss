@@ -51,14 +51,10 @@ parser.add_argument('--eval-tests', dest='eval_tests', action='store_const',
 
 parser.add_argument('-r', '--database-update', dest='database_update',
     default='auto',
-    help='Whether the database should be updated to the current version. Possible values: "re-init": re-initializes the database, need to re-compile all pgmapcss styles, "update": update all database functions, "none": do not update, "auto": if necessary a database functions update will be performed.')
-
-parser.add_argument('-o', '--options', dest='options', nargs='+',
-    choices=['profiler', 'context', 'rusage'],
-    help='Additional options. Currently supported options: "profiler": during execution, show some statistics about query/processing time and count of objects. "context": show bounding box and scale denominator of requests. "rusage": show resource usage at end of processing.')
+    help='Whether the database should be updated to the current version. Possible values: "init": (re-)initializes the database - you need to re-compile all pgmapcss styles, "update": update all database functions, "none": do not update, "auto": if necessary a database functions update will be performed.')
 
 parser.add_argument('-c', '--config', dest='config', nargs='+',
-    help='Set configuration options, e.g. -c foo=bar. See doc/MapCSS.creole for available configuration options.')
+    help='Set configuration options, e.g. -c foo=bar. See doc/config_options.md for available configuration options.')
 
 parser.add_argument('-D', '--defaults', dest='defaults', nargs='+',
     help='Load specified defaults. These can either be included in the pgmapcss distribution (see doc/defaults.md for a list of available defaults) or local files (specified by trailing .mapcss). You may specify several defaults which will be loaded consecutive (e.g. -D josm local.mapcss)')
@@ -111,7 +107,6 @@ def main():
 
     stat = pgmapcss.compiler.stat._stat({
         'id': style_id,
-        'options': set(args.options) if args.options else set(),
         'config': {},
         'base_style': args.base_style,
         'icons_dir': style_id + '.icons',
@@ -125,39 +120,55 @@ def main():
     if args.config:
         for v in args.config:
             v = v.split("=")
-            stat['config'][v[0]] = v[1]
+            if len(v) > 1:
+                stat['config'][v[0]] = v[1]
+            else:
+                stat['config'][v[0]] = True
 
     conn = pgmapcss.db.connect(args, stat)
 
     stat['database'] = conn.database
 
-    if args.database_update == 're-init':
-        print('* Re-initializing database')
-        pgmapcss.db.db_init(conn)
-
-    db_version = pgmapcss.db.db_version()
-    if db_version == None:
-        print('* DB functions not installed; installing')
-        pgmapcss.db.db_init(conn)
-    else:
-        db_check = pgmapcss.db.db_version_check()
-        if db_check == 1 and args.database_update == 'auto':
-            print('* Current DB version: {version} -> updating DB functions'.format(**db_version))
-            pgmapcss.db.db_update(conn)
-
-        elif db_check == 2:
-            print('* Current DB version: {version}'.format(**db_version))
-            print('pgmapcss version too new. Database needs to be re-initialized. Please re-run pgmapcss with parameter "-r re-init". All Mapnik styles need to be re-compiled afterwards.')
-            sys.exit(1)
-
-        elif args.database_update == 'update':
-            pgmapcss.db.db_update(conn)
-
+    if not 'unit.srs' in stat['config']:
+        stat['config']['unit.srs'] = 900913
+    if not 'srs' in stat['config']:
+        if stat['mode'] == 'database-function':
+            stat['config']['srs'] = 900913
         else:
-            print('* Current DB version: {version}'.format(**db_version))
+            stat['config']['srs'] = 4326
+
+    if stat['config'].get('offline', False) in (False, 'false', 'no') and args.database_update in ('init', 're-init'):
+        print('* Re-initializing database')
+        pgmapcss.db.db_init(conn, stat)
+
+    if stat['config'].get('offline', False) not in (False, 'false', 'no'):
+        print('* Using offline mode. Attention! Some functionality might be missing.')
+
+    else:
+        db_version = pgmapcss.db.db_version()
+        if db_version == None:
+            print('* DB functions not installed; installing')
+            pgmapcss.db.db_init(conn, stat)
+        else:
+            db_check = pgmapcss.db.db_version_check()
+            if db_check == 1 and args.database_update == 'auto':
+                print('* Current DB version: {version} -> updating DB functions'.format(**db_version))
+                pgmapcss.db.db_update(conn)
+
+            elif db_check == 2:
+                print('* Current DB version: {version}'.format(**db_version))
+                print('pgmapcss version too new. Database needs to be re-initialized. Please re-run pgmapcss with parameter "-r init". All Mapnik styles need to be re-compiled afterwards.')
+                sys.exit(1)
+
+            elif args.database_update == 'update':
+                pgmapcss.db.db_update(conn)
+
+            else:
+                print('* Current DB version: {version}'.format(**db_version))
 
     if args.eval_tests:
-        pgmapcss.eval.functions().test_all()
+        pgmapcss.eval.functions(stat).test_all()
+        print('* All tests completed successfully.')
 
     try:
         os.mkdir(stat['icons_dir'])
@@ -212,7 +223,9 @@ def main():
         pgmapcss.db.install(style_id, style, conn)
         pgmapcss.renderer.process_renderer(style_id, args, stat, conn)
     elif stat['mode'] == 'standalone':
-        open('pgmapcss_' + style_id + '.py', 'w').write(style['function_match'])
+        open(style_id + '.py', 'w').write(style['function_match'])
+        os.chmod(style_id + '.py', 0o755)
+        print('Created executable {}.py'.format(style_id))
 
     pgmapcss.icons.process_icons(style_id, args, stat, conn)
     pgmapcss.symbols.process_symbols(style_id, args, stat, conn)

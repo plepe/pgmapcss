@@ -49,7 +49,7 @@ def eval_line_part(param, current):
     if pos1 > length:
         pos1 = length
 
-    plan = plpy.prepare('select ST_Line_Substring($1, $2, $3) as r', ['geometry', 'float', 'float' ])
+    plan = plpy.prepare('select ST_Transform(ST_Line_Substring(ST_Transform($1, {unit.srs}), $2, $3), {db.srs}) as r', ['geometry', 'float', 'float' ])
     res = plpy.execute(plan, [ param[0], pos0 / length, pos1 / length ])
 
     return res[0]['r']

@@ -1,12 +1,18 @@
-0.9-dev
+0.9.0 release 2014-11-02
 * support osmosis pgsnapshot as alternative database backend, see [[doc/database.md|database docu]] for details
-* pseudo tags 'osm:id' (osm2pgsql and osmosis), 'osm:version', 'osm:user_id', 'osm:user', 'osm:timestamp', 'osm:changeset' (osmosis only), see [[doc/database.md|database docu]] for details
-* new option 'rusage' to show resource usage
 * new 'standalone' mode, which compiles mapcss into a python executable which can be used from command line or as CGI script
+* pseudo tags 'osm:id' (osm2pgsql and osmosis), 'osm:version', 'osm:user_id', 'osm:user', 'osm:timestamp', 'osm:changeset' (osmosis only), see [[doc/database.md|database docu]] for details
+* removed command line options (-o, --options) and merged them into config options (-c, --config). See [[doc/config_options.md]] for a full list.
+* new eval functions: parameter(), lang(), localized_tag()
+* Improved SQL queries to select map features from database; now [key!=value] will also select features without key set.
+* Debugging: new option 'debug.rusage' to show resource usage; 'debug.explain_queries' to list and count queries and show their plans (standalone mode only); 'debug.counter' shows how many map features were rendered - set to 'verbose' to list each map feature which was read from the database but not rendered.
+* Support databases with geometries in a different Spatial Reference System, see config db.srs in [[doc/config_options.md]].
 * if no bounding box is given (to the database function or the standalone executable), the whole database will be queried
 * Language support (see chapter "Language support" in [[doc/MapCSS.creole|MapCSS docu]]
 * enable usage for tag checking, see [[doc/tagchecker.md|tagchecker docu]] for details
 * near selector (e.g. {{{node near node}}}) does no longer include the current object
+* New property type 'list_append' (add value to existing list)
+* Performace improvements (especially memory usage has been drastically reduced), and many bugfixes (and many new bugs!)
 
 0.8.1 release 2014-10-19
 * Bugfixes

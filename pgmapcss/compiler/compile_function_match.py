@@ -1,12 +1,13 @@
 from pkg_resources import *
 import pgmapcss.db as db
-from .compile_function_get_where import compile_function_get_where
+from .compile_db_selects import compile_db_selects
 from .compile_function_check import compile_function_check
 from .compile_build_result import compile_build_result
 from ..includes import include_text
 import pgmapcss.eval
 import pgmapcss.mode
 import pgmapcss.types
+from pgmapcss.misc import strip_includes
 
 def compile_function_match(stat):
     scale_denominators = sorted(stat.all_scale_denominators(), reverse=True)
@@ -46,6 +47,8 @@ def compile_function_match(stat):
       'database': stat['args'].database,
       'default_lang': repr(stat['lang']),
       'user': stat['args'].user,
+      'db_srs': stat['config']['db.srs'],
+      'srs': stat['config']['srs'],
       'style_element_property': repr({
           k: v['value'].split(';')
           for k, v in stat['defines']['style_element_property'].items()
@@ -54,7 +57,7 @@ def compile_function_match(stat):
           for k, v in stat['defines']['style_element_property'].items()
       }),
       'scale_denominators': repr(scale_denominators),
-      'match_where': compile_function_get_where(stat['id'], stat),
+      'db_selects': compile_db_selects(stat['id'], stat),
       'db_query': db.query_functions(stat),
       'function_check': object_checks,
       'check_chooser': check_chooser,
@@ -71,7 +74,7 @@ import datetime
 import copy
 '''.format(**replacement)
 
-    if 'profiler' in stat['options']:
+    if stat['config'].get('debug.profiler', False):
         ret += 'time_start = datetime.datetime.now() # profiling\n'
 
     ret += '''\
@@ -79,18 +82,22 @@ global render_context
 
 if not 'lang' in parameters:
     parameters['lang'] = {default_lang}
+if not 'srs' in parameters:
+    parameters['srs' ] = {srs}
 
 if type(bbox) == list and len(bbox) == 4:
-    plan = plpy.prepare('select ST_Transform(SetSRID(MakeBox2D(ST_Point($1, $2), ST_Point($3, $4)), 4326), 900913) as bounds', ['float', 'float', 'float', 'float'])
-    res = plpy.execute(plan, [float(b) for b in bbox])
+    plan = plpy.prepare('select SetSRID(MakeBox2D(ST_Point($1, $2), ST_Point($3, $4)), $5) as bounds', ['float', 'float', 'float', 'float', 'int'])
+    res = plpy.execute(plan, [float(b) for b in bbox] + [ parameters['in.srs'] if 'in.srs' in parameters else parameters['srs'] ])
     _bbox = res[0]['bounds']
 else:
     _bbox = bbox
 
-render_context = {{ 'bbox': _bbox, 'scale_denominator': scale_denominator }}
+plan = plpy.prepare('select ST_Transform($1, {db_srs}) as bounds', ['geometry'])
+res = plpy.execute(plan, [_bbox])
+render_context = {{ 'bbox': res[0]['bounds'], 'scale_denominator': scale_denominator }}
 '''.format(**replacement)
 
-    if 'context' in stat['options']:
+    if stat['config'].get('debug.context', False):
         ret += 'plpy.warning(render_context)\n'
 
     ret += 'global_data = ' + repr(stat['global_data']) + '\n'
@@ -99,8 +106,8 @@ render_context = {{ 'bbox': _bbox, 'scale_denominator': scale_denominator }}
 {db_query}
 {eval_functions}
 {function_check}
-match_where = None
-{match_where}
+db_selects = None
+{db_selects}
 counter = {{ 'rendered': 0, 'total': 0 }}
 
 {check_chooser}
@@ -113,8 +120,8 @@ for style_element in all_style_elements:
 
 '''.format(**replacement)
 
-    func = "objects(render_context.get('bbox'), match_where)"
-    if 'profiler' in stat['options']:
+    func = "objects(render_context.get('bbox'), db_selects)"
+    if stat['config'].get('debug.profiler', False):
         ret += "time_qry_start = datetime.datetime.now() # profiling\n"
         ret += "src = list(" + func + ")\n"
         ret += "time_qry_stop = datetime.datetime.now() # profiling\n"
@@ -127,6 +134,11 @@ for style_element in all_style_elements:
 def ST_Collect(geometries):
     plan = plpy.prepare('select ST_Collect($1) as r', ['geometry[]'])
     res = plpy.execute(plan, [geometries])
+    return res[0]['r']
+
+def convert_srs(geom):
+    plan = plpy.prepare('select ST_Transform($1, $2) as r', ['geometry', 'integer'])
+    res = plpy.execute(plan, [geom, parameters['srs']])
     return res[0]['r']
 
 def dict_merge(dicts):
@@ -249,7 +261,7 @@ while src:
                     'types': result['types'],
                     'tags': pghstore.dumps(result['tags']),
                     'pseudo_element': result['pseudo_element'],
-                    'geo': result['geo'],
+                    'geo': convert_srs(result['geo']),
                     'properties': pghstore.dumps(result['properties']),
                     'style_elements': [ se[0] for se in style_elements ],
                     'style_elements_index': [ se[1] for se in style_elements ],
@@ -265,7 +277,7 @@ while src:
                     'types': result['types'],
                     'tags': result['tags'],
                     'pseudo_element': result['pseudo_element'],
-                    'geo': result['geo'],
+                    'geo': convert_srs(result['geo']),
                     'properties': result['properties'],
                     'style_elements': [ se[0] for se in style_elements ],
                     'style_elements_index': [ se[1] for se in style_elements ],
@@ -326,8 +338,15 @@ while src:
 
         if shown:
             counter['rendered'] += 1
-#        else:
-#            plpy.warning('not rendered: ' + object['id'] + ' ' + repr(object['tags']))
+'''.format(**replacement)
+
+    if stat['config'].get('debug.counter', False) == 'verbose':
+        ret += '''
+        elif object['state'][0] == 'finished':
+            plpy.warning('not rendered: ' + object['id'] + ' ' + repr(object['tags']))
+'''.format(**replacement)
+
+    ret += '''
 
     # the current src is empty, lets see, what there is still to be done
     # 1st: check if there are any requests we can finish / continue
@@ -376,34 +395,38 @@ while src:
             src = None
 
     # final: no sources left
-    '''.format(**replacement)
+'''.format(**replacement)
 
-    if 'profiler' in stat['options']:
+    if stat['config'].get('debug.profiler', False):
         ret += '''
 time_stop = datetime.datetime.now() # profiling
 plpy.warning('total run of processing (incl. querying db objects) took %.2fs' % (time_stop - time_start).total_seconds())
+'''.format(**replacement)
+
+    if stat['config'].get('debug.counter', False):
+        ret += '''
 if counter['total'] == 0:
     counter['perc'] = 100.0
 else:
     counter['perc'] = counter['rendered'] / counter['total'] * 100.0
 plpy.warning('rendered map features: {{rendered}} / {{total}}, {{perc:.2f}}%'.format(**counter))
-'''.format(**replacement);
+'''.format(**replacement)
 
-    if 'rusage' in stat['options']:
-        ret += '''\
+    if stat['config'].get('debug.rusage', False):
+        ret += '''
 import resource
 plpy.warning('Resource Usage: ' + str(resource.getrusage(resource.RUSAGE_SELF)) + '\\nsee https://docs.python.org/3/library/resource.html')
-'''.format(**replacement);
+'''.format(**replacement)
 
     indent = ''
     if stat['mode'] == 'standalone':
         indent = '    '
 
-    header = resource_string(pgmapcss.mode.__name__, stat['mode'] + '/header.inc')
-    header = header.decode('utf-8').format(**replacement)
+    header = strip_includes(resource_stream(pgmapcss.mode.__name__, stat['mode'] + '/header.inc'), stat)
+    header = header.format(**replacement)
 
-    footer = resource_string(pgmapcss.mode.__name__, stat['mode'] + '/footer.inc')
-    footer = footer.decode('utf-8').format(**replacement)
+    footer = strip_includes(resource_stream(pgmapcss.mode.__name__, stat['mode'] + '/footer.inc'), stat)
+    footer = footer.format(**replacement)
 
     ret = header + indent + ret.replace('\n', '\n' + indent) + '\n' + footer
 

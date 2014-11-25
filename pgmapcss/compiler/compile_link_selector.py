@@ -1,24 +1,32 @@
 from .compile_selector_part import compile_selector_part
 from .compile_conditions import compile_conditions
-from .compile_sql import *
 from .compile_eval import compile_eval
 import pgmapcss.db as db
 
 def compile_link_selector(statement, stat):
-    parent_conditions = ' and '.join([
-        compile_condition_sql(c, statement, stat, prefix='') or 'true'
-        for c in statement['parent_selector']['conditions']
-    ])
+    parent_conditions = stat['database'].merge_conditions([(
+        statement['parent_selector']['type'],
+        stat['database'].compile_selector(
+            statement, stat, prefix='', selector='parent_selector')
+    )])[statement['parent_selector']['type']]
+
+    child_conditions = stat['database'].merge_conditions([(
+        statement['selector']['type'],
+        stat['database'].compile_selector(
+            statement, stat, prefix='')
+    )])[statement['selector']['type']]
 
     if statement['link_selector']['type'] in ('>', ''):
         return "objects_member_of(object['id'], " +\
             repr(statement['parent_selector']['type']) + ", " +\
-            repr(parent_conditions) + ")"
+            repr(parent_conditions) + ", " +\
+            repr(child_conditions) + ")"
 
     elif statement['link_selector']['type'] == '<':
         return "objects_members(object['id'], " +\
             repr(statement['parent_selector']['type']) + ", " +\
-            repr(parent_conditions) + ")"
+            repr(parent_conditions) + ", " +\
+            repr(child_conditions) + ")"
 
     elif statement['link_selector']['type'] == 'near':
         distance = { 'value': '100' }
@@ -37,12 +45,14 @@ def compile_link_selector(statement, stat):
 
         return "objects_near(" + distance + ", None, "+\
             repr(statement['parent_selector']['type']) + ", " +\
-            repr(parent_conditions) + ", current)"
+            repr(parent_conditions) + ", " +\
+            repr(child_conditions) + ", current)"
 
     elif statement['link_selector']['type'] in ('within', 'surrounds', 'overlaps'):
         return "objects_near(\"0\", None, "+\
             repr(statement['parent_selector']['type']) + ", " +\
-            repr(parent_conditions) + ", current, check_geo=" +\
+            repr(parent_conditions) + ", " +\
+            repr(child_conditions) + ", current, check_geo=" +\
             repr(statement['link_selector']['type']) + ")"
 
     else:

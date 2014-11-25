@@ -8,7 +8,7 @@ pgmapcss compiles MapCSS styles into a database function. Mapnik just needs to c
 
 Alternatively there's a standalone mode, where the MapCSS style is compiled into an executable, which can be run from the command line. The executable will not render an image but create GeoJSON output instead. See below for details.
 
-Stable version: [0.8.1](https://github.com/plepe/pgmapcss), development version: [0.9-dev](https://github.com/plepe/pgmapcss/tree/branch-0.9), see [open issues](https://github.com/plepe/pgmapcss/milestones/Version%200.9)
+Stable version: [0.9.0](https://github.com/plepe/pgmapcss), development version: [0.10-dev](https://github.com/plepe/pgmapcss/tree/branch-0.10), see [open issues](https://github.com/plepe/pgmapcss/milestones/Version%200.10)
 
 Features
 --------
@@ -113,6 +113,10 @@ The compiled database function uses PL/Python3 database language, which makes ex
 As Mapnik 2.x can't read symbolizer values (like color, width, ...) from database columns, the mapnik pre-processor has to create style rules for all possible value combinations. The more complex the style sheet, the larger the mapnik style files and therefore rendering can take a long time. The up-coming Mapnik 3.0 should solve these issues.
 
 ### Standalone mode ###
+Version 0.9 introduces the option, to compile a MapCSS style into a standalone
+executable. Running this executable (either from command line or as CGI script)
+will produce GeoJSON output.
+
 Let's take the following MapCSS style:
 ```css
 node[place=city] {
@@ -121,7 +125,7 @@ node[place=city] {
 }
 ```
 
-If you compile this MapCSS style into a standalone executable, running this executable (either from command line or as CGI script) will produce the following GeoJSON output (simplified, there will be more values). If you don't specify a bounding box as parameter the whole database will be queried:
+The compiled executable will produced an output similar to this (it has been shortened for readability):
 ```json
 { "type": "FeatureCollection", "features": [
 {
@@ -130,7 +134,7 @@ If you compile this MapCSS style into a standalone executable, running this exec
     "results": [
       {
         "icon": "circle",
-        "text": "Salzburg (149201)",
+        "text": "Salzburg (149201)", // <- here's the result of property "text"
         "pseudo_element": "default",
       }
     ],
@@ -154,7 +158,7 @@ If you compile this MapCSS style into a standalone executable, running this exec
     "results": [
       {
         "icon": "circle",
-        "text": "Wien (1626440)",
+        "text": "Wien (1626440)", // <- here's the result of property "text"
         "pseudo_element": "default",
       }
     ],
@@ -174,9 +178,13 @@ If you compile this MapCSS style into a standalone executable, running this exec
 ]}
 ```
 
+Two possible uses for the standalone mode:
+* Quality assurance by building a tagchecker, see [doc/tagchecker.md](doc/tagchecker.md).
+* Interactive rendering using a JavaScript library frontend, e.g. [ol4pgm](https://github.com/plepe/ol4pgm). See [doc/ol4pgm.md](doc/ol4pgm.md).
+
 ### Easy to install: ###
 
-Find installation instructions in [Install pgmapcss with Mapnik 2.2 on Ubuntu 12.04](doc/Install pgmapcss with Mapnik_2.2 on Ubuntu_12.04.md).
+Find installation instructions in [Install pgmapcss with Mapnik 3.0 on Ubuntu 14.04](doc/Install pgmapcss with Mapnik_3.0 on Ubuntu_14.04.md).
 
 There's a file [test.mapcss](./test.mapcss) which you can use to build upon. You can [try it online!](http://pgmapcss.openstreetbrowser.org/?style=f457f&zoom=14&lat=48.2098&lon=16.3725)
 

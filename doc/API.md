@@ -29,18 +29,25 @@ style_elements_z_index | float[] | z-index for each style element.
 Notes:
 * `!bbox!` and `!scale_denominator!` will be replaced by Mapnik by the current bounding box resp. scale denominator. See [zoom-to-scale.txt](https://trac.openstreetmap.org/browser/subversion/applications/rendering/mapnik/zoom-to-scale.txt) for valid values.
 
-### Mode 'standalone': file pgmapcss_{style_id}.py
-When compiling in 'standalone' mode, a file pgmapcss_{style_id}.py will be created, which can be used either from command line or as CGI script. In any case it will produce GeoJSON output. See below for details.
+### Mode 'standalone': file {style_id}.py
+When compiling in 'standalone' mode, a file {style_id}.py will be created, which can be used either from command line or as CGI script. In any case it will produce GeoJSON output. See below for details.
 
 #### command line
 ```
-usage: pgmapcss_{style_id}.py [-h] [-b BOUNDS] [-s SCALE]
+usage: {style_id}.py [-h] [-b BOUNDS] [-s SCALE]
                        [-P PARAMETERS [PARAMETERS ...]] [--lang LANG]
 
 Executes the compiled map style and prints resulting objects.
 
 optional arguments:
   -h, --help            show this help message and exit
+  -d DATABASE, --database DATABASE
+                        Name of database (default: as set at compile time)
+  -u USER, --user USER  User for database (default: as set at compile time)
+  -p PASSWORD, --password PASSWORD
+                        Password for database (default: as set at compile
+                        time)
+  -H HOST, --host HOST  Host for database (default: as set at compile time)
   -b BOUNDS, --bounds BOUNDS
                         Process the map from the specified bounding box as
                         min_lon,min_lat,max_lon,max_lat in WGS-84. (default:
@@ -69,6 +76,7 @@ z             | zoom level in combination with x/y tiles. If a different tilesiz
 tilesize      | the tilesize when using x/y tiles (default: 256)
 lang          | Use the given language code (e.g. "en" or "de") for language dependend instructions. Default: the first value of the HTTP Accept-Language header.
 srs           | ID of projection of output coordinates (default: 4326).
+in.srs        | Per default the coordinates of the bounding box are assumed to be in 'srs'. Use this to override this value.
 OTHER         | all other parameters will be available via the parameters() function.
 
 #### GeoJSON output

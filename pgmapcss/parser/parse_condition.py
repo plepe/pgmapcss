@@ -5,6 +5,7 @@ import re
 
 def parse_condition(to_parse):
     condition = { 'op': '', 'value_type': 'value' }
+    pos = to_parse.pos()
 
     if to_parse.match('\s*!'):
         condition['op'] += '! '
@@ -52,8 +53,23 @@ def parse_condition(to_parse):
         condition['op'] += '@='
         return condition
 
-    else:
+    elif to_parse.match('\s*\]'):
         condition['op'] += 'has_tag'
+        return condition
+
+    else:
+        # try to parse eval condition
+        to_parse.seek(pos)
+
+        value = parse_eval(to_parse, end_chars={']'})
+
+        if not to_parse.match('\s*\]'):
+            raise ParseError(to_parse, 'parse condition: Can\'t parse condition')
+
+        condition['op'] = 'eval'
+        condition['key'] = value
+
+        return condition
 
     r = parse_string(to_parse)
     if r:
@@ -84,6 +100,9 @@ def parse_condition(to_parse):
 
     elif condition['op'] in ('=~', '!~'):
         condition['value'] = parse_string(to_parse, delim="/")
+
+        if condition['value'] is None:
+            raise ParseError(to_parse, 'parse condition: expecting regular expression in /.../')
 
         m = to_parse.match('([^\]]*)\]')
 
