@@ -242,7 +242,7 @@ def get_bbox(_bbox=None):
 
     plan = plpy.prepare("select ST_YMin($1::geometry) || ',' || ST_XMIN($1::geometry) || ',' || ST_YMAX($1::geometry) || ',' || ST_XMAX($1::geometry) as bbox_string", [ 'geometry' ])
     res = plpy.execute(plan, [ _bbox ])
-    return '[bbox:' + res[0]['bbox_string'] + ']'
+    return res[0]['bbox_string']
 
 def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_value=[]):
     time_start = datetime.datetime.now() # profiling
@@ -252,9 +252,13 @@ def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_v
     area_ways_done = []
 
     qry = '[out:json]'
+    replacements = {}
 
     if _bbox:
-        qry += get_bbox(_bbox)
+        qry += '[bbox:' + get_bbox(_bbox) + ']'
+        replacements['__BBOX__'] = '(' + get_bbox(_bbox) + ')'
+    else:
+        replacements['__BBOX__'] = ''
 
     qry += ';__QRY__;out meta geom;'
 
@@ -265,8 +269,15 @@ def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_v
             w.append(where_clauses[t])
 
     if len(w):
-        q = qry.replace('__QRY__', '((' + ');('.join(w) + ');)')
+        parent_query = ''
+        for w1 in w:
+            if 'parent_query' in w1:
+                parent_query += w1['parent_query']
+
+        q = qry.replace('__QRY__', parent_query + '((' + ');('.join([ w1['query'] for w1 in w ]) + ');)')
         q = q.replace('__TYPE__', 'node')
+        for r1, r2 in replacements.items():
+            q = q.replace(r1, r2)
 
         for r in overpass_query(q):
             yield(assemble_object(r))
@@ -285,10 +296,15 @@ def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_v
         # multipolygon has no (relevant) tags and all outer ways share the same
         # tags (save non relevant tags) the ways are discarded and the relation
         # is used - as type 'multipolygon' and a 'm' prefixed to the ID
-        q1 = ');('.join(w).replace('__TYPE__', 'way(r.rel:"outer")')
-        q2 = ');('.join(w).replace('__TYPE__', 'way(r.rel:"")')
+        parent_query = ''
+        for w1 in w:
+            if 'parent_query' in w1:
+                parent_query += w1['parent_query']
 
-        q = qry.replace('__QRY__',
+        q1 = ');('.join([ w1['query'] for w1 in w ]).replace('__TYPE__', 'way(r.rel:"outer")')
+        q2 = ');('.join([ w1['query'] for w1 in w ]).replace('__TYPE__', 'way(r.rel:"")')
+
+        q = qry.replace('__QRY__', parent_query +\
                 "relation[type~'^multipolygon|boundary$'] -> .rel;" +
                 '((' + q1 + q2 + ");) -> .outer;relation(bw.outer)[type~'^multipolygon|boundary$']") + '.outer out tags qt;'
 
@@ -359,8 +375,15 @@ def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_v
                 w.append(where_clauses[t])
 
         if len(w):
-            q = qry.replace('__QRY__', '((' + ');('.join(w) + ');)')
+            parent_query = ''
+            for w1 in w:
+                if 'parent_query' in w1:
+                    parent_query += w1['parent_query']
+
+            q = qry.replace('__QRY__', parent_query + '((' + ');('.join([ w1['query'] for w1 in w ]) + ');)')
             q = q.replace('__TYPE__', 'way')
+            for r1, r2 in replacements.items():
+                q = q.replace(r1, r2)
 
             for r in overpass_query(q):
                 if r['id'] in ways_done:
@@ -382,12 +405,17 @@ def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_v
 
     # relations
     w = []
+    parent_query = ''
     for t, type_condition in {'*': '', 'relation': '', 'area': "[type~'^multipolygon|boundary$']"}.items():
         if t in where_clauses:
-            w.append(where_clauses[t].replace('__TYPE__', 'relation' + type_condition))
+            w.append(where_clauses[t]['query'].replace('__TYPE__', 'relation' + type_condition))
+            if 'parent_query' in where_clauses[t]:
+                parent_query += where_clauses[t]['parent_query']
 
     if len(w):
-        q = qry.replace('__QRY__', '((' + ');('.join(w) + ');)')
+        q = qry.replace('__QRY__', parent_query + '((' + ');('.join(w) + ');)')
+        for r1, r2 in replacements.items():
+            q = q.replace(r1, r2)
 
         for r in overpass_query(q):
             if r['id'] in rels_done:
@@ -406,10 +434,12 @@ def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_v
         plan = plpy.prepare("select ST_Y(ST_Centroid($1::geometry)) || ',' || ST_X(ST_Centroid($1::geometry)) as geom", [ 'geometry' ])
         res = plpy.execute(plan, [ _bbox ])
 
-        q1 = ');('.join(w).replace('__TYPE__', 'relation(pivot.a)')
-        q2 = ');('.join(w).replace('__TYPE__', 'way(pivot.a)')
+        q1 = ');('.join([ w1['query'] for w1 in w ]).replace('__TYPE__', 'relation(pivot.a)')
+        q2 = ');('.join([ w1['query'] for w1 in w ]).replace('__TYPE__', 'way(pivot.a)')
 
         q = ('[out:json];is_in({})->.a;(' + q1 + q2 + ');out meta geom;').format(res[0]['geom'])
+        for r1, r2 in replacements.items():
+            q = q.replace(r1, r2)
 
         for r in overpass_query(q):
             if (r['type'] == 'way' and r['id'] in ways_done) or\
@@ -460,13 +490,21 @@ def objects_member_of(member_id, parent_type, parent_conditions, child_condition
 
     if member_of_cache_id not in member_of_cache:
         member_of_cache[member_of_cache_id] = []
-        q = '[out:json]' + get_bbox() + ';'
+        replacements = { '__BBOX__': '(' + get_bbox() + ')' }
+        q = '[out:json][bbox:' + get_bbox() + '];'
 
-        q += '(' + child_conditions.replace('__TYPE__', ob_type) + ')->.a;'
+        if 'parent_query' in child_conditions:
+            q += child_conditions['parent_query']
+        if 'parent_query' in parent_conditions:
+            q += parent_conditions['parent_query']
 
-        q += '(' + parent_conditions.replace('__TYPE__', parent_type + '(b' +
+        q += '(' + child_conditions['query'].replace('__TYPE__', ob_type) + ')->.a;'
+
+        q += '(' + parent_conditions['query'].replace('__TYPE__', parent_type + '(b' +
                 ob_type[0] + '.a)') + ');'
         q += 'out meta qt geom;'
+        for r1, r2 in replacements.items():
+            q = q.replace(r1, r2)
 
         for r in overpass_query(q):
             t = assemble_object(r)
@@ -507,24 +545,36 @@ def objects_members(relation_id, parent_type, parent_conditions, child_condition
 
     if members_cache_id not in members_cache:
         members_cache[members_cache_id] = { 'parents': {}, 'children': [] }
-        q = '[out:json]' + get_bbox() + ';'
+        replacements = { '__BBOX__': '(' + get_bbox() + ')' }
+        q = '[out:json][bbox:' + get_bbox() + '];'
 
-        q += '(' + child_conditions.replace('__TYPE__', ob_type) + ');'
+        if 'parent_query' in child_conditions:
+            q += child_conditions['parent_query']
+        q += '(' + child_conditions['query'].replace('__TYPE__', ob_type) + ');'
         q += 'out meta qt geom;'
         # TODO: out body qt; would be sufficient, but need to adapt assemble_object
+        for r1, r2 in replacements.items():
+            q = q.replace(r1, r2)
 
         for r in overpass_query(q):
             t = assemble_object(r)
             t['type'] = r['type']
             members_cache[members_cache_id]['parents'][t['id']] = t
 
-        q = '[out:json]' + get_bbox() + ';'
+        q = '[out:json][bbox:' + get_bbox() + '];'
 
-        q += '(' + child_conditions.replace('__TYPE__', ob_type) + ')->.a;'
-        q += '(' + parent_conditions.replace('__TYPE__', parent_type + '(' +
+        if 'parent_query' in child_conditions:
+            q += child_conditions['parent_query']
+        if 'parent_query' in parent_conditions:
+            q += parent_conditions['parent_query']
+
+        q += '(' + child_conditions['query'].replace('__TYPE__', ob_type) + ')->.a;'
+        q += '(' + parent_conditions['query'].replace('__TYPE__', parent_type + '(' +
                 relation_id[0] + '.a)') + ');'
         q += 'out meta qt geom;'
         # TODO: .a out body qt; would be sufficient, but need to adapt assemble_object
+        for r1, r2 in replacements.items():
+            q = q.replace(r1, r2)
 
         for r in overpass_query(q):
             t = assemble_object(r)
