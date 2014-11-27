@@ -8,7 +8,12 @@ def compile_link_selector(statement, stat):
         statement['parent_selector']['type'],
         stat['database'].compile_selector(
             statement, stat, prefix='', selector='parent_selector')
-    )])[statement['parent_selector']['type']]
+    )])
+
+    if statement['parent_selector']['type'] in parent_conditions:
+        parent_conditions = parent_conditions[statement['parent_selector']['type']]
+    else:
+        parent_conditions = None
 
     child_conditions = stat['database'].merge_conditions([(
         statement['selector']['type'],
