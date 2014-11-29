@@ -287,6 +287,9 @@ class db(default):
             m1 = self.convert_to_regexp(d1[0])
             m2 = self.convert_to_regexp(d2[0])
 
+            if m1 is None or m2 is None:
+                return
+
             if m1[0] == m2[0]:
                 return [
                         c
