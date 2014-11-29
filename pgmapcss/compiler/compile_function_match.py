@@ -302,7 +302,7 @@ while src:
                 # remember, that the current object has a request
                 request_objects.append(object)
 
-                if result[1] <= pending_min_index:
+                if True:
                     # remember to handle rest of 'src'
                     src_stack.append(src)
                     # now, process the pending objects ...
@@ -353,9 +353,12 @@ while src:
 
     ret += '''
 
+    src = None
+
     # the current src is empty, lets see, what there is still to be done
     # 1st: check if there are any requests we can finish / continue
     if len(request_objects):
+        src = []
         for object in request_objects:
             if pending_min_index >= object['state'][1]:
                 src.append(object)
@@ -383,7 +386,7 @@ while src:
                     'geo': ST_Collect([ ob['geo'] for ob in obs ])
                 }})
 
-        combined_objects = []
+        combined_objects = {{ }}
 
     # 4th: check if there are still pending_objects, process them next
     # pending_min_index always points to the next pending objects -> if it is
