@@ -373,6 +373,7 @@ class db(default):
 
         parent_conditions = None
         if 'parent_selector' in statement and selector == 'selector' and statement['link_selector']['type'] in ('', '>', '<'):
+            filter['object_type'] = statement['parent_selector']['type']
             parent_conditions = [
                 self.compile_condition(c, statement, stat, prefix, filter) or None
                 for c in statement['parent_selector']['conditions']
