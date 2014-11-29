@@ -363,6 +363,22 @@ class db(default):
 
         return ret
 
+    def convert_condition_parent(self, condition):
+        if type(condition) == list:
+            t = []
+            for c1 in condition:
+                t.append(self.convert_condition_parent(c1))
+
+            return t
+
+        t = tuple()
+        for i, c in enumerate(condition):
+            if i == 0:
+                c = 'parent_' + c
+            t += ( c ,)
+
+        return t
+
     def compile_selector(self, statement, stat, prefix='current.', filter={}, object_type=None, selector='selector', no_object_type=False):
         filter['object_type'] = object_type
 
@@ -380,16 +396,18 @@ class db(default):
             ]
 
             conditions.append(( 'parent', statement['parent_selector']['type'], statement['link_selector']['type'] ))
-            for condition in parent_conditions:
-                if condition is None:
-                    continue
-                t = tuple()
-                for i, c in enumerate(condition):
-                    if i == 0:
-                        c = 'parent_' + c
-                    t += ( c ,)
 
-                conditions.append(t)
+            for condition in parent_conditions:
+                if condition is not None:
+                    condition = self.convert_condition_parent(condition)
+                    if type(condition) == list:
+                        conditions = [[[
+                            conditions + r2
+                            for r1 in condition
+                            for r2 in r1
+                        ]]]
+                    else:
+                        conditions.append(condition)
 
         ret = [ [] ]
 
