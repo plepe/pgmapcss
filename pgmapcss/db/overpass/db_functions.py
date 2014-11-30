@@ -570,7 +570,7 @@ def objects_members(relation_id, parent_type, parent_conditions, child_condition
 
         q += '(' + child_conditions['query'].replace('__TYPE__', ob_type) + ')->.a;'
         q += '(' + parent_conditions['query'].replace('__TYPE__', parent_type + '(' +
-                relation_id[0] + '.a)') + ');'
+                relation_id[0] + '.a)(' + get_bbox() + ')') + ');'
         q += 'out meta qt geom;'
         # TODO: .a out body qt; would be sufficient, but need to adapt assemble_object
         for r1, r2 in replacements.items():
