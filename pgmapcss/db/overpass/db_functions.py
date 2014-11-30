@@ -580,6 +580,9 @@ def objects_members(relation_id, parent_type, parent_conditions, child_condition
             t = assemble_object(r)
             members_cache[members_cache_id]['children'].append(t)
 
+    if not relation_id in members_cache[members_cache_id]['parents']:
+        return
+
     relation = members_cache[members_cache_id]['parents'][relation_id]
 
     for t in members_cache[members_cache_id]['children']:
