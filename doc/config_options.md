@@ -18,6 +18,7 @@ The following config options are supported:
 | debug.rusage     | show resource usage at end of processing. | true/**false** |
 | debug.explain_queries | Print queries, their plans and count of executions to stderr (standalone mode only). | true/**false** |
 | debug.overpass_queries | overpass only: Print a debug message for each query posted to the Overpass API | true/**false** |
+| debug.loop | While running the main loop see which objects are processed and at which state | true/**false** |
 
 Advances options:
 

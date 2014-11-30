@@ -172,6 +172,17 @@ done_objects = {{ }}
 
 while src:
     while True:
+'''.format(**replacement)
+
+    if stat['config'].get('debug.loop', False):
+        ret += '''
+        try:
+            plpy.warning(object['id'] + ' ' + start_state + ' => ' + object['state'][0] + ' ' + str(object['state'][1]))
+        except:
+            pass
+'''.format(**replacement)
+
+    ret += '''
         # get the next object from the current source.
         if type(src) == list:
             try:
@@ -202,7 +213,14 @@ while src:
             counter['total'] += 1
             object_check = check(object)
             object['object_check'] = object_check
+'''.format(**replacement)
 
+    if stat['config'].get('debug.loop', False):
+        ret += '''
+        start_state = object['state'][0] + ' ' + str(object['state'][1])
+'''.format(**replacement)
+
+    ret += '''
         # get the next return value from the check() function, this can be
         # either a result or a notification about relationship: 'pending',
         # 'request', 'combine'
