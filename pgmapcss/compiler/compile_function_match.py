@@ -178,6 +178,7 @@ while src:
         ret += '''
         try:
             plpy.warning(object['id'] + ' ' + start_state + ' => ' + object['state'][0] + ' ' + str(object['state'][1]))
+            del start_state
         except:
             pass
 '''.format(**replacement)
