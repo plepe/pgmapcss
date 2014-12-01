@@ -370,18 +370,18 @@ while src:
 
         request_id, request_def = request_objects.popitem()
         request_type = request_def[0]
-        objects = request_def[1]
+        objects_list = request_def[1]
 
         if request_type['type'] == 'objects_member_of':
-            request = objects_member_of(objects, request_type)
+            request = objects_member_of(objects_list, request_type)
         elif request_type['type'] == 'objects_members':
-            request = objects_members(objects, request_type)
+            request = objects_members(objects_list, request_type)
         elif request_type['type'] == 'objects_near':
-            request = objects_near(objects, request_type)
+            request = objects_near(objects_list, request_type)
         else:
             plpy.warning('unknown request type {{}}', request_type['type'])
 
-        for o in objects:
+        for o in objects_list:
             o['state'] = ( 'pending', o['state'][1], [] )
 
         for request_object, src_object, link_tags in request:
