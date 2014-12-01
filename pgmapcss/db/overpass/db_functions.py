@@ -472,26 +472,9 @@ def objects_by_id(objects):
         yield(assemble_object(r))
 
 def objects_member_of(objects, args):
-    q_list = '';
-
-    for o in objects:
-        member_id = o['id']
-
-        if member_id[0] == 'n':
-            q_list += 'node(' + member_id[1:] + ');'
-        elif member_id[0] == 'w':
-            q_list += 'way(' + member_id[1:] + ');'
-        elif member_id[0] == 'r':
-            q_list += 'relation(' + member_id[1:] + ');'
-
-    plpy.warning('args', args)
-    q = '[out:json];(' + q_list + ')->.a;'
-    q += '('
-
-    for i in ('n', 'w', 'r'):
-        q += args['parent_conditions']['query'].replace('__TYPE__', args['parent_type'] + '(b' + i + '.a)(' + get_bbox() + ')')
-
-    q += ');out meta qt geom;'
+    q = '[out:json][bbox:' + get_bbox() + '];'
+    q += '(' + args['child_conditions']['parent_query'] + ');'
+    q += 'out meta qt geom;'
 
     for r in overpass_query(q):
         t = assemble_object(r)
