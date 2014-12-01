@@ -508,85 +508,47 @@ def objects_member_of(objects, args):
 
                     yield (o, t, link_tags)
 
-def objects_members(relation_id, parent_type, parent_conditions, child_conditions):
-    global members_cache
-    try:
-        members_cache
-    except:
-        members_cache = {}
+def objects_members(objects, args):
+    q_list = '';
+    types = set()
 
-    q = '[out:json];'
+    for o in objects:
+        member_id = o['id']
 
-    if relation_id[0] == 'n':
-        ob_type = 'node'
-        ob_id = int(relation_id[1:])
-    elif relation_id[0] == 'w':
-        ob_type = 'way'
-        ob_id = int(relation_id[1:])
-    elif relation_id[0] == 'r':
-        ob_type = 'relation'
-        ob_id = int(relation_id[1:])
+        if member_id[0] == 'w':
+            q_list += 'way(' + member_id[1:] + ');'
+            types.add('w')
+        elif member_id[0] == 'r':
+            q_list += 'relation(' + member_id[1:] + ');'
+            types.add('r')
 
-    members_cache_id = parent_type + '|' + ob_type + '|' + repr(parent_conditions) + '|' + repr(child_conditions)
+    q = '[out:json];(' + q_list + ')->.a;'
+    q += '('
 
-    if members_cache_id not in members_cache:
-        members_cache[members_cache_id] = { 'parents': {}, 'children': [] }
-        replacements = { '__BBOX__': '(' + get_bbox() + ')' }
-        q = '[out:json][bbox:' + get_bbox() + '];'
+    for t in types:
+        q += args['parent_conditions']['query'].replace('__TYPE__', args['parent_type'] + '(' + t + '.a)(' + get_bbox() + ')')
 
-        if 'parent_query' in child_conditions:
-            q += child_conditions['parent_query']
-        q += '(' + child_conditions['query'].replace('__TYPE__', ob_type) + ');'
-        q += 'out meta qt geom;'
-        # TODO: out body qt; would be sufficient, but need to adapt assemble_object
-        for r1, r2 in replacements.items():
-            q = q.replace(r1, r2)
+    q += ');out meta qt geom;'
 
-        for r in overpass_query(q):
-            t = assemble_object(r)
-            t['type'] = r['type']
-            members_cache[members_cache_id]['parents'][t['id']] = t
+    for r in overpass_query(q):
+        t = assemble_object(r)
 
-        q = '[out:json][bbox:' + get_bbox() + '];'
+        for o in objects:
+            for m in o['members']:
+                if t['id'] == m['member_id']:
+                    link_tags = {
+                            'sequence_id': m['sequence_id'],
+                            'member_id': m['member_id'],
+                        }
+                    if 'role' in m:
+                        link_tags['role'] = m['role']
 
-        if 'parent_query' in child_conditions:
-            q += child_conditions['parent_query']
-        if 'parent_query' in parent_conditions:
-            q += parent_conditions['parent_query']
+                    yield (o, t, link_tags)
 
-        q += '(' + child_conditions['query'].replace('__TYPE__', ob_type) + ')->.a;'
-        q += '(' + parent_conditions['query'].replace('__TYPE__', parent_type + '(' +
-                relation_id[0] + '.a)(' + get_bbox() + ')') + ');'
-        q += 'out meta qt geom;'
-        # TODO: .a out body qt; would be sufficient, but need to adapt assemble_object
-        for r1, r2 in replacements.items():
-            q = q.replace(r1, r2)
+def objects_near(objects_list, args):
+    cache_id = 'objects_near' + '|' + args['parent_type'] + '|' + repr(args['parent_conditions'])
 
-        for r in overpass_query(q):
-            t = assemble_object(r)
-            members_cache[members_cache_id]['children'].append(t)
-
-    if not relation_id in members_cache[members_cache_id]['parents']:
-        return
-
-    relation = members_cache[members_cache_id]['parents'][relation_id]
-
-    for t in members_cache[members_cache_id]['children']:
-        for m in relation['members']:
-            if m['member_id'] == t['id']:
-                t['link_tags'] = {
-                        'sequence_id': m['sequence_id'],
-                        'member_id': m['member_id'],
-                }
-                if 'role' in m:
-                    t['link_tags']['role'] = m['role']
-
-                yield(t)
-
-def objects_near(max_distance, ob, parent_type, parent_conditions, child_conditions, current, check_geo=None):
-    cache_id = 'objects_near' + '|' + parent_type + '|' + repr(parent_conditions)
-
-    max_distance = to_float(eval_metric([ max_distance, 'u' ]))
+    max_distance = to_float(eval_metric([ args['distance'], 'u' ], None))
     if max_distance is None:
         return
 
@@ -599,37 +561,40 @@ def objects_near(max_distance, ob, parent_type, parent_conditions, child_conditi
         res = plpy.execute(plan, [ render_context['bbox'], max_distance ])
         bbox = res[0]['r']
 
-        for t in objects(bbox, { parent_type: parent_conditions }):
+        for t in objects(bbox, { args['parent_type']: args['parent_conditions'] }):
             cache.add(t)
 
-    if ob:
-        geom = ob['geo']
-    elif 'geo' in current['properties'][current['pseudo_element']]:
-        geom = current['properties'][current['pseudo_element']]['geo']
-    else:
-        geom = current['object']['geo']
+    for ob in objects_list:
+        if ob:
+            geom = ob['geo']
+        elif 'geo' in current['properties'][current['pseudo_element']]:
+            geom = current['properties'][current['pseudo_element']]['geo']
+        else:
+            geom = current['object']['geo']
 
-    if max_distance == 0:
-        bbox = geom
-    else:
-        plan = plpy.prepare('select ST_Transform(ST_Buffer(ST_Transform(ST_Envelope($1), {unit.srs}), $2), {db.srs}) as r', ['geometry', 'float'])
-        res = plpy.execute(plan, [ geom, max_distance ])
-        bbox = res[0]['r']
+        if max_distance == 0:
+            bbox = geom
+        else:
+            plan = plpy.prepare('select ST_Transform(ST_Buffer(ST_Transform(ST_Envelope($1), {unit.srs}), $2), {db.srs}) as r', ['geometry', 'float'])
+            res = plpy.execute(plan, [ geom, max_distance ])
+            bbox = res[0]['r']
 
-    if check_geo == 'within':
-        where_clause += " and ST_DWithin(geo, $1, 0.0)"
-    elif check_geo == 'surrounds':
-        where_clause += " and ST_DWithin($1, geo, 0.0)"
-    elif check_geo == 'overlaps':
-        where_clause += " and ST_Overlaps($1, geo)"
+        if not 'check_geo' in args:
+            pass
+        elif args['check_geo'] == 'within':
+            where_clause += " and ST_DWithin(geo, $1, 0.0)"
+        elif args['check_geo'] == 'surrounds':
+            where_clause += " and ST_DWithin($1, geo, 0.0)"
+        elif args['check_geo'] == 'overlaps':
+            where_clause += " and ST_Overlaps($1, geo)"
 
-    plan = cache.prepare('select * from (select *, ST_Distance(ST_Transform($1, {unit.srs}), ST_Transform(geo, {unit.srs})) dist from {table} where geo && $2 offset 0) t order by dist asc', [ 'geometry', 'geometry' ])
-    for t in cache.cursor(plan, [ geom, bbox ]):
-        ob = t['data']
+        plan = cache.prepare('select * from (select *, ST_Distance(ST_Transform($1, {unit.srs}), ST_Transform(geo, {unit.srs})) dist from {table} where geo && $2 offset 0) t order by dist asc', [ 'geometry', 'geometry' ])
+        for t in cache.cursor(plan, [ geom, bbox ]):
+            o = t['data']
 
-        if ob['id'] != current['object']['id'] and t['dist'] <= max_distance:
-            ob['link_tags'] = {
-                'distance': eval_metric([ str(t['dist']) + 'u', 'px' ])
-            }
+            if o['id'] != ob['id'] and t['dist'] <= max_distance:
+                link_tags = {
+                    'distance': eval_metric([ str(t['dist']) + 'u', 'px' ], o)
+                }
 
-            yield ob
+                yield ( ob, o, link_tags )
