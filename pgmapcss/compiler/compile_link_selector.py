@@ -17,16 +17,16 @@ def compile_link_selector(statement, stat):
     )])[statement['selector']['type']]
 
     if statement['link_selector']['type'] in ('>', ''):
-        return "objects_member_of(object['id'], " +\
-            repr(statement['parent_selector']['type']) + ", " +\
-            repr(parent_conditions) + ", " +\
-            repr(child_conditions) + ")"
+        return "{ 'type': 'objects_member_of', " +\
+               "'parent_type': " + repr(statement['parent_selector']['type']) + ", " +\
+               "'parent_conditions': " + repr(parent_conditions) + ", " +\
+               "'child_conditions': " + repr(child_conditions) + "}"
 
     elif statement['link_selector']['type'] == '<':
-        return "objects_members(object['id'], " +\
-            repr(statement['parent_selector']['type']) + ", " +\
-            repr(parent_conditions) + ", " +\
-            repr(child_conditions) + ")"
+        return "{ 'type': 'objects_members', " +\
+               "'parent_type': " + repr(statement['parent_selector']['type']) + ", " +\
+               "'parent_conditions': " + repr(parent_conditions) + ", " +\
+               "'child_conditions': " + repr(child_conditions) + "}"
 
     elif statement['link_selector']['type'] == 'near':
         distance = { 'value': '100' }
@@ -43,17 +43,19 @@ def compile_link_selector(statement, stat):
         else:
             distance = repr(distance['value'])
 
-        return "objects_near(" + distance + ", None, "+\
-            repr(statement['parent_selector']['type']) + ", " +\
-            repr(parent_conditions) + ", " +\
-            repr(child_conditions) + ", current)"
+        return "{ 'type': 'objects_near', " +\
+               "'parent_type': " + repr(statement['parent_selector']['type']) + ", " +\
+               "'parent_conditions': " + repr(parent_conditions) + ", " +\
+               "'child_conditions': " + repr(child_conditions) + ", " +\
+               "'distance': " + distance + "}"
 
     elif statement['link_selector']['type'] in ('within', 'surrounds', 'overlaps'):
-        return "objects_near(\"0\", None, "+\
-            repr(statement['parent_selector']['type']) + ", " +\
-            repr(parent_conditions) + ", " +\
-            repr(child_conditions) + ", current, check_geo=" +\
-            repr(statement['link_selector']['type']) + ")"
+        return "{ 'type': 'objects_near', " +\
+               "'parent_type': " + repr(statement['parent_selector']['type']) + ", " +\
+               "'parent_conditions': " + repr(parent_conditions) + ", " +\
+               "'child_conditions': " + repr(child_conditions) + ", " +\
+               "'distance': " + distance + ", " +\
+               "'check_geo': " + repr(statement['link_selector']['type']) + "}"
 
     else:
         raise Exception('Unknown link selector "{type}"'.format(**selector['link_selector']))

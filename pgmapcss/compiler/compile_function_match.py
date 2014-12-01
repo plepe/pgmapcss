@@ -160,7 +160,7 @@ def dict_merge(dicts):
 # due to a relationship), the previous source will be pushed to the src_stack.
 src_stack = [ ]
 # Objects which have a request (e.g. from a relationship).
-request_objects = [ ]
+request_objects = {{ }}
 # Objects which are partly processed, but might still be needed at the current
 # state for handling relationships.
 pending_objects = {{ }}
@@ -227,10 +227,7 @@ while src:
         while object_check:
             try:
                 if len(object['state']) > 2:
-                    result = object_check.send([
-                        pending_objects[r['id']] if r['id'] in pending_objects else r
-                        for r in object['state'][2]
-                    ])
+                    result = object_check.send(object['state'][2])
                 else:
                     result = next(object_check)
             except StopIteration:
@@ -318,24 +315,15 @@ while src:
                 object_check = None
 
                 # remember, that the current object has a request
-                request_objects.append(object)
+                request_id = repr(result[2])
+                if not request_id in request_objects:
+                    request_objects[request_id] = [ result[2], [] ]
 
-                if True:
-                    # remember to handle rest of 'src'
-                    src_stack.append(src)
-                    # now, process the pending objects ...
-                    src = [
-                        pending_objects[r['id']] if r['id'] in pending_objects else r
-                        for r in result[2]
-                    ]
+                request_objects[request_id][1].append(object)
 
-                    # ... but only those which have not been processed (up to
-                    # the current statement id)
-                    src = [
-                        r
-                        for r in src
-                        if not 'state' in r or (r['state'][0] != 'finish' and r['state'][1] < result[1])
-                    ]
+                # also add to pending_objects, so that relations will find this
+                # object
+                pending_objects[object['id']] = object
 
             # the current object might used as parent for a relationship. add
             # to pending_objects and cancel processing.
@@ -375,12 +363,33 @@ while src:
 
     # the current src is empty, lets see, what there is still to be done
     # 1st: check if there are any requests we can finish / continue
-    if len(request_objects):
+    if not src and len(request_objects):
         src = []
-        for object in request_objects:
-            if pending_min_index >= object['state'][1]:
-                src.append(object)
-                request_objects.remove(object)
+        done = []
+
+        request_id, request_def = request_objects.popitem()
+        request_type = request_def[0]
+        objects = request_def[1]
+
+        if request_type['type'] == 'objects_member_of':
+            request = objects_member_of(objects, request_type)
+        elif request_type['type'] == 'objects_members':
+            request = objects_members(objects, request_type)
+        elif request_type['type'] == 'objects_near':
+            request = objects_near(objects, request_type)
+        else:
+            plpy.warning('unknown request type {{}}', request_type['type'])
+
+        for o in objects:
+            o['state'] = ( 'pending', o['state'][1], [] )
+
+        for request_object, src_object, link_tags in request:
+            if src_object['id'] in pending_objects:
+                src_object = pending_objects[src_object['id']]
+            elif src_object['id'] not in done_objects:
+                src.append(src_object)
+
+            request_object['state'][2].append(( src_object, link_tags))
 
         if len(src) == 0:
             src = None
