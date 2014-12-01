@@ -364,7 +364,7 @@ while src:
     # the current src is empty, lets see, what there is still to be done
     # 1st: check if there are any requests we can finish / continue
     if not src and len(request_objects):
-        src = []
+        src = {{}}
         done = []
 
         request_id, request_def = request_objects.popitem()
@@ -387,10 +387,11 @@ while src:
             if src_object['id'] in pending_objects:
                 src_object = pending_objects[src_object['id']]
             elif src_object['id'] not in done_objects:
-                src.append(src_object)
+                src[src_object['id']] = src_object
 
             request_object['state'][2].append(( src_object, link_tags))
 
+        src = list(src.values())
         if len(src) == 0:
             src = None
 
