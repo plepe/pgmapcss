@@ -424,11 +424,11 @@ while src:
         pending_min_index = 999999999999999
 
         for pending_id, pending in pending_objects.items():
-            if pending['state'][1] < pending_min_index:
+            if pending['state'][0] == 'pending' and pending['state'][1] < pending_min_index:
                 pending_min_index = pending['state'][1]
 
         for pending_id, pending in pending_objects.items():
-            if pending['state'][1] == pending_min_index:
+            if pending['state'][0] == 'pending' and pending['state'][1] == pending_min_index:
                 src.append(pending)
 
         pending_min_index = 999999999999999
