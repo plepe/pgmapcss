@@ -451,10 +451,12 @@ def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_v
     time_stop = datetime.datetime.now() # profiling
     plpy.notice('querying db objects took %.2fs' % (time_stop - time_start).total_seconds())
 
-def objects_by_id(id_list):
+def objects_by_id(objects):
     q = ''
     multipolygons = []
-    for i in id_list:
+    for o in objects:
+        i = o['id']
+
         if i[0:1] == 'n':
             q += 'node({});out meta geom;'.format(i[1:])
         elif i[0:1] == 'w':
@@ -469,58 +471,42 @@ def objects_by_id(id_list):
     for r in overpass_query(q):
         yield(assemble_object(r))
 
-def objects_member_of(member_id, parent_type, parent_conditions, child_conditions):
-    global member_of_cache
-    try:
-        member_of_cache
-    except:
-        member_of_cache = {}
+def objects_member_of(objects, args):
+    q_list = '';
 
-    if member_id[0] == 'n':
-        ob_type = 'node'
-        ob_id = int(member_id[1:])
-    elif member_id[0] == 'w':
-        ob_type = 'way'
-        ob_id = int(member_id[1:])
-    elif member_id[0] == 'r':
-        ob_type = 'relation'
-        ob_id = int(member_id[1:])
+    for o in objects:
+        member_id = o['id']
 
-    member_of_cache_id = parent_type + '|' + ob_type + '|' + repr(parent_conditions) + '|' + repr(child_conditions)
+        if member_id[0] == 'n':
+            q_list += 'node(' + member_id[1:] + ');'
+        elif member_id[0] == 'w':
+            q_list += 'way(' + member_id[1:] + ');'
+        elif member_id[0] == 'r':
+            q_list += 'relation(' + member_id[1:] + ');'
 
-    if member_of_cache_id not in member_of_cache:
-        member_of_cache[member_of_cache_id] = []
-        replacements = { '__BBOX__': '(' + get_bbox() + ')' }
-        q = '[out:json][bbox:' + get_bbox() + '];'
+    plpy.warning('args', args)
+    q = '[out:json];(' + q_list + ')->.a;'
+    q += '('
 
-        if 'parent_query' in child_conditions:
-            q += child_conditions['parent_query']
-        if 'parent_query' in parent_conditions:
-            q += parent_conditions['parent_query']
+    for i in ('n', 'w', 'r'):
+        q += args['parent_conditions']['query'].replace('__TYPE__', args['parent_type'] + '(b' + i + '.a)(' + get_bbox() + ')')
 
-        q += '(' + child_conditions['query'].replace('__TYPE__', ob_type) + ')->.a;'
+    q += ');out meta qt geom;'
 
-        q += '(' + parent_conditions['query'].replace('__TYPE__', parent_type + '(b' +
-                ob_type[0] + '.a)') + ');'
-        q += 'out meta qt geom;'
-        for r1, r2 in replacements.items():
-            q = q.replace(r1, r2)
+    for r in overpass_query(q):
+        t = assemble_object(r)
 
-        for r in overpass_query(q):
-            t = assemble_object(r)
-            member_of_cache[member_of_cache_id].append(t)
+        for o in objects:
+            for m in t['members']:
+                if o['id'] == m['member_id']:
+                    link_tags = {
+                            'sequence_id': m['sequence_id'],
+                            'member_id': m['member_id'],
+                        }
+                    if 'role' in m:
+                        link_tags['role'] = m['role']
 
-    for t in member_of_cache[member_of_cache_id]:
-        for m in t['members']:
-            if m['member_id'] == member_id:
-                t['link_tags'] = {
-                        'sequence_id': m['sequence_id'],
-                        'member_id': m['member_id'],
-                }
-                if 'role' in m:
-                    t['link_tags']['role'] = m['role']
-
-                yield(t)
+                    yield (o, t, link_tags)
 
 def objects_members(relation_id, parent_type, parent_conditions, child_conditions):
     global members_cache
