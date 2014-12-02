@@ -116,3 +116,5 @@ List of icons available from the [Mapbox Maki](https://www.mapbox.com/maki/) pro
 | chemist | Chemist | ![Chemist](../pgmapcss/icons/maki/chemist-24.png)
 | mobilephone | Mobile phone | ![Mobile phone](../pgmapcss/icons/maki/mobilephone-24.png)
 | scooter | Scooter | ![Scooter](../pgmapcss/icons/maki/scooter-24.png)
+| gift | Gift | ![Gift](../pgmapcss/icons/maki/gift-24.png)
+| ice-cream | Ice cream | ![Ice cream](../pgmapcss/icons/maki/ice-cream-24.png)
