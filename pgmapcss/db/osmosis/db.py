@@ -27,6 +27,9 @@ class db(default):
                 self.stat['config']['db.srs'] = res[0][0]
                 print('- Database SRS ID {} detected'.format(self.stat['config']['db.srs']))
 
+        if 'db.hstore_key_index' in stat['config']:
+            stat['config']['db.hstore_key_index'] = stat['config']['db.hstore_key_index'].split(',')
+
     def tag_type(self, key, condition, selector, statement):
         if key[0:4] == 'osm:':
             if key == 'osm:id':

@@ -62,6 +62,9 @@ class db(default):
                         for k in self.stat['config']['db.columns.' + t]
                     ])
 
+        if 'db.hstore_key_index' in stat['config']:
+            stat['config']['db.hstore_key_index'] = stat['config']['db.hstore_key_index'].split(',')
+
     def tag_type(self, key, condition, selector, statement):
         if key[0:4] == 'osm:':
             if key == 'osm:id':

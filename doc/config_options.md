@@ -27,3 +27,4 @@ Advances options:
 | db.columns       | osm2pgsql only: Use the specified list for db.columns.node and db.columns.way | |
 | db.has-hstore    | osm2pgsql only: Additional tags can be read from the 'tags' column (of type hstore). Usually autodetected. Needed when using offline mode. | |
 | db.multipolygons | osmosis only: Specify whether the multipolygons table is present and should be used. Usually autodected. Needed when using offline mode (default: false) | true/false
+| db.hstore_key_index| osm2pgsql/osmosis: Assume that there's a btree index on the specified keys (,-separated) and therefore add a tag-exists condition into the SQL query. E.g.: db.hstore_key_index=sport,amenity . | |
