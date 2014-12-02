@@ -39,6 +39,9 @@ def connect(args, stat):
 
     conn.database_type=args.database_type
 
+    if 'db.search_path' in stat['config']:
+        conn.prepare('set search_path to {}'.format(postgresql.string.escape_ident(stat['config']['db.search_path'])))()
+
     if args.database_type == 'osm2pgsql':
         conn.database = pgmapcss.db.osm2pgsql.db(conn, stat)
     elif args.database_type == 'osmosis':

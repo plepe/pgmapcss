@@ -7,6 +7,7 @@ The following config options are supported:
 | josm_classes     | when 'true', a `set foo;` statement will also set the class foo (synonymous to `set .foo;`) | 'true' or 'false' (default) |
 | angular_system   | choose which angular system will be used for trigonometric functions | 'degrees' (default), 'radians' |
 | db.srs           | Spatial Reference System used in the database. Autodetected. | Usual values: 4326 (WGS-84), 900913 resp. 3857 (Spherical Mercator for Web Maps) |
+| db.search_path   | Set a PostgreSQL search_path (works only with mode standalone)
 | unit.srs         | Spatial Reference System to use for distances. If other values than 900913 are used, unexpected behaviour might happen. | 900913 |
 | srs              | Default Spatial Reference System to use on the frontend side | 900913 when using with renderer (mode 'database-function'), 4326 otherwise |
 | db.hstore-only   | osm2pgsql only: Do not use the separate tag columns, only use the hstore 'tags' column. Might be faster on large databases in combination with a multicolumn index on way and tags: e.g. create index planet_osm_point_way_tags on planet_osm_point using gist(way, tags). Requires --hstore-all on osm2pgsql when importing the database. | true/**false** |
