@@ -61,12 +61,18 @@ class postgresql_db(default):
         elif op == '=':
             ret = prefix + column + ' @> ' + self.format({ key: condition['value'] })
 
+            if 'db.hstore_key_index' in stat['config'] and key in stat['config']['db.hstore_key_index']:
+                ret += ' and ' + prefix + column + ' ? ' + self.format(key)
+
         # @=
         elif op == '@=' and condition['value_type'] == 'value':
             ret = '(' + ' or '.join([
                 prefix + column + ' @> ' + self.format({ key: v })
                 for v in condition['value'].split(';')
                 ]) + ')'
+
+            if 'db.hstore_key_index' in stat['config'] and key in stat['config']['db.hstore_key_index']:
+                ret += ' and ' + prefix + column + ' ? ' + self.format(key)
 
         # !=
         elif op == '!=':

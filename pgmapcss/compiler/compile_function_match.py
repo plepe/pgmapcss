@@ -47,7 +47,6 @@ def compile_function_match(stat):
       'database': stat['args'].database,
       'default_lang': repr(stat['lang']),
       'user': stat['args'].user,
-      'db_srs': stat['config']['db.srs'],
       'srs': stat['config']['srs'],
       'style_element_property': repr({
           k: v['value'].split(';')
@@ -66,6 +65,11 @@ resource_string(pgmapcss.eval.__name__, 'base.py').decode('utf-8') +\
 pgmapcss.eval.functions().print(indent='') +\
 include_text()
     }
+    # add all config options as replacement patterns, in the form
+    # 'config|foo|bar', were 'foo.bar' was the config option ('.' not allowed
+    # in patterns)
+    for k, v in stat['config'].items():
+      replacement['config|' + k.replace('.', '|')] = v
 
     ret = '''\
 import re
@@ -94,7 +98,7 @@ if type(bbox) == list and len(bbox) == 4:
 else:
     _bbox = bbox
 
-plan = plpy.prepare('select ST_Transform($1, {db_srs}) as bounds', ['geometry'])
+plan = plpy.prepare('select ST_Transform($1, {config|db|srs}) as bounds', ['geometry'])
 res = plpy.execute(plan, [_bbox])
 render_context = {{ 'bbox': res[0]['bounds'], 'scale_denominator': scale_denominator }}
 '''.format(**replacement)
@@ -162,6 +166,10 @@ while src:
     for object in src:
         shown = False
         counter['total'] += 1
+
+        orig_geo_src = object['geo']
+        orig_geo_out = convert_srs(object['geo'])
+
         for result in check(object):
             if type(result) != tuple or len(result) == 0:
                 plpy.warning('unknown check result: ', result)
@@ -205,7 +213,7 @@ while src:
                     'types': result['types'],
                     'tags': pghstore.dumps(result['tags']),
                     'pseudo_element': result['pseudo_element'],
-                    'geo': convert_srs(result['geo']),
+                    'geo': orig_geo_out if result['geo'] == orig_geo_src else convert_srs(result['geo']),
                     'properties': pghstore.dumps(result['properties']),
                     'style_elements': [ se[0] for se in style_elements ],
                     'style_elements_index': [ se[1] for se in style_elements ],
@@ -216,12 +224,13 @@ while src:
 
     elif stat['mode'] == 'standalone':
         ret += '''
+                object['geo'] = orig_geo_out
                 yield {{
                     'id': result['id'],
                     'types': result['types'],
                     'tags': result['tags'],
                     'pseudo_element': result['pseudo_element'],
-                    'geo': convert_srs(result['geo']),
+                    'geo': orig_geo_out if result['geo'] == orig_geo_src else convert_srs(result['geo']),
                     'properties': result['properties'],
                     'style_elements': [ se[0] for se in style_elements ],
                     'style_elements_index': [ se[1] for se in style_elements ],
