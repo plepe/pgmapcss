@@ -1,3 +1,6 @@
+0.9.2 release ?
+* Mode standalone/CGI: accept z/x/y and zoom/x/y coordinates
+
 0.9.1 release 2014-12-02
 * advanced database options: db.search_path, db.hstore_key_index
 * updated Maki icons
