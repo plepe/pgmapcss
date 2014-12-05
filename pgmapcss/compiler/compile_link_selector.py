@@ -19,7 +19,11 @@ def compile_link_selector(statement, stat):
         statement['selector']['type'],
         stat['database'].compile_selector(
             statement, stat, prefix='')
-    )])[statement['selector']['type']]
+    )])
+    if statement['selector']['type'] in child_conditions:
+        child_conditions = child_conditions[statement['selector']['type']]
+    else:
+        child_conditions = None
 
     if statement['link_selector']['type'] in ('>', ''):
         return "objects_member_of(object['id'], " +\
