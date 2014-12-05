@@ -127,6 +127,8 @@ class db(default):
 
         return ret
 
+    # returns None if it's not possible to query for condition (e.g. osm:user)
+    # returns False if query always evaluates negative
     def compile_condition(self, condition, statement, stat, prefix='current.', filter={}):
         ret = []
 
@@ -145,6 +147,8 @@ class db(default):
 
         # ignore generated tags (identified by leading .)
         if condition['key'][0] == '.':
+            if len(set_statements) == 0:
+                return False
             return set_statements
 
         # depending on the tag type compile the specified condition
@@ -161,6 +165,9 @@ class db(default):
             return set_statements
 
         if len(set_statements):
+            if False in set_statements:
+                return False
+
             return [
                     s + [[ ret ]]
                     for s in set_statements
@@ -301,13 +308,14 @@ class db(default):
                 for c in cs
             ]) + ';\n'
             for t, cs in conditions.items()
+            if len(cs)
         }
 
     def compile_selector(self, statement, stat, prefix='current.', filter={}, object_type=None, selector='selector', no_object_type=False):
         filter['object_type'] = object_type
 
         conditions = [
-            self.compile_condition(c, statement, stat, prefix, filter) or None
+            self.compile_condition(c, statement, stat, prefix, filter)
             for c in statement[selector]['conditions']
         ]
 
@@ -331,8 +339,8 @@ class db(default):
                         for r in ret
                     ]
 
-        if False in ret:
-            return False
+            elif condition == False:
+                return False
 
         if no_object_type:
             return ret
