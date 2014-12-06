@@ -25,7 +25,7 @@ if __name__ == '__main__':
                 print("Error parsing bounds, expecting four numbers.")
                 sys.exit(1)
 
-        parameters = {{ }}
+        parameters = {{ 'format': 'geojson-combine' }}
 
         scale_denom = 2000
         z = None
@@ -140,7 +140,8 @@ if __name__ == '__main__':
             print("Error parsing scale.")
             sys.exit(1)
 
-        parameters = {{ }}
+        parameters = {{ 'format': 'geojson-combine' }}
+
         if args.parameters is not None:
             parameters = {{
                 p[0:p.find('=')]: p[p.find('=')+1:]
@@ -176,13 +177,17 @@ if __name__ == '__main__':
         for result in results:
             props = result['properties']
             props['pseudo_element'] = result['pseudo_element']
-            if result['geo'] != object['geo']:
+            if parameters['format'] in ('geojson-combine') and result['geo'] != object['geo']:
                 g = plpy.execute(plan_to_geojson, [ result['geo'] ])[0]['r']
                 props['geometry'] = json.loads(g) if g else None,
 
             properties_list['results'].append(props)
 
-        geo = plpy.execute(plan_to_geojson, [ object['geo'] ])[0]['r']
+        if parameters['format'] in ('geojson-combine'):
+            geo = plpy.execute(plan_to_geojson, [ object['geo'] ])[0]['r']
+        else:
+            geo = plpy.execute(plan_to_geojson, [ result['geo'] ])[0]['r']
+
         feature = {{
             'type': 'Feature',
             'geometry': json.loads(geo) if geo else None,
@@ -196,7 +201,7 @@ if __name__ == '__main__':
     last_object = None
 
     for result in pgmapcss_{style_id}(bounds, scale_denom, parameters):
-        if result['object'] == last_object:
+        if parameters['format'] in ('geojson-combine') and result['object'] == last_object:
             results.append(result)
 
         else:
