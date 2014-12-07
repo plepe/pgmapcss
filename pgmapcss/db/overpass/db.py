@@ -385,7 +385,8 @@ class db(default):
         return t
 
     def compile_selector(self, statement, stat, prefix='current.', filter={}, object_type=None, selector='selector', no_object_type=False):
-        filter['object_type'] = object_type
+        if object_type is not None:
+            filter['object_type'] = object_type
 
         conditions = [
             self.compile_condition(c, statement, stat, prefix, filter) or None
