@@ -62,6 +62,8 @@ def compile_db_selects(id, stat):
             for object_type in ({'node', 'way', 'area'} if stat['statements'][i]['selector']['type'] == True else { stat['statements'][i]['selector']['type'] })
         ]
 
+# TODO: call merge_conditions() for each object_type individially, replace list
+# of tuples by list of compiled selectors
         conditions = stat['database'].merge_conditions(conditions)
 
         max_scale = min_scale
