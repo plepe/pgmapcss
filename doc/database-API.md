@@ -1,8 +1,14 @@
-This is a documentation how support for a database backend is implemented in pgmapcss. It basically consists of a directory under pgmapcss/db (e.g. pgmapcss/db/osm2pgsql for the osm2pgsql backend) with two files: db.py and db_functions.py .
+This is a documentation how support for a database backend is implemented in pgmapcss. It basically consists of a directory under pgmapcss/db (e.g. pgmapcss/db/osm2pgsql for the osm2pgsql backend) with three files: __init__.py, db.py and db_functions.py .
 
-pgmapcss/db/BACKEND/db.py
+pgmapcss/db/TEMPLATE/__init__.py
 =========================
-The minimal file looks like this:
+```python
+from .db import db
+```
+
+pgmapcss/db/TEMPLATE/db.py
+=========================
+The template file looks like this:
 ```python
 from ..default import default
 
@@ -19,25 +25,26 @@ class db(default):
         # self.stat['config'], e.g. self.stat['config']['my_opt'] = True
         # this might come in handy later-on in db_functions.py
 
-    # compile the selector (e.g. `node[amenity=bar][name]`) to a select
-    # condition without selecting the object type
+    # compile the conditions of the selector (e.g. `node[amenity=bar][name]`)
+    # to a select condition without selecting the object type
     # (e.g. `"amenity"='bar' and "name" is not null` or
     # `tags @> 'amenity=>bar' and tags ? 'name'`).
     # see below for the structure of the statement argument
+    # for good performance it would be advisable to also compile relationships
     # You may define the datatype of the return value
     def compile_selector(self, statement):
         pass
 
     # merge several compiled selectors together (the argument conditions is a
     # list)
-    e.g. `[ '"amenity"=\'bar\' and "name" is not null', '"foo"=\'bar\'' ]`
+    # e.g. `[ '"amenity"=\'bar\' and "name" is not null', '"foo"=\'bar\'' ]`
     # => `'("amenity"=\'bar\' and "name" is not null) or ("foo"=\'bar\')'`
     # You may define the datatype of the return value
     def merge_conditions(self, conditions):
         pass
 ```
 
-pgmapcss/db/BACKEND/db_functions.py
+pgmapcss/db/TEMPLATE/db_functions.py
 ===================================
 This file will be included in the compiled executable / database function. All the functions may return more objects as actually needed, the objects will be checked again later-on during processing (though this will reduce performace. you can set the config option `db.counter=verbose` to see which objects were returned but not rendered in the output).
 
@@ -55,7 +62,7 @@ An object should look like this:
 }
 ```
 
-The minimal file looks like this:
+The template file looks like this:
 ```python
 # objects() yields all objects which match the query/queries in the current
 # bounding box.
@@ -92,6 +99,90 @@ def objects_member_of(objects, db_selects):
 def objects_members(objects, db_selects):
     pass
 
+# objects_near(). For each object in the `objects` list, return all nearby objects (which match the db_selects).
+# Argument options (dict):
+# * distance: maximum distance in pixels
+# * check_geo: (optional) one of:
+#   * 'within': if child object is within certain distance around parent
+#   * 'surrounds': if parent object is within certain distance around child
+#   * 'overlaps': if parent object and child object overlap (distance=0)
+# As yielded values, tuples are expected with:
+# ( parent_object, child_object, link_tags )
+# link_tags (dict) should contain:
+# * distance: distance between objects in pixels
 def objects_near(objects, db_selects, options):
     pass
+```
+
+APPENDIX
+========
+Structure of parsed statements
+------------------------------
+An example statement structure looks like this:
+```css
+node[amenity=bar][name] {
+    text: "name";
+    text-color: #ff0000;
+}
+```
+
+```python
+{
+    'id': 5,                     # sequential numbering of statements/properties
+    'selector': {
+        'conditions': [
+            {
+                'key': 'amenity',
+                'op': '=',
+                'value': 'bar',
+                'value_type': 'value' # one of (value, eval)
+            }, {
+                'key': 'name',
+                'op': 'has_tag'
+            }
+        ],
+        'type': 'node'           # selected type; True if any type (*)
+    },
+    'properties': ....
+}
+```
+
+An example using relationships:
+```css
+relation[type=route] >[role=stop] node {
+    text: parent_tag('ref');
+}
+```
+
+```python
+{
+    'id': 7,                     # sequential numbering of statements/properties
+    'selector': {
+        'conditions': [],        # no conditions on node
+        'type': 'node'
+    },
+    'link_selector': {           # (optional) when using relationship selector
+        'type': '>'                  # '', '>', '<', 'near', 'within', 'overlaps' or 'surrounds'
+        'conditions': [
+            {
+                'key': 'role',
+                'op': '=',
+                'value': 'stop',
+                'value_type': 'value'
+            }
+        ]
+    }
+    'parent_selector': {         # (optional) when using relationship selector
+        'type': 'relation'
+        'conditions': [
+            {
+                'key': 'type',
+                'op': '=',
+                'value': 'route',
+                'value_type': 'value'
+            }
+        ]
+    }
+    'properties': ....
+}
 ```
