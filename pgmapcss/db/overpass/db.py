@@ -42,7 +42,7 @@ class db(default):
         if s[0] == 'is':
             return ('regexp', s[1], { '^' + self.value_to_regexp(s[2]) + '$' })
 
-    def compile_condition_overpass(self, condition, statement, tag_type, stat, prefix, filter):
+    def compile_condition_overpass(self, condition, statement, tag_type, filter):
         ret = None
         negate = False
         key = tag_type[1]
@@ -129,7 +129,7 @@ class db(default):
 
     # returns None if it's not possible to query for condition (e.g. osm:user)
     # returns False if query always evaluates negative
-    def compile_condition(self, condition, statement, stat, prefix='current.', filter={}):
+    def compile_condition(self, condition, statement, filter={}):
         ret = []
 
         # assignments: map conditions which are based on a (possible) set-statement
@@ -137,7 +137,7 @@ class db(default):
         f = filter.copy()
         f['has_set_tag'] = condition['key']
         f['max_id'] = statement['id']
-        set_statements = stat.filter_statements(f)
+        set_statements = self.stat.filter_statements(f)
 
         if len(set_statements) > 0:
             set_statements = [
@@ -152,12 +152,12 @@ class db(default):
             return set_statements
 
         # depending on the tag type compile the specified condition
-        tag_type = stat['database'].tag_type(condition['key'], condition, statement['selector'], statement)
+        tag_type = self.stat['database'].tag_type(condition['key'], condition, statement['selector'], statement)
 
         if tag_type is None:
             pass
         elif tag_type[0] == 'overpass':
-            ret = self.compile_condition_overpass(condition, statement, tag_type, stat, prefix, filter)
+            ret = self.compile_condition_overpass(condition, statement, tag_type, filter)
         else:
             raise CompileError('unknown tag type {}'.format(tag_type))
 
@@ -311,12 +311,13 @@ class db(default):
             if len(cs)
         }
 
-    def compile_selector(self, statement, stat, prefix='current.', filter={}, object_type=None, selector='selector', no_object_type=False):
-        filter['object_type'] = object_type
+    def compile_selector(self, statement, no_object_type=False):
+        filter = {}
+        filter['object_type'] = statement['selector']['type']
 
         conditions = [
-            self.compile_condition(c, statement, stat, prefix, filter)
-            for c in statement[selector]['conditions']
+            self.compile_condition(c, statement, filter)
+            for c in statement['selector']['conditions']
         ]
 
         ret = [ [] ]

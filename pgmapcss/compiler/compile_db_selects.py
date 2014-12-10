@@ -53,13 +53,14 @@ def compile_db_selects(id, stat):
 
         # compile all selectors
         # TODO: define list of possible object_types
+        # TODO: how to handle wildcard object type?
         conditions = [
             (
-                object_type,
-                stat['database'].compile_selector(stat['statements'][i], stat, prefix='', filter=filter, object_type=object_type)
+                stat['statements'][i]['selector']['type'],
+                stat['database'].compile_selector(stat['statements'][i])
             )
             for i in current_selectors
-            for object_type in ({'node', 'way', 'area'} if stat['statements'][i]['selector']['type'] == True else { stat['statements'][i]['selector']['type'] })
+            #for object_type in ({'node', 'way', 'area'} if stat['statements'][i]['selector']['type'] == True else { stat['statements'][i]['selector']['type'] })
         ]
 
 # TODO: call merge_conditions() for each object_type individially, replace list

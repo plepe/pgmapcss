@@ -4,10 +4,15 @@ from .compile_eval import compile_eval
 import pgmapcss.db as db
 
 def compile_link_selector(statement, stat):
+    # create statement where selector is build from parent_selector for compiling
+    _statement = statement.copy()
+    _statement['selector'] = _statement['parent_selector']
+    del _statement['link_selector']
+    del _statement['parent_selector']
+
     parent_conditions = stat['database'].merge_conditions([(
         statement['parent_selector']['type'],
-        stat['database'].compile_selector(
-            statement, stat, prefix='', selector='parent_selector')
+        stat['database'].compile_selector(_statement)
     )])
 
     if statement['parent_selector']['type'] in parent_conditions:
@@ -17,8 +22,7 @@ def compile_link_selector(statement, stat):
 
     child_conditions = stat['database'].merge_conditions([(
         statement['selector']['type'],
-        stat['database'].compile_selector(
-            statement, stat, prefix='')
+        stat['database'].compile_selector(statement)
     )])
     if statement['selector']['type'] in child_conditions:
         child_conditions = child_conditions[statement['selector']['type']]

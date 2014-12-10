@@ -29,12 +29,13 @@ class postgresql_db(default):
             if cs != '()'
         }
 
-    def compile_condition_hstore_value(self, condition, statement, tag_type, stat, prefix, filter):
+    def compile_condition_hstore_value(self, condition, statement, tag_type, filter):
         ret = None
         negate = False
         key = tag_type[1]
         column = tag_type[2]
         op = condition['op']
+        prefix = ''
 
         if op[0:2] == '! ':
             op = op[2:]
@@ -61,7 +62,7 @@ class postgresql_db(default):
         elif op == '=':
             ret = prefix + column + ' @> ' + self.format({ key: condition['value'] })
 
-            if 'db.hstore_key_index' in stat['config'] and key in stat['config']['db.hstore_key_index']:
+            if 'db.hstore_key_index' in self.stat['config'] and key in self.stat['config']['db.hstore_key_index']:
                 ret += ' and ' + prefix + column + ' ? ' + self.format(key)
 
         # @=
@@ -71,7 +72,7 @@ class postgresql_db(default):
                 for v in condition['value'].split(';')
                 ]) + ')'
 
-            if 'db.hstore_key_index' in stat['config'] and key in stat['config']['db.hstore_key_index']:
+            if 'db.hstore_key_index' in self.stat['config'] and key in self.stat['config']['db.hstore_key_index']:
                 ret += ' and ' + prefix + column + ' ? ' + self.format(key)
 
         # !=
@@ -130,11 +131,12 @@ class postgresql_db(default):
 
         return ret
 
-    def compile_condition_column(self, condition, statement, tag_type, stat, prefix, filter):
+    def compile_condition_column(self, condition, statement, tag_type, filter):
         ret = None
         key = tag_type[1]
         op = condition['op']
         negate = False
+        prefix = ''
 
         value_format = self.value_format_default
         if len(tag_type) > 2:
@@ -241,7 +243,7 @@ class postgresql_db(default):
 
         return ret
 
-    def compile_condition(self, condition, statement, stat, prefix='current.', filter={}):
+    def compile_condition(self, condition, statement, filter={}):
         ret = set()
 
         # assignments: map conditions which are based on a (possible) set-statement
@@ -249,11 +251,11 @@ class postgresql_db(default):
         f = filter.copy()
         f['has_set_tag'] = condition['key']
         f['max_id'] = statement['id']
-        set_statements = stat.filter_statements(f)
+        set_statements = self.stat.filter_statements(f)
 
         if len(set_statements) > 0:
             ret.add('((' + ') or ('.join([
-                self.compile_selector(s, stat, prefix, filter)
+                self.compile_selector(s)
                 for s in set_statements
             ]) + '))')
 
@@ -264,14 +266,14 @@ class postgresql_db(default):
             return ''.join(ret)
 
         # depending on the tag type compile the specified condition
-        tag_type = stat['database'].tag_type(condition['key'], condition, statement['selector'], statement)
+        tag_type = self.stat['database'].tag_type(condition['key'], condition, statement['selector'], statement)
 
         if tag_type is None:
             pass
         elif tag_type[0] == 'hstore-value':
-            ret.add(self.compile_condition_hstore_value(condition, statement, tag_type, stat, prefix, filter))
+            ret.add(self.compile_condition_hstore_value(condition, statement, tag_type, filter))
         elif tag_type[0] == 'column':
-            ret.add(self.compile_condition_column(condition, statement, tag_type, stat, prefix, filter))
+            ret.add(self.compile_condition_column(condition, statement, tag_type, filter))
         else:
             raise CompileError('unknown tag type {}'.format(tag_type))
 
@@ -283,12 +285,13 @@ class postgresql_db(default):
         # merge conditions together, return
         return '(' + ' or '.join(ret) + ')'    
 
-    def compile_selector(self, statement, stat, prefix='current.', filter={}, object_type=None, selector='selector'):
-        filter['object_type'] = object_type
+    def compile_selector(self, statement):
+        filter = {}
+        filter['object_type'] = statement['selector']['type']
 
         ret = {
-            self.compile_condition(c, statement, stat, prefix, filter) or 'true'
-            for c in statement[selector]['conditions']
+            self.compile_condition(c, statement, filter) or 'true'
+            for c in statement['selector']['conditions']
         }
 
         if len(ret) == 0:
