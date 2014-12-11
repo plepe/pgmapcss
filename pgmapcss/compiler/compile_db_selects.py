@@ -1,3 +1,44 @@
+# takes a list of conditions as input and returns several condition combinations
+def resolve_set_statements(statement, stat):
+    ret = [ [] ]
+
+    # iterate over all conditions in the statement
+    for condition in statement['selector']['conditions']:
+        last_ret = ret
+        ret = []
+
+        # check if there are any statements which assign the current condition key
+        filter = {
+            'has_set_tag': condition['key'],
+            'max_id': statement['id']
+        }
+        set_statements = stat.filter_statements(filter)
+
+        # recurse into resolve_set_statements, to also resolve conditions in
+        # the statements where set statements happened
+        set_statements = [
+            resolve_set_statements(s, stat)
+            for s in set_statements
+        ]
+
+        # for all set statements create a new set of conditions
+        ret = [
+            r + s1
+            for r in last_ret
+            for s in set_statements
+            for s1 in s
+        ]
+
+        # for each set of conditions add the current condition
+        # unless the condition's key does not start with a '.'
+        if condition['key'][0] != '.':
+            ret += [
+                r + [ condition ]
+                for r in last_ret
+            ]
+
+    return ret
+
 def filter_selectors(filter, stat):
     # where_selectors contains indexes of all selectors which we need for match queries
     where_selectors = []
@@ -51,17 +92,22 @@ def compile_db_selects(id, stat):
         filter = { 'min_scale': min_scale, 'max_scale': max_scale or 10E+10}
         current_selectors = filter_selectors(filter, stat)
 
+        conditions = []
+        for i in current_selectors:
+            _statement = stat['statements'][i].copy()
+            for c in resolve_set_statements(stat['statements'][i], stat):
+                _statement['selector']['conditions'] = c
+
+                conditions.append(
+                    (
+                        _statement['selector']['type'],
+                        stat['database'].compile_selector(_statement)
+                    )
+                )
+
         # compile all selectors
         # TODO: define list of possible object_types
         # TODO: how to handle wildcard object type?
-        conditions = [
-            (
-                stat['statements'][i]['selector']['type'],
-                stat['database'].compile_selector(stat['statements'][i])
-            )
-            for i in current_selectors
-            #for object_type in ({'node', 'way', 'area'} if stat['statements'][i]['selector']['type'] == True else { stat['statements'][i]['selector']['type'] })
-        ]
 
 # TODO: call merge_conditions() for each object_type individially, replace list
 # of tuples by list of compiled selectors

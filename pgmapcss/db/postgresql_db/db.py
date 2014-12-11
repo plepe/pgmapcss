@@ -246,25 +246,6 @@ class postgresql_db(default):
     def compile_condition(self, condition, statement, filter={}):
         ret = set()
 
-        # assignments: map conditions which are based on a (possible) set-statement
-        # back to their original selectors:
-        f = filter.copy()
-        f['has_set_tag'] = condition['key']
-        f['max_id'] = statement['id']
-        set_statements = self.stat.filter_statements(f)
-
-        if len(set_statements) > 0:
-            ret.add('((' + ') or ('.join([
-                self.compile_selector(s)
-                for s in set_statements
-            ]) + '))')
-
-        # ignore generated tags (identified by leading .)
-        if condition['key'][0] == '.':
-            if len(ret) == 0:
-                return 'false'
-            return ''.join(ret)
-
         # depending on the tag type compile the specified condition
         tag_type = self.stat['database'].tag_type(condition['key'], condition, statement['selector'], statement)
 

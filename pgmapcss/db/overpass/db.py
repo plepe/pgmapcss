@@ -132,25 +132,6 @@ class db(default):
     def compile_condition(self, condition, statement, filter={}):
         ret = []
 
-        # assignments: map conditions which are based on a (possible) set-statement
-        # back to their original selectors:
-        f = filter.copy()
-        f['has_set_tag'] = condition['key']
-        f['max_id'] = statement['id']
-        set_statements = self.stat.filter_statements(f)
-
-        if len(set_statements) > 0:
-            set_statements = [
-                self.compile_selector(s, stat, prefix, filter, no_object_type=True)
-                for s in set_statements
-            ]
-
-        # ignore generated tags (identified by leading .)
-        if condition['key'][0] == '.':
-            if len(set_statements) == 0:
-                return False
-            return set_statements
-
         # depending on the tag type compile the specified condition
         tag_type = self.stat['database'].tag_type(condition['key'], condition, statement['selector'], statement)
 
@@ -160,18 +141,6 @@ class db(default):
             ret = self.compile_condition_overpass(condition, statement, tag_type, filter)
         else:
             raise CompileError('unknown tag type {}'.format(tag_type))
-
-        if ret is None:
-            return set_statements
-
-        if len(set_statements):
-            if False in set_statements:
-                return False
-
-            return [
-                    s + [[ ret ]]
-                    for s in set_statements
-                ]
 
         # return
         return ret
