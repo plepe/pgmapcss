@@ -31,7 +31,8 @@ class db(default):
     # `tags @> 'amenity=>bar' and tags ? 'name'`).
     # see below for the structure of the selector argument
     # for good performance it would be advisable to also compile relationships
-    # You may define the datatype of the return value
+    # You may define the datatype of the return value, with the exception of
+    # False -> the condition will be dropped
     def compile_selector(self, selector):
         pass
 
@@ -39,7 +40,8 @@ class db(default):
     # list)
     # e.g. `[ '"amenity"=\'bar\' and "name" is not null', '"foo"=\'bar\'' ]`
     # => `'("amenity"=\'bar\' and "name" is not null) or ("foo"=\'bar\')'`
-    # You may define the datatype of the return value
+    # You may define the datatype of the return value, with the exception of
+    # False -> the conditions will be dropped
     def merge_conditions(self, conditions):
         pass
 ```

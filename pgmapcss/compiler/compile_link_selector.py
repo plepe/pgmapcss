@@ -5,24 +5,13 @@ import pgmapcss.db as db
 
 def compile_link_selector(statement, stat):
     # create statement where selector is build from parent_selector for compiling
-    parent_conditions = stat['database'].merge_conditions([(
-        statement['selector']['parent']['type'],
+    parent_conditions = stat['database'].merge_conditions([
         stat['database'].compile_selector(statement['selector']['parent'])
-    )])
+    ])
 
-    if statement['selector']['parent']['type'] in parent_conditions:
-        parent_conditions = parent_conditions[statement['selector']['parent']['type']]
-    else:
-        parent_conditions = None
-
-    child_conditions = stat['database'].merge_conditions([(
-        statement['selector']['type'],
+    child_conditions = stat['database'].merge_conditions([
         stat['database'].compile_selector(statement['selector'])
-    )])
-    if statement['selector']['type'] in child_conditions:
-        child_conditions = child_conditions[statement['selector']['type']]
-    else:
-        child_conditions = None
+    ])
 
     if statement['selector']['link']['type'] in ('>', ''):
         return "objects_member_of(object['id'], " +\

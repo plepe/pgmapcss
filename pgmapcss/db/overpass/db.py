@@ -253,32 +253,21 @@ class db(default):
         return conditions
 
     def merge_conditions(self, conditions):
-        types = [ t for t, cs in conditions if t != True ]
-
-        conditions = {
-            t: [
-                    c
-                    for t2, cs in conditions
-                    if t == t2
-                    if cs != False
-                    for c in cs
-                ]
-            for t in types
-        }
-
-        conditions = {
-            t: self.simplify_conditions(cs)
-            for t, cs in conditions.items()
-        }
-
-        return {
-            t: ';\n'.join([
-                self.conditions_to_query(c)
+        conditions = [
+                c
+                for cs in conditions
                 for c in cs
+            ]
+
+        conditions = self.simplify_conditions(conditions)
+
+        if len(conditions) == 0:
+            return False
+
+        return ';\n'.join([
+                self.conditions_to_query(c)
+                for c in conditions
             ]) + ';\n'
-            for t, cs in conditions.items()
-            if len(cs)
-        }
 
     def compile_selector(self, selector, no_object_type=False):
         filter = {}

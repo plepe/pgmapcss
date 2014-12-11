@@ -109,9 +109,30 @@ def compile_db_selects(id, stat):
         # TODO: define list of possible object_types
         # TODO: how to handle wildcard object type?
 
-# TODO: call merge_conditions() for each object_type individially, replace list
-# of tuples by list of compiled selectors
-        conditions = stat['database'].merge_conditions(conditions)
+        # get list of types and make list of conditions of each type
+        types = [ t for t, cs in conditions if t != True ]
+        conditions = {
+            t: [
+                    cs
+                    for t2, cs in conditions
+                    if t == t2
+                    if cs != False
+                ]
+            for t in types
+        }
+
+        # merge all conditions for each types together
+        conditions = {
+                t: stat['database'].merge_conditions(cs)
+                for t, cs in conditions.items()
+            }
+
+        # remove False entries
+        conditions = {
+                t: cs
+                for t, cs in conditions.items()
+                if cs is not False
+            }
 
         max_scale = min_scale
 

@@ -10,24 +10,17 @@ class postgresql_db(default):
 
     def merge_conditions(self, conditions):
         conditions = set(conditions)
-        types = [ t for t, cs in conditions if t != True ]
 
-        conditions = {
-            t:
-                '(' + ') or ('.join([
-                    cs
-                    for t2, cs in conditions
-                    if t == t2
-                    if cs != 'false'
-                ]) + ')'
-            for t in types
-        }
+        conditions = '(' + ') or ('.join([
+                cs
+                for cs in conditions
+                if cs != 'false'
+            ]) + ')'
 
-        return {
-            t: cs
-            for t, cs in conditions.items()
-            if cs != '()'
-        }
+        if conditions == '()':
+            return False
+
+        return conditions
 
     def compile_condition_hstore_value(self, condition, tag_type, filter):
         ret = None
