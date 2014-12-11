@@ -29,7 +29,7 @@ class postgresql_db(default):
             if cs != '()'
         }
 
-    def compile_condition_hstore_value(self, condition, statement, tag_type, filter):
+    def compile_condition_hstore_value(self, condition, tag_type, filter):
         ret = None
         negate = False
         key = tag_type[1]
@@ -131,7 +131,7 @@ class postgresql_db(default):
 
         return ret
 
-    def compile_condition_column(self, condition, statement, tag_type, filter):
+    def compile_condition_column(self, condition, tag_type, filter):
         ret = None
         key = tag_type[1]
         op = condition['op']
@@ -243,18 +243,18 @@ class postgresql_db(default):
 
         return ret
 
-    def compile_condition(self, condition, statement, filter={}):
+    def compile_condition(self, condition, selector, filter={}):
         ret = set()
 
         # depending on the tag type compile the specified condition
-        tag_type = self.stat['database'].tag_type(condition['key'], condition, statement['selector'], statement)
+        tag_type = self.stat['database'].tag_type(condition['key'], condition, selector)
 
         if tag_type is None:
             pass
         elif tag_type[0] == 'hstore-value':
-            ret.add(self.compile_condition_hstore_value(condition, statement, tag_type, filter))
+            ret.add(self.compile_condition_hstore_value(condition, tag_type, filter))
         elif tag_type[0] == 'column':
-            ret.add(self.compile_condition_column(condition, statement, tag_type, filter))
+            ret.add(self.compile_condition_column(condition, tag_type, filter))
         else:
             raise CompileError('unknown tag type {}'.format(tag_type))
 
@@ -266,13 +266,13 @@ class postgresql_db(default):
         # merge conditions together, return
         return '(' + ' or '.join(ret) + ')'    
 
-    def compile_selector(self, statement):
+    def compile_selector(self, selector):
         filter = {}
-        filter['object_type'] = statement['selector']['type']
+        filter['object_type'] = selector['type']
 
         ret = {
-            self.compile_condition(c, statement, filter) or 'true'
-            for c in statement['selector']['conditions']
+            self.compile_condition(c, selector, filter) or 'true'
+            for c in selector['conditions']
         }
 
         if len(ret) == 0:

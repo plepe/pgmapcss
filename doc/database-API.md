@@ -29,10 +29,10 @@ class db(default):
     # to a select condition without selecting the object type
     # (e.g. `"amenity"='bar' and "name" is not null` or
     # `tags @> 'amenity=>bar' and tags ? 'name'`).
-    # see below for the structure of the statement argument
+    # see below for the structure of the selector argument
     # for good performance it would be advisable to also compile relationships
     # You may define the datatype of the return value
-    def compile_selector(self, statement):
+    def compile_selector(self, selector):
         pass
 
     # merge several compiled selectors together (the argument conditions is a
@@ -116,9 +116,9 @@ def objects_near(objects, db_selects, options):
 
 APPENDIX
 ========
-Structure of parsed statements
-------------------------------
-An example statement structure looks like this:
+Structure of parsed selector
+----------------------------
+An example selector structure looks like this:
 ```css
 node[amenity=bar][name] {
     text: "name";
@@ -128,22 +128,18 @@ node[amenity=bar][name] {
 
 ```python
 {
-    'id': 5,                     # sequential numbering of statements/properties
-    'selector': {
-        'conditions': [
-            {
-                'key': 'amenity',
-                'op': '=',
-                'value': 'bar',
-                'value_type': 'value' # one of (value, eval)
-            }, {
-                'key': 'name',
-                'op': 'has_tag'
-            }
-        ],
-        'type': 'node'           # selected type; True if any type (*)
-    },
-    'properties': ....
+    'type': 'node',          # selected type; True if any type (*)
+    'conditions': [
+        {
+            'key': 'amenity',
+            'op': '=',
+            'value': 'bar',
+            'value_type': 'value' # one of (value, eval)
+        }, {
+            'key': 'name',
+            'op': 'has_tag'
+        }
+    ]
 }
 ```
 
@@ -156,13 +152,10 @@ relation[type=route] >[role=stop] node {
 
 ```python
 {
-    'id': 7,                     # sequential numbering of statements/properties
-    'selector': {
-        'conditions': [],        # no conditions on node
-        'type': 'node'
-    },
-    'link_selector': {           # (optional) when using relationship selector
-        'type': '>'                  # '', '>', '<', 'near', 'within', 'overlaps' or 'surrounds'
+    'type': 'node',
+    'conditions': [],        # no conditions on node
+    'link': {                # (optional) when using relationship selector
+        'type': '>'          # '', '>', '<', 'near', 'within', 'overlaps' or 'surrounds'
         'conditions': [
             {
                 'key': 'role',
@@ -171,8 +164,8 @@ relation[type=route] >[role=stop] node {
                 'value_type': 'value'
             }
         ]
-    }
-    'parent_selector': {         # (optional) when using relationship selector
+    },
+    'parent': {              # (optional) when using relationship selector
         'type': 'relation'
         'conditions': [
             {
@@ -183,6 +176,5 @@ relation[type=route] >[role=stop] node {
             }
         ]
     }
-    'properties': ....
 }
 ```

@@ -101,7 +101,7 @@ def compile_db_selects(id, stat):
                 conditions.append(
                     (
                         _statement['selector']['type'],
-                        stat['database'].compile_selector(_statement)
+                        stat['database'].compile_selector(_statement['selector'])
                     )
                 )
 

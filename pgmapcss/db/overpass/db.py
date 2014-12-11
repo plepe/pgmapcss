@@ -13,7 +13,7 @@ class db(default):
         if not 'db.overpass-url' in self.stat['config']:
             self.stat['config']['db.overpass-url'] = 'http://overpass-api.de/api'
 
-    def tag_type(self, key, condition, selector, statement):
+    def tag_type(self, key, condition):
         if key[0:4] == 'osm:':
             return None
 
@@ -42,7 +42,7 @@ class db(default):
         if s[0] == 'is':
             return ('regexp', s[1], { '^' + self.value_to_regexp(s[2]) + '$' })
 
-    def compile_condition_overpass(self, condition, statement, tag_type, filter):
+    def compile_condition_overpass(self, condition, tag_type, filter):
         ret = None
         negate = False
         key = tag_type[1]
@@ -129,16 +129,16 @@ class db(default):
 
     # returns None if it's not possible to query for condition (e.g. osm:user)
     # returns False if query always evaluates negative
-    def compile_condition(self, condition, statement, filter={}):
+    def compile_condition(self, condition, filter={}):
         ret = []
 
         # depending on the tag type compile the specified condition
-        tag_type = self.stat['database'].tag_type(condition['key'], condition, statement['selector'], statement)
+        tag_type = self.stat['database'].tag_type(condition['key'], condition)
 
         if tag_type is None:
             pass
         elif tag_type[0] == 'overpass':
-            ret = self.compile_condition_overpass(condition, statement, tag_type, filter)
+            ret = self.compile_condition_overpass(condition, tag_type, filter)
         else:
             raise CompileError('unknown tag type {}'.format(tag_type))
 
@@ -280,13 +280,13 @@ class db(default):
             if len(cs)
         }
 
-    def compile_selector(self, statement, no_object_type=False):
+    def compile_selector(self, selector, no_object_type=False):
         filter = {}
-        filter['object_type'] = statement['selector']['type']
+        filter['object_type'] = selector['type']
 
         conditions = [
-            self.compile_condition(c, statement, filter)
-            for c in statement['selector']['conditions']
+            self.compile_condition(c, filter)
+            for c in selector['conditions']
         ]
 
         ret = [ [] ]
