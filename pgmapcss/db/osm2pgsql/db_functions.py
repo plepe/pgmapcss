@@ -288,7 +288,7 @@ def objects_by_id(id_list):
         t['tags'] = {
             k: r[k]
             for k in r
-            if k not in ['id', 'geo', 'types', 'tags']
+            if k not in ['id', 'geo', 'types', 'tags', 'way', 'osm_id']
             if r[k] is not None
         }
 # START db.has-hstore
@@ -320,7 +320,7 @@ def objects_by_id(id_list):
         t['tags'] = {
             k: r[k]
             for k in r
-            if k not in ['id', 'geo', 'types', 'tags']
+            if k not in ['osm_id', 'geo', 'types', 'tags', 'nodes', '_type', 'way']
             if r[k] is not None
         }
 # START db.has-hstore
