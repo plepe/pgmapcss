@@ -398,7 +398,7 @@ def objects_member_of(member_id, parent_type, parent_conditions, child_condition
                             'sequence_id': str(i)
                         }
                     }
-# START db.columns
+# START db.columns.way
                     t['tags'] = {
                         k: r[k]
                         for k in r
@@ -408,7 +408,7 @@ def objects_member_of(member_id, parent_type, parent_conditions, child_condition
 # START db.has-hstore
                     t['tags'] = dict(pghstore.loads(r['tags']).items() | t['tags'].items())
 # END db.has-hstore
-# END db.columns
+# END db.columns.way
 # START db.hstore-only
                     t['tags'] = pghstore.loads(r['tags'])
 # END db.hstore-only
