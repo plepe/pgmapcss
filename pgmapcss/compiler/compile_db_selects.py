@@ -82,6 +82,59 @@ def filter_selectors(filter, stat):
     # uniq list
     return list(set(where_selectors))
 
+def compile_selectors_db(statements, selector_index, stat):
+    conditions = []
+    for i in statements:
+        if type(i) == int:
+            _statement = stat['statements'][i].copy()
+        else:
+            _statement = i.copy()
+
+        for c in resolve_set_statements(_statement, stat):
+            _statement['selector']['conditions'] = c
+            if selector_index is None:
+                selector = _statement['selector']
+            else:
+                selector = _statement['selector'][selector_index]
+
+            conditions.append(
+                (
+                    selector['type'],
+                    stat['database'].compile_selector(selector)
+                )
+            )
+
+    # compile all selectors
+    # TODO: define list of possible object_types
+    # TODO: how to handle wildcard object type?
+
+    # get list of types and make list of conditions of each type
+    types = [ t for t, cs in conditions if t != True ]
+    conditions = {
+        t: [
+                cs
+                for t2, cs in conditions
+                if t == t2
+                if cs != False
+            ]
+        for t in types
+    }
+
+    # merge all conditions for each types together
+    conditions = {
+            t: stat['database'].merge_conditions(cs)
+            for t, cs in conditions.items()
+        }
+
+    # remove False entries
+    conditions = {
+            t: cs
+            for t, cs in conditions.items()
+            if cs is not False
+        }
+
+    return conditions
+
 def compile_db_selects(id, stat):
     ret = ''
 
@@ -92,47 +145,7 @@ def compile_db_selects(id, stat):
         filter = { 'min_scale': min_scale, 'max_scale': max_scale or 10E+10}
         current_selectors = filter_selectors(filter, stat)
 
-        conditions = []
-        for i in current_selectors:
-            _statement = stat['statements'][i].copy()
-            for c in resolve_set_statements(stat['statements'][i], stat):
-                _statement['selector']['conditions'] = c
-
-                conditions.append(
-                    (
-                        _statement['selector']['type'],
-                        stat['database'].compile_selector(_statement['selector'])
-                    )
-                )
-
-        # compile all selectors
-        # TODO: define list of possible object_types
-        # TODO: how to handle wildcard object type?
-
-        # get list of types and make list of conditions of each type
-        types = [ t for t, cs in conditions if t != True ]
-        conditions = {
-            t: [
-                    cs
-                    for t2, cs in conditions
-                    if t == t2
-                    if cs != False
-                ]
-            for t in types
-        }
-
-        # merge all conditions for each types together
-        conditions = {
-                t: stat['database'].merge_conditions(cs)
-                for t, cs in conditions.items()
-            }
-
-        # remove False entries
-        conditions = {
-                t: cs
-                for t, cs in conditions.items()
-                if cs is not False
-            }
+        conditions = compile_selectors_db(current_selectors, None, stat)
 
         max_scale = min_scale
 
