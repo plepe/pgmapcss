@@ -1,8 +1,11 @@
 import copy
 
 # takes a list of conditions as input and returns several condition combinations
-def resolve_set_statements(statement, stat):
+def resolve_set_statements(statement, done, stat):
     ret = [ [] ]
+    if statement['id'] in done:
+        return [ [] ]
+    done.append(statement['id'])
 
     # iterate over all conditions in the statement
     for condition in statement['selector']['conditions']:
@@ -19,7 +22,7 @@ def resolve_set_statements(statement, stat):
         # recurse into resolve_set_statements, to also resolve conditions in
         # the statements where set statements happened
         set_statements = [
-            resolve_set_statements(s, stat)
+            resolve_set_statements(s, done, stat)
             for s in set_statements
         ]
 
@@ -92,7 +95,7 @@ def compile_selectors_db(statements, selector_index, stat):
         else:
             _statement = copy.deepcopy(i)
 
-        for c in resolve_set_statements(_statement, stat):
+        for c in resolve_set_statements(_statement, [], stat):
             _statement['selector']['conditions'] = c
             if selector_index is None:
                 selector = _statement['selector']
