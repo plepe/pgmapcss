@@ -1,3 +1,5 @@
+import copy
+
 # takes a list of conditions as input and returns several condition combinations
 def resolve_set_statements(statement, stat):
     ret = [ [] ]
@@ -86,9 +88,9 @@ def compile_selectors_db(statements, selector_index, stat):
     conditions = []
     for i in statements:
         if type(i) == int:
-            _statement = stat['statements'][i].copy()
+            _statement = copy.deepcopy(stat['statements'][i])
         else:
-            _statement = i.copy()
+            _statement = copy.deepcopy(i)
 
         for c in resolve_set_statements(_statement, stat):
             _statement['selector']['conditions'] = c
