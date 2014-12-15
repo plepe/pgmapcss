@@ -55,11 +55,11 @@ def compile_statement(statement, stat, indent=''):
             ]) + '\n'
 
     if 'link' in statement['selector']:
-        ret['body'] += indent + 'for parent_index, parent_object in enumerate(' + compile_link_selector(statement, stat) + '):\n'
+        ret['body'] += indent + 'for parent_index, (o, parent_object, link_tags) in enumerate(' + compile_link_selector(statement, stat) + '):\n'
 
         indent += '    '
         ret['body'] += indent + "current['parent_object'] = parent_object\n"
-        ret['body'] += indent + "current['link_object'] = { 'tags': parent_object['link_tags'] }\n"
+        ret['body'] += indent + "current['link_object'] = { 'tags': link_tags }\n"
         ret['body'] += indent + "current['link_object']['tags']['index'] = str(parent_index)\n"
         ret['body'] += indent + 'if (' +\
           and_join(compile_conditions(statement['selector']['parent']['conditions'], stat, "current['parent_object']['tags']")) +\

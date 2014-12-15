@@ -66,53 +66,79 @@ An object should look like this:
 
 The template file looks like this:
 ```python
-# objects() yields all objects which match the query/queries in the current
+# objects_bbox() yields all objects which match the query/queries in the current
 # bounding box.
+#
 # Arguments:
 # bbox: a bounding box as WKT or None (ignore bounding box ; return all objects
 #       in database)
-# db_selects: a dict, with the object types and the compiled conditions from db.py, e.g.: `{ 'area': '("amenity"=\'bar\' and "name" is not null) or ("foo"=\'bar\')' }`. objects() need to match the object types to the respective openstreetmap objects, e.g. 'area' => closed ways and multipolygons.
-def objects(bbox, db_selects):
+# db_selects: a dict, with the object types and the compiled conditions from db.py, e.g.: `{ 'area': '("amenity"=\'bar\' and "name" is not null) or ("foo"=\'bar\')' }`. objects_bbox() need to match the object types to the respective openstreetmap objects, e.g. 'area' => closed ways and multipolygons.
+# options: a dict, with additional settings (currently: none)
+def objects_bbox(bbox, db_selects, options):
     pass
 
 # objects_by_id() yields the specified objects from the database
 # an id is a string with the object type identifier and the id, e.g. 'n1234'
-def objects_by_id(id_list):
+# options: a dict, with additional settings (currently: none)
+def objects_by_id(id_list, options):
     pass
 
 # objects_member_of(). For each object in the `objects` list, return all parent
 # objects (which match the db_selects).
+#
+# Arguments:
+# objects: a list of objects
+# other_selects: a query/queries how to select parent objects (see db_selects on objects_bbox())
+# self_selects: a query/queries how to select child objects (this might be useful if you want to query all objects in the bounding box for caching)
+# options: a dict, with additional settings (currently: none)
+#
+# Yields:
 # As yielded values, tuples are expected with:
 # ( child_object, parent_object, link_tags )
 #
 # link_tags (dict) should contain:
 # * sequence_id: members are consecutively numbered, the child is the nth entry (counting from 0)
 # * role: role as specified in osm data (when the parent is a relation)
-def objects_member_of(objects, db_selects):
+def objects_member_of(objects, other_selects, self_selects, options):
     pass
 
 # objects_members(). For each object in the `objects` list, return all child
 # objects (which match the db_selects).
-# As yielded values, tuples are expected with:
+#
+# Arguments:
+# objects: a list of objects
+# other_selects: a query/queries how to select child objects (this might be useful if you want to query all objects in the bounding box for caching)
+# self_selects: a query/queries how to select parent objects (see db_selects on objects_bbox())
+# options: a dict, with additional settings (currently: none)
+#
+# Yields:
+## As yielded values, tuples are expected with:
 # ( parent_object, child_object, link_tags )
 # link_tags (dict) should contain:
 # * sequence_id: members are consecutively numbered, the child is the nth entry (counting from 0)
 # * role: role as specified in osm data (when the parent is a relation)
-def objects_members(objects, db_selects):
+def objects_members(objects, other_selects, self_selects, options):
     pass
 
 # objects_near(). For each object in the `objects` list, return all nearby objects (which match the db_selects).
-# Argument options (dict):
+#
+# Arguments:
+# objects: a list of objects
+# other_selects: a query/queries how to select the other objects (see db_selects on objects_bbox())
+# self_selects: a query/queries how to select the objects from which we query (this might be useful if you want to query all objects in the bounding box for caching)
+# options: a dict, with additional settings:
 # * distance: maximum distance in pixels
 # * check_geo: (optional) one of:
 #   * 'within': if child object is within certain distance around parent
 #   * 'surrounds': if parent object is within certain distance around child
 #   * 'overlaps': if parent object and child object overlap (distance=0)
+#
+# Yields:
 # As yielded values, tuples are expected with:
 # ( parent_object, child_object, link_tags )
 # link_tags (dict) should contain:
 # * distance: distance between objects in pixels
-def objects_near(objects, db_selects, options):
+def objects_near(objects, other_selects, self_selects, options):
     pass
 ```
 
