@@ -5,12 +5,19 @@ def eval_area(param):
     if len(param) == 0:
         return ''
 
-    plan = plpy.prepare('select ST_Area(ST_Transform($1, 900913)) as area', ['geometry'])
-    res = plpy.execute(plan, param)
+    try:
+        plan = plpy.prepare('select ST_Area(ST_Transform($1, 900913)) as area', ['geometry'])
+        res = plpy.execute(plan, param)
+    except Exception as err:
+        plpy.warning('{} | Eval::area({}): Exception: {}'.format(current['object']['id'], param, err))
+        return ''
 
     zoom = eval_metric(['1u'])
 
     if zoom == '':
+        return ''
+
+    if res[0]['area'] is None:
         return ''
 
     ret = res[0]['area'] * float(zoom) ** 2

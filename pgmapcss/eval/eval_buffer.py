@@ -10,8 +10,12 @@ def eval_buffer(param):
     if radius == '':
         return ''
 
-    plan = plpy.prepare('select ST_Transform(ST_Buffer(ST_Transform($1, 900913), $2), {db.srs}) as r', ['geometry', 'float'])
-    res = plpy.execute(plan, [ param[0], float(radius) ])
+    try:
+        plan = plpy.prepare('select ST_Transform(ST_Buffer(ST_Transform($1, 900913), $2), {db.srs}) as r', ['geometry', 'float'])
+        res = plpy.execute(plan, [ param[0], float(radius) ])
+    except Exception as err:
+        plpy.warning('{} | Eval::buffer({}): Exception: {}'.format(current['object']['id'], param, err))
+        return ''
 
     return res[0]['r']
 

@@ -2,16 +2,23 @@ class config_eval_azimuth(config_base):
     mutable = 2
 
 def eval_azimuth(param):
-  if len(param) < 2:
+    if len(param) < 2:
+        return ''
+
+    if param[0] is None or param[0] == '' or param[1] is None or param[1] == '':
+        return ''
+
+    try:
+        plan = plpy.prepare('select ST_Azimuth($1, $2) as r', ['geometry', 'geometry'])
+        res = plpy.execute(plan, param)
+    except Exception as err:
+        plpy.warning('{} | Eval::azimuth({}): Exception: {}'.format(current['object']['id'], param, err))
+        return ''
+
+    if res[0]['r'] is None:
       return ''
 
-  if param[0] is None or param[0] == '' or param[1] is None or param[1] == '':
-      return ''
-
-  plan = plpy.prepare('select ST_Azimuth($1, $2) as r', ['geometry', 'geometry'])
-  res = plpy.execute(plan, param)
-
-  return float_to_str(FROM_RADIANS(res[0]['r']))
+    return float_to_str(FROM_RADIANS(res[0]['r']))
 
 # TESTS
 # IN ['010100002031BF0D0033333333F4EE2F41E17A14DE3A8A5641', '010100002031BF0D0052B81E8583EF2F417B14AE77FC895641']

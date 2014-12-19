@@ -26,8 +26,12 @@ def eval_is_left_hand_traffic(param):
     if not geo:
         return 'partly'
 
-    plan = plpy.prepare('select ST_Within($1, geo) as r from _pgmapcss_left_right_hand_traffic where ST_Intersects($1, geo)', ['geometry'])
-    res = plpy.execute(plan, [ geo ])
+    try:
+      plan = plpy.prepare('select ST_Within($1, geo) as r from _pgmapcss_left_right_hand_traffic where ST_Intersects($1, geo)', ['geometry'])
+      res = plpy.execute(plan, [ geo ])
+    except Exception as err:
+        plpy.warning('{} | Eval::is_left_hand_traffic({}): Exception: {}'.format(current['object']['id'], param, err))
+        return ''
 
 
     if len(res) == 0:

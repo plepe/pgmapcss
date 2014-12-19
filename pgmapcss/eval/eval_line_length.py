@@ -8,9 +8,13 @@ def eval_line_length(param):
     if not param[0]:
         return ''
 
-    plan = plpy.prepare('select ST_Length(ST_Transform($1, {unit.srs})) as r', ['geometry'])
-    res = plpy.execute(plan, [param[0]])
-    l = res[0]['r']
+    try:
+        plan = plpy.prepare('select ST_Length(ST_Transform($1, {unit.srs})) as r', ['geometry'])
+        res = plpy.execute(plan, [param[0]])
+        l = res[0]['r']
+    except Exception as err:
+        plpy.warning('{} | Eval::line_length({}): Exception: {}'.format(current['object']['id'], param, err))
+        return ''
 
     return eval_metric([ repr(l) + 'u' ])
 

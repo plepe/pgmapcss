@@ -5,8 +5,12 @@ def eval_intersection(param):
     if len(param) < 2:
         return ''
 
-    plan = plpy.prepare('select ST_Intersection($1, $2) as geo', ['geometry', 'geometry'])
-    res = plpy.execute(plan, param)
+    try:
+        plan = plpy.prepare('select ST_Intersection($1, $2) as geo', ['geometry', 'geometry'])
+        res = plpy.execute(plan, param)
+    except Exception as err:
+        plpy.warning('{} | Eval::intersection({}): Exception: {}'.format(current['object']['id'], param, err))
+        return ''
 
     return res[0]['geo']
 
