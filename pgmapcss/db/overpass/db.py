@@ -39,10 +39,12 @@ class db(default):
         return s
 
     def convert_to_regexp(self, s):
-        if s[0] in ('regexp', 'iregexp', 'isnot', 'notregexp', 'notiregexp'):
+        if s[0] in ('regexp', 'iregexp', 'isnot', 'notregexp', 'notiregexp', 'parent_regexp', 'parent_iregexp', 'parent_isnot', 'parent_notregexp', 'parent_notiregexp'):
             return s
         if s[0] == 'is':
             return ('regexp', s[1], { '^' + self.value_to_regexp(s[2]) + '$' })
+        if s[0] == 'parent_is':
+            return ('parent_regexp', s[1], { '^' + self.value_to_regexp(s[2]) + '$' })
 
     def compile_condition_overpass(self, condition, tag_type, filter):
         ret = None
