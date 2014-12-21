@@ -126,7 +126,7 @@ for style_element in all_style_elements:
 
 '''.format(**replacement)
 
-    func = "objects(render_context.get('bbox'), db_selects)"
+    func = "objects_bbox(render_context.get('bbox'), db_selects, {})"
     if stat['config'].get('debug.profiler', False):
         ret += "time_qry_start = datetime.datetime.now() # profiling\n"
         ret += "src = list(" + func + ")\n"

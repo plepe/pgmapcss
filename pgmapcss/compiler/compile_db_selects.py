@@ -1,3 +1,49 @@
+import copy
+
+# takes a list of conditions as input and returns several condition combinations
+def resolve_set_statements(statement, done, stat):
+    ret = [ [] ]
+    if statement['id'] in done:
+        return [ [] ]
+    done.append(statement['id'])
+
+    # iterate over all conditions in the statement
+    for condition in statement['selector']['conditions']:
+        last_ret = ret
+        ret = []
+
+        # check if there are any statements which assign the current condition key
+        filter = {
+            'has_set_tag': condition['key'],
+            'max_id': statement['id']
+        }
+        set_statements = stat.filter_statements(filter)
+
+        # recurse into resolve_set_statements, to also resolve conditions in
+        # the statements where set statements happened
+        set_statements = [
+            resolve_set_statements(s, done, stat)
+            for s in set_statements
+        ]
+
+        # for all set statements create a new set of conditions
+        ret = [
+            r + s1
+            for r in last_ret
+            for s in set_statements
+            for s1 in s
+        ]
+
+        # for each set of conditions add the current condition
+        # unless the condition's key does not start with a '.'
+        if condition['key'][0] != '.':
+            ret += [
+                r + [ condition ]
+                for r in last_ret
+            ]
+
+    return ret
+
 def filter_selectors(filter, stat):
     # where_selectors contains indexes of all selectors which we need for match queries
     where_selectors = []
@@ -41,6 +87,100 @@ def filter_selectors(filter, stat):
     # uniq list
     return list(set(where_selectors))
 
+def check_is_sub_selector(selector, master_selector):
+    is_sub = True
+    for c in master_selector['conditions']:
+        if not c in selector['conditions']:
+            # also check for has_tag conditions
+            has_tag = False
+            if c['op'] == 'has_tag':
+                for oc in selector['conditions']:
+                    if oc['op'] not in ('key_regexp', 'eval') and \
+                       oc['key'] == c['key']:
+                        has_tag = True
+
+            if not has_tag:
+                is_sub = False
+                break
+
+    return is_sub
+
+def compile_selectors_db(statements, selector_index, stat):
+    selectors = {}
+
+    for i in statements:
+        if type(i) == int:
+            _statement = copy.deepcopy(stat['statements'][i])
+        else:
+            _statement = copy.deepcopy(i)
+
+        for c in resolve_set_statements(_statement, [], stat):
+            _statement['selector']['conditions'] = c
+            if selector_index is None:
+                selector = _statement['selector']
+            else:
+                selector = _statement['selector'][selector_index]
+
+            if not selector['type'] in selectors:
+                selectors[selector['type']] = []
+
+            # check if the current selector is a sub selector of any other ->
+            # then we don't need to add it
+            is_sub = False
+            for s in selectors[selector['type']]:
+                if check_is_sub_selector(selector, s):
+                    is_sub = True
+                    break
+
+            if not is_sub:
+                # check if the current selector is a master selector of others
+                # -> remove those
+                selectors[selector['type']] = [
+                    s
+                    for s in selectors[selector['type']]
+                    if not check_is_sub_selector(s, selector)
+                ]
+
+                selectors[selector['type']].append(selector)
+
+    # compile each selector
+    conditions = {
+        t: [
+            stat['database'].compile_selector(selector)
+            for selector in s
+        ]
+        for t, s in selectors.items()
+    }
+
+    # compile all selectors
+    # TODO: define list of possible object_types
+    # TODO: how to handle wildcard object type?
+
+    # remove all invalid conditions from list
+    conditions = {
+        t: [
+            c
+            for c in cs
+            if c != False
+        ]
+        for t, cs in conditions.items()
+    }
+
+    # merge all conditions for each types together
+    conditions = {
+            t: stat['database'].merge_conditions(cs)
+            for t, cs in conditions.items()
+        }
+
+    # remove False entries
+    conditions = {
+            t: cs
+            for t, cs in conditions.items()
+            if cs is not False
+        }
+
+    return conditions
+
 def compile_db_selects(id, stat):
     ret = ''
 
@@ -51,18 +191,7 @@ def compile_db_selects(id, stat):
         filter = { 'min_scale': min_scale, 'max_scale': max_scale or 10E+10}
         current_selectors = filter_selectors(filter, stat)
 
-        # compile all selectors
-        # TODO: define list of possible object_types
-        conditions = [
-            (
-                object_type,
-                stat['database'].compile_selector(stat['statements'][i], stat, prefix='', filter=filter, object_type=object_type)
-            )
-            for i in current_selectors
-            for object_type in ({'node', 'way', 'area'} if stat['statements'][i]['selector']['type'] == True else { stat['statements'][i]['selector']['type'] })
-        ]
-
-        conditions = stat['database'].merge_conditions(conditions)
+        conditions = compile_selectors_db(current_selectors, None, stat)
 
         max_scale = min_scale
 
