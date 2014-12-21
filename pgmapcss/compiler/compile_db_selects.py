@@ -91,8 +91,17 @@ def check_is_sub_selector(selector, master_selector):
     is_sub = True
     for c in master_selector['conditions']:
         if not c in selector['conditions']:
-            is_sub = False
-            break
+            # also check for has_tag conditions
+            has_tag = False
+            if c['op'] == 'has_tag':
+                for oc in selector['conditions']:
+                    if oc['op'] not in ('key_regexp', 'eval') and \
+                       oc['key'] == c['key']:
+                        has_tag = True
+
+            if not has_tag:
+                is_sub = False
+                break
 
     return is_sub
 
