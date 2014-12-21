@@ -87,6 +87,15 @@ def filter_selectors(filter, stat):
     # uniq list
     return list(set(where_selectors))
 
+def check_is_sub_selector(selector, master_selector):
+    is_sub = True
+    for c in master_selector['conditions']:
+        if not c in selector['conditions']:
+            is_sub = False
+            break
+
+    return is_sub
+
 def compile_selectors_db(statements, selector_index, stat):
     selectors = {}
 
@@ -106,7 +115,16 @@ def compile_selectors_db(statements, selector_index, stat):
             if not selector['type'] in selectors:
                 selectors[selector['type']] = []
 
-            selectors[selector['type']].append(selector)
+            # check if the current selector is a sub selector of any other ->
+            # then we don't need to add it
+            is_sub = False
+            for s in selectors[selector['type']]:
+                if check_is_sub_selector(selector, s):
+                    is_sub = True
+                    break
+
+            if not is_sub:
+                selectors[selector['type']].append(selector)
 
     # compile each selector
     conditions = {
