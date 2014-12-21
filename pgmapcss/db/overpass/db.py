@@ -13,6 +13,8 @@ class db(default):
         if not 'db.overpass-url' in self.stat['config']:
             self.stat['config']['db.overpass-url'] = 'http://overpass-api.de/api'
 
+        self.parent_queries = []
+
     def tag_type(self, key, condition):
         if key[0:4] == 'osm:':
             return None
@@ -37,10 +39,12 @@ class db(default):
         return s
 
     def convert_to_regexp(self, s):
-        if s[0] in ('regexp', 'iregexp', 'isnot', 'notregexp', 'notiregexp'):
+        if s[0] in ('regexp', 'iregexp', 'isnot', 'notregexp', 'notiregexp', 'parent_regexp', 'parent_iregexp', 'parent_isnot', 'parent_notregexp', 'parent_notiregexp'):
             return s
         if s[0] == 'is':
             return ('regexp', s[1], { '^' + self.value_to_regexp(s[2]) + '$' })
+        if s[0] == 'parent_is':
+            return ('parent_regexp', s[1], { '^' + self.value_to_regexp(s[2]) + '$' })
 
     def compile_condition_overpass(self, condition, tag_type, filter):
         ret = None
@@ -146,7 +150,8 @@ class db(default):
         return ret
 
     def conditions_to_query(self, conditions):
-        ret = '__TYPE__';
+        parent_ret = ''
+        ret = ''
 
         for c in conditions:
             if c[0] == 'type':
@@ -165,10 +170,54 @@ class db(default):
                 ret += '[' + repr(c[1]) + '!~' + self.merge_regexp(c[2]) + ']'
             elif c[0] == 'notiregexp':
                 ret += '[' + repr(c[1]) + '!~' + self.merge_regexp(c[2]) + ', i]'
+
+            elif c[0] == 'parent_key':
+                parent_ret += '[' + repr(c[1]) + ']'
+            elif c[0] == 'parent_is':
+                parent_ret += '[' + repr(c[1]) + '=' + repr(c[2]) + ']'
+            elif c[0] == 'parent_isnot':
+                parent_ret += '[' + repr(c[1]) + '!=' + repr(c[2]) + ']'
+            elif c[0] == 'parent_regexp':
+                parent_ret += '[' + repr(c[1]) + '~' + self.merge_regexp(c[2]) + ']'
+            elif c[0] == 'parent_iregexp':
+                parent_ret += '[' + repr(c[1]) + '~' + self.merge_regexp(c[2]) + ', i]'
+            elif c[0] == 'parent_notregexp':
+                parent_ret += '[' + repr(c[1]) + '!~' + self.merge_regexp(c[2]) + ']'
+            elif c[0] == 'parent_notiregexp':
+                parent_ret += '[' + repr(c[1]) + '!~' + self.merge_regexp(c[2]) + ', i]'
+            elif c[0] == 'parent':
+                pass
+
             else:
                 print('Unknown Overpass operator "{}"'.format(c[0]))
 
-        return ret
+        r = { }
+
+        parent = [ c for c in conditions if c[0] == 'parent' ]
+        if len(parent):
+            parent_selector = parent[0]
+            parent_ret = parent_selector[1] + parent_ret
+
+            try:
+                pq = self.parent_queries.index(parent_ret)
+            except ValueError:
+                pq = len(self.parent_queries)
+                self.parent_queries.append(parent_ret)
+
+            if parent_selector[2] in ('>', ''):
+                parent_sel = parent_selector[1][0]
+            elif parent_selector[2] in ('<'):
+                parent_sel = 'b' + parent_selector[1][0]
+
+            ret = '__TYPE__(' + parent_sel + '.pq' + str(pq) + ')__BBOX__' + ret
+            r['parent_query'] = parent_ret + '->.pq' + str(pq)
+
+        else:
+            ret = '__TYPE__' + ret
+
+        r['query'] = ret
+
+        return r
 
     def merge_regexp(self, regexps):
         r = ''
@@ -261,13 +310,21 @@ class db(default):
 
         conditions = self.simplify_conditions(conditions)
 
-        if len(conditions) == 0:
-            return False
+        ret = {}
+        for cs in conditions:
+            c = self.conditions_to_query(cs)
+            for c1, c2 in c.items():
+                if not c1 in ret:
+                    ret[c1] = set()
 
-        return ';\n'.join([
-                self.conditions_to_query(c)
-                for c in conditions
-            ]) + ';\n'
+                ret[c1].add(c2)
+
+        if 'query' in ret:
+            ret['query'] = ';\n'.join(ret['query']) + ';\n'
+        if 'parent_query' in ret:
+            ret['parent_query'] = ';\n'.join(ret['parent_query']) + ';\n'
+
+        return ret
 
     def compile_selector(self, selector, no_object_type=False):
         filter = {}
@@ -277,6 +334,22 @@ class db(default):
             self.compile_condition(c, filter)
             for c in selector['conditions']
         ]
+
+        parent_conditions = None
+        if 'parent' in selector and selector['link']['type'] in ('', '>', '<'):
+            parent_conditions = self.compile_selector(selector['parent'])[0]
+
+            conditions.append(( 'parent', selector['parent']['type'], selector['link']['type'] ))
+            for condition in parent_conditions:
+                if condition is None:
+                    continue
+                t = tuple()
+                for i, c in enumerate(condition):
+                    if i == 0:
+                        c = 'parent_' + c
+                    t += ( c ,)
+
+                conditions.append(t)
 
         ret = [ [] ]
 
