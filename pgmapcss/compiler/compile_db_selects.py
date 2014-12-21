@@ -88,6 +88,19 @@ def filter_selectors(filter, stat):
     return list(set(where_selectors))
 
 def check_is_sub_selector(selector, master_selector):
+    # if master_selector has relationship conditions, check if these match with
+    # the current selectors conditions
+    if 'parent' in master_selector:
+        if not 'parent' in selector:
+            return False
+
+        if selector['link']['type'] != master_selector['link']['type'] or\
+            not check_is_sub_selector(selector['link'], master_selector['link']) or\
+            not check_is_sub_selector(selector['parent'], master_selector['parent']):
+                return False
+
+    # check if all the master_conditions are also in current selector's
+    # condition
     is_sub = True
     for c in master_selector['conditions']:
         if not c in selector['conditions']:
