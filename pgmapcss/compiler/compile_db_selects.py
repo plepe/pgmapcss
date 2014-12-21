@@ -124,6 +124,14 @@ def compile_selectors_db(statements, selector_index, stat):
                     break
 
             if not is_sub:
+                # check if the current selector is a master selector of others
+                # -> remove those
+                selectors[selector['type']] = [
+                    s
+                    for s in selectors[selector['type']]
+                    if not check_is_sub_selector(s, selector)
+                ]
+
                 selectors[selector['type']].append(selector)
 
     # compile each selector
