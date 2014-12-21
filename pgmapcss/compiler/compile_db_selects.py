@@ -88,7 +88,8 @@ def filter_selectors(filter, stat):
     return list(set(where_selectors))
 
 def compile_selectors_db(statements, selector_index, stat):
-    conditions = []
+    selectors = {}
+
     for i in statements:
         if type(i) == int:
             _statement = copy.deepcopy(stat['statements'][i])
@@ -102,27 +103,32 @@ def compile_selectors_db(statements, selector_index, stat):
             else:
                 selector = _statement['selector'][selector_index]
 
-            conditions.append(
-                (
-                    selector['type'],
-                    stat['database'].compile_selector(selector)
-                )
-            )
+            if not selector['type'] in selectors:
+                selectors[selector['type']] = []
+
+            selectors[selector['type']].append(selector)
+
+    # compile each selector
+    conditions = {
+        t: [
+            stat['database'].compile_selector(selector)
+            for selector in s
+        ]
+        for t, s in selectors.items()
+    }
 
     # compile all selectors
     # TODO: define list of possible object_types
     # TODO: how to handle wildcard object type?
 
-    # get list of types and make list of conditions of each type
-    types = [ t for t, cs in conditions if t != True ]
+    # remove all invalid conditions from list
     conditions = {
         t: [
-                cs
-                for t2, cs in conditions
-                if t == t2
-                if cs != False
-            ]
-        for t in types
+            c
+            for c in cs
+            if c != False
+        ]
+        for t, cs in conditions.items()
     }
 
     # merge all conditions for each types together
