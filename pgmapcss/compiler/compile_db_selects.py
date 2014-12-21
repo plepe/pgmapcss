@@ -134,6 +134,9 @@ def compile_selectors_db(statements, selector_index, stat):
             else:
                 selector = _statement['selector'][selector_index]
 
+            # make sure that selector does not get modified
+            selector = copy.deepcopy(selector)
+
             if not selector['type'] in selectors:
                 selectors[selector['type']] = []
 
