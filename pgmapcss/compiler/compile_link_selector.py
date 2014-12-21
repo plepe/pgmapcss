@@ -1,37 +1,30 @@
 from .compile_selector_part import compile_selector_part
 from .compile_conditions import compile_conditions
+from .compile_db_selects import compile_selectors_db
 from .compile_eval import compile_eval
 import pgmapcss.db as db
 
 def compile_link_selector(statement, stat):
-    parent_conditions = stat['database'].merge_conditions([(
-        statement['parent_selector']['type'],
-        stat['database'].compile_selector(
-            statement, stat, prefix='', selector='parent_selector')
-    )])[statement['parent_selector']['type']]
+    # create statement where selector is build from parent_selector for compiling
+    other_selects = compile_selectors_db([statement], 'parent', stat)
+    self_selects = compile_selectors_db([statement], None, stat)
 
-    child_conditions = stat['database'].merge_conditions([(
-        statement['selector']['type'],
-        stat['database'].compile_selector(
-            statement, stat, prefix='')
-    )])[statement['selector']['type']]
+    if statement['selector']['link']['type'] in ('>', ''):
+        return "objects_member_of([object], " +\
+            repr(other_selects) + ", " +\
+            repr(self_selects) + ", " +\
+            repr({}) + ")"
 
-    if statement['link_selector']['type'] in ('>', ''):
-        return "objects_member_of(object['id'], " +\
-            repr(statement['parent_selector']['type']) + ", " +\
-            repr(parent_conditions) + ", " +\
-            repr(child_conditions) + ")"
+    elif statement['selector']['link']['type'] == '<':
+        return "objects_members([object], " +\
+            repr(other_selects) + ", " +\
+            repr(self_selects) + ", " +\
+            repr({}) + ")"
 
-    elif statement['link_selector']['type'] == '<':
-        return "objects_members(object['id'], " +\
-            repr(statement['parent_selector']['type']) + ", " +\
-            repr(parent_conditions) + ", " +\
-            repr(child_conditions) + ")"
-
-    elif statement['link_selector']['type'] == 'near':
+    elif statement['selector']['link']['type'] == 'near':
         distance = { 'value': '100' }
 
-        for r in statement['link_selector']['conditions']:
+        for r in statement['selector']['link']['conditions']:
             if r['key'] == 'distance' and r['op'] in ('<', '<=', '='):
                 distance = r
 
@@ -41,19 +34,23 @@ def compile_link_selector(statement, stat):
                     'id': statement['id']
                 }, stat)
         else:
-            distance = repr(distance['value'])
+            distance = distance['value']
 
-        return "objects_near(" + distance + ", None, "+\
-            repr(statement['parent_selector']['type']) + ", " +\
-            repr(parent_conditions) + ", " +\
-            repr(child_conditions) + ")"
+        return "objects_near([object], " +\
+            repr(other_selects) + ", " +\
+            repr(self_selects) + ", " +\
+            repr({
+                'distance': distance
+            }) + ")"
 
-    elif statement['link_selector']['type'] in ('within', 'surrounds', 'overlaps'):
-        return "objects_near(\"0\", None, "+\
-            repr(statement['parent_selector']['type']) + ", " +\
-            repr(parent_conditions) + ", " +\
-            repr(child_conditions) + ", check_geo=" +\
-            repr(statement['link_selector']['type']) + ")"
+    elif statement['selector']['link']['type'] in ('within', 'surrounds', 'overlaps'):
+        return "objects_near([object], " +\
+            repr(other_selects) + ", " +\
+            repr(self_selects) + ", " +\
+            repr({
+                'distance': 0,
+                'check_geo': statement['selector']['link']['type'],
+            }) + ")"
 
     else:
-        raise Exception('Unknown link selector "{type}"'.format(**selector['link_selector']))
+        raise Exception('Unknown link selector "{type}"'.format(**selector['selector']['link']))

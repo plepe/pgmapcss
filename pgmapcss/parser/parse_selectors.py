@@ -117,20 +117,20 @@ def parse_selectors(selectors, to_parse):
                 raise
 
         if sel1 and sel2 and sel3:
-            selector['parent_selector'] = sel1
-            selector['link_selector'] = sel2
             selector['selector'] = sel3
+            selector['selector']['parent'] = sel1
+            selector['selector']['link'] = sel2
 
         elif sel1 and not sel2 and sel3:
-            selector['parent_selector'] = sel1
-            selector['link_selector'] = {
+            selector['selector'] = sel3
+            selector['selector']['parent'] = sel1
+            selector['selector']['link'] = {
                 'type': '',
                 'conditions': []
             }
-            selector['selector'] = sel3
 
         else:
             selector['selector'] = sel1
 
         if not to_parse.match('\s*,'):
-          return
+            return

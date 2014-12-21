@@ -62,7 +62,10 @@ class db(postgresql_db):
                         for k in self.stat['config']['db.columns.' + t]
                     ])
 
-    def tag_type(self, key, condition, selector, statement):
+        if 'db.hstore_key_index' in stat['config']:
+            stat['config']['db.hstore_key_index'] = stat['config']['db.hstore_key_index'].split(',')
+
+    def tag_type(self, key, condition, selector):
         if key[0:4] == 'osm:':
             if key == 'osm:id':
                 return ( 'column', 'osm_id', self.compile_modify_id )

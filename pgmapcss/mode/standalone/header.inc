@@ -10,8 +10,13 @@ class fake_plpy:
             host=(args.host if args and args.host else '{host}'),
             password=(args.password if args and args.password else '{password}'),
             database=(args.database if args and args.database else '{database}'),
-            user=(args.user if args and args.user else '{user}'),
+            user=(args.user if args and args.user else '{user}')
         )
+        self.conn.settings.update({{
+# START db.search_path
+            'search_path': "{config|db|search_path}"
+# END db.search_path
+        }})
 # START debug.explain_queries
         self.explain_queries = {{ }}
 # END debug.explain_queries

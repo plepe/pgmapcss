@@ -1,3 +1,8 @@
+0.9.1 release 2014-12-02
+* advanced database options: db.search_path, db.hstore_key_index
+* updated Maki icons
+* bugfixes (especially regarding SRS)
+
 0.9.0 release 2014-11-02
 * support osmosis pgsnapshot as alternative database backend, see [[doc/database.md|database docu]] for details
 * new 'standalone' mode, which compiles mapcss into a python executable which can be used from command line or as CGI script
