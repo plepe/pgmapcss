@@ -494,8 +494,9 @@ def objects_member_of(objects, other_selects, self_selects, options):
             replacements = { '__BBOX__': '(' + get_bbox() + ')' }
             q = '[out:json][bbox:' + get_bbox() + '];'
 
-            if 'parent_query' in self_selects[ob_type]:
-                q += self_selects[ob_type]['parent_query']
+            for si, ss in self_selects.items():
+                if 'parent_query' in ss:
+                    q += ss['parent_query']
             for oi, os in other_selects.items():
                 if 'parent_query' in os:
                     q += os['parent_query']
@@ -558,8 +559,9 @@ def objects_members(objects, other_selects, self_selects, options):
             replacements = { '__BBOX__': '(' + get_bbox() + ')' }
             q = '[out:json][bbox:' + get_bbox() + '];'
 
-            if 'parent_query' in self_selects[ob_type]:
-                q += self_selects[ob_type]['parent_query']
+            for si, ss in self_selects.items():
+                if 'parent_query' in ss:
+                    q += ss['parent_query']
             q += '(' + ''.join([
                 ss['query'].replace('__TYPE__', ob_type)
                 for si, ss in self_selects.items()
@@ -576,8 +578,9 @@ def objects_members(objects, other_selects, self_selects, options):
 
             q = '[out:json][bbox:' + get_bbox() + '];'
 
-            if 'parent_query' in self_selects[ob_type]:
-                q += self_selects[ob_type]['parent_query']
+            for si, ss in self_selects.items():
+                if 'parent_query' in ss:
+                    q += ss['parent_query']
             for oi, os in other_selects.items():
                 if 'parent_query' in os:
                     q += os['parent_query']
