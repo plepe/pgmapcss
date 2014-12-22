@@ -78,6 +78,11 @@ class db(postgresql_db):
         if selector['type'] in ('way', 'line', 'area'):
             type = 'way'
 
+        # type=route, type=multipolygon is not set for relations
+        # TODO: a relation can also be an area -> how to handle this?
+        if selector['type'] in ('relation') and key in ('type'):
+            return None
+
         if type and self.stat['config']['db.columns.' + type]:
             if key in self.stat['config']['db.columns.' + type]:
                 return ( 'column', key )
