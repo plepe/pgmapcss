@@ -1,3 +1,8 @@
+0.9.2 release 2014-12-26
+* Mode standalone/CGI: accept z/x/y and zoom/x/y coordinates
+* DB/Osmosis: support for hide_outer_ways column (osmosis-multipolygon v0.3)
+* bugfixes
+
 0.9.1 release 2014-12-02
 * advanced database options: db.search_path, db.hstore_key_index
 * updated Maki icons
