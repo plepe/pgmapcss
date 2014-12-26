@@ -69,9 +69,16 @@ select 'w' || cast(id as text) as id, version, user_id, (select name from users 
        tags, (CASE WHEN ST_NPoints(linestring) >= 4 and ST_IsClosed(linestring) THEN ST_MakePolygon(linestring) ELSE linestring END) as geo, (ST_NPoints(linestring) >= 4) and ST_IsClosed(linestring) as is_closed, Array['line', 'way'] as types
        '''
 # START db.multipolygons
+# START db.multipolygons-v0.2
+# deprecated by osmosis-multipolygon v0.3
         qry += '''
 , (select array_agg(has_outer_tags) from relation_members join multipolygons on relation_members.relation_id=multipolygons.id where relation_members.member_id=ways.id and relation_members.member_type='W' and relation_members.member_role in ('outer', 'exclave')) part_of_mp_outer
         '''
+# ELSE db.multipolygons-v0.2
+        qry += '''
+, (select array_agg(true) from multipolygons where hide_outer_ways @> Array[ways.id]) part_of_mp_outer
+        '''
+# END db.multipolygons-v0.2
 # END db.multipolygons
         qry += '''
 from ways
