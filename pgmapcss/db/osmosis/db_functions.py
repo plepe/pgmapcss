@@ -64,20 +64,21 @@ where {bbox} ( {w} )
             bbox = 'linestring && $1 and (ST_NPoints(linestring) = 1 or ST_Intersects(linestring, $1::geometry)) and'
 
         qry = '''
-select * from (
+select * {add_columns} from (
 select 'w' || cast(id as text) as id, version, user_id, (select name from users where id=user_id) as user, tstamp, changeset_id,
-       tags, (CASE WHEN ST_NPoints(linestring) >= 4 and ST_IsClosed(linestring) THEN ST_MakePolygon(linestring) ELSE linestring END) as geo, (ST_NPoints(linestring) >= 4) and ST_IsClosed(linestring) as is_closed, Array['line', 'way'] as types '''
+       tags, (CASE WHEN ST_NPoints(linestring) >= 4 and ST_IsClosed(linestring) THEN ST_MakePolygon(linestring) ELSE linestring END) as geo, (ST_NPoints(linestring) >= 4) and ST_IsClosed(linestring) as is_closed, Array['line', 'way'] as types
+       '''
 # START db.multipolygons
         qry += '''
 , (select array_agg(has_outer_tags) from relation_members join multipolygons on relation_members.relation_id=multipolygons.id where relation_members.member_id=ways.id and relation_members.member_type='W' and relation_members.member_role in ('outer', 'exclave')) part_of_mp_outer
         '''
 # END db.multipolygons
         qry += '''
-       {add_columns}
 from ways
 where {bbox} ( {w} ) offset 0) t
-       {add_columns}
-'''.format(bbox=bbox, w=' or '.join(w), add_columns=add_columns_qry.replace('__geo__', 'linestring'))
+'''
+
+        qry = qry.format(bbox=bbox, w=' or '.join(w), add_columns=add_columns_qry.replace('__geo__', 'geo'))
 
         plan = plpy.prepare(qry, param_type )
         res = plpy.cursor(plan, param_value )
@@ -112,14 +113,12 @@ where {bbox} ( {w} ) offset 0) t
             bbox = 'geom && $1 and ST_Intersects(geom, $1::geometry) and'
 
         qry = '''
-select * from (
+select * {add_columns} from (
 select (CASE WHEN has_outer_tags THEN 'm' ELSE 'r' END) || cast(id as text) as id, id as rid, version, user_id, (select name from users where id=user_id) as user, tstamp, changeset_id, has_outer_tags,
        tags, geom as geo, Array['area'] as types
-       {add_columns}
 from (select multipolygons.*, relations.version, relations.user_id, relations.tstamp, relations.changeset_id from multipolygons left join relations on multipolygons.id = relations.id) t
 where {bbox} ( {w} ) offset 0) t
-       {add_columns}
-'''.format(bbox=bbox, w=' or '.join(w), add_columns=add_columns_qry.replace('__geo__', 'linestring'))
+'''.format(bbox=bbox, w=' or '.join(w), add_columns=add_columns_qry.replace('__geo__', 'geo'))
 
         plan = plpy.prepare(qry, param_type )
         res = plpy.cursor(plan, param_value )
@@ -149,11 +148,11 @@ where {bbox} ( {w} ) offset 0) t
 
     if len(w):
         qry = '''
+select * {add_columns} from (
 select 'r' || cast(id as text) as id, version, user_id, (select name from users where id=user_id) as user, tstamp, changeset_id,
        tags, null as geo, Array['relation'] as types
-       {add_columns}
 from relations
-where ({w}) and not id = ANY(Array[{done}]::bigint[])
+where ({w}) and not id = ANY(Array[{done}]::bigint[])) t
 '''.format(w=' or '.join(w), add_columns=add_columns_qry, done=','.join({ str(d) for d in done_multipolygons}))
 
         plan = plpy.prepare(qry, param_type )
