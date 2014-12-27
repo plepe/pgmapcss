@@ -22,13 +22,12 @@ class postgresql_db(default):
 
         return conditions
 
-    def compile_condition_hstore_value(self, condition, tag_type, filter):
+    def compile_condition_hstore_value(self, condition, tag_type, filter, prefix=''):
         ret = None
         negate = False
         key = tag_type[1]
         column = tag_type[2]
         op = condition['op']
-        prefix = ''
 
         if op[0:2] == '! ':
             op = op[2:]
@@ -124,7 +123,7 @@ class postgresql_db(default):
 
         return ret
 
-    def compile_condition_column(self, condition, tag_type, filter):
+    def compile_condition_column(self, condition, tag_type, filter, prefix=''):
         ret = None
         key = tag_type[1]
         op = condition['op']
@@ -236,7 +235,7 @@ class postgresql_db(default):
 
         return ret
 
-    def compile_condition(self, condition, selector, filter={}):
+    def compile_condition(self, condition, selector, filter={}, prefix=''):
         ret = set()
 
         # depending on the tag type compile the specified condition
@@ -245,9 +244,9 @@ class postgresql_db(default):
         if tag_type is None:
             pass
         elif tag_type[0] == 'hstore-value':
-            ret.add(self.compile_condition_hstore_value(condition, tag_type, filter))
+            ret.add(self.compile_condition_hstore_value(condition, tag_type, filter, prefix=prefix))
         elif tag_type[0] == 'column':
-            ret.add(self.compile_condition_column(condition, tag_type, filter))
+            ret.add(self.compile_condition_column(condition, tag_type, filter, prefix=prefix))
         else:
             raise CompileError('unknown tag type {}'.format(tag_type))
 
@@ -259,12 +258,12 @@ class postgresql_db(default):
         # merge conditions together, return
         return '(' + ' or '.join(ret) + ')'    
 
-    def compile_selector(self, selector):
+    def compile_selector(self, selector, prefix=''):
         filter = {}
         filter['object_type'] = selector['type']
 
         ret = {
-            self.compile_condition(c, selector, filter) or 'true'
+            self.compile_condition(c, selector, filter, prefix=prefix) or 'true'
             for c in selector['conditions']
         }
 

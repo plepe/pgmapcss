@@ -5,8 +5,13 @@ def objects_bbox(_bbox, db_selects, options, add_columns={}, add_param_type=[], 
     qry = ''
 
     bbox = ''
+    replacements = {
+        'parent_bbox': '',
+    }
+
     if _bbox is not None:
         bbox = 'way && $1 and ST_Intersects(way, $1::geometry) and'
+        replacements['parent_bbox'] = 'way && $1 and ST_Intersects(way, $1::geometry) and'
 
     if len(add_columns):
         add_columns_qry = ', ' + ', '.join([
@@ -91,6 +96,8 @@ select 'w' || cast(osm_id as text) as id,
 from planet_osm_line
 where osm_id>0 and {bbox} ( {w} )
 '''.format(bbox=bbox, w=' or '.join(w), add_columns=add_columns_qry)
+        qry = qry.replace('__PARENT_BBOX__', replacements['parent_bbox'])
+        plpy.warning(qry)
 
         plan = plpy.prepare(qry, param_type )
         res = plpy.cursor(plan, param_value )
@@ -141,6 +148,7 @@ select 'r' || cast(-osm_id as text) as id,
 from planet_osm_line
 where osm_id<0 and {bbox} ( {w} )
 '''.format(bbox=bbox, w=' or '.join(w), add_columns=add_columns_qry)
+        qry = qry.replace('__PARENT_BBOX__', replacements['parent_bbox'])
 
         plan = plpy.prepare(qry, param_type )
         res = plpy.cursor(plan, param_value )
