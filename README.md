@@ -184,7 +184,7 @@ Two possible uses for the standalone mode:
 
 ### Easy to install: ###
 
-Find installation instructions in [Install pgmapcss with Mapnik 3.0 on Ubuntu 14.04](doc/Install pgmapcss with Mapnik_3.0 on Ubuntu_14.04.md).
+Find installation instructions in [Install with Mapnik 3.0](doc/Install_with_Mapnik_3.0.md).
 
 There's a file [test.mapcss](./test.mapcss) which you can use to build upon. You can [try it online!](http://pgmapcss.openstreetbrowser.org/?style=f457f&zoom=14&lat=48.2098&lon=16.3725)
 
