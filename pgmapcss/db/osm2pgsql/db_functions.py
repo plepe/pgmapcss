@@ -435,11 +435,13 @@ def objects_member_of(objects, other_selects, self_selects, options):
                             if r[k] is not None
                         }
 # START db.has-hstore
-                        t['tags'] = dict(pghstore.loads(r['tags']).items() | t['tags'].items())
+                        if r['tags'] is not None:
+                            t['tags'] = dict(pghstore.loads(r['tags']).items() | t['tags'].items())
 # END db.has-hstore
 # END db.columns.way
 # START db.hstore-only
-                        t['tags'] = pghstore.loads(r['tags'])
+                        if r['tags'] is not None:
+                            t['tags'] = pghstore.loads(r['tags'])
 # END db.hstore-only
                         t['tags']['osm:id'] = t['id']
                         yield(o, t, link_tags)
