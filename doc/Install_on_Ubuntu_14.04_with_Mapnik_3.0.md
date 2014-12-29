@@ -4,6 +4,7 @@ Install additional packages:
 ```sh
 sudo apt-get install python-software-properties
 sudo add-apt-repository ppa:mapnik/nightly-trunk
+sudo apt-get update
 sudo apt-get install git postgresql postgresql-contrib postgresql-9.3-postgis-2.1 python3-setuptools python3-dev python-mapnik osm2pgsql postgresql-plpython3 python3-postgresql ttf-unifont mapnik-input-plugin-postgis libmapnik libmapnik-dev mapnik-utils python3-wand
 ```
 
@@ -46,7 +47,7 @@ sudo python3 setup.py install
 
 Compile 'test.mapcss' file and install database functions:
 ```
-pgmapcss -dtest -uuser -pPASSWORD -tmapnik-2.2 test
+pgmapcss -dtest -uuser -pPASSWORD -tmapnik-3.0 test
 ```
 
 You get a file `test.mapnik` which you can use with your preferred render front-end (these are just examples):
