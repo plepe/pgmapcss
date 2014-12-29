@@ -27,12 +27,31 @@ if __name__ == '__main__':
 
         parameters = {{ }}
 
+        scale_denom = 2000
+        z = None
+        if params.getvalue("zoom"):
+            zoom = int(params.getvalue("zoom"))
+            z = zoom
+
+            if params.getvalue("tilesize"):
+                z = zoom - int(math.log(int(params.getvalue("tilesize")) / 256, 2))
+            scale_denom = 559082264.028 / (2 ** zoom)
+
+        if params.getvalue("z"):
+            zoom = int(params.getvalue("z"))
+            z = zoom
+
+            if params.getvalue("tilesize"):
+                zoom = zoom + int(math.log(int(params.getvalue("tilesize")) / 256, 2))
+
+            scale_denom = 559082264.028 / (2 ** zoom)
+
         # using z/x/y
-        if params.getvalue('x') and params.getvalue('y') and params.getvalue('z'):
+        if params.getvalue('x') and params.getvalue('y') and z:
             import math
             x = int(params.getvalue('x'))
             y = int(params.getvalue('y'))
-            n = 2.0 ** int(params.getvalue('z'))
+            n = 2.0 ** z
             bounds = [
                 x / n * 360.0 - 180.0,
                 math.degrees(math.atan(math.sinh(math.pi * (1 - 2 * y / n)))),
@@ -41,16 +60,6 @@ if __name__ == '__main__':
             ]
             parameters['in.srs'] = 4326
 
-        scale_denom = 2000
-        if params.getvalue("zoom"):
-            zoom = int(params.getvalue("zoom"))
-
-            scale_denom = 559082264.028 / (2 ** zoom)
-        if params.getvalue("z"):
-            zoom = int(params.getvalue("z"))
-            if params.getvalue("tilesize"):
-                zoom = zoom + int(math.log(int(params.getvalue("tilesize")) / 256, 2))
-            scale_denom = 559082264.028 / (2 ** zoom)
         if params.getvalue("scale"):
             scale_denom = float(params.getvalue("scale"))
 

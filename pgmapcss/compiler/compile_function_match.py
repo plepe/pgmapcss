@@ -92,7 +92,7 @@ if not 'srs' in parameters:
     parameters['srs' ] = {srs}
 
 if type(bbox) == list and len(bbox) == 4:
-    plan = plpy.prepare('select SetSRID(MakeBox2D(ST_Point($1, $2), ST_Point($3, $4)), $5) as bounds', ['float', 'float', 'float', 'float', 'int'])
+    plan = plpy.prepare('select ST_SetSRID(ST_MakeBox2D(ST_Point($1, $2), ST_Point($3, $4)), $5) as bounds', ['float', 'float', 'float', 'float', 'int'])
     res = plpy.execute(plan, [float(b) for b in bbox] + [ parameters['in.srs'] if 'in.srs' in parameters else parameters['srs'] ])
     _bbox = res[0]['bounds']
 else:

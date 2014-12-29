@@ -14,6 +14,7 @@ class db(postgresql_db):
                 res = plan()
                 print("- DB table 'multipolygons' detected; enabling support")
                 self.stat['config']['db.multipolygons'] = True
+                self.stat['config']['db.multipolygons-v0.2'] = not 'hide_outer_ways' in plan.column_names
             except postgresql.exceptions.UndefinedTableError:
                 self.stat['config']['db.multipolygons'] = False
 

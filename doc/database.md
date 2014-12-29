@@ -42,6 +42,8 @@ There are two "types" of multipolygons, those that have their tags bound to the 
 * "Standard" multipolygons get their ID prefixed by 'r' (as they are relations).
 * Multipolygons with tags from their outer members get their ID prefixed by 'm' (for multipolygon) and an additional tag 'osm:has_outer_tags' (set to 'yes'). On the other hand closed ways which are an outer member of a multipolygon relation do not count as 'area', whereas the multipolygon itself does not count as 'relation'.
 
+With osmosis-multipolygon v0.2 also multipolygons will be checked where the relation and the outer ways have the same tags (save non-relevant tags).
+
 Options
 -------
 Behaviour can be influenced with the following config options:
@@ -50,6 +52,7 @@ Behaviour can be influenced with the following config options:
 |------------------|-------------|-----------------
 | db.srs           | Spatial Reference System used in the database. Autodetected. | Usual values: 4326 (WGS-84), 900913 resp. 3857 (Spherical Mercator for Web Maps) |
 | db.multipolygons | Specify whether the multipolygons table is present and should be used. Usually autodected. Needed when using offline mode (default: false) | true/false
+| db.multipolygons-v0.2 | osmosis-multipolygon compatibility with version 0.1 (before the hide_outer_ways column had been added). | true/false
 
 Overpass API (short: overpass)
 ==============================
