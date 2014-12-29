@@ -371,6 +371,9 @@ def objects_by_id(id_list, options):
         yield t
 
 def flatarray_to_tags(arr):
+    if arr is None:
+        return {}
+
     ret = {}
     for i in range(0, len(arr), 2):
         ret[arr[i]] = arr[i + 1]
@@ -408,7 +411,7 @@ def objects_member_of(objects, other_selects, self_selects, options):
                         yield (o, t, member)
 
     if 'way' in other_selects:
-        plan = plpy.prepare('select id, nodes, planet_osm_line.tags, way as geo from planet_osm_ways left join planet_osm_line on planet_osm_ways.id=planet_osm_line.osm_id where nodes::bigint[] @> Array[$1]', ['bigint']);
+        plan = plpy.prepare('select id, nodes, tags, (select way from planet_osm_line where id=osm_id union select way from planet_osm_polygon where id=osm_id) as geo from planet_osm_ways where nodes::bigint[] @> Array[$1]', ['bigint']);
         for o in objects:
             member_id = o['id']
             num_id = int(member_id[1:])
@@ -427,22 +430,7 @@ def objects_member_of(objects, other_selects, self_selects, options):
                             'member_id': member_id,
                             'sequence_id': str(i)
                         }
-# START db.columns.way
-                        t['tags'] = {
-                            k: r[k]
-                            for k in r
-                            if k not in ['id', 'geo', 'types', 'tags', 'nodes']
-                            if r[k] is not None
-                        }
-# START db.has-hstore
-                        if r['tags'] is not None:
-                            t['tags'] = dict(pghstore.loads(r['tags']).items() | t['tags'].items())
-# END db.has-hstore
-# END db.columns.way
-# START db.hstore-only
-                        if r['tags'] is not None:
-                            t['tags'] = pghstore.loads(r['tags'])
-# END db.hstore-only
+                        t['tags'] = flatarray_to_tags(r['tags'])
                         t['tags']['osm:id'] = t['id']
                         yield(o, t, link_tags)
 
