@@ -119,6 +119,6 @@ class db(postgresql_db):
             if selector['parent']['type'] == 'relation' and \
                self.has_condition(selector['parent']['conditions'], 'type', { 'route' }):
                 parent_conditions = self.compile_selector(selector['parent'], prefix='parent.')
-                ret += ' and osm_id in (select cast(substr(member_id, 2) as bigint) member_ids from (select unnest(r.members) member_id, generate_series(1, array_upper(r.members, 1)) % 2 is_member_id from planet_osm_line parent join planet_osm_rels r on r.id=-parent.osm_id where __PARENT_BBOX__ ' + parent_conditions + ') t where is_member_id=1 and substr(member_id, 1, 1) = \'w\')';
+                ret += ' and osm_id in (select __TYPE_MODIFY__cast(substr(member_id, 2) as bigint) member_ids from (select unnest(r.members) member_id, generate_series(1, array_upper(r.members, 1)) % 2 is_member_id from planet_osm_line parent join planet_osm_rels r on r.id=-parent.osm_id where __PARENT_BBOX__ ' + parent_conditions + ') t where is_member_id=1 and substr(member_id, 1, 1) = \'__TYPE_SHORT__\')';
 
         return ret

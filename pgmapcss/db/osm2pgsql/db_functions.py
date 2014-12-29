@@ -47,6 +47,10 @@ from planet_osm_point
 where {bbox} ( {w} )
 '''.format(bbox=bbox, w=' or '.join(w), add_columns=add_columns_qry)
 
+        qry = qry.replace('__PARENT_BBOX__', replacements['parent_bbox'])
+        qry = qry.replace('__TYPE_SHORT__', 'n')
+        qry = qry.replace('__TYPE_MODIFY__', '')
+
         plan = plpy.prepare(qry, param_type )
         res = plpy.cursor(plan, param_value )
 
@@ -97,7 +101,8 @@ from planet_osm_line
 where osm_id>0 and {bbox} ( {w} )
 '''.format(bbox=bbox, w=' or '.join(w), add_columns=add_columns_qry)
         qry = qry.replace('__PARENT_BBOX__', replacements['parent_bbox'])
-        plpy.warning(qry)
+        qry = qry.replace('__TYPE_SHORT__', 'w')
+        qry = qry.replace('__TYPE_MODIFY__', '')
 
         plan = plpy.prepare(qry, param_type )
         res = plpy.cursor(plan, param_value )
@@ -149,6 +154,8 @@ from planet_osm_line
 where osm_id<0 and {bbox} ( {w} )
 '''.format(bbox=bbox, w=' or '.join(w), add_columns=add_columns_qry)
         qry = qry.replace('__PARENT_BBOX__', replacements['parent_bbox'])
+        qry = qry.replace('__TYPE_SHORT__', 'w')
+        qry = qry.replace('__TYPE_MODIFY__', '')
 
         plan = plpy.prepare(qry, param_type )
         res = plpy.cursor(plan, param_value )
@@ -200,6 +207,10 @@ from planet_osm_polygon
 where osm_id>0 and {bbox} ( {w} )
 '''.format(bbox=bbox, w=' or '.join(w), add_columns=add_columns_qry)
 
+        qry = qry.replace('__PARENT_BBOX__', replacements['parent_bbox'])
+        qry = qry.replace('__TYPE_SHORT__', 'r')
+        qry = qry.replace('__TYPE_MODIFY__', '-')
+
         plan = plpy.prepare(qry, param_type )
         res = plpy.cursor(plan, param_value )
 
@@ -249,6 +260,10 @@ select 'r' || cast(-osm_id as text) as id,
 from planet_osm_polygon
 where osm_id<0 and {bbox} ( {w} )
 '''.format(bbox=bbox, w=' or '.join(w), add_columns=add_columns_qry)
+
+        qry = qry.replace('__PARENT_BBOX__', replacements['parent_bbox'])
+        qry = qry.replace('__TYPE_SHORT__', 'r')
+        qry = qry.replace('__TYPE_MODIFY__', '-')
 
         plan = plpy.prepare(qry, param_type )
         res = plpy.cursor(plan, param_value )
