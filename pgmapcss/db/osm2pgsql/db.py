@@ -98,11 +98,27 @@ class db(postgresql_db):
         else:
             return format(value[1:])
 
+    def has_condition(self, conditions, key, values):
+        for condition in conditions:
+            if 'key' in condition and condition['key'] == key:
+                if condition['op'] == '=' and condition['value_type'] == 'value':
+                    if condition['value'] in values:
+                        return True
+
+                if condition['op'] == '@=' and condition['value_type'] == 'value':
+                    print(condition)
+                    if len(set(condition['value'].split(';')) - values) == 0:
+                        return True
+
+        return False
+
     def compile_selector(self, selector, prefix=''):
         ret = postgresql_db.compile_selector(self, selector, prefix=prefix)
 
         if 'parent' in selector and selector['link']['type'] in ('', '>'):
-            parent_conditions = self.compile_selector(selector['parent'], prefix='parent.')
-            ret += ' and osm_id in (select cast(substr(member_id, 2) as bigint) member_ids from (select unnest(r.members) member_id, generate_series(1, array_upper(r.members, 1)) % 2 is_member_id from planet_osm_line parent join planet_osm_rels r on r.id=-parent.osm_id where __PARENT_BBOX__ ' + parent_conditions + ') t where is_member_id=1 and substr(member_id, 1, 1) = \'w\')';
+            if selector['parent']['type'] == 'relation' and \
+               self.has_condition(selector['parent']['conditions'], 'type', { 'route' }):
+                parent_conditions = self.compile_selector(selector['parent'], prefix='parent.')
+                ret += ' and osm_id in (select cast(substr(member_id, 2) as bigint) member_ids from (select unnest(r.members) member_id, generate_series(1, array_upper(r.members, 1)) % 2 is_member_id from planet_osm_line parent join planet_osm_rels r on r.id=-parent.osm_id where __PARENT_BBOX__ ' + parent_conditions + ') t where is_member_id=1 and substr(member_id, 1, 1) = \'w\')';
 
         return ret
