@@ -3,6 +3,7 @@ from ..includes import *
 from .base import config_base
 import pgmapcss.misc
 import re
+import postgresql
 
 class Functions:
     def __init__(self, stat):
@@ -146,7 +147,7 @@ class Functions:
         config = self.eval_functions[func]
 
         ret = '''
-create or replace function __eval_test__() returns text
+create or replace function __eval_test__() returns setof text
 as $body$
 import re
 import math
@@ -160,9 +161,10 @@ current = { 'object': { 'id': 'n123', 'tags': { 'amenity': 'restaurant', 'name':
 render_context = {'bbox': '010300002031BF0D000100000005000000DBF1839BB5DC3B41E708549B2B705741DBF1839BB5DC3B41118E9739B171574182069214CCE23B41118E9739B171574182069214CCE23B41E708549B2B705741DBF1839BB5DC3B41E708549B2B705741', 'scale_denominator': 8536.77}
 '''
         ret += self.print()
-        ret += "result = ''\n"
 
-        param_in = None
+        list_param_in = []
+        list_return_possibilities = []
+        list_shall_round = []
         for r in rows:
             m = re.match('# IN (.*)$', r)
             if m:
@@ -173,6 +175,10 @@ render_context = {'bbox': '010300002031BF0D000100000005000000DBF1839BB5DC3B41E70
                         for p in param_in
                     ]
 
+                list_param_in.append(param_in)
+                list_return_possibilities.append(set())
+                list_shall_round.append(False)
+
             m = re.match('# OUT(_ROUND)? (.*)$', r)
             if m:
                 return_out = eval(m.group(2))
@@ -180,32 +186,40 @@ render_context = {'bbox': '010300002031BF0D000100000005000000DBF1839BB5DC3B41E70
                 if len(return_out) > 16 and re.match('[0-9A-F]+$', return_out):
                     return_out = self.convert_srs(return_out, self.stat['config']['db.srs'])
 
-                shall_round = m.group(1) == '_ROUND'
+                if m.group(1) == '_ROUND':
+                    list_shall_round[-1] = True
 
-                ret += 'ret = ' + config.compiler([ repr(p) for p in param_in ], '', {}) + '\n'
-                ret += 'result += "IN  %s\\n"\n' % repr(param_in)
-                ret += 'result += "EXP %s\\n"\n' % repr(return_out)
-                ret += 'result += "OUT %s\\n" % repr(ret)\n'
+                list_return_possibilities[-1].add(return_out)
 
-                ret += 'if type(ret) != str:\n    result += "ERROR not a string: " + repr(ret) + "\\n"\n'
-                if shall_round:
-                    ret += 'elif round(float(ret), 5) != %s:\n    result += "ERROR return value wrong!\\n"\n' % repr(round(float(return_out), 5))
+        if len(list_param_in):
+            for i, param_in in enumerate(list_param_in):
+                ret += 'yield ' + config.compiler([ repr(p) for p in param_in ], '', {}) + '\n'
+
+            ret += "$body$ language 'plpython3u' immutable;"
+            conn = db.connection()
+            conn.execute(ret)
+
+            res = conn.prepare('select * from __eval_test__()')
+            error = False
+            for i, r in enumerate(res()):
+                print('IN', repr(list_param_in[i]))
+                print('EXP', '\n    '.join([
+                    repr(r)
+                    for r in list_return_possibilities[i]
+                ]))
+                print('OUT', repr(r[0]))
+
+                if list_shall_round[i]:
+                    if round(float(r[0]), 5) not in [ float(q) for q in list_return_possibilities[i] ]:
+                        error = True
+                        print('ERROR return value wrong!')
                 else:
-                    ret += 'elif ret != %s:\n    result += "ERROR return value wrong!\\n"\n' % repr(return_out)
+                    if r[0] not in list_return_possibilities[i]:
+                        error = True
+                        print('ERROR return value wrong!')
 
-        ret += 'return result\n'
-        ret += "$body$ language 'plpython3u' immutable;"
-        #print(ret)
-        conn = db.connection()
-        conn.execute(ret)
-
-        r = conn.prepare('select __eval_test__()');
-        res = r()[0][0]
-
-        print(res)
-
-        if(re.search("^ERROR", res, re.MULTILINE)):
-            raise Exception("eval-test failed!")
+            if error:
+                raise Exception("eval-test failed!")
 
     def test_all(self):
         if not self.eval_functions:

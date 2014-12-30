@@ -34,3 +34,5 @@ create table _pgmapcss_PGCache (
 create index _pgmapcss_PGCache_cache_id on _pgmapcss_PGCache(cache_id);
 create index _pgmapcss_PGCache_id on _pgmapcss_PGCache(id);
 create index _pgmapcss_PGCache_geo on _pgmapcss_PGCache using gist(geo);
+
+drop function if exists __eval_test__();
