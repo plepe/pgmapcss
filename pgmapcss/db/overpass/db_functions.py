@@ -5,9 +5,6 @@ def overpass_query(query):
     import urllib.parse
     import json
 
-# START debug.overpass_queries
-    plpy.warning(query)
-# END debug.overpass_queries
 # START db.serial_requests
     ret = []
 # END db.serial_requests
