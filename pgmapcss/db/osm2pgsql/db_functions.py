@@ -5,8 +5,13 @@ def objects_bbox(_bbox, db_selects, options, add_columns={}, add_param_type=[], 
     qry = ''
 
     bbox = ''
+    replacements = {
+        'parent_bbox': '',
+    }
+
     if _bbox is not None:
         bbox = 'way && $1 and ST_Intersects(way, $1::geometry) and'
+        replacements['parent_bbox'] = 'way && $1 and ST_Intersects(way, $1::geometry) and'
 
     if len(add_columns):
         add_columns_qry = ', ' + ', '.join([
@@ -41,6 +46,10 @@ select 'n' || cast(osm_id as text) as id,
 from planet_osm_point
 where {bbox} ( {w} )
 '''.format(bbox=bbox, w=' or '.join(w), add_columns=add_columns_qry)
+
+        qry = qry.replace('__PARENT_BBOX__', replacements['parent_bbox'])
+        qry = qry.replace('__TYPE_SHORT__', 'n')
+        qry = qry.replace('__TYPE_MODIFY__', '')
 
         plan = plpy.prepare(qry, param_type )
         res = plpy.cursor(plan, param_value )
@@ -91,6 +100,9 @@ select 'w' || cast(osm_id as text) as id,
 from planet_osm_line
 where osm_id>0 and {bbox} ( {w} )
 '''.format(bbox=bbox, w=' or '.join(w), add_columns=add_columns_qry)
+        qry = qry.replace('__PARENT_BBOX__', replacements['parent_bbox'])
+        qry = qry.replace('__TYPE_SHORT__', 'w')
+        qry = qry.replace('__TYPE_MODIFY__', '')
 
         plan = plpy.prepare(qry, param_type )
         res = plpy.cursor(plan, param_value )
@@ -141,6 +153,9 @@ select 'r' || cast(-osm_id as text) as id,
 from planet_osm_line
 where osm_id<0 and {bbox} ( {w} )
 '''.format(bbox=bbox, w=' or '.join(w), add_columns=add_columns_qry)
+        qry = qry.replace('__PARENT_BBOX__', replacements['parent_bbox'])
+        qry = qry.replace('__TYPE_SHORT__', 'w')
+        qry = qry.replace('__TYPE_MODIFY__', '')
 
         plan = plpy.prepare(qry, param_type )
         res = plpy.cursor(plan, param_value )
@@ -192,6 +207,10 @@ from planet_osm_polygon
 where osm_id>0 and {bbox} ( {w} )
 '''.format(bbox=bbox, w=' or '.join(w), add_columns=add_columns_qry)
 
+        qry = qry.replace('__PARENT_BBOX__', replacements['parent_bbox'])
+        qry = qry.replace('__TYPE_SHORT__', 'r')
+        qry = qry.replace('__TYPE_MODIFY__', '-')
+
         plan = plpy.prepare(qry, param_type )
         res = plpy.cursor(plan, param_value )
 
@@ -241,6 +260,10 @@ select 'r' || cast(-osm_id as text) as id,
 from planet_osm_polygon
 where osm_id<0 and {bbox} ( {w} )
 '''.format(bbox=bbox, w=' or '.join(w), add_columns=add_columns_qry)
+
+        qry = qry.replace('__PARENT_BBOX__', replacements['parent_bbox'])
+        qry = qry.replace('__TYPE_SHORT__', 'r')
+        qry = qry.replace('__TYPE_MODIFY__', '-')
 
         plan = plpy.prepare(qry, param_type )
         res = plpy.cursor(plan, param_value )
@@ -348,6 +371,9 @@ def objects_by_id(id_list, options):
         yield t
 
 def flatarray_to_tags(arr):
+    if arr is None:
+        return {}
+
     ret = {}
     for i in range(0, len(arr), 2):
         ret[arr[i]] = arr[i + 1]
@@ -385,7 +411,7 @@ def objects_member_of(objects, other_selects, self_selects, options):
                         yield (o, t, member)
 
     if 'way' in other_selects:
-        plan = plpy.prepare('select id, nodes, planet_osm_line.tags, way as geo from planet_osm_ways left join planet_osm_line on planet_osm_ways.id=planet_osm_line.osm_id where nodes::bigint[] @> Array[$1]', ['bigint']);
+        plan = plpy.prepare('select id, nodes, tags, (select way from planet_osm_line where id=osm_id union select way from planet_osm_polygon where id=osm_id) as geo from planet_osm_ways where nodes::bigint[] @> Array[$1]', ['bigint']);
         for o in objects:
             member_id = o['id']
             num_id = int(member_id[1:])
@@ -404,20 +430,7 @@ def objects_member_of(objects, other_selects, self_selects, options):
                             'member_id': member_id,
                             'sequence_id': str(i)
                         }
-# START db.columns.way
-                        t['tags'] = {
-                            k: r[k]
-                            for k in r
-                            if k not in ['id', 'geo', 'types', 'tags', 'nodes']
-                            if r[k] is not None
-                        }
-# START db.has-hstore
-                        t['tags'] = dict(pghstore.loads(r['tags']).items() | t['tags'].items())
-# END db.has-hstore
-# END db.columns.way
-# START db.hstore-only
-                        t['tags'] = pghstore.loads(r['tags'])
-# END db.hstore-only
+                        t['tags'] = flatarray_to_tags(r['tags'])
                         t['tags']['osm:id'] = t['id']
                         yield(o, t, link_tags)
 

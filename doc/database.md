@@ -6,8 +6,8 @@ osm2pgsql
 * Objects matching 'line' depend on the osm2pgsql style file; also relation=route are included in 'line'
 * Objects matching 'area' depend on the osm2pgsql style file; also multipolygons and boundaries are included in 'area'.
 * As direct query, only relations of type=route, type=boundary and type=multipolygon are available. On the other hand the 'type' tag is removed by osm2pgsql, therefore a query for `relation[type=route]` will not work.
-* Queries of the type `relation node|way|relation` do work for all relation types as parents; even the type-tag is available. Currently those queries are inefficient, as for every possible member all available relations are queried.
-* Queries of the type `way node` work. Currently those queries are inefficient, as for every possible member all available relations are queried.
+* Queries of the type `relation node|way|relation` do work for all relation types as parents; even the type-tag is available. Currently those queries are inefficient, as for every possible member all available relations are queried, except when the parent contains a query for the tag 'type' with the values 'route', 'multipolygon' or 'boundary' (as these object are added to planet_osm_line or planet_osm_polygon). E.g. `relation[type=route][route=tram] way`.
+* Queries of the type `way node` work, and will be optimized, as first all ways in the bouding box are queried and then all associated nodes.
 * Additionally the tag "osm:id" will be set (e.g. 'n1234'), but it will not be available for querying (see below at osmosis pgsnapshot for additional tags).
 * The osm2pgsql mode will by default use the tag columns of the database tables, and for other tags the "tags" column (type hstore), if available.
 
