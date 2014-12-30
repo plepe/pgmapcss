@@ -3,9 +3,7 @@ import os
 import shutil
 import subprocess
 import json
-
-if os.path.exists('pgmapcss/icons/maki'):
-    shutil.rmtree('pgmapcss/icons/maki/')
+import glob
 
 if os.path.exists('maki'):
     os.chdir('maki')
@@ -14,11 +12,14 @@ if os.path.exists('maki'):
 else:
     subprocess.call(["git", "clone", "https://github.com/mapbox/maki.git"])
 
-shutil.copytree('maki/src/', 'pgmapcss/icons/maki', ignore=shutil.ignore_patterns('*ai'))
+for file in glob.glob('maki/src/*.svg'):
+    shutil.copy(file, 'pgmapcss/icons/maki/')
 shutil.copy('maki/_includes/maki.json', 'pgmapcss/icons/maki/')
 
+subprocess.call(["git", "add", "pgmapcss/icons/maki"])
+
 # TODO: convert using Python libraries
-subprocess.getoutput("for i in pgmapcss/icons/maki/*24.svg ; do convert $i `echo $i | cut -d. -f1`.png ; done")
+subprocess.getoutput("for i in `git diff --cached --name-only pgmapcss/icons/maki | grep '24.svg'` ; do echo $i ; convert $i `echo $i | cut -d. -f1`.png ; done")
 
 subprocess.call(["git", "add", "pgmapcss/icons/maki"])
 
