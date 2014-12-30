@@ -1,3 +1,12 @@
+0.10.0 release 2014-01-??
+* New database backend 'overpass', which is also the new default database backend, including multipolygon support, relationship queries, ...
+* DB/osm2pgsql can optimize some queries with relationships. (e.g. relation[type=route] member)
+* Re-structured and simplified code for database backends, see [[doc/database-API.md|doc/database-API.md]] for details.
+* new internal module PGCache which can be used to cache data (with different backends, depending on writeability of the database)
+* improved installation instructions ([[doc/Install_with_Mapnik_3.0.md|doc/Install_with_Mapnik_3.0.md]] or [[doc/Install_with_Mapnik_2.2.md|doc/Install_with_Mapnik_2.2.md]])
+* improved eval tests (also using standalone mode; choose which tests to run)
+* geometric eval functions now catch and print errors
+
 0.9.3 release 2015-01-03
 * bugfixes
 
