@@ -14,7 +14,11 @@ def overpass_query(query):
     url = '{db.overpass-url}/interpreter?' +\
         urllib.parse.urlencode({ 'data': query })
 
-    f = urllib.request.urlopen(url)
+    try:
+        f = urllib.request.urlopen(url)
+    except urllib.error.HTTPError as err:
+        plpy.warning('Overpass query failed:\n' + query)
+        raise
 
     block = ''
     mode = 0
