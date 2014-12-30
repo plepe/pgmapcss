@@ -1,6 +1,7 @@
 from pkg_resources import *
 from ..includes import *
 from .base import config_base
+import pgmapcss.misc
 import re
 
 class Functions:
@@ -60,18 +61,29 @@ class Functions:
 
         if not self._eval or additional_code != '':
             self._eval_global_data = repr(self.stat['global_data'])
+
+            replacement = {
+                  'host': self.stat['args'].host,
+                  'password': self.stat['args'].password,
+                  'database': self.stat['args'].database,
+                  'user': self.stat['args'].user,
+            }
+
             content = \
                 'def _eval(statement):\n' +\
                 '    import re\n' +\
                 '    import math\n' +\
+                '    import postgresql\n' +\
                 '    global_data = ' + repr(self.stat['global_data']) + '\n' +\
                 '    ' + resource_string(__name__, 'base.py').decode('utf-8').replace('\n', '\n    ') +\
                 '\n' +\
-                '    ' + include_text().replace('\n', '\n    ') +\
+                '    ' + include_text().replace('\n', '\n    ') + '\n' +\
+                '    ' + pgmapcss.misc.strip_includes(resource_stream(pgmapcss.misc.__name__, 'fake_plpy.py'), self.stat).format(**replacement).replace('\n', '\n    ') + '\n' +\
                 '\n' +\
                 additional_code.replace('\n', '\n    ') +\
                 '\n' +\
-                self.print(indent='    ') + '\n'\
+                self.print(indent='    ') + '\n' +\
+                '    plpy = fake_plpy()\n' +\
                 '    return eval(statement)'
 
             eval_code = compile(content, '<eval functions>', 'exec')
