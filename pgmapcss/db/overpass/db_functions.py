@@ -11,11 +11,12 @@ def overpass_query(query):
 # START debug.profiler
     time_start = datetime.datetime.now()
 # END debug.profiler
-    url = '{db.overpass-url}/interpreter?' +\
-        urllib.parse.urlencode({ 'data': query })
+    url = '{db.overpass-url}/interpreter'
+    data = urllib.parse.urlencode({ 'data': query })
+    data = data.encode('utf-8')
 
     try:
-        f = urllib.request.urlopen(url)
+        f = urllib.request.urlopen(url, data)
     except urllib.error.HTTPError as err:
         plpy.warning('Overpass query failed:\n' + query)
         raise
