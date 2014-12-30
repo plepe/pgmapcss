@@ -138,12 +138,50 @@ class Functions:
         statement = config.compiler([ repr(p) for p in param ], '', stat)
         return self.eval(statement)
 
+    def get_tests(self, src):
+        ret = {
+            'param_in': [],
+            'return_possibilities': [],
+            'shall_round': [],
+            'set': [],
+        }
+
+        for r in src.split('\n'):
+            m = re.match('# IN (.*)$', r)
+            if m:
+                param_in = eval(m.group(1))
+
+                param_in = [
+                        p if len(p) < 16 or not re.match('[0-9A-F]+$', p) else self.convert_srs(p, self.stat['config']['db.srs'])
+                        for p in param_in
+                    ]
+
+                ret['param_in'].append(param_in)
+                ret['return_possibilities'].append(set())
+                ret['shall_round'].append(False)
+                ret['set'].append(False)
+
+            m = re.match('# OUT(_ROUND|_SET)? (.*)$', r)
+            if m:
+                return_out = eval(m.group(2))
+
+                if len(return_out) > 16 and re.match('[0-9A-F]+$', return_out):
+                    return_out = self.convert_srs(return_out, self.stat['config']['db.srs'])
+
+                if m.group(1) == '_ROUND':
+                    ret['shall_round'][-1] = True
+                if m.group(1) == '_SET':
+                    ret['set'][-1] = True
+
+                ret['return_possibilities'][-1].add(return_out)
+
+        return ret
+
     def test(self, func, src):
         print('* Testing %s' % func)
 
         import re
         import pgmapcss.db as db
-        rows = src.split('\n')
         config = self.eval_functions[func]
 
         ret = '''
@@ -162,42 +200,10 @@ render_context = {'bbox': '010300002031BF0D000100000005000000DBF1839BB5DC3B41E70
 '''
         ret += self.print()
 
-        list_param_in = []
-        list_return_possibilities = []
-        list_shall_round = []
-        list_set = []
+        tests = self.get_tests(src)
 
-        for r in rows:
-            m = re.match('# IN (.*)$', r)
-            if m:
-                param_in = eval(m.group(1))
-
-                param_in = [
-                        p if len(p) < 16 or not re.match('[0-9A-F]+$', p) else self.convert_srs(p, self.stat['config']['db.srs'])
-                        for p in param_in
-                    ]
-
-                list_param_in.append(param_in)
-                list_return_possibilities.append(set())
-                list_shall_round.append(False)
-                list_set.append(False)
-
-            m = re.match('# OUT(_ROUND|_SET)? (.*)$', r)
-            if m:
-                return_out = eval(m.group(2))
-
-                if len(return_out) > 16 and re.match('[0-9A-F]+$', return_out):
-                    return_out = self.convert_srs(return_out, self.stat['config']['db.srs'])
-
-                if m.group(1) == '_ROUND':
-                    list_shall_round[-1] = True
-                if m.group(1) == '_SET':
-                    list_set[-1] = True
-
-                list_return_possibilities[-1].add(return_out)
-
-        if len(list_param_in):
-            for i, param_in in enumerate(list_param_in):
+        if len(tests['param_in']):
+            for i, param_in in enumerate(tests['param_in']):
                 ret += 'yield ' + config.compiler([ repr(p) for p in param_in ], '', {}) + '\n'
 
             ret += "$body$ language 'plpython3u' immutable;"
@@ -207,23 +213,23 @@ render_context = {'bbox': '010300002031BF0D000100000005000000DBF1839BB5DC3B41E70
             res = conn.prepare('select * from __eval_test__()')
             error = False
             for i, r in enumerate(res()):
-                print('IN', repr(list_param_in[i]))
+                print('IN', repr(tests['param_in'][i]))
                 print('EXP', '\n    '.join([
                     repr(r)
-                    for r in list_return_possibilities[i]
+                    for r in tests['return_possibilities'][i]
                 ]))
                 print('OUT', repr(r[0]))
 
-                if list_shall_round[i]:
-                    if round(float(r[0]), 5) not in [ float(q) for q in list_return_possibilities[i] ]:
+                if tests['shall_round'][i]:
+                    if round(float(r[0]), 5) not in [ float(q) for q in tests['return_possibilities'][i] ]:
                         error = True
                         print('ERROR return value wrong!')
-                elif list_set[i]:
-                    if ';'.split(r[0]) not in [ ';'.split(q) for q in list_return_possibilities[i] ]:
+                elif tests['set'][i]:
+                    if ';'.split(r[0]) not in [ ';'.split(q) for q in tests['return_possibilities'][i] ]:
                         error = True
                         print('ERROR return value wrong!')
                 else:
-                    if r[0] not in list_return_possibilities[i]:
+                    if r[0] not in tests['return_possibilities'][i]:
                         error = True
                         print('ERROR return value wrong!')
 
