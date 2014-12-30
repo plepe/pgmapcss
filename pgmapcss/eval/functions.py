@@ -218,26 +218,11 @@ include_text()
             res = conn.prepare('select * from __eval_test__()')
             return [ r[0] for r in res() ]
 
-    def test(self, func, src):
-        print('* Testing %s' % func)
-
-        add_code = \
-'''
-global_data = {'icon-image': {'crossing.svg': (11, 7)}}
-parameters = {'lang': 'en', 'foo': 'bar'}
-current = { 'object': { 'id': 'n123', 'tags': { 'amenity': 'restaurant', 'name': 'Foobar', 'name:en': 'English Foobar', 'name:de': 'German Foobar', 'cuisine': 'pizza;kebab;noodles' }}, 'pseudo_element': 'default', 'pseudo_elements': ['default', 'test'], 'tags': { 'amenity': 'restaurant', 'name': 'Foobar', 'name:en': 'English Foobar', 'name:de': 'German Foobar', 'cuisine': 'pizza;kebab;noodles' }, 'properties': { 'default': { 'width': '2', 'color': '#ff0000' }, 'test': { 'fill-color': '#00ff00', 'icon-image': 'crossing.svg', 'text': 'Test' } } }
-render_context = {'bbox': '010300002031BF0D000100000005000000DBF1839BB5DC3B41E708549B2B705741DBF1839BB5DC3B41118E9739B171574182069214CCE23B41118E9739B171574182069214CCE23B41E708549B2B705741DBF1839BB5DC3B41E708549B2B705741', 'scale_denominator': 8536.77}
-'''
-
-        tests = self.get_tests(src)
-
-        error = False
-        results = self.test_dbfun(func, tests, add_code)
-        #results = self.test_standalone(func, tests, add_code)
-
+    def analyze_results(self, tests, results):
         if results is None:
             return
 
+        error = False
         for i, res in enumerate(results):
             print('IN', repr(tests['param_in'][i]))
             print('EXP', '\n    '.join([
@@ -261,6 +246,25 @@ render_context = {'bbox': '010300002031BF0D000100000005000000DBF1839BB5DC3B41E70
 
         if error:
             raise Exception("eval-test failed!")
+
+    def test(self, func, src):
+        add_code = \
+'''
+global_data = {'icon-image': {'crossing.svg': (11, 7)}}
+parameters = {'lang': 'en', 'foo': 'bar'}
+current = { 'object': { 'id': 'n123', 'tags': { 'amenity': 'restaurant', 'name': 'Foobar', 'name:en': 'English Foobar', 'name:de': 'German Foobar', 'cuisine': 'pizza;kebab;noodles' }}, 'pseudo_element': 'default', 'pseudo_elements': ['default', 'test'], 'tags': { 'amenity': 'restaurant', 'name': 'Foobar', 'name:en': 'English Foobar', 'name:de': 'German Foobar', 'cuisine': 'pizza;kebab;noodles' }, 'properties': { 'default': { 'width': '2', 'color': '#ff0000' }, 'test': { 'fill-color': '#00ff00', 'icon-image': 'crossing.svg', 'text': 'Test' } } }
+render_context = {'bbox': '010300002031BF0D000100000005000000DBF1839BB5DC3B41E708549B2B705741DBF1839BB5DC3B41118E9739B171574182069214CCE23B41118E9739B171574182069214CCE23B41E708549B2B705741DBF1839BB5DC3B41E708549B2B705741', 'scale_denominator': 8536.77}
+'''
+
+        tests = self.get_tests(src)
+
+        print('* Testing %s (DB Function)' % func)
+        results = self.test_dbfun(func, tests, add_code)
+        self.analyze_results(tests, results)
+
+        print('* Testing %s (Standalone)' % func)
+        results = self.test_standalone(func, tests, add_code)
+        self.analyze_results(tests, results)
 
     def test_all(self):
         if not self.eval_functions:
