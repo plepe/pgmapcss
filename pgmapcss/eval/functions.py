@@ -177,6 +177,19 @@ class Functions:
 
         return ret
 
+    def test_standalone(self, func, tests, add_code):
+        if len(tests) == 0:
+            return None
+
+        config = self.eval_functions[func]
+
+        code = '[ ' + ', '.join([
+            config.compiler([ repr(p) for p in t ], '', {})
+            for t in tests['param_in']
+        ]) + ' ]'
+
+        return self.eval(code, additional_code=add_code)
+
     def test_dbfun(self, func, tests, add_code):
         import re
         import pgmapcss.db as db
@@ -220,6 +233,7 @@ render_context = {'bbox': '010300002031BF0D000100000005000000DBF1839BB5DC3B41E70
 
         error = False
         results = self.test_dbfun(func, tests, add_code)
+        #results = self.test_standalone(func, tests, add_code)
 
         if results is None:
             return
