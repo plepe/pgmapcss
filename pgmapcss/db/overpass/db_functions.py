@@ -8,8 +8,10 @@ def overpass_query(query):
 # START debug.overpass_queries
     plpy.warning(query)
 # END debug.overpass_queries
-# START debug.profiler
+# START db.serial_requests
     ret = []
+# END db.serial_requests
+# START debug.profiler
     time_start = datetime.datetime.now()
 # END debug.profiler
     url = '{db.overpass-url}/interpreter?' +\
@@ -36,11 +38,11 @@ def overpass_query(query):
         elif mode == 1:
             if re.match('}', r):
                 block += '}'
-# START debug.profiler
+# START db.serial_requests
                 ret.append(json.loads(block))
-# ELSE debug.profiler
+# ELSE db.serial_requests
                 yield json.loads(block)
-# END debug.profiler
+# END db.serial_requests
 
                 block = ''
 
@@ -49,9 +51,11 @@ def overpass_query(query):
 
 # START debug.profiler
                 plpy.warning('%s\nquery took %.2fs for %d features' % (query, (datetime.datetime.now() - time_start).total_seconds(), len(ret)))
+# END debug.profiler
+# START db.serial_requests
                 for r in ret:
                     yield r
-# END debug.profiler
+# END db.serial_requests
 
                 return
 

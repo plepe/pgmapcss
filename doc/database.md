@@ -80,6 +80,7 @@ Behaviour can be influenced with the following config options:
 | Config option    | Description | Possible values
 |------------------|-------------|-----------------
 | db.overpass-url  | overpass only: Use this alternative Overpass API url. default: http://overpass-api.de/api | |
+| db.serial_requests | overpass only: Always finish parsing result data, before sending a parallel request (e.g. for handling relationships). Necessary on some APIs which disallow multiple requests at once. Impacts memory usage, as results need to be cached. | true/**false**
 | debug.overpass_queries | overpass only: Print a debug message for each query posted to the Overpass API | true/**false** |
 
 Example usage:
