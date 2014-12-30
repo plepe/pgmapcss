@@ -245,7 +245,6 @@ def get_bbox(_bbox=None):
     return res[0]['bbox_string']
 
 def objects_bbox(_bbox, db_selects, options):
-    time_start = datetime.datetime.now() # profiling
     non_relevant_tags = {'type', 'source', 'source:ref', 'source_ref', 'note', 'comment', 'created_by', 'converted_by', 'fixme', 'FIXME', 'description', 'attribution', 'osm:id', 'osm:version', 'osm:user_id', 'osm:user', 'osm:timestamp', 'osm:changeset'}
     ways_done = []
     rels_done = []
@@ -447,9 +446,6 @@ def objects_bbox(_bbox, db_selects, options):
                 continue
 
             yield(assemble_object(r))
-
-    time_stop = datetime.datetime.now() # profiling
-    plpy.notice('querying db objects took %.2fs' % (time_stop - time_start).total_seconds())
 
 def objects_by_id(id_list, options):
     q = ''
