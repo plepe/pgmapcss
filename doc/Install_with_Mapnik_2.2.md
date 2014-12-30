@@ -36,7 +36,9 @@ for i in /usr/share/fonts/truetype/dejavu/* ; do sudo ln -s $i /usr/lib/mapnik/f
 sudo ln -s /usr/share/fonts/truetype/unifont/unifont.ttf /usr/lib/mapnik/fonts/
 ```
 
-For the next step you can decide, whether you want to use osm2pgsql, osmosis or overpass as database backend.
+For the next step you can decide, whether you want to use overpass (default), osm2pgsql or osmosis as database backend.
+
+Case 'overpass': You can use one of the public Overpass APIs (default), or [install your own](http://wiki.openstreetmap.org/wiki/Overpass_API/install).
 
 Case 'osm2pgsql': Download an OSM file and import to database:
 ```sh
@@ -55,8 +57,6 @@ psql -d "dbname=test user=user host=localhost password=PASSWORD" -f /usr/share/d
 psql -d "dbname=test user=user host=localhost password=PASSWORD" -f /usr/share/doc/osmosis/examples/pgsnapshot_load_0.6.sql
 ```
 
-Case 'overpass': You can use one of the public Overpass APIs (default), or [install your own](http://wiki.openstreetmap.org/wiki/Overpass_API/install).
-
 Clone pgmapcss:
 ```sh
 git clone https://github.com/plepe/pgmapcss.git
@@ -70,7 +70,7 @@ Compile 'test.mapcss' file and install database functions:
 pgmapcss --database-type=TYPE -dtest -uuser -pPASSWORD -tmapnik-2.2 test
 ```
 
-Replace TYPE by 'osm2pgsql' (default), 'osmosis' or 'overpass'. See [config_options.md](./config_options.md) for advanced options.
+Replace TYPE by 'overpass' (default), 'osm2pgsql' or 'osmosis'. See [config_options.md](./config_options.md) for advanced options.
 
 You get a file `test.mapnik` which you can use with your preferred render front-end (these are just examples):
 * [Render an image](https://github.com/plepe/mapnik-render-image)
