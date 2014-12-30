@@ -177,9 +177,7 @@ class Functions:
 
         return ret
 
-    def test(self, func, src):
-        print('* Testing %s' % func)
-
+    def test_dbfun(self, func, tests, add_code):
         import re
         import pgmapcss.db as db
         config = self.eval_functions[func]
@@ -190,17 +188,11 @@ as $body$
 import re
 import math
 ''' +\
+add_code +\
 resource_string(__name__, 'base.py').decode('utf-8') +\
-include_text() +\
-'''
-global_data = {'icon-image': {'crossing.svg': (11, 7)}}
-parameters = {'lang': 'en', 'foo': 'bar'}
-current = { 'object': { 'id': 'n123', 'tags': { 'amenity': 'restaurant', 'name': 'Foobar', 'name:en': 'English Foobar', 'name:de': 'German Foobar', 'cuisine': 'pizza;kebab;noodles' }}, 'pseudo_element': 'default', 'pseudo_elements': ['default', 'test'], 'tags': { 'amenity': 'restaurant', 'name': 'Foobar', 'name:en': 'English Foobar', 'name:de': 'German Foobar', 'cuisine': 'pizza;kebab;noodles' }, 'properties': { 'default': { 'width': '2', 'color': '#ff0000' }, 'test': { 'fill-color': '#00ff00', 'icon-image': 'crossing.svg', 'text': 'Test' } } }
-render_context = {'bbox': '010300002031BF0D000100000005000000DBF1839BB5DC3B41E708549B2B705741DBF1839BB5DC3B41118E9739B171574182069214CCE23B41118E9739B171574182069214CCE23B41E708549B2B705741DBF1839BB5DC3B41E708549B2B705741', 'scale_denominator': 8536.77}
-'''
-        ret += self.print()
+include_text()
 
-        tests = self.get_tests(src)
+        ret += self.print()
 
         if len(tests['param_in']):
             for i, param_in in enumerate(tests['param_in']):
@@ -211,30 +203,50 @@ render_context = {'bbox': '010300002031BF0D000100000005000000DBF1839BB5DC3B41E70
             conn.execute(ret)
 
             res = conn.prepare('select * from __eval_test__()')
-            error = False
-            for i, r in enumerate(res()):
-                print('IN', repr(tests['param_in'][i]))
-                print('EXP', '\n    '.join([
-                    repr(r)
-                    for r in tests['return_possibilities'][i]
-                ]))
-                print('OUT', repr(r[0]))
+            return [ r[0] for r in res() ]
 
-                if tests['shall_round'][i]:
-                    if round(float(r[0]), 5) not in [ float(q) for q in tests['return_possibilities'][i] ]:
-                        error = True
-                        print('ERROR return value wrong!')
-                elif tests['set'][i]:
-                    if ';'.split(r[0]) not in [ ';'.split(q) for q in tests['return_possibilities'][i] ]:
-                        error = True
-                        print('ERROR return value wrong!')
-                else:
-                    if r[0] not in tests['return_possibilities'][i]:
-                        error = True
-                        print('ERROR return value wrong!')
+    def test(self, func, src):
+        print('* Testing %s' % func)
 
-            if error:
-                raise Exception("eval-test failed!")
+        add_code = \
+'''
+global_data = {'icon-image': {'crossing.svg': (11, 7)}}
+parameters = {'lang': 'en', 'foo': 'bar'}
+current = { 'object': { 'id': 'n123', 'tags': { 'amenity': 'restaurant', 'name': 'Foobar', 'name:en': 'English Foobar', 'name:de': 'German Foobar', 'cuisine': 'pizza;kebab;noodles' }}, 'pseudo_element': 'default', 'pseudo_elements': ['default', 'test'], 'tags': { 'amenity': 'restaurant', 'name': 'Foobar', 'name:en': 'English Foobar', 'name:de': 'German Foobar', 'cuisine': 'pizza;kebab;noodles' }, 'properties': { 'default': { 'width': '2', 'color': '#ff0000' }, 'test': { 'fill-color': '#00ff00', 'icon-image': 'crossing.svg', 'text': 'Test' } } }
+render_context = {'bbox': '010300002031BF0D000100000005000000DBF1839BB5DC3B41E708549B2B705741DBF1839BB5DC3B41118E9739B171574182069214CCE23B41118E9739B171574182069214CCE23B41E708549B2B705741DBF1839BB5DC3B41E708549B2B705741', 'scale_denominator': 8536.77}
+'''
+
+        tests = self.get_tests(src)
+
+        error = False
+        results = self.test_dbfun(func, tests, add_code)
+
+        if results is None:
+            return
+
+        for i, res in enumerate(results):
+            print('IN', repr(tests['param_in'][i]))
+            print('EXP', '\n    '.join([
+                repr(r)
+                for r in tests['return_possibilities'][i]
+            ]))
+            print('OUT', repr(res))
+
+            if tests['shall_round'][i]:
+                if round(float(res), 5) not in [ float(q) for q in tests['return_possibilities'][i] ]:
+                    error = True
+                    print('ERROR return value wrong!')
+            elif tests['set'][i]:
+                if ';'.split(res) not in [ ';'.split(q) for q in tests['return_possibilities'][i] ]:
+                    error = True
+                    print('ERROR return value wrong!')
+            else:
+                if res not in tests['return_possibilities'][i]:
+                    error = True
+                    print('ERROR return value wrong!')
+
+        if error:
+            raise Exception("eval-test failed!")
 
     def test_all(self):
         if not self.eval_functions:
