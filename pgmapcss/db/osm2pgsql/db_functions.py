@@ -10,8 +10,8 @@ def objects_bbox(_bbox, db_selects, options, add_columns={}, add_param_type=[], 
     }
 
     if _bbox is not None:
-        bbox = 'way && $1 and ST_Intersects(way, $1::geometry) and'
-        replacements['parent_bbox'] = 'way && $1 and ST_Intersects(way, $1::geometry) and'
+        bbox = 'way && $1 and ST_Intersects(way, $1) and'
+        replacements['parent_bbox'] = 'way && $1 and ST_Intersects(way, $1) and'
 
     if len(add_columns):
         add_columns_qry = ', ' + ', '.join([
@@ -488,7 +488,7 @@ def objects_near(objects, other_selects, self_selects, options):
             other_selects,
             options,
             { # add_columns
-                '__distance': 'ST_Distance(ST_Transform($2::geometry, {unit.srs}), ST_Transform(way, {unit.srs}))'
+                '__distance': 'ST_Distance(ST_Transform($2, {unit.srs}), ST_Transform(way, {unit.srs}))'
             },
             [ 'geometry' ],
             [ geom ]

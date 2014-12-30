@@ -25,9 +25,9 @@ class fake_plpy:
         for (i, t) in enumerate(param_type):
             i1 = i + 1
             if t == 'geometry':
-                t = 'text'
+                t = 'text::geometry'
             elif t == 'geometry[]':
-                t = 'text[]'
+                t = 'text[]::geometry[]'
             query = query.replace('$' + str(i1), '$' + str(i1) + '::' + t)
 
         plan = self.conn.prepare(query)

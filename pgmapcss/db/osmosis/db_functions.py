@@ -28,7 +28,7 @@ def objects_bbox(_bbox, db_selects, options, add_columns={}, add_param_type=[], 
     if len(w):
         bbox = ''
         if _bbox is not None:
-            bbox = 'geom && $1 and ST_Intersects(geom, $1::geometry) and'
+            bbox = 'geom && $1 and ST_Intersects(geom, $1) and'
 
         qry = '''
 select 'n' || cast(id as text) as id, version, user_id, (select name from users where id=user_id) as user, tstamp, changeset_id,
@@ -61,7 +61,7 @@ where {bbox} ( {w} )
     if len(w):
         bbox = ''
         if _bbox is not None:
-            bbox = 'linestring && $1 and (ST_NPoints(linestring) = 1 or ST_Intersects(linestring, $1::geometry)) and'
+            bbox = 'linestring && $1 and (ST_NPoints(linestring) = 1 or ST_Intersects(linestring, $1)) and'
 
         qry = '''
 select * {add_columns} from (
@@ -117,7 +117,7 @@ where {bbox} ( {w} ) offset 0) t
     if len(w):
         bbox = ''
         if _bbox is not None:
-            bbox = 'geom && $1 and ST_Intersects(geom, $1::geometry) and'
+            bbox = 'geom && $1 and ST_Intersects(geom, $1) and'
 
         qry = '''
 select * {add_columns} from (
@@ -349,7 +349,7 @@ def objects_near(objects, other_selects, self_selects, options):
             other_selects,
             {},
             { # add_columns
-                '__distance': 'ST_Distance(ST_Transform($2::geometry, {unit.srs}), ST_Transform(__geo__, {unit.srs}))'
+                '__distance': 'ST_Distance(ST_Transform($2, {unit.srs}), ST_Transform(__geo__, {unit.srs}))'
             },
             [ 'geometry' ],
             [ geom ]

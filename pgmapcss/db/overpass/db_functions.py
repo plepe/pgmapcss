@@ -246,7 +246,7 @@ def get_bbox(_bbox=None):
     if _bbox is None:
         _bbox = render_context['bbox']
 
-    plan = plpy.prepare("select ST_YMin($1::geometry) || ',' || ST_XMIN($1::geometry) || ',' || ST_YMAX($1::geometry) || ',' || ST_XMAX($1::geometry) as bbox_string", [ 'geometry' ])
+    plan = plpy.prepare("select ST_YMin($1) || ',' || ST_XMIN($1) || ',' || ST_YMAX($1) || ',' || ST_XMAX($1) as bbox_string", [ 'geometry' ])
     res = plpy.execute(plan, [ _bbox ])
     return res[0]['bbox_string']
 
@@ -436,7 +436,7 @@ def objects_bbox(_bbox, db_selects, options):
             w.append(db_selects[t])
 
     if len(w):
-        plan = plpy.prepare("select ST_Y(ST_Centroid($1::geometry)) || ',' || ST_X(ST_Centroid($1::geometry)) as geom", [ 'geometry' ])
+        plan = plpy.prepare("select ST_Y(ST_Centroid($1)) || ',' || ST_X(ST_Centroid($1)) as geom", [ 'geometry' ])
         res = plpy.execute(plan, [ _bbox ])
 
         q1 = ');('.join([ w1['query'] for w1 in w ]).replace('__TYPE__', 'relation(pivot.a)')
@@ -635,7 +635,7 @@ def objects_near(objects, other_selects, self_selects, options):
     except:
         cache = PGCache(cache_id, read_geo=True)
 
-        plan = plpy.prepare('select ST_Transform(ST_Envelope(ST_Buffer(ST_Transform(ST_Envelope($1::geometry), {unit.srs}), $2)), {db.srs}) as r', ['geometry', 'float'])
+        plan = plpy.prepare('select ST_Transform(ST_Envelope(ST_Buffer(ST_Transform(ST_Envelope($1), {unit.srs}), $2)), {db.srs}) as r', ['geometry', 'float'])
         res = plpy.execute(plan, [ render_context['bbox'], max_distance ])
         bbox = res[0]['r']
 
