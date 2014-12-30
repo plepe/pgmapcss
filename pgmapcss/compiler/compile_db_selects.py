@@ -38,6 +38,14 @@ def resolve_set_statements(statement, done, stat):
                 for s in s1:
                     r = copy.deepcopy(lr)
                     r['conditions'] += s['conditions']
+
+                    # also copy parent selector from set statements (but only,
+                    # if there's not a parent selector on the child yet)
+                    # TODO: allow several parent selectors for a single selector
+                    if 'parent' in s and not 'parent' in r:
+                        r['parent'] = s['parent']
+                        r['link'] = s['link']
+
                     ret.append(r)
 
         # for each set of conditions add the current condition
