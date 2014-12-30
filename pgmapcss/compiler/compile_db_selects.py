@@ -1,10 +1,16 @@
 import copy
 
-# takes a list of conditions as input and returns several condition combinations
+# takes a statement as input and returns several selectors with condition
+# combinations from set statements. also, conditions with a key prefixed by '.'
+# are removed.
 def resolve_set_statements(statement, done, stat):
-    ret = [ [] ]
+    # initialize return selector(s) with empty conditions
+    ret = copy.deepcopy(statement['selector'])
+    ret['conditions'] = []
+    ret = [ ret ]
+
     if statement['id'] in done:
-        return [ [] ]
+        return ret
     done.append(statement['id'])
 
     # iterate over all conditions in the statement
@@ -27,20 +33,20 @@ def resolve_set_statements(statement, done, stat):
         ]
 
         # for all set statements create a new set of conditions
-        ret = [
-            r + s1
-            for r in last_ret
-            for s in set_statements
-            for s1 in s
-        ]
+        for lr in last_ret:
+            for s1 in set_statements:
+                for s in s1:
+                    r = copy.deepcopy(lr)
+                    r['conditions'] += s['conditions']
+                    ret.append(r)
 
         # for each set of conditions add the current condition
         # unless the condition's key does not start with a '.'
         if condition['key'][0] != '.':
-            ret += [
-                r + [ condition ]
-                for r in last_ret
-            ]
+            for r in last_ret:
+                c = copy.deepcopy(r)
+                r['conditions'] += [ condition ]
+                ret.append(r)
 
     return ret
 
@@ -123,16 +129,13 @@ def compile_selectors_db(statements, selector_index, stat):
 
     for i in statements:
         if type(i) == int:
-            _statement = copy.deepcopy(stat['statements'][i])
+            _statement = stat['statements'][i]
         else:
-            _statement = copy.deepcopy(i)
+            _statement = i
 
-        for c in resolve_set_statements(_statement, [], stat):
-            _statement['selector']['conditions'] = c
-            if selector_index is None:
-                selector = _statement['selector']
-            else:
-                selector = _statement['selector'][selector_index]
+        for selector in resolve_set_statements(_statement, [], stat):
+            if selector_index is not None:
+                selector = selector[selector_index]
 
             # make sure that selector does not get modified
             selector = copy.deepcopy(selector)
