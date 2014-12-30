@@ -165,6 +165,8 @@ render_context = {'bbox': '010300002031BF0D000100000005000000DBF1839BB5DC3B41E70
         list_param_in = []
         list_return_possibilities = []
         list_shall_round = []
+        list_set = []
+
         for r in rows:
             m = re.match('# IN (.*)$', r)
             if m:
@@ -178,8 +180,9 @@ render_context = {'bbox': '010300002031BF0D000100000005000000DBF1839BB5DC3B41E70
                 list_param_in.append(param_in)
                 list_return_possibilities.append(set())
                 list_shall_round.append(False)
+                list_set.append(False)
 
-            m = re.match('# OUT(_ROUND)? (.*)$', r)
+            m = re.match('# OUT(_ROUND|_SET)? (.*)$', r)
             if m:
                 return_out = eval(m.group(2))
 
@@ -188,6 +191,8 @@ render_context = {'bbox': '010300002031BF0D000100000005000000DBF1839BB5DC3B41E70
 
                 if m.group(1) == '_ROUND':
                     list_shall_round[-1] = True
+                if m.group(1) == '_SET':
+                    list_set[-1] = True
 
                 list_return_possibilities[-1].add(return_out)
 
@@ -211,6 +216,10 @@ render_context = {'bbox': '010300002031BF0D000100000005000000DBF1839BB5DC3B41E70
 
                 if list_shall_round[i]:
                     if round(float(r[0]), 5) not in [ float(q) for q in list_return_possibilities[i] ]:
+                        error = True
+                        print('ERROR return value wrong!')
+                elif list_set[i]:
+                    if ';'.split(r[0]) not in [ ';'.split(q) for q in list_return_possibilities[i] ]:
                         error = True
                         print('ERROR return value wrong!')
                 else:
