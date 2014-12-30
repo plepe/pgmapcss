@@ -266,8 +266,15 @@ render_context = {'bbox': '010300002031BF0D000100000005000000DBF1839BB5DC3B41E70
         results = self.test_standalone(func, tests, add_code)
         self.analyze_results(tests, results)
 
-    def test_all(self):
+    def test_all(self, tests=None):
         if not self.eval_functions:
             self.resolve_config()
 
-        [ self.test(func, src) for func, src in self.eval_functions_source.items() ]
+        if tests is None:
+            tests = self.eval_functions_source.keys()
+
+        for func in tests:
+            if not func in self.eval_functions_source:
+                print('* No such function "{}"'.format(func))
+            else:
+                self.test(func, self.eval_functions_source[func])
