@@ -9,7 +9,7 @@ def eval_convex_hull(param):
         plan = plpy.prepare('select ST_ConvexHull($1) as r', ['geometry'])
         res = plpy.execute(plan, param)
     except Exception as err:
-        plpy.warning('{} | Eval::convex_hull({}): Exception: {}'.format(current['object']['id'], param, err))
+        debug('Eval::convex_hull({}): Exception: {}'.format(param, err))
         return ''
 
     return res[0]['r']

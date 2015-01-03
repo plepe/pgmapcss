@@ -18,7 +18,7 @@ def eval_line(param):
     try:
       res = plpy.execute(plan, [param])
     except Exception as err:
-        plpy.warning('{} | Eval::line({}): Exception: {}'.format(current['object']['id'], param, err))
+        debug('Eval::line({}): Exception: {}'.format(param, err))
         return ''
 
     return res[0]['r']

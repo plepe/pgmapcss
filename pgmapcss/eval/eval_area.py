@@ -9,7 +9,7 @@ def eval_area(param):
         plan = plpy.prepare('select ST_Area(ST_Transform($1, 900913)) as area', ['geometry'])
         res = plpy.execute(plan, param)
     except Exception as err:
-        plpy.warning('{} | Eval::area({}): Exception: {}'.format(current['object']['id'], param, err))
+        debug('Eval::area({}): Exception: {}'.format(param, err))
         return ''
 
     zoom = eval_metric(['1u'])

@@ -15,7 +15,7 @@ def eval_is_closed(param):
         plan = plpy.prepare('select ST_GeometryType($1) in (\'ST_Polygon\', \'ST_MultiPolygon\') or (ST_GeometryType($1) in (\'ST_Line\') and ST_Line_Interpolate_Point($1, 0.0) = ST_Line_Interpolate_Point($1, 1.0)) as r', ['geometry'])
         res = plpy.execute(plan, [ geo ])
     except Exception as err:
-        plpy.warning('{} | Eval::is_closed({}): Exception: {}'.format(current['object']['id'], param, err))
+        debug('Eval::is_closed({}): Exception: {}'.format(param, err))
         return ''
 
     return 'true' if res[0]['r'] else 'false'

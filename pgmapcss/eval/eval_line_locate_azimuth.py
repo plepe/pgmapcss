@@ -39,7 +39,7 @@ def eval_line_locate_azimuth(param):
         plan = plpy.prepare('select degrees(ST_Azimuth(ST_Line_Interpolate_Point($1, $2), ST_Line_Interpolate_Point($1, $3))) as r1, degrees(ST_Azimuth(ST_Line_Interpolate_Point($1, $3), ST_Line_Interpolate_Point($1, $4))) as r2', ['geometry', 'float', 'float', 'float'])
         res = plpy.execute(plan, [ param[0], f1 / l, f / l, f2 / l ])
     except Exception as err:
-        plpy.warning('{} | Eval::line_locate_azimuth({}): Exception: {}'.format(current['object']['id'], param, err))
+        debug('Eval::line_locate_azimuth({}): Exception: {}'.format(param, err))
         return ''
 
     r1 = res[0]['r1']

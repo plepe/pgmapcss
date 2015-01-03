@@ -13,7 +13,7 @@ def eval_line_length(param):
         res = plpy.execute(plan, [param[0]])
         l = res[0]['r']
     except Exception as err:
-        plpy.warning('{} | Eval::line_length({}): Exception: {}'.format(current['object']['id'], param, err))
+        debug('Eval::line_length({}): Exception: {}'.format(param, err))
         return ''
 
     return eval_metric([ repr(l) + 'u' ])

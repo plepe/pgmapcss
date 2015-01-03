@@ -17,7 +17,7 @@ def eval_line_merge(param):
             plan = plpy.prepare('select ST_LineMerge(ST_Collect($1)) as r', ['geometry[]'])
             res = plpy.execute(plan, [param])
     except Exception as err:
-        plpy.warning('{} | Eval::line_merge({}): Exception: {}'.format(current['object']['id'], param, err))
+        debug('Eval::line_merge({}): Exception: {}'.format(param, err))
         return ''
 
     return res[0]['r']

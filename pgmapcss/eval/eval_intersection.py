@@ -9,7 +9,7 @@ def eval_intersection(param):
         plan = plpy.prepare('select ST_Intersection($1, $2) as geo', ['geometry', 'geometry'])
         res = plpy.execute(plan, param)
     except Exception as err:
-        plpy.warning('{} | Eval::intersection({}): Exception: {}'.format(current['object']['id'], param, err))
+        debug('Eval::intersection({}): Exception: {}'.format(param, err))
         return ''
 
     return res[0]['geo']

@@ -18,7 +18,7 @@ def eval_to_dashes(params):
         for t in ret.split(',')
         if not re.match('[0-9]+$', t)
     ]):
-        # plpy.warning("invalid dashes value '{}'".format(params[0]))
+        # debug("invalid dashes value '{}'".format(params[0]))
         return 'none'
 
     return ret

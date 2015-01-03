@@ -12,7 +12,7 @@ def eval_azimuth(param):
         plan = plpy.prepare('select ST_Azimuth($1, $2) as r', ['geometry', 'geometry'])
         res = plpy.execute(plan, param)
     except Exception as err:
-        plpy.warning('{} | Eval::azimuth({}): Exception: {}'.format(current['object']['id'], param, err))
+        debug('Eval::azimuth({}): Exception: {}'.format(param, err))
         return ''
 
     if res[0]['r'] is None:

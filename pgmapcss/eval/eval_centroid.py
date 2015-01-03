@@ -9,7 +9,7 @@ def eval_centroid(param):
         plan = plpy.prepare('select ST_Centroid($1) as r', ['geometry'])
         res = plpy.execute(plan, param)
     except Exception as err:
-        plpy.warning('{} | Eval::centroid({}): Exception: {}'.format(current['object']['id'], param, err))
+        debug('Eval::centroid({}): Exception: {}'.format(param, err))
         return ''
 
     return res[0]['r']

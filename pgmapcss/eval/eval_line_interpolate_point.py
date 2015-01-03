@@ -25,7 +25,7 @@ def eval_line_interpolate_point(param):
         plan = plpy.prepare('select ST_Line_Interpolate_Point($1, $2) as r', ['geometry', 'float'])
         res = plpy.execute(plan, [ param[0], float(f) ])
     except Exception as err:
-        plpy.warning('{} | Eval::line_interpolate_point({}): Exception: {}'.format(current['object']['id'], param, err))
+        debug('Eval::line_interpolate_point({}): Exception: {}'.format(param, err))
         return ''
 
     return res[0]['r']

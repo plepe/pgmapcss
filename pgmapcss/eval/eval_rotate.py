@@ -23,7 +23,7 @@ def eval_rotate(param):
         plan = plpy.prepare('select ST_Translate(ST_Rotate(ST_Translate($1, -ST_X($3), -ST_Y($3)), $2), ST_X($3), ST_Y($3)) as r', ['geometry', 'float', 'geometry'])
         res = plpy.execute(plan, [ param[0], angle, center ])
     except Exception as err:
-        plpy.warning('{} | Eval::rotate({}): Exception: {}'.format(current['object']['id'], param, err))
+        debug('Eval::rotate({}): Exception: {}'.format(param, err))
         return ''
 
     return res[0]['r']

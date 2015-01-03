@@ -12,7 +12,7 @@ def eval_line_locate_point(param):
         plan = plpy.prepare('select ST_Line_Locate_Point($1, $2) * ST_Length(ST_Transform($1, {unit.srs})) as r', ['geometry', 'geometry'])
         res = plpy.execute(plan, [ param[0], param[1] ])
     except Exception as err:
-        plpy.warning('{} | Eval::line_locate_point({}): Exception: {}'.format(current['object']['id'], param, err))
+        debug('Eval::line_locate_point({}): Exception: {}'.format(param, err))
         return ''
 
     return eval_metric([ repr(res[0]['r']) + 'u' ])
