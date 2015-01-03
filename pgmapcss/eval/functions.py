@@ -75,6 +75,7 @@ class Functions:
                 '    import re\n' +\
                 '    import math\n' +\
                 '    import postgresql\n' +\
+                '    import sys\n' +\
                 '    global_data = ' + repr(self.stat['global_data']) + '\n' +\
                 '    ' + resource_string(__name__, 'base.py').decode('utf-8').replace('\n', '\n    ') +\
                 '\n' +\
