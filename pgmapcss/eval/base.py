@@ -18,7 +18,12 @@ def float_to_str(v, default=None):
         r = r[:-2]
     return r
 def debug(text):
-    plpy.warning(text)
+    try:
+        prefix = current['object']['id'] + ' | '
+    except:
+        prefix = ''
+
+    plpy.warning(prefix + text)
 
 class config_base:
     math_level = None

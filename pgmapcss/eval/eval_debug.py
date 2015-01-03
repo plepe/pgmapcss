@@ -6,9 +6,14 @@ class config_eval_debug(config_base):
         return (param_values[0], 0)
 
 def eval_debug(param):
+    prefix = ''
+
     if len(param) == 1:
-        plpy.warning(param[0])
+        debug(param[0])
     else:
-        plpy.warning(param)
+        debug(param)
 
     return param[0]
+
+# IN ['foo']
+# OUT 'foo'
