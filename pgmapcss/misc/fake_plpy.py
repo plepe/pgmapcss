@@ -16,10 +16,10 @@ class fake_plpy:
 # END debug.explain_queries
 
     def notice(self, *arg):
-        sys.stderr.write('NOTICE: ' + ' '.join([repr(a) for a in arg]) + '\n')
+        sys.stderr.write('NOTICE: ' + '\n  '.join([str(a) for a in arg]) + '\n')
 
     def warning(self, *arg):
-        sys.stderr.write('WARNING: ' + ' '.join([repr(a) for a in arg]) + '\n')
+        sys.stderr.write('WARNING: ' + '\n  '.join([str(a) for a in arg]) + '\n')
 
     def prepare(self, query, param_type):
         for (i, t) in enumerate(param_type):
