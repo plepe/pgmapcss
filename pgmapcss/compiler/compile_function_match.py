@@ -63,8 +63,9 @@ def compile_function_match(stat):
       'eval_functions': \
 resource_string(pgmapcss.eval.__name__, 'base.py').decode('utf-8') +\
 pgmapcss.eval.functions().print(indent='') +\
-include_text()
+include_text(),
     }
+    replacement['fake_plpy'] = strip_includes(resource_stream(pgmapcss.misc.__name__, 'fake_plpy.py'), stat).format(**replacement)
     # add all config options as replacement patterns, in the form
     # 'config|foo|bar', were 'foo.bar' was the config option ('.' not allowed
     # in patterns)
