@@ -1,10 +1,10 @@
-from ..default import default
+from ..postgresql_db import postgresql_db
 from ..pg import format
 from ..pg import ident
 
-class db(default):
+class db(postgresql_db):
     def __init__(self, conn, stat):
-        default.__init__(self, conn, stat)
+        postgresql_db.__init__(self, conn, stat)
 
         if not 'db.srs' in self.stat['config']:
             if stat['config'].get('offline', False):
@@ -65,7 +65,7 @@ class db(default):
         if 'db.hstore_key_index' in stat['config']:
             stat['config']['db.hstore_key_index'] = stat['config']['db.hstore_key_index'].split(',')
 
-    def tag_type(self, key, condition, selector, statement):
+    def tag_type(self, key, condition, selector):
         if key[0:4] == 'osm:':
             if key == 'osm:id':
                 return ( 'column', 'osm_id', self.compile_modify_id )
@@ -77,6 +77,11 @@ class db(default):
             type = 'node'
         if selector['type'] in ('way', 'line', 'area'):
             type = 'way'
+
+        # type=route, type=multipolygon is not set for relations
+        # TODO: a relation can also be an area -> how to handle this?
+        if selector['type'] in ('relation') and key in ('type'):
+            return None
 
         if type and self.stat['config']['db.columns.' + type]:
             if key in self.stat['config']['db.columns.' + type]:
@@ -92,3 +97,37 @@ class db(default):
             return format(-int(value[1:]))
         else:
             return format(value[1:])
+
+    def has_condition(self, conditions, key, values):
+        for condition in conditions:
+            if 'key' in condition and condition['key'] == key:
+                if condition['op'] == '=' and condition['value_type'] == 'value':
+                    if condition['value'] in values:
+                        return True
+
+                if condition['op'] == '@=' and condition['value_type'] == 'value':
+                    print(condition)
+                    if len(set(condition['value'].split(';')) - values) == 0:
+                        return True
+
+        return False
+
+    def compile_selector(self, selector, prefix=''):
+        ret = postgresql_db.compile_selector(self, selector, prefix=prefix)
+
+        if 'parent' in selector and selector['link']['type'] in ('', '>'):
+            if selector['parent']['type'] == 'relation' and \
+               self.has_condition(selector['parent']['conditions'], 'type', { 'route' }):
+                parent_conditions = self.compile_selector(selector['parent'], prefix='parent.')
+                ret += ' and osm_id in (select __TYPE_MODIFY__cast(substr(member_id, 2) as bigint) member_ids from (select unnest(r.members) member_id, generate_series(1, array_upper(r.members, 1)) % 2 is_member_id from planet_osm_line parent join planet_osm_rels r on r.id=-parent.osm_id where __PARENT_BBOX__ ' + parent_conditions + ') t where is_member_id=1 and substr(member_id, 1, 1) = \'__TYPE_SHORT__\')';
+
+            if selector['parent']['type'] == 'relation' and \
+               self.has_condition(selector['parent']['conditions'], 'type', { 'multipolygon', 'boundary' }):
+                parent_conditions = self.compile_selector(selector['parent'], prefix='parent.')
+                ret += ' and osm_id in (select __TYPE_MODIFY__cast(substr(member_id, 2) as bigint) member_ids from (select unnest(r.members) member_id, generate_series(1, array_upper(r.members, 1)) % 2 is_member_id from planet_osm_polygon parent join planet_osm_rels r on r.id=-parent.osm_id where __PARENT_BBOX__ ' + parent_conditions + ') t where is_member_id=1 and substr(member_id, 1, 1) = \'__TYPE_SHORT__\')';
+
+            if selector['parent']['type'] == 'way' and selector['type'] == 'node':
+                parent_conditions = self.compile_selector(selector['parent'], prefix='parent.')
+                ret += ' and osm_id in (select __TYPE_MODIFY__member_id member_ids from (select unnest(r.nodes) member_id from (select * from planet_osm_line union select * from planet_osm_polygon) parent join planet_osm_ways r on r.id=parent.osm_id where parent.osm_id>0 and __PARENT_BBOX__ ' + parent_conditions + ') t)';
+
+        return ret

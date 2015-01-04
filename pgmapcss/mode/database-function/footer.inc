@@ -1,1 +1,1 @@
-$body$ language 'plpython3u' immutable;
+$body$ language 'plpython3u' volatile;

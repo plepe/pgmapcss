@@ -8,13 +8,17 @@ def eval_line_merge(param):
     if len(param) == 1:
         param = param[0].split(';');
 
-    if len(param) == 1:
-        plan = plpy.prepare('select ST_LineMerge($1) as r', ['geometry'])
-        res = plpy.execute(plan, [param[0]])
+    try:
+        if len(param) == 1:
+            plan = plpy.prepare('select ST_LineMerge($1) as r', ['geometry'])
+            res = plpy.execute(plan, [param[0]])
 
-    else:
-        plan = plpy.prepare('select ST_LineMerge(ST_Collect($1)) as r', ['geometry[]'])
-        res = plpy.execute(plan, [param])
+        else:
+            plan = plpy.prepare('select ST_LineMerge(ST_Collect($1)) as r', ['geometry[]'])
+            res = plpy.execute(plan, [param])
+    except Exception as err:
+        debug('Eval::line_merge({}): Exception: {}'.format(param, err))
+        return ''
 
     return res[0]['r']
 

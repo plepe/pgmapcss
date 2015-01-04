@@ -49,8 +49,12 @@ def eval_line_part(param):
     if pos1 > length:
         pos1 = length
 
-    plan = plpy.prepare('select ST_Transform(ST_Line_Substring(ST_Transform($1, {unit.srs}), $2, $3), {db.srs}) as r', ['geometry', 'float', 'float' ])
-    res = plpy.execute(plan, [ param[0], pos0 / length, pos1 / length ])
+    try:
+        plan = plpy.prepare('select ST_Transform(ST_Line_Substring(ST_Transform($1, {unit.srs}), $2, $3), {db.srs}) as r', ['geometry', 'float', 'float' ])
+        res = plpy.execute(plan, [ param[0], pos0 / length, pos1 / length ])
+    except Exception as err:
+        debug('Eval::line_part({}): Exception: {}'.format(param, err))
+        return ''
 
     return res[0]['r']
 

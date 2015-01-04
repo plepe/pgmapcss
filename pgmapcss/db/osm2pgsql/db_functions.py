@@ -1,12 +1,17 @@
 # Use this functions only with a database based on an import with osm2pgsql
-def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_value=[]):
+def objects_bbox(_bbox, db_selects, options, add_columns={}, add_param_type=[], add_param_value=[]):
     import pghstore
 
     qry = ''
 
     bbox = ''
+    replacements = {
+        'parent_bbox': '',
+    }
+
     if _bbox is not None:
-        bbox = 'way && $1 and ST_Intersects(way, $1::geometry) and'
+        bbox = 'way && $1 and ST_Intersects(way, $1) and'
+        replacements['parent_bbox'] = 'way && $1 and ST_Intersects(way, $1) and'
 
     if len(add_columns):
         add_columns_qry = ', ' + ', '.join([
@@ -26,8 +31,8 @@ def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_v
     # planet_osm_point
     w = []
     for t in ('*', 'node', 'point'):
-        if t in where_clauses:
-            w.append(where_clauses[t])
+        if t in db_selects:
+            w.append(db_selects[t])
 
     if len(w):
         qry = '''
@@ -41,6 +46,10 @@ select 'n' || cast(osm_id as text) as id,
 from planet_osm_point
 where {bbox} ( {w} )
 '''.format(bbox=bbox, w=' or '.join(w), add_columns=add_columns_qry)
+
+        qry = qry.replace('__PARENT_BBOX__', replacements['parent_bbox'])
+        qry = qry.replace('__TYPE_SHORT__', 'n')
+        qry = qry.replace('__TYPE_MODIFY__', '')
 
         plan = plpy.prepare(qry, param_type )
         res = plpy.cursor(plan, param_value )
@@ -76,8 +85,8 @@ where {bbox} ( {w} )
     # planet_osm_line - ways
     w = []
     for t in ('*', 'line', 'way'):
-        if t in where_clauses:
-            w.append(where_clauses[t])
+        if t in db_selects:
+            w.append(db_selects[t])
 
     if len(w):
         qry = '''
@@ -91,6 +100,9 @@ select 'w' || cast(osm_id as text) as id,
 from planet_osm_line
 where osm_id>0 and {bbox} ( {w} )
 '''.format(bbox=bbox, w=' or '.join(w), add_columns=add_columns_qry)
+        qry = qry.replace('__PARENT_BBOX__', replacements['parent_bbox'])
+        qry = qry.replace('__TYPE_SHORT__', 'w')
+        qry = qry.replace('__TYPE_MODIFY__', '')
 
         plan = plpy.prepare(qry, param_type )
         res = plpy.cursor(plan, param_value )
@@ -126,8 +138,8 @@ where osm_id>0 and {bbox} ( {w} )
     # planet_osm_line - relations
     w = []
     for t in ('*', 'line', 'relation'):
-        if t in where_clauses:
-            w.append(where_clauses[t])
+        if t in db_selects:
+            w.append(db_selects[t])
 
     if len(w):
         qry = '''
@@ -141,6 +153,9 @@ select 'r' || cast(-osm_id as text) as id,
 from planet_osm_line
 where osm_id<0 and {bbox} ( {w} )
 '''.format(bbox=bbox, w=' or '.join(w), add_columns=add_columns_qry)
+        qry = qry.replace('__PARENT_BBOX__', replacements['parent_bbox'])
+        qry = qry.replace('__TYPE_SHORT__', 'w')
+        qry = qry.replace('__TYPE_MODIFY__', '')
 
         plan = plpy.prepare(qry, param_type )
         res = plpy.cursor(plan, param_value )
@@ -176,8 +191,8 @@ where osm_id<0 and {bbox} ( {w} )
     # planet_osm_polygon - ways
     w = []
     for t in ('*', 'area', 'way'):
-        if t in where_clauses:
-            w.append(where_clauses[t])
+        if t in db_selects:
+            w.append(db_selects[t])
 
     if len(w):
         qry = '''
@@ -191,6 +206,10 @@ select 'w' || cast(osm_id as text) as id,
 from planet_osm_polygon
 where osm_id>0 and {bbox} ( {w} )
 '''.format(bbox=bbox, w=' or '.join(w), add_columns=add_columns_qry)
+
+        qry = qry.replace('__PARENT_BBOX__', replacements['parent_bbox'])
+        qry = qry.replace('__TYPE_SHORT__', 'r')
+        qry = qry.replace('__TYPE_MODIFY__', '-')
 
         plan = plpy.prepare(qry, param_type )
         res = plpy.cursor(plan, param_value )
@@ -226,8 +245,8 @@ where osm_id>0 and {bbox} ( {w} )
 # planet_osm_polygon - relations
     w = []
     for t in ('*', 'area', 'relation'):
-        if t in where_clauses:
-            w.append(where_clauses[t])
+        if t in db_selects:
+            w.append(db_selects[t])
 
     if len(w):
         qry = '''
@@ -241,6 +260,10 @@ select 'r' || cast(-osm_id as text) as id,
 from planet_osm_polygon
 where osm_id<0 and {bbox} ( {w} )
 '''.format(bbox=bbox, w=' or '.join(w), add_columns=add_columns_qry)
+
+        qry = qry.replace('__PARENT_BBOX__', replacements['parent_bbox'])
+        qry = qry.replace('__TYPE_SHORT__', 'r')
+        qry = qry.replace('__TYPE_MODIFY__', '-')
 
         plan = plpy.prepare(qry, param_type )
         res = plpy.cursor(plan, param_value )
@@ -273,7 +296,7 @@ where osm_id<0 and {bbox} ( {w} )
 
             yield(t)
 
-def objects_by_id(id_list):
+def objects_by_id(id_list, options):
     _id_list = [ int(i[1:]) for i in id_list if i[0] == 'n' ]
     plan = plpy.prepare('select * from planet_osm_point where osm_id=any($1)', ['bigint[]']);
     res = plpy.cursor(plan, [_id_list])
@@ -288,7 +311,7 @@ def objects_by_id(id_list):
         t['tags'] = {
             k: r[k]
             for k in r
-            if k not in ['id', 'geo', 'types', 'tags']
+            if k not in ['id', 'geo', 'types', 'tags', 'way', 'osm_id']
             if r[k] is not None
         }
 # START db.has-hstore
@@ -320,7 +343,7 @@ def objects_by_id(id_list):
         t['tags'] = {
             k: r[k]
             for k in r
-            if k not in ['id', 'geo', 'types', 'tags']
+            if k not in ['osm_id', 'geo', 'types', 'tags', 'nodes', '_type', 'way']
             if r[k] is not None
         }
 # START db.has-hstore
@@ -348,6 +371,9 @@ def objects_by_id(id_list):
         yield t
 
 def flatarray_to_tags(arr):
+    if arr is None:
+        return {}
+
     ret = {}
     for i in range(0, len(arr), 2):
         ret[arr[i]] = arr[i + 1]
@@ -365,124 +391,114 @@ def flatarray_to_members(arr):
 
     return ret
 
-def objects_member_of(member_id, parent_type, parent_conditions):
-    if parent_type == 'relation':
+def objects_member_of(objects, other_selects, self_selects, options):
+    if 'relation' in other_selects:
         plan = plpy.prepare('select * from planet_osm_rels where members @> Array[$1]', ['text']);
-        res = plpy.cursor(plan, [member_id])
-        for r in res:
-            for member in flatarray_to_members(r['members']):
-                if member['member_id'] == member_id:
-                    t = {
-                        'id': 'r' + str(r['id']),
-                        'tags': flatarray_to_tags(r['tags']) if r['tags'] else {},
-                        'types': ['relation'],
-                        'geo': None,
-                        'link_tags': member
-                    }
-                    t['tags']['osm:id'] = t['id']
-                    yield(t)
+        for o in objects:
+            member_id = o['id']
 
-    if parent_type == 'way':
-        num_id = int(member_id[1:])
-        plan = plpy.prepare('select id, nodes, planet_osm_line.tags, way as geo from planet_osm_ways left join planet_osm_line on planet_osm_ways.id=planet_osm_line.osm_id where nodes::bigint[] @> Array[$1]', ['bigint']);
-        res = plpy.cursor(plan, [num_id])
-        for r in res:
-            for i, member in enumerate(r['nodes']):
-                if member == num_id:
-                    t = {
-                        'id': 'w' + str(r['id']),
-                        'types': ['way'],
-                        'geo': r['geo'],
-                        'link_tags': {
+            res = plpy.cursor(plan, [member_id])
+            for r in res:
+                for member in flatarray_to_members(r['members']):
+                    if member['member_id'] == member_id:
+                        t = {
+                            'id': 'r' + str(r['id']),
+                            'tags': flatarray_to_tags(r['tags']) if r['tags'] else {},
+                            'types': ['relation'],
+                            'geo': None,
+                        }
+                        t['tags']['osm:id'] = t['id']
+                        yield (o, t, member)
+
+    if 'way' in other_selects:
+        plan = plpy.prepare('select id, nodes, tags, (select way from planet_osm_line where id=osm_id union select way from planet_osm_polygon where id=osm_id) as geo from planet_osm_ways where nodes::bigint[] @> Array[$1]', ['bigint']);
+        for o in objects:
+            member_id = o['id']
+            num_id = int(member_id[1:])
+
+            res = plpy.cursor(plan, [num_id])
+            for r in res:
+                for i, member in enumerate(r['nodes']):
+                    if member == num_id:
+                        t = {
+                            'id': 'w' + str(r['id']),
+                            'types': ['way'],
+                            'geo': r['geo'],
+                        }
+
+                        link_tags = {
                             'member_id': member_id,
                             'sequence_id': str(i)
                         }
-                    }
-# START db.columns
-                    t['tags'] = {
-                        k: r[k]
-                        for k in r
-                        if k not in ['id', 'geo', 'types', 'tags']
-                        if r[k] is not None
-                    }
-# START db.has-hstore
-                    t['tags'] = dict(pghstore.loads(r['tags']).items() | t['tags'].items())
-# END db.has-hstore
-# END db.columns
-# START db.hstore-only
-                    t['tags'] = pghstore.loads(r['tags'])
-# END db.hstore-only
-                    t['tags']['osm:id'] = t['id']
-                    yield(t)
+                        t['tags'] = flatarray_to_tags(r['tags'])
+                        t['tags']['osm:id'] = t['id']
+                        yield(o, t, link_tags)
 
-def objects_members(relation_id, parent_type, parent_conditions):
-    ob = list(objects_by_id([relation_id]))
+def objects_members(objects, other_selects, self_selects, options):
+    for _ob in objects:
+        # relation don't get 'members' from objects_bbox(), therefore reload object
+        ob = list(objects_by_id([ _ob['id'] ], {}))
 
-    if not len(ob):
-        return
-
-    ob = ob[0]
-
-    link_obs_ids = [ i['member_id'] for i in ob['members'] ]
-    link_obs = {}
-    for o in objects_by_id(link_obs_ids):
-        link_obs[o['id']] = o
-
-    for member in ob['members']:
-        if not member['member_id'] in link_obs:
+        if not len(ob):
             continue
 
-        ret = link_obs[member['member_id']]
+        ob = ob[0]
 
-        if parent_type not in ret['types']:
-            continue
+        link_obs_ids = [ i['member_id'] for i in ob['members'] ]
+        link_obs = {}
+        for o in objects_by_id(link_obs_ids, {}):
+            link_obs[o['id']] = o
 
-        ret['link_tags'] = member
-        yield ret
+        for member in ob['members']:
+            if not member['member_id'] in link_obs:
+                continue
 
-def objects_near(max_distance, ob, parent_selector, where_clause, check_geo=None):
-    if ob:
+            ret = link_obs[member['member_id']]
+
+            if len(other_selects.keys() - ret['types']):
+                yield (_ob, ret, member )
+
+def objects_near(objects, other_selects, self_selects, options):
+    # TODO: how to check properties of object (e.g. when geometry has been modified)
+    for ob in objects:
         geom = ob['geo']
-    elif 'geo' in current['properties'][current['pseudo_element']]:
-        geom = current['properties'][current['pseudo_element']]['geo']
-    else:
-        geom = current['object']['geo']
 
-    if where_clause == '':
-        where_clause = 'true'
+        max_distance = to_float(eval_metric([ options['distance'], 'u' ]))
+        if max_distance is None:
+            return
+        elif max_distance == 0:
+            bbox = geom
+        else:
+            plan = plpy.prepare('select ST_Transform(ST_Buffer(ST_Transform(ST_Envelope($1), {unit.srs}), $2), {db.srs}) as r', ['geometry', 'float'])
+            res = plpy.execute(plan, [ geom, max_distance ])
+            bbox = res[0]['r']
 
-    max_distance = to_float(eval_metric([ max_distance, 'u' ]))
-    if max_distance is None:
-        return []
-    elif max_distance == 0:
-        bbox = geom
-    else:
-        plan = plpy.prepare('select ST_Transform(ST_Buffer(ST_Transform(ST_Envelope($1), {unit.srs}), $2), {db.srs}) as r', ['geometry', 'float'])
-        res = plpy.execute(plan, [ geom, max_distance ])
-        bbox = res[0]['r']
+        if not 'check_geo' in options:
+            pass
+        elif options['check_geo'] == 'within':
+            where_clause += " and ST_DWithin(way, $2, 0.0)"
+        elif options['check_geo'] == 'surrounds':
+            where_clause += " and ST_DWithin($2, way, 0.0)"
+        elif options['check_geo'] == 'overlaps':
+            where_clause += " and ST_Overlaps($2, way)"
 
-    if check_geo == 'within':
-        where_clause += " and ST_DWithin(way, $2, 0.0)"
-    elif check_geo == 'surrounds':
-        where_clause += " and ST_DWithin($2, way, 0.0)"
-    elif check_geo == 'overlaps':
-        where_clause += " and ST_Overlaps($2, way)"
+        obs = []
+        for o in objects_bbox(
+            bbox,
+            other_selects,
+            options,
+            { # add_columns
+                '__distance': 'ST_Distance(ST_Transform($2, {unit.srs}), ST_Transform(way, {unit.srs}))'
+            },
+            [ 'geometry' ],
+            [ geom ]
+        ):
+            if o['id'] != ob['id'] and o['__distance'] <= max_distance:
+                link_tags = {
+                    'distance': eval_metric([ str(o['__distance']) + 'u', 'px' ])
+                }
+                obs.append((o, link_tags))
 
-    obs = []
-    for ob in objects(
-        bbox,
-        { parent_selector: where_clause },
-        { # add_columns
-            '__distance': 'ST_Distance(ST_Transform($2::geometry, {unit.srs}), ST_Transform(way, {unit.srs}))'
-        },
-        [ 'geometry' ],
-        [ geom ]
-    ):
-        if ob['id'] != current['object']['id'] and ob['__distance'] <= max_distance:
-            ob['link_tags'] = {
-                'distance': eval_metric([ str(ob['__distance']) + 'u', 'px' ])
-            }
-            obs.append(ob)
-
-    obs = sorted(obs, key=lambda ob: ob['__distance'] )
-    return obs
+        obs = sorted(obs, key=lambda o: o[0]['__distance'] )
+        for o in obs:
+            yield((ob, o[0], o[1]))

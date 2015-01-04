@@ -8,6 +8,8 @@ pgmapcss compiles MapCSS styles into a database function. Mapnik just needs to c
 
 Alternatively there's a standalone mode, where the MapCSS style is compiled into an executable, which can be run from the command line. The executable will not render an image but create GeoJSON output instead. See below for details.
 
+Since version 0.10 you don't even need a local database import (a local database is needed nonetheless), as the new default data source is Overpass API. Alternatively, osm2pgsql and osmosis pgsnapshot are supported. See [doc/database.md](doc/database.md) for details.
+
 Stable version: [0.9.3](https://github.com/plepe/pgmapcss), development version: [0.10-dev](https://github.com/plepe/pgmapcss/tree/branch-0.10), see [open issues](https://github.com/plepe/pgmapcss/milestones/Version%200.10)
 
 Features
@@ -184,7 +186,7 @@ Two possible uses for the standalone mode:
 
 ### Easy to install: ###
 
-Find installation instructions in [Install pgmapcss with Mapnik 3.0 on Ubuntu 14.04](doc/Install pgmapcss with Mapnik_3.0 on Ubuntu_14.04.md).
+Find installation instructions in [Install with Mapnik 3.0](doc/Install_with_Mapnik_3.0.md).
 
 There's a file [test.mapcss](./test.mapcss) which you can use to build upon. You can [try it online!](http://pgmapcss.openstreetbrowser.org/?style=f457f&zoom=14&lat=48.2098&lon=16.3725)
 

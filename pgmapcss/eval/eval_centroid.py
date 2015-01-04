@@ -5,8 +5,12 @@ def eval_centroid(param):
     if not len(param):
         return ''
 
-    plan = plpy.prepare('select ST_Centroid($1) as r', ['geometry'])
-    res = plpy.execute(plan, param)
+    try:
+        plan = plpy.prepare('select ST_Centroid($1) as r', ['geometry'])
+        res = plpy.execute(plan, param)
+    except Exception as err:
+        debug('Eval::centroid({}): Exception: {}'.format(param, err))
+        return ''
 
     return res[0]['r']
 

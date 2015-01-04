@@ -5,6 +5,7 @@ from pkg_resources import *
 from .version import *
 import pgmapcss.db.osm2pgsql
 import pgmapcss.db.osmosis
+import pgmapcss.db.overpass
 from pgmapcss.misc import strip_includes
 conn = None
 
@@ -23,7 +24,7 @@ class NullDB_Plan():
 def connect(args, stat):
     global conn
 
-    if not args.database_type in ('osm2pgsql', 'osmosis'):
+    if not args.database_type in ('osm2pgsql', 'osmosis', 'overpass'):
         print('* Database type "{}" not supported right now'.format(args.database_type))
         exit(1)
 
@@ -46,6 +47,8 @@ def connect(args, stat):
         conn.database = pgmapcss.db.osm2pgsql.db(conn, stat)
     elif args.database_type == 'osmosis':
         conn.database = pgmapcss.db.osmosis.db(conn, stat)
+    elif args.database_type == 'overpass':
+        conn.database = pgmapcss.db.overpass.db(conn, stat)
     else:
         raise Exception('unknown database type {}'.format(args.database_type))
 
@@ -92,7 +95,7 @@ def query_functions(stat):
     ret = strip_includes(resource_stream(__name__, conn.database_type + '/db_functions.py'), stat)
 
     for k, v in stat['config'].items():
-        if re.match('^[a-zA-Z\._0-9]+$', k):
+        if re.match('^[a-zA-Z\.\-_0-9]+$', k):
             ret = ret.replace('{' + k + '}', str(v))
 
     return ret

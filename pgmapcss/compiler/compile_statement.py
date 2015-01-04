@@ -54,17 +54,17 @@ def compile_statement(statement, stat, indent=''):
                 for c in object_selector['conditions']
             ]) + '\n'
 
-    if 'link_selector' in statement:
-        ret['body'] += indent + 'for parent_index, parent_object in enumerate(' + compile_link_selector(statement, stat) + '):\n'
+    if 'link' in statement['selector']:
+        ret['body'] += indent + 'for parent_index, (o, parent_object, link_tags) in enumerate(' + compile_link_selector(statement, stat) + '):\n'
 
         indent += '    '
         ret['body'] += indent + "current['parent_object'] = parent_object\n"
-        ret['body'] += indent + "current['link_object'] = { 'tags': parent_object['link_tags'] }\n"
+        ret['body'] += indent + "current['link_object'] = { 'tags': link_tags }\n"
         ret['body'] += indent + "current['link_object']['tags']['index'] = str(parent_index)\n"
         ret['body'] += indent + 'if (' +\
-          and_join(compile_conditions(statement['parent_selector']['conditions'], stat, "current['parent_object']['tags']")) +\
+          and_join(compile_conditions(statement['selector']['parent']['conditions'], stat, "current['parent_object']['tags']")) +\
           ') and (' +\
-          and_join(compile_conditions(statement['link_selector']['conditions'], stat, "current['link_object']['tags']")) + '):\n'
+          and_join(compile_conditions(statement['selector']['link']['conditions'], stat, "current['link_object']['tags']")) + '):\n'
 
         indent += '    '
         ret['body'] += indent + 'current[\'parent_object\'] = parent_object\n'
@@ -97,7 +97,7 @@ def compile_statement(statement, stat, indent=''):
     if object_selector['pseudo_element'] == '*':
         indent = indent[4:]
 
-    if 'link_selector' in statement:
+    if 'link' in statement['selector']:
         ret['body'] += indent + "current['parent_object'] = None\n"
         indent = indent[8:]
 
