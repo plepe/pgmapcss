@@ -71,21 +71,18 @@ class Functions:
             }
 
             content = \
+                'import re\n' +\
+                'import math\n' +\
+                'import postgresql\n' +\
+                'import sys\n' +\
+                'global_data = ' + repr(self.stat['global_data']) + '\n' +\
+                resource_string(__name__, 'base.py').decode('utf-8') + '\n' +\
+                include_text() + '\n' +\
+                pgmapcss.misc.strip_includes(resource_stream(pgmapcss.misc.__name__, 'fake_plpy.py'), self.stat).format(**replacement) + '\n' +\
+                additional_code + '\n' +\
+                self.print() + '\n' +\
+                'plpy = fake_plpy()\n' +\
                 'def _eval(statement):\n' +\
-                '    import re\n' +\
-                '    import math\n' +\
-                '    import postgresql\n' +\
-                '    import sys\n' +\
-                '    global_data = ' + repr(self.stat['global_data']) + '\n' +\
-                '    ' + resource_string(__name__, 'base.py').decode('utf-8').replace('\n', '\n    ') +\
-                '\n' +\
-                '    ' + include_text().replace('\n', '\n    ') + '\n' +\
-                '    ' + pgmapcss.misc.strip_includes(resource_stream(pgmapcss.misc.__name__, 'fake_plpy.py'), self.stat).format(**replacement).replace('\n', '\n    ') + '\n' +\
-                '\n' +\
-                additional_code.replace('\n', '\n    ') +\
-                '\n' +\
-                self.print(indent='    ') + '\n' +\
-                '    plpy = fake_plpy()\n' +\
                 '    return eval(statement)'
 
             eval_code = compile(content, '<eval functions>', 'exec')
