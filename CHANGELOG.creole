@@ -1,4 +1,4 @@
-0.10.0 release 2014-01-??
+0.10.0 release 2014-01-04
 * New database backend 'overpass', which is also the new default database backend, including multipolygon support, relationship queries, ...
 * DB/osm2pgsql can optimize some queries with relationships. (e.g. relation[type=route] member)
 * Re-structured and simplified code for database backends, see [[doc/database-API.md|doc/database-API.md]] for details.
