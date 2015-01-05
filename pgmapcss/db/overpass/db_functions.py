@@ -117,7 +117,7 @@ def multipolygon_geom(r):
         geom_plan_collect = plpy.prepare('select ST_Collect($1) as geom', [ 'geometry[]' ])
         geom_plan_substract = plpy.prepare('select ST_Difference($1, $2) as geom', [ 'geometry', 'geometry' ])
         # merge all lines together, return all closed rings (but remove unconnected lines)
-        geom_plan_linemerge = plpy.prepare('select geom from (select (ST_Dump((ST_LineMerge(ST_Collect(geom))))).geom as geom from (select ST_GeomFromText(unnest($1), 4326) geom) t offset 0) t where ST_NPoints(geom) > 3 and ST_IsClosed(geom)', [ 'text[]' ])
+        geom_plan_linemerge = plpy.prepare('select ST_MakePolygon(geom) geom from (select (ST_Dump((ST_LineMerge(ST_Collect(geom))))).geom as geom from (select ST_GeomFromText(unnest($1), 4326) geom) t offset 0) t where ST_NPoints(geom) > 3 and ST_IsClosed(geom)', [ 'text[]' ])
 
     t = 'MULTIPOLYGON'
 
