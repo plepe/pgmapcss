@@ -5,12 +5,12 @@ class config_eval_prop(config_base):
         elif not 'statement' in prop or \
              not 'selector' in prop['statement'] or \
              not 'pseudo_element' in prop['statement']['selector']:
-            return ( True, 0 )
+            return ( { True, '' }, 0 )
         else:
             pseudo_element = prop['statement']['selector']['pseudo_element']
 
         if not 'id' in prop:
-            return ( True, 0 )
+            return ( { True, '' }, 0 )
 
         values = stat.property_values(param_values[0], pseudo_element=pseudo_element, max_prop_id=prop['id'] - 1, include_none=True)
 
@@ -19,6 +19,9 @@ class config_eval_prop(config_base):
             '' if v is None else v
             for v in values
         }
+
+        # prop() may always return ''
+        values.add('')
 
         return ( values, 0 )
 

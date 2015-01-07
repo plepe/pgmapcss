@@ -34,17 +34,30 @@ class config_eval__text_offset(config_base):
 
         # symbol-shape used
         if len(param_values[4]):
-            values = values.union({ math.ceil(float(w) / 2.0) + float(s) + 2.0 for w in param_values[5] for s in param_values[6] })
+            values = values.union({
+                math.ceil(float(w) / 2.0) + float(s) + 2.0
+                for w in param_values[5]
+                for s in param_values[6]
+                if w not in ('', True) and s not in ('', True)
+            })
 
 
         ret = { "0" }
 
         # check text-vertical-anchor
         if True in param_values[1] or 'below' in param_values[1]:
-            ret = ret.union({ str(int(c)) for c in values })
+            ret = ret.union({
+                str(int(c))
+                for c in values
+                if c not in ('', True)
+            })
 
         if True in param_values[1] or 'above' in param_values[1]:
-            ret = ret.union({ str(int(-c)) for c in values })
+            ret = ret.union({
+                str(int(-c))
+                for c in values
+                if c not in ('', True)
+            })
 
         return (ret, 0)
 

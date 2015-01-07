@@ -2,7 +2,7 @@ Installation on a plain Ubuntu 14.04 Server:
 
 Install additional packages:
 ```sh
-sudo apt-get install git postgresql postgresql-contrib postgresql-9.3-postgis-2.1 python3-setuptools python3-dev python-mapnik osm2pgsql postgresql-plpython3 python3-postgresql ttf-unifont python3-wand
+sudo apt-get install git postgresql postgresql-contrib postgresql-9.3-postgis-2.1 python3-setuptools python3-dev python-mapnik postgresql-plpython3 python3-postgresql ttf-unifont python3-wand
 ```
 
 More dependencies:
@@ -36,9 +36,25 @@ for i in /usr/share/fonts/truetype/dejavu/* ; do sudo ln -s $i /usr/lib/mapnik/f
 sudo ln -s /usr/share/fonts/truetype/unifont/unifont.ttf /usr/lib/mapnik/fonts/
 ```
 
-Download an OSM file and import to database:
+For the next step you can decide, whether you want to use overpass (default), osm2pgsql or osmosis as database backend.
+
+Case 'overpass': You can use one of the public Overpass APIs (default), or [install your own](http://wiki.openstreetmap.org/wiki/Overpass_API/install).
+
+Case 'osm2pgsql': Download an OSM file and import to database:
 ```sh
+sudo apt-get install osm2pgsql
 osm2pgsql -dtest -Uuser -Hlocalhost -W -s -S /usr/share/osm2pgsql/default.style --hstore -G azores-latest.osm.bz2
+```
+
+Case 'osmosis': Download an OSM file and import to database:
+```sh
+sudo apt-get install osmosis
+mkdir pgimport
+osmosis --read-xml azores-latest.osm.bz2 --write-pgsql-dump
+cd pgimport
+psql -d "dbname=test user=user host=localhost password=PASSWORD" -f /usr/share/doc/osmosis/examples/pgsnapshot_schema_0.6.sql
+psql -d "dbname=test user=user host=localhost password=PASSWORD" -f /usr/share/doc/osmosis/examples/pgsnapshot_schema_0.6_linestring.sql
+psql -d "dbname=test user=user host=localhost password=PASSWORD" -f /usr/share/doc/osmosis/examples/pgsnapshot_load_0.6.sql
 ```
 
 Clone pgmapcss:
@@ -51,8 +67,10 @@ sudo python3 setup.py install
 
 Compile 'test.mapcss' file and install database functions:
 ```
-pgmapcss -dtest -uuser -pPASSWORD -tmapnik-2.2 test
+pgmapcss --database-type=TYPE -dtest -uuser -pPASSWORD -tmapnik-2.2 test
 ```
+
+Replace TYPE by 'overpass' (default), 'osm2pgsql' or 'osmosis'. See [config_options.md](./config_options.md) for advanced options.
 
 You get a file `test.mapnik` which you can use with your preferred render front-end (these are just examples):
 * [Render an image](https://github.com/plepe/mapnik-render-image)

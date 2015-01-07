@@ -10,26 +10,19 @@ class postgresql_db(default):
 
     def merge_conditions(self, conditions):
         conditions = set(conditions)
-        types = [ t for t, cs in conditions if t != True ]
 
-        conditions = {
-            t:
-                '(' + ') or ('.join([
-                    cs
-                    for t2, cs in conditions
-                    if t == t2
-                    if cs != 'false'
-                ]) + ')'
-            for t in types
-        }
+        conditions = '(' + ') or ('.join([
+                cs
+                for cs in conditions
+                if cs != 'false'
+            ]) + ')'
 
-        return {
-            t: cs
-            for t, cs in conditions.items()
-            if cs != '()'
-        }
+        if conditions == '()':
+            return False
 
-    def compile_condition_hstore_value(self, condition, statement, tag_type, stat, prefix, filter):
+        return conditions
+
+    def compile_condition_hstore_value(self, condition, tag_type, filter, prefix=''):
         ret = None
         negate = False
         key = tag_type[1]
@@ -61,12 +54,18 @@ class postgresql_db(default):
         elif op == '=':
             ret = prefix + column + ' @> ' + self.format({ key: condition['value'] })
 
+            if 'db.hstore_key_index' in self.stat['config'] and key in self.stat['config']['db.hstore_key_index']:
+                ret += ' and ' + prefix + column + ' ? ' + self.format(key)
+
         # @=
         elif op == '@=' and condition['value_type'] == 'value':
             ret = '(' + ' or '.join([
                 prefix + column + ' @> ' + self.format({ key: v })
                 for v in condition['value'].split(';')
                 ]) + ')'
+
+            if 'db.hstore_key_index' in self.stat['config'] and key in self.stat['config']['db.hstore_key_index']:
+                ret += ' and ' + prefix + column + ' ? ' + self.format(key)
 
         # !=
         elif op == '!=':
@@ -124,11 +123,12 @@ class postgresql_db(default):
 
         return ret
 
-    def compile_condition_column(self, condition, statement, tag_type, stat, prefix, filter):
+    def compile_condition_column(self, condition, tag_type, filter, prefix=''):
         ret = None
         key = tag_type[1]
         op = condition['op']
         negate = False
+        prefix = ''
 
         value_format = self.value_format_default
         if len(tag_type) > 2:
@@ -235,37 +235,18 @@ class postgresql_db(default):
 
         return ret
 
-    def compile_condition(self, condition, statement, stat, prefix='current.', filter={}):
+    def compile_condition(self, condition, selector, filter={}, prefix=''):
         ret = set()
 
-        # assignments: map conditions which are based on a (possible) set-statement
-        # back to their original selectors:
-        f = filter.copy()
-        f['has_set_tag'] = condition['key']
-        f['max_id'] = statement['id']
-        set_statements = stat.filter_statements(f)
-
-        if len(set_statements) > 0:
-            ret.add('((' + ') or ('.join([
-                self.compile_selector(s, stat, prefix, filter)
-                for s in set_statements
-            ]) + '))')
-
-        # ignore generated tags (identified by leading .)
-        if condition['key'][0] == '.':
-            if len(ret) == 0:
-                return 'false'
-            return ''.join(ret)
-
         # depending on the tag type compile the specified condition
-        tag_type = stat['database'].tag_type(condition['key'], condition, statement['selector'], statement)
+        tag_type = self.stat['database'].tag_type(condition['key'], condition, selector)
 
         if tag_type is None:
             pass
         elif tag_type[0] == 'hstore-value':
-            ret.add(self.compile_condition_hstore_value(condition, statement, tag_type, stat, prefix, filter))
+            ret.add(self.compile_condition_hstore_value(condition, tag_type, filter, prefix=prefix))
         elif tag_type[0] == 'column':
-            ret.add(self.compile_condition_column(condition, statement, tag_type, stat, prefix, filter))
+            ret.add(self.compile_condition_column(condition, tag_type, filter, prefix=prefix))
         else:
             raise CompileError('unknown tag type {}'.format(tag_type))
 
@@ -277,12 +258,13 @@ class postgresql_db(default):
         # merge conditions together, return
         return '(' + ' or '.join(ret) + ')'    
 
-    def compile_selector(self, statement, stat, prefix='current.', filter={}, object_type=None, selector='selector'):
-        filter['object_type'] = object_type
+    def compile_selector(self, selector, prefix=''):
+        filter = {}
+        filter['object_type'] = selector['type']
 
         ret = {
-            self.compile_condition(c, statement, stat, prefix, filter) or 'true'
-            for c in statement[selector]['conditions']
+            self.compile_condition(c, selector, filter, prefix=prefix) or 'true'
+            for c in selector['conditions']
         }
 
         if len(ret) == 0:

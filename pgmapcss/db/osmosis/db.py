@@ -14,6 +14,7 @@ class db(postgresql_db):
                 res = plan()
                 print("- DB table 'multipolygons' detected; enabling support")
                 self.stat['config']['db.multipolygons'] = True
+                self.stat['config']['db.multipolygons-v0.2'] = not 'hide_outer_ways' in plan.column_names
             except postgresql.exceptions.UndefinedTableError:
                 self.stat['config']['db.multipolygons'] = False
 
@@ -30,7 +31,7 @@ class db(postgresql_db):
         if 'db.hstore_key_index' in stat['config']:
             stat['config']['db.hstore_key_index'] = stat['config']['db.hstore_key_index'].split(',')
 
-    def tag_type(self, key, condition, selector, statement):
+    def tag_type(self, key, condition, selector):
         if key[0:4] == 'osm:':
             if key == 'osm:id':
                 return ( 'column', 'id', self.compile_modify_id )

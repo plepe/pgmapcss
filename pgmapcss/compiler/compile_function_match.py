@@ -63,8 +63,9 @@ def compile_function_match(stat):
       'eval_functions': \
 resource_string(pgmapcss.eval.__name__, 'base.py').decode('utf-8') +\
 pgmapcss.eval.functions().print(indent='') +\
-include_text()
+include_text(),
     }
+    replacement['fake_plpy'] = strip_includes(resource_stream(pgmapcss.misc.__name__, 'fake_plpy.py'), stat).format(**replacement)
     # add all config options as replacement patterns, in the form
     # 'config|foo|bar', were 'foo.bar' was the config option ('.' not allowed
     # in patterns)
@@ -90,7 +91,7 @@ if not 'srs' in parameters:
     parameters['srs' ] = {srs}
 
 if type(bbox) == list and len(bbox) == 4:
-    plan = plpy.prepare('select SetSRID(MakeBox2D(ST_Point($1, $2), ST_Point($3, $4)), $5) as bounds', ['float', 'float', 'float', 'float', 'int'])
+    plan = plpy.prepare('select ST_SetSRID(ST_MakeBox2D(ST_Point($1, $2), ST_Point($3, $4)), $5) as bounds', ['float', 'float', 'float', 'float', 'int'])
     res = plpy.execute(plan, [float(b) for b in bbox] + [ parameters['in.srs'] if 'in.srs' in parameters else parameters['srs'] ])
     _bbox = res[0]['bounds']
 else:
@@ -124,7 +125,7 @@ for style_element in all_style_elements:
 
 '''.format(**replacement)
 
-    func = "objects(render_context.get('bbox'), db_selects)"
+    func = "objects_bbox(render_context.get('bbox'), db_selects, {})"
     if stat['config'].get('debug.profiler', False):
         ret += "time_qry_start = datetime.datetime.now() # profiling\n"
         ret += "src = list(" + func + ")\n"

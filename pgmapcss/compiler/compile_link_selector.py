@@ -1,37 +1,30 @@
 from .compile_selector_part import compile_selector_part
 from .compile_conditions import compile_conditions
+from .compile_db_selects import compile_selectors_db
 from .compile_eval import compile_eval
 import pgmapcss.db as db
 
 def compile_link_selector(statement, stat):
-    parent_conditions = stat['database'].merge_conditions([(
-        statement['parent_selector']['type'],
-        stat['database'].compile_selector(
-            statement, stat, prefix='', selector='parent_selector')
-    )])[statement['parent_selector']['type']]
+    # create statement where selector is build from parent_selector for compiling
+    other_selects = compile_selectors_db([statement], 'parent', stat)
+    self_selects = compile_selectors_db([statement], None, stat)
 
-    child_conditions = stat['database'].merge_conditions([(
-        statement['selector']['type'],
-        stat['database'].compile_selector(
-            statement, stat, prefix='')
-    )])[statement['selector']['type']]
-
-    if statement['link_selector']['type'] in ('>', ''):
+    if statement['selector']['link']['type'] in ('>', ''):
         return "{ 'type': 'objects_member_of', " +\
-               "'parent_type': " + repr(statement['parent_selector']['type']) + ", " +\
-               "'parent_conditions': " + repr(parent_conditions) + ", " +\
-               "'child_conditions': " + repr(child_conditions) + "}"
+                "'other_selects': " + repr(other_selects) + ", " +\
+                "'self_selects': " + repr(self_selects) + ", " +\
+                "'options': {} }"
 
-    elif statement['link_selector']['type'] == '<':
+    elif statement['selector']['link']['type'] == '<':
         return "{ 'type': 'objects_members', " +\
-               "'parent_type': " + repr(statement['parent_selector']['type']) + ", " +\
-               "'parent_conditions': " + repr(parent_conditions) + ", " +\
-               "'child_conditions': " + repr(child_conditions) + "}"
+                "'other_selects': " + repr(other_selects) + ", " +\
+                "'self_selects': " + repr(self_selects) + ", " +\
+                "'options': {} }"
 
-    elif statement['link_selector']['type'] == 'near':
+    elif statement['selector']['link']['type'] == 'near':
         distance = { 'value': '100' }
 
-        for r in statement['link_selector']['conditions']:
+        for r in statement['selector']['link']['conditions']:
             if r['key'] == 'distance' and r['op'] in ('<', '<=', '='):
                 distance = r
 
@@ -44,18 +37,20 @@ def compile_link_selector(statement, stat):
             distance = repr(distance['value'])
 
         return "{ 'type': 'objects_near', " +\
-               "'parent_type': " + repr(statement['parent_selector']['type']) + ", " +\
-               "'parent_conditions': " + repr(parent_conditions) + ", " +\
-               "'child_conditions': " + repr(child_conditions) + ", " +\
-               "'distance': " + distance + "}"
+               "'other_selects': " + repr(other_selects) + ", " +\
+               "'self_selects': " + repr(self_selects) + ", " +\
+               "'options': { " +\
+               "'distance': " + distance +\
+               "}}"
 
     elif statement['link_selector']['type'] in ('within', 'surrounds', 'overlaps'):
         return "{ 'type': 'objects_near', " +\
-               "'parent_type': " + repr(statement['parent_selector']['type']) + ", " +\
-               "'parent_conditions': " + repr(parent_conditions) + ", " +\
-               "'child_conditions': " + repr(child_conditions) + ", " +\
-               "'distance': " + distance + ", " +\
-               "'check_geo': " + repr(statement['link_selector']['type']) + "}"
+               "'other_selects': " + repr(other_selects) + ", " +\
+               "'self_selects': " + repr(self_selects) + ", " +\
+               "'options': { " +\
+               "'distance': 0," +\
+               "'check_geo': " + repr(statement['link_selector']['type']) +\
+               " }}"
 
     else:
-        raise Exception('Unknown link selector "{type}"'.format(**selector['link_selector']))
+        raise Exception('Unknown link selector "{type}"'.format(**selector['selector']['link']))

@@ -5,17 +5,21 @@ def overpass_query(query):
     import urllib.parse
     import json
 
-# START debug.overpass_queries
-    plpy.warning(query)
-# END debug.overpass_queries
-# START debug.profiler
+# START db.serial_requests
     ret = []
+# END db.serial_requests
+# START debug.profiler
     time_start = datetime.datetime.now()
 # END debug.profiler
-    url = '{db.overpass-url}/interpreter?' +\
-        urllib.parse.urlencode({ 'data': query })
+    url = '{db.overpass-url}/interpreter'
+    data = urllib.parse.urlencode({ 'data': query })
+    data = data.encode('utf-8')
 
-    f = urllib.request.urlopen(url)
+    try:
+        f = urllib.request.urlopen(url, data)
+    except urllib.error.HTTPError as err:
+        plpy.warning('Overpass query failed:\n' + query)
+        raise
 
     block = ''
     mode = 0
@@ -36,11 +40,11 @@ def overpass_query(query):
         elif mode == 1:
             if re.match('}', r):
                 block += '}'
-# START debug.profiler
+# START db.serial_requests
                 ret.append(json.loads(block))
-# ELSE debug.profiler
+# ELSE db.serial_requests
                 yield json.loads(block)
-# END debug.profiler
+# END db.serial_requests
 
                 block = ''
 
@@ -49,9 +53,11 @@ def overpass_query(query):
 
 # START debug.profiler
                 plpy.warning('%s\nquery took %.2fs for %d features' % (query, (datetime.datetime.now() - time_start).total_seconds(), len(ret)))
+# END debug.profiler
+# START db.serial_requests
                 for r in ret:
                     yield r
-# END debug.profiler
+# END db.serial_requests
 
                 return
 
@@ -111,7 +117,7 @@ def multipolygon_geom(r):
         geom_plan_collect = plpy.prepare('select ST_Collect($1) as geom', [ 'geometry[]' ])
         geom_plan_substract = plpy.prepare('select ST_Difference($1, $2) as geom', [ 'geometry', 'geometry' ])
         # merge all lines together, return all closed rings (but remove unconnected lines)
-        geom_plan_linemerge = plpy.prepare('select geom from (select (ST_Dump((ST_LineMerge(ST_Collect(geom))))).geom as geom from (select ST_GeomFromText(unnest($1), 4326) geom) t offset 0) t where ST_NPoints(geom) > 3 and ST_IsClosed(geom)', [ 'text[]' ])
+        geom_plan_linemerge = plpy.prepare('select ST_MakePolygon(geom) geom from (select (ST_Dump((ST_LineMerge(ST_Collect(geom))))).geom as geom from (select ST_GeomFromText(unnest($1), 4326) geom) t offset 0) t where ST_NPoints(geom) > 3 and ST_IsClosed(geom)', [ 'text[]' ])
 
     t = 'MULTIPOLYGON'
 
@@ -240,12 +246,11 @@ def get_bbox(_bbox=None):
     if _bbox is None:
         _bbox = render_context['bbox']
 
-    plan = plpy.prepare("select ST_YMin($1::geometry) || ',' || ST_XMIN($1::geometry) || ',' || ST_YMAX($1::geometry) || ',' || ST_XMAX($1::geometry) as bbox_string", [ 'geometry' ])
+    plan = plpy.prepare("select ST_YMin($1) || ',' || ST_XMIN($1) || ',' || ST_YMAX($1) || ',' || ST_XMAX($1) as bbox_string", [ 'geometry' ])
     res = plpy.execute(plan, [ _bbox ])
     return res[0]['bbox_string']
 
-def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_value=[]):
-    time_start = datetime.datetime.now() # profiling
+def objects_bbox(_bbox, db_selects, options):
     non_relevant_tags = {'type', 'source', 'source:ref', 'source_ref', 'note', 'comment', 'created_by', 'converted_by', 'fixme', 'FIXME', 'description', 'attribution', 'osm:id', 'osm:version', 'osm:user_id', 'osm:user', 'osm:timestamp', 'osm:changeset'}
     ways_done = []
     rels_done = []
@@ -265,8 +270,8 @@ def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_v
     # nodes
     w = []
     for t in ('*', 'node', 'point'):
-        if t in where_clauses:
-            w.append(where_clauses[t])
+        if t in db_selects:
+            w.append(db_selects[t])
 
     if len(w):
         parent_query = ''
@@ -287,8 +292,8 @@ def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_v
     # way areas and multipolygons based on outer tags
     w = []
     for t in ('*', 'area'):
-        if t in where_clauses:
-            w.append(where_clauses[t])
+        if t in db_selects:
+            w.append(db_selects[t])
 
     if len(w):
         # query for ways which match query, also get their parent relations and
@@ -371,8 +376,8 @@ def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_v
         ]:
         w = []
         for t in types['types']:
-            if t in where_clauses:
-                w.append(where_clauses[t])
+            if t in db_selects:
+                w.append(db_selects[t])
 
         if len(w):
             parent_query = ''
@@ -407,10 +412,10 @@ def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_v
     w = []
     parent_query = ''
     for t, type_condition in {'*': '', 'relation': '', 'area': "[type~'^multipolygon|boundary$']"}.items():
-        if t in where_clauses:
-            w.append(where_clauses[t]['query'].replace('__TYPE__', 'relation' + type_condition))
-            if 'parent_query' in where_clauses[t]:
-                parent_query += where_clauses[t]['parent_query']
+        if t in db_selects:
+            w.append(db_selects[t]['query'].replace('__TYPE__', 'relation' + type_condition))
+            if 'parent_query' in db_selects[t]:
+                parent_query += db_selects[t]['parent_query']
 
     if len(w):
         q = qry.replace('__QRY__', parent_query + '((' + ');('.join(w) + ');)')
@@ -427,11 +432,11 @@ def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_v
     # areas
     w = []
     for t in ('*', 'area'):
-        if t in where_clauses:
-            w.append(where_clauses[t])
+        if t in db_selects:
+            w.append(db_selects[t])
 
     if len(w):
-        plan = plpy.prepare("select ST_Y(ST_Centroid($1::geometry)) || ',' || ST_X(ST_Centroid($1::geometry)) as geom", [ 'geometry' ])
+        plan = plpy.prepare("select ST_Y(ST_Centroid($1)) || ',' || ST_X(ST_Centroid($1)) as geom", [ 'geometry' ])
         res = plpy.execute(plan, [ _bbox ])
 
         q1 = ');('.join([ w1['query'] for w1 in w ]).replace('__TYPE__', 'relation(pivot.a)')
@@ -448,10 +453,7 @@ def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_v
 
             yield(assemble_object(r))
 
-    time_stop = datetime.datetime.now() # profiling
-    plpy.notice('querying db objects took %.2fs' % (time_stop - time_start).total_seconds())
-
-def objects_by_id(objects):
+def objects_by_id(id_list, options):
     q = ''
     multipolygons = []
     for o in objects:
@@ -471,67 +473,165 @@ def objects_by_id(objects):
     for r in overpass_query(q):
         yield(assemble_object(r))
 
-def objects_member_of(objects, args):
-    q = '[out:json][bbox:' + get_bbox() + '];'
-    q += '(' + args['child_conditions']['parent_query'] + ');'
-    q += 'out meta qt geom;'
+def objects_member_of(objects, other_selects, self_selects, options):
+    global member_of_cache
+    try:
+        member_of_cache
+    except:
+        member_of_cache = {}
 
-    for r in overpass_query(q):
-        t = assemble_object(r)
+    for ob in objects:
+        if ob['id'][0] == 'n':
+            ob_type = 'node'
+            ob_id = int(ob['id'][1:])
+        elif ob['id'][0] == 'w':
+            ob_type = 'way'
+            ob_id = int(ob['id'][1:])
+        elif ob['id'][0] == 'r':
+            ob_type = 'relation'
+            ob_id = int(ob['id'][1:])
 
-        for o in objects:
+        member_of_cache_id = ob_type + '|' + repr(other_selects) + '|' + repr(self_selects)
+
+        if member_of_cache_id not in member_of_cache:
+            member_of_cache[member_of_cache_id] = []
+            replacements = { '__BBOX__': '(' + get_bbox() + ')' }
+            q = '[out:json][bbox:' + get_bbox() + '];'
+
+            for si, ss in self_selects.items():
+                if 'parent_query' in ss:
+                    q += ss['parent_query']
+            for oi, os in other_selects.items():
+                if 'parent_query' in os:
+                    q += os['parent_query']
+
+            q += '(' + ''.join([
+                ss['query'].replace('__TYPE__', ob_type)
+                for si, ss in self_selects.items()
+            ]) + ')->.a;'
+
+            q += '(' + ''.join([
+                ss['query'].replace('__TYPE__', si + '(b' + ob_type[0] + '.a)')
+                for si, ss in other_selects.items()
+            ]) + ');'
+
+            q += 'out meta qt geom;'
+
+            for r1, r2 in replacements.items():
+                q = q.replace(r1, r2)
+
+            for r in overpass_query(q):
+                t = assemble_object(r)
+                member_of_cache[member_of_cache_id].append(t)
+
+        for t in member_of_cache[member_of_cache_id]:
             for m in t['members']:
-                if o['id'] == m['member_id']:
+                if m['member_id'] == ob['id']:
                     link_tags = {
                             'sequence_id': m['sequence_id'],
                             'member_id': m['member_id'],
-                        }
+                    }
                     if 'role' in m:
                         link_tags['role'] = m['role']
 
-                    yield (o, t, link_tags)
+                    yield((ob, t, link_tags))
 
-def objects_members(objects, args):
-    q_list = '';
-    types = set()
+def objects_members(objects, other_selects, self_selects, options):
+    global members_cache
+    try:
+        members_cache
+    except:
+        members_cache = {}
 
-    for o in objects:
-        member_id = o['id']
+    q = '[out:json];'
 
-        if member_id[0] == 'w':
-            q_list += 'way(' + member_id[1:] + ');'
-            types.add('w')
-        elif member_id[0] == 'r':
-            q_list += 'relation(' + member_id[1:] + ');'
-            types.add('r')
+    for ob in objects:
+        if ob['id'][0] == 'n':
+            ob_type = 'node'
+            ob_id = int(ob['id'][1:])
+        elif ob['id'][0] == 'w':
+            ob_type = 'way'
+            ob_id = int(ob['id'][1:])
+        elif ob['id'][0] == 'r':
+            ob_type = 'relation'
+            ob_id = int(ob['id'][1:])
 
-    q = '[out:json];(' + q_list + ')->.a;'
-    q += '('
+        members_cache_id = ob_type + '|' + repr(other_selects) + '|' + repr(self_selects)
 
-    for t in types:
-        q += args['parent_conditions']['query'].replace('__TYPE__', args['parent_type'] + '(' + t + '.a)(' + get_bbox() + ')')
+        if members_cache_id not in members_cache:
+            members_cache[members_cache_id] = { 'self': {}, 'other': [] }
+            replacements = { '__BBOX__': '(' + get_bbox() + ')' }
+            q = '[out:json][bbox:' + get_bbox() + '];'
 
-    q += ');out meta qt geom;'
+            for si, ss in self_selects.items():
+                if 'parent_query' in ss:
+                    q += ss['parent_query']
+            q += '(' + ''.join([
+                ss['query'].replace('__TYPE__', ob_type)
+                for si, ss in self_selects.items()
+            ]) + ');'
+            q += 'out meta qt geom;'
+            # TODO: out body qt; would be sufficient, but need to adapt assemble_object
+            for r1, r2 in replacements.items():
+                q = q.replace(r1, r2)
 
-    for r in overpass_query(q):
-        t = assemble_object(r)
+            for r in overpass_query(q):
+                t = assemble_object(r)
+                t['type'] = r['type']
+                members_cache[members_cache_id]['self'][t['id']] = t
 
-        for o in objects:
-            for m in o['members']:
-                if t['id'] == m['member_id']:
+            q = '[out:json][bbox:' + get_bbox() + '];'
+
+            for si, ss in self_selects.items():
+                if 'parent_query' in ss:
+                    q += ss['parent_query']
+            for oi, os in other_selects.items():
+                if 'parent_query' in os:
+                    q += os['parent_query']
+
+            q += '(' + ''.join([
+                ss['query'].replace('__TYPE__', ob_type)
+                for si, ss in self_selects.items()
+            ]) + ')->.a;'
+
+            q += '(' + ''.join([
+                ss['query'].replace('__TYPE__', si + '(' + ob_type[0] + '.a)')
+                for si, ss in other_selects.items()
+            ]) + ');'
+
+            q += 'out meta qt geom;'
+        # TODO: .a out body qt; would be sufficient, but need to adapt assemble_object
+            for r1, r2 in replacements.items():
+                q = q.replace(r1, r2)
+
+            for r in overpass_query(q):
+                t = assemble_object(r)
+                members_cache[members_cache_id]['other'].append(t)
+
+        if not ob['id'] in members_cache[members_cache_id]['self']:
+            continue
+
+        relation = members_cache[members_cache_id]['self'][ob['id']]
+
+        for t in members_cache[members_cache_id]['other']:
+            for m in relation['members']:
+                if m['member_id'] == t['id']:
                     link_tags = {
-                            'sequence_id': m['sequence_id'],
-                            'member_id': m['member_id'],
-                        }
+                        'sequence_id': m['sequence_id'],
+                        'member_id': m['member_id'],
+                    }
                     if 'role' in m:
                         link_tags['role'] = m['role']
 
-                    yield (o, t, link_tags)
+                    yield((ob, t, link_tags))
 
-def objects_near(objects_list, args):
-    cache_id = 'objects_near' + '|' + args['parent_type'] + '|' + repr(args['parent_conditions'])
+def objects_near(objects, other_selects, self_selects, options):
+    if not len(objects):
+        return
 
-    max_distance = to_float(eval_metric([ args['distance'], 'u' ], None))
+    cache_id = 'objects_near' + '|' + repr(other_selects) + '|' + repr(self_selects) + '|' + repr(options)
+
+    max_distance = to_float(eval_metric([ options['distance'], 'u' ], objects[0]))
     if max_distance is None:
         return
 
@@ -540,20 +640,24 @@ def objects_near(objects_list, args):
     except:
         cache = PGCache(cache_id, read_geo=True)
 
-        plan = plpy.prepare('select ST_Transform(ST_Envelope(ST_Buffer(ST_Transform(ST_Envelope($1::geometry), {unit.srs}), $2)), {db.srs}) as r', ['geometry', 'float'])
+        plan = plpy.prepare('select ST_Transform(ST_Envelope(ST_Buffer(ST_Transform(ST_Envelope($1), {unit.srs}), $2)), {db.srs}) as r', ['geometry', 'float'])
         res = plpy.execute(plan, [ render_context['bbox'], max_distance ])
         bbox = res[0]['r']
 
-        for t in objects(bbox, { args['parent_type']: args['parent_conditions'] }):
+        for t in objects_bbox(bbox, other_selects, options):
             cache.add(t)
 
-    for ob in objects_list:
-        if ob:
-            geom = ob['geo']
-        elif 'geo' in current['properties'][current['pseudo_element']]:
-            geom = current['properties'][current['pseudo_element']]['geo']
-        else:
-            geom = current['object']['geo']
+    if not 'check_geo' in options:
+        pass
+    elif options['check_geo'] == 'within':
+        where_clause += " and ST_DWithin(geo, $1, 0.0)"
+    elif options['check_geo'] == 'surrounds':
+        where_clause += " and ST_DWithin($1, geo, 0.0)"
+    elif options['check_geo'] == 'overlaps':
+        where_clause += " and ST_Overlaps($1, geo)"
+
+    for ob in objects:
+        geom = ob['geo']
 
         if max_distance == 0:
             bbox = geom
@@ -562,22 +666,13 @@ def objects_near(objects_list, args):
             res = plpy.execute(plan, [ geom, max_distance ])
             bbox = res[0]['r']
 
-        if not 'check_geo' in args:
-            pass
-        elif args['check_geo'] == 'within':
-            where_clause += " and ST_DWithin(geo, $1, 0.0)"
-        elif args['check_geo'] == 'surrounds':
-            where_clause += " and ST_DWithin($1, geo, 0.0)"
-        elif args['check_geo'] == 'overlaps':
-            where_clause += " and ST_Overlaps($1, geo)"
+            plan = cache.prepare('select * from (select *, ST_Distance(ST_Transform($1, {unit.srs}), ST_Transform(geo, {unit.srs})) dist from {table} where geo && $2 offset 0) t order by dist asc', [ 'geometry', 'geometry' ])
+            for t in cache.cursor(plan, [ geom, bbox ]):
+                o = t['data']
 
-        plan = cache.prepare('select * from (select *, ST_Distance(ST_Transform($1, {unit.srs}), ST_Transform(geo, {unit.srs})) dist from {table} where geo && $2 offset 0) t order by dist asc', [ 'geometry', 'geometry' ])
-        for t in cache.cursor(plan, [ geom, bbox ]):
-            o = t['data']
+                if o['id'] != ob['id'] and t['dist'] <= max_distance:
+                    link_tags = {
+                        'distance': eval_metric([ str(t['dist']) + 'u', 'px' ], ob)
+                    }
 
-            if o['id'] != ob['id'] and t['dist'] <= max_distance:
-                link_tags = {
-                    'distance': eval_metric([ str(t['dist']) + 'u', 'px' ], o)
-                }
-
-                yield ( ob, o, link_tags )
+                    yield (ob, o, link_tags)

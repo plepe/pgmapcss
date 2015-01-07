@@ -26,8 +26,8 @@ parser.add_argument('-d', '--database', dest='database',
     help='Name of database (default: username)')
 
 parser.add_argument('--database-type', dest='database_type',
-    default='osm2pgsql',
-    help='Type of database, see doc/database.md for details. (currently supported: osm2pgsql (default), osmosis)')
+    default='overpass',
+    help='Type of database, see doc/database.md for details. (currently supported: overpass (default), osm2pgsql, osmosis)')
 
 parser.add_argument('-u', '--user', dest='user',
     default=getpass.getuser(),
@@ -45,9 +45,9 @@ parser.add_argument('-t', '--template', dest='base_style',
     required=True,
     help='mapcss/renderer base style for the correct renderer and renderer version, e.g. "mapnik-2.0"')
 
-parser.add_argument('--eval-tests', dest='eval_tests', action='store_const',
-    const=True, default=False,
-    help='Test all eval functions.')
+parser.add_argument('--eval-tests', dest='eval_tests',
+    default=False, nargs='*',
+    help='Test eval functions. Pass list of functions to be tested as parameters. Default: all functions.')
 
 parser.add_argument('-r', '--database-update', dest='database_update',
     default='auto',
@@ -166,8 +166,12 @@ def main():
             else:
                 print('* Current DB version: {version}'.format(**db_version))
 
-    if args.eval_tests:
-        pgmapcss.eval.functions(stat).test_all()
+    if args.eval_tests is not False:
+        if len(args.eval_tests):
+            pgmapcss.eval.functions(stat).test_all(args.eval_tests)
+        else:
+            pgmapcss.eval.functions(stat).test_all()
+
         print('* All tests completed successfully.')
 
     try:

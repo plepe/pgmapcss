@@ -33,5 +33,7 @@ def eval_tr(param, current):
 # OUT 'barfoo'
 # IN ['{1}{}', 'foo', 'bar']
 # OUT 'barfoo'
+# IN ['{} {} {}', '{0.key}', '{0.value}', '{0.tag}']
+# OUT 'amenity restaurant amenity=restaurant'
 # IN []
 # OUT ''

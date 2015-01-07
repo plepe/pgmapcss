@@ -1,7 +1,9 @@
 from pkg_resources import *
 from ..includes import *
 from .base import config_base
+import pgmapcss.misc
 import re
+import postgresql
 
 class Functions:
     def __init__(self, stat):
@@ -60,18 +62,27 @@ class Functions:
 
         if not self._eval or additional_code != '':
             self._eval_global_data = repr(self.stat['global_data'])
+
+            replacement = {
+                  'host': self.stat['args'].host,
+                  'password': self.stat['args'].password,
+                  'database': self.stat['args'].database,
+                  'user': self.stat['args'].user,
+            }
+
             content = \
+                'import re\n' +\
+                'import math\n' +\
+                'import postgresql\n' +\
+                'import sys\n' +\
+                'global_data = ' + repr(self.stat['global_data']) + '\n' +\
+                resource_string(__name__, 'base.py').decode('utf-8') + '\n' +\
+                include_text() + '\n' +\
+                pgmapcss.misc.strip_includes(resource_stream(pgmapcss.misc.__name__, 'fake_plpy.py'), self.stat).format(**replacement) + '\n' +\
+                additional_code + '\n' +\
+                self.print() + '\n' +\
+                'plpy = fake_plpy()\n' +\
                 'def _eval(statement):\n' +\
-                '    import re\n' +\
-                '    import math\n' +\
-                '    global_data = ' + repr(self.stat['global_data']) + '\n' +\
-                '    ' + resource_string(__name__, 'base.py').decode('utf-8').replace('\n', '\n    ') +\
-                '\n' +\
-                '    ' + include_text().replace('\n', '\n    ') +\
-                '\n' +\
-                additional_code.replace('\n', '\n    ') +\
-                '\n' +\
-                self.print(indent='    ') + '\n'\
                 '    return eval(statement)'
 
             eval_code = compile(content, '<eval functions>', 'exec')
@@ -125,33 +136,15 @@ class Functions:
         statement = config.compiler([ repr(p) for p in param ], ', None', stat)
         return self.eval(statement)
 
-    def test(self, func, src):
-        print('* Testing %s' % func)
+    def get_tests(self, src):
+        ret = {
+            'param_in': [],
+            'return_possibilities': [],
+            'shall_round': [],
+            'set': [],
+        }
 
-        import re
-        import pgmapcss.db as db
-        rows = src.split('\n')
-        config = self.eval_functions[func]
-
-        ret = '''
-create or replace function __eval_test__() returns text
-as $body$
-import re
-import math
-''' +\
-resource_string(__name__, 'base.py').decode('utf-8') +\
-include_text() +\
-'''
-global_data = {'icon-image': {'crossing.svg': (11, 7)}}
-parameters = {'lang': 'en', 'foo': 'bar'}
-current = { 'object': { 'id': 'n123', 'tags': { 'amenity': 'restaurant', 'name': 'Foobar', 'name:en': 'English Foobar', 'name:de': 'German Foobar', 'cuisine': 'pizza;kebab;noodles' }}, 'pseudo_element': 'default', 'pseudo_elements': ['default', 'test'], 'tags': { 'amenity': 'restaurant', 'name': 'Foobar', 'name:en': 'English Foobar', 'name:de': 'German Foobar', 'cuisine': 'pizza;kebab;noodles' }, 'properties': { 'default': { 'width': '2', 'color': '#ff0000' }, 'test': { 'fill-color': '#00ff00', 'icon-image': 'crossing.svg', 'text': 'Test' } } }
-render_context = {'bbox': '010300002031BF0D000100000005000000DBF1839BB5DC3B41E708549B2B705741DBF1839BB5DC3B41118E9739B171574182069214CCE23B41118E9739B171574182069214CCE23B41E708549B2B705741DBF1839BB5DC3B41E708549B2B705741', 'scale_denominator': 8536.77}
-'''
-        ret += self.print()
-        ret += "result = ''\n"
-
-        param_in = None
-        for r in rows:
+        for r in src.split('\n'):
             m = re.match('# IN (.*)$', r)
             if m:
                 param_in = eval(m.group(1))
@@ -161,42 +154,125 @@ render_context = {'bbox': '010300002031BF0D000100000005000000DBF1839BB5DC3B41E70
                         for p in param_in
                     ]
 
-            m = re.match('# OUT(_ROUND)? (.*)$', r)
+                ret['param_in'].append(param_in)
+                ret['return_possibilities'].append(set())
+                ret['shall_round'].append(False)
+                ret['set'].append(False)
+
+            m = re.match('# OUT(_ROUND|_SET)? (.*)$', r)
             if m:
                 return_out = eval(m.group(2))
 
                 if len(return_out) > 16 and re.match('[0-9A-F]+$', return_out):
                     return_out = self.convert_srs(return_out, self.stat['config']['db.srs'])
 
-                shall_round = m.group(1) == '_ROUND'
+                if m.group(1) == '_ROUND':
+                    ret['shall_round'][-1] = True
+                if m.group(1) == '_SET':
+                    ret['set'][-1] = True
 
-                ret += 'ret = ' + config.compiler([ repr(p) for p in param_in ], '', {}) + '\n'
-                ret += 'result += "IN  %s\\n"\n' % repr(param_in)
-                ret += 'result += "EXP %s\\n"\n' % repr(return_out)
-                ret += 'result += "OUT %s\\n" % repr(ret)\n'
+                ret['return_possibilities'][-1].add(return_out)
 
-                ret += 'if type(ret) != str:\n    result += "ERROR not a string: " + repr(ret) + "\\n"\n'
-                if shall_round:
-                    ret += 'elif round(float(ret), 5) != %s:\n    result += "ERROR return value wrong!\\n"\n' % repr(round(float(return_out), 5))
-                else:
-                    ret += 'elif ret != %s:\n    result += "ERROR return value wrong!\\n"\n' % repr(return_out)
+        return ret
 
-        ret += 'return result\n'
-        ret += "$body$ language 'plpython3u' immutable;"
-        #print(ret)
-        conn = db.connection()
-        conn.execute(ret)
+    def test_standalone(self, func, tests, add_code):
+        if len(tests) == 0:
+            return None
 
-        r = conn.prepare('select __eval_test__()');
-        res = r()[0][0]
+        config = self.eval_functions[func]
 
-        print(res)
+        code = '[ ' + ', '.join([
+            config.compiler([ repr(p) for p in t ], '', {})
+            for t in tests['param_in']
+        ]) + ' ]'
 
-        if(re.search("^ERROR", res, re.MULTILINE)):
+        return self.eval(code, additional_code=add_code)
+
+    def test_dbfun(self, func, tests, add_code):
+        import re
+        import pgmapcss.db as db
+        config = self.eval_functions[func]
+
+        ret = '''
+create or replace function __eval_test__() returns setof text
+as $body$
+import re
+import math
+''' +\
+add_code +\
+resource_string(__name__, 'base.py').decode('utf-8') +\
+include_text()
+
+        ret += self.print()
+
+        if len(tests['param_in']):
+            for i, param_in in enumerate(tests['param_in']):
+                ret += 'yield ' + config.compiler([ repr(p) for p in param_in ], '', {}) + '\n'
+
+            ret += "$body$ language 'plpython3u' immutable;"
+            conn = db.connection()
+            conn.execute(ret)
+
+            res = conn.prepare('select * from __eval_test__()')
+            return [ r[0] for r in res() ]
+
+    def analyze_results(self, tests, results):
+        if results is None:
+            return
+
+        error = False
+        for i, res in enumerate(results):
+            print('IN', repr(tests['param_in'][i]))
+            print('EXP', '\n    '.join([
+                repr(r)
+                for r in tests['return_possibilities'][i]
+            ]))
+            print('OUT', repr(res))
+
+            if tests['shall_round'][i]:
+                if round(float(res), 5) not in [ float(q) for q in tests['return_possibilities'][i] ]:
+                    error = True
+                    print('ERROR return value wrong!')
+            elif tests['set'][i]:
+                if ';'.split(res) not in [ ';'.split(q) for q in tests['return_possibilities'][i] ]:
+                    error = True
+                    print('ERROR return value wrong!')
+            else:
+                if res not in tests['return_possibilities'][i]:
+                    error = True
+                    print('ERROR return value wrong!')
+
+        if error:
             raise Exception("eval-test failed!")
 
-    def test_all(self):
+    def test(self, func, src):
+        add_code = \
+'''
+global_data = {'icon-image': {'crossing.svg': (11, 7)}}
+parameters = {'lang': 'en', 'foo': 'bar'}
+current = { 'object': { 'id': 'n123', 'tags': { 'amenity': 'restaurant', 'name': 'Foobar', 'name:en': 'English Foobar', 'name:de': 'German Foobar', 'cuisine': 'pizza;kebab;noodles' }}, 'pseudo_element': 'default', 'pseudo_elements': ['default', 'test'], 'tags': { 'amenity': 'restaurant', 'name': 'Foobar', 'name:en': 'English Foobar', 'name:de': 'German Foobar', 'cuisine': 'pizza;kebab;noodles' }, 'properties': { 'default': { 'width': '2', 'color': '#ff0000' }, 'test': { 'fill-color': '#00ff00', 'icon-image': 'crossing.svg', 'text': 'Test' } }, 'condition-keys': [ 'amenity' ] }
+render_context = {'bbox': '010300002031BF0D000100000005000000DBF1839BB5DC3B41E708549B2B705741DBF1839BB5DC3B41118E9739B171574182069214CCE23B41118E9739B171574182069214CCE23B41E708549B2B705741DBF1839BB5DC3B41E708549B2B705741', 'scale_denominator': 8536.77}
+'''
+
+        tests = self.get_tests(src)
+
+        print('* Testing %s (DB Function)' % func)
+        results = self.test_dbfun(func, tests, add_code)
+        self.analyze_results(tests, results)
+
+        print('* Testing %s (Standalone)' % func)
+        results = self.test_standalone(func, tests, add_code)
+        self.analyze_results(tests, results)
+
+    def test_all(self, tests=None):
         if not self.eval_functions:
             self.resolve_config()
 
-        [ self.test(func, src) for func, src in self.eval_functions_source.items() ]
+        if tests is None:
+            tests = self.eval_functions_source.keys()
+
+        for func in tests:
+            if not func in self.eval_functions_source:
+                print('* No such function "{}"'.format(func))
+            else:
+                self.test(func, self.eval_functions_source[func])

@@ -1,7 +1,6 @@
 # Use this functions only with a database based on an import with osmosis
-def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_value=[]):
+def objects_bbox(_bbox, db_selects, options, add_columns={}, add_param_type=[], add_param_value=[]):
     import pghstore
-    time_start = datetime.datetime.now() # profiling
 
     qry = ''
 
@@ -23,13 +22,13 @@ def objects(_bbox, where_clauses, add_columns={}, add_param_type=[], add_param_v
     # nodes
     w = []
     for t in ('*', 'node', 'point'):
-        if t in where_clauses:
-            w.append(where_clauses[t])
+        if t in db_selects:
+            w.append(db_selects[t])
 
     if len(w):
         bbox = ''
         if _bbox is not None:
-            bbox = 'geom && $1 and ST_Intersects(geom, $1::geometry) and'
+            bbox = 'geom && $1 and ST_Intersects(geom, $1) and'
 
         qry = '''
 select 'n' || cast(id as text) as id, version, user_id, (select name from users where id=user_id) as user, tstamp, changeset_id,
@@ -56,29 +55,37 @@ where {bbox} ( {w} )
     # ways
     w = []
     for t in ('*', 'line', 'area', 'way'):
-        if t in where_clauses:
-            w.append(where_clauses[t])
+        if t in db_selects:
+            w.append(db_selects[t])
 
     if len(w):
         bbox = ''
         if _bbox is not None:
-            bbox = 'linestring && $1 and (ST_NPoints(linestring) = 1 or ST_Intersects(linestring, $1::geometry)) and'
+            bbox = 'linestring && $1 and (ST_NPoints(linestring) = 1 or ST_Intersects(linestring, $1)) and'
 
         qry = '''
-select * from (
+select * {add_columns} from (
 select 'w' || cast(id as text) as id, version, user_id, (select name from users where id=user_id) as user, tstamp, changeset_id,
-       tags, (CASE WHEN ST_NPoints(linestring) >= 4 and ST_IsClosed(linestring) THEN ST_MakePolygon(linestring) ELSE linestring END) as geo, (ST_NPoints(linestring) >= 4) and ST_IsClosed(linestring) as is_closed, Array['line', 'way'] as types '''
+       tags, (CASE WHEN ST_NPoints(linestring) >= 4 and ST_IsClosed(linestring) THEN ST_MakePolygon(linestring) ELSE linestring END) as geo, (ST_NPoints(linestring) >= 4) and ST_IsClosed(linestring) as is_closed, Array['line', 'way'] as types
+       '''
 # START db.multipolygons
+# START db.multipolygons-v0.2
+# deprecated by osmosis-multipolygon v0.3
         qry += '''
 , (select array_agg(has_outer_tags) from relation_members join multipolygons on relation_members.relation_id=multipolygons.id where relation_members.member_id=ways.id and relation_members.member_type='W' and relation_members.member_role in ('outer', 'exclave')) part_of_mp_outer
         '''
+# ELSE db.multipolygons-v0.2
+        qry += '''
+, (select array_agg(true) from multipolygons where hide_outer_ways @> Array[ways.id]) part_of_mp_outer
+        '''
+# END db.multipolygons-v0.2
 # END db.multipolygons
         qry += '''
-       {add_columns}
 from ways
 where {bbox} ( {w} ) offset 0) t
-       {add_columns}
-'''.format(bbox=bbox, w=' or '.join(w), add_columns=add_columns_qry.replace('__geo__', 'linestring'))
+'''
+
+        qry = qry.format(bbox=bbox, w=' or '.join(w), add_columns=add_columns_qry.replace('__geo__', 'geo'))
 
         plan = plpy.prepare(qry, param_type )
         res = plpy.cursor(plan, param_value )
@@ -104,23 +111,21 @@ where {bbox} ( {w} ) offset 0) t
     # multipolygons
     w = []
     for t in ('*', 'relation', 'area'):
-        if t in where_clauses:
-            w.append(where_clauses[t])
+        if t in db_selects:
+            w.append(db_selects[t])
 
     if len(w):
         bbox = ''
         if _bbox is not None:
-            bbox = 'geom && $1 and ST_Intersects(geom, $1::geometry) and'
+            bbox = 'geom && $1 and ST_Intersects(geom, $1) and'
 
         qry = '''
-select * from (
+select * {add_columns} from (
 select (CASE WHEN has_outer_tags THEN 'm' ELSE 'r' END) || cast(id as text) as id, id as rid, version, user_id, (select name from users where id=user_id) as user, tstamp, changeset_id, has_outer_tags,
        tags, geom as geo, Array['area'] as types
-       {add_columns}
 from (select multipolygons.*, relations.version, relations.user_id, relations.tstamp, relations.changeset_id from multipolygons left join relations on multipolygons.id = relations.id) t
 where {bbox} ( {w} ) offset 0) t
-       {add_columns}
-'''.format(bbox=bbox, w=' or '.join(w), add_columns=add_columns_qry.replace('__geo__', 'linestring'))
+'''.format(bbox=bbox, w=' or '.join(w), add_columns=add_columns_qry.replace('__geo__', 'geo'))
 
         plan = plpy.prepare(qry, param_type )
         res = plpy.cursor(plan, param_value )
@@ -145,16 +150,16 @@ where {bbox} ( {w} ) offset 0) t
     # relations - (no bbox match!)
     w = []
     for t in ('*', 'relation'):
-        if t in where_clauses:
-            w.append(where_clauses[t])
+        if t in db_selects:
+            w.append(db_selects[t])
 
     if len(w):
         qry = '''
+select * {add_columns} from (
 select 'r' || cast(id as text) as id, version, user_id, (select name from users where id=user_id) as user, tstamp, changeset_id,
        tags, null as geo, Array['relation'] as types
-       {add_columns}
 from relations
-where ({w}) and not id = ANY(Array[{done}]::bigint[])
+where ({w}) and not id = ANY(Array[{done}]::bigint[])) t
 '''.format(w=' or '.join(w), add_columns=add_columns_qry, done=','.join({ str(d) for d in done_multipolygons}))
 
         plan = plpy.prepare(qry, param_type )
@@ -171,10 +176,7 @@ where ({w}) and not id = ANY(Array[{done}]::bigint[])
             r['tags']['osm:changeset'] = str(r['changeset_id'])
             yield(r)
 
-    time_stop = datetime.datetime.now() # profiling
-    plpy.notice('querying db objects took %.2fs' % (time_stop - time_start).total_seconds())
-
-def objects_by_id(id_list):
+def objects_by_id(id_list, options):
     _id_list = [ int(i[1:]) for i in id_list if i[0] == 'n' ]
     plan = plpy.prepare('select id, tags, geom from nodes where id=any($1)', ['bigint[]']);
     res = plpy.cursor(plan, [_id_list])
@@ -236,121 +238,128 @@ def objects_by_id(id_list):
         t['tags']['osm:changeset'] = str(r['changeset_id'])
         yield(t)
 
-def objects_member_of(member_id, parent_type, parent_conditions, child_conditions):
-    if parent_type == 'relation':
+def objects_member_of(objects, other_selects, self_selects, options):
+    if 'relation' in other_selects:
         plan = plpy.prepare('select *, (select name from users where id=user_id) as user from relation_members join relations on relation_members.relation_id=relations.id where member_id=$1 and member_type=$2', ['bigint', 'text']);
-        res = plpy.cursor(plan, [int(member_id[1:]), member_id[0:1].upper()])
-        for r in res:
-            t = {
-                'id': 'r' + str(r['id']),
-                'tags': pghstore.loads(r['tags']),
-                'types': ['relation'],
-                'geo': None,
-                'link_tags': {
+        for ob in objects:
+            member_id = ob['id']
+
+            res = plpy.cursor(plan, [int(member_id[1:]), member_id[0:1].upper()])
+            for r in res:
+                t = {
+                    'id': 'r' + str(r['id']),
+                    'tags': pghstore.loads(r['tags']),
+                    'types': ['relation'],
+                    'geo': None,
+                }
+                link_tags = {
                     'sequence_id': str(r['sequence_id']),
                     'role': str(r['member_role']),
                     'member_id': r['member_type'].lower() + str(r['member_id']),
                 }
-            }
-            t['tags']['osm:id'] = str(t['id'])
-            t['tags']['osm:version'] = str(r['version'])
-            t['tags']['osm:user_id'] = str(r['user_id'])
-            t['tags']['osm:user'] = r['user']
-            t['tags']['osm:timestamp'] = str(r['tstamp'])
-            t['tags']['osm:changeset'] = str(r['changeset_id'])
-            yield(t)
+                t['tags']['osm:id'] = str(t['id'])
+                t['tags']['osm:version'] = str(r['version'])
+                t['tags']['osm:user_id'] = str(r['user_id'])
+                t['tags']['osm:user'] = r['user']
+                t['tags']['osm:timestamp'] = str(r['tstamp'])
+                t['tags']['osm:changeset'] = str(r['changeset_id'])
+                yield((ob, t, link_tags))
 
-    if parent_type == 'way' and member_id[0] == 'n':
-        num_id = int(member_id[1:])
+    if 'way' in other_selects:
         plan = plpy.prepare('select *, (select name from users where id=user_id) as user from way_nodes join ways on way_nodes.way_id=ways.id where node_id=$1', ['bigint']);
-        res = plpy.cursor(plan, [num_id])
-        for r in res:
-            t = {
-                'id': 'w' + str(r['id']),
-                'tags': pghstore.loads(r['tags']),
-                'types': ['way'],
-                'geo': r['linestring'],
-                'link_tags': {
+        for o in objects:
+            member_id = o['id']
+
+            if member_id[0] != 'n':
+                continue
+
+            num_id = int(member_id[1:])
+            res = plpy.cursor(plan, [num_id])
+            for r in res:
+                t = {
+                    'id': 'w' + str(r['id']),
+                    'tags': pghstore.loads(r['tags']),
+                    'types': ['way'],
+                    'geo': r['linestring'],
+                }
+                link_tags = {
                     'member_id': member_id,
                     'sequence_id': str(r['sequence_id'])
                 }
-            }
-            t['tags']['osm:id'] = str(t['id'])
-            t['tags']['osm:version'] = str(r['version'])
-            t['tags']['osm:user_id'] = str(r['user_id'])
-            t['tags']['osm:user'] = r['user']
-            t['tags']['osm:timestamp'] = str(r['tstamp'])
-            t['tags']['osm:changeset'] = str(r['changeset_id'])
-            yield(t)
+                t['tags']['osm:id'] = str(t['id'])
+                t['tags']['osm:version'] = str(r['version'])
+                t['tags']['osm:user_id'] = str(r['user_id'])
+                t['tags']['osm:user'] = r['user']
+                t['tags']['osm:timestamp'] = str(r['tstamp'])
+                t['tags']['osm:changeset'] = str(r['changeset_id'])
+                yield((ob, t, link_tags))
 
-def objects_members(relation_id, parent_type, parent_conditions, child_conditions):
-    ob = list(objects_by_id([relation_id]))
+def objects_members(objects, other_selects, self_selects, options):
+    for _ob in objects:
+        # relation don't get 'members' from objects_bbox(), therefore reload object
+        ob = list(objects_by_id([ _ob['id'] ], {}))
 
-    if not len(ob):
-        return
-
-    ob = ob[0]
-
-    link_obs_ids = [ i['member_id'] for i in ob['members'] ]
-    link_obs = {}
-    for o in objects_by_id(link_obs_ids):
-        link_obs[o['id']] = o
-
-    for member in ob['members']:
-        if not member['member_id'] in link_obs:
+        if not len(ob):
             continue
 
-        ret = link_obs[member['member_id']]
+        ob = ob[0]
 
-        if parent_type not in ret['types']:
-            continue
+        link_obs_ids = [ i['member_id'] for i in ob['members'] ]
+        link_obs = {}
+        for o in objects_by_id(link_obs_ids, {}):
+            link_obs[o['id']] = o
 
-        ret['link_tags'] = member
-        yield ret
+        for member in ob['members']:
+            if not member['member_id'] in link_obs:
+                continue
 
-def objects_near(max_distance, ob, parent_selector, where_clause, child_conditions, current, check_geo=None):
-    if ob:
+            ret = link_obs[member['member_id']]
+
+            if len(other_selects.keys() - ret['types']):
+                continue
+
+            yield (( _ob, ret, member ))
+
+def objects_near(objects, other_selects, self_selects, options):
+    for ob in objects:
         geom = ob['geo']
-    elif 'geo' in current['properties'][current['pseudo_element']]:
-        geom = current['properties'][current['pseudo_element']]['geo']
-    else:
-        geom = current['object']['geo']
 
-    if where_clause == '':
-        where_clause = 'true'
+        max_distance = to_float(eval_metric([ options['distance'], 'u' ], ob))
+        if max_distance is None:
+            return
+        elif max_distance == 0:
+            bbox = geom
+        else:
+            plan = plpy.prepare('select ST_Transform(ST_Buffer(ST_Transform(ST_Envelope($1), {unit.srs}), $2), {db.srs}) as r', ['geometry', 'float'])
+            res = plpy.execute(plan, [ geom, max_distance ])
+            bbox = res[0]['r']
 
-    max_distance = to_float(eval_metric([ max_distance, 'u' ], current))
-    if max_distance is None:
-        return []
-    elif max_distance == 0:
-        bbox = geom
-    else:
-        plan = plpy.prepare('select ST_Transform(ST_Buffer(ST_Transform(ST_Envelope($1), {unit.srs}), $2), {db.srs}) as r', ['geometry', 'float'])
-        res = plpy.execute(plan, [ geom, max_distance ])
-        bbox = res[0]['r']
+        if not 'check_geo' in options:
+            pass
+        elif options['check_geo'] == 'within':
+            where_clause += " and ST_DWithin(way, $2, 0.0)"
+        elif options['check_geo'] == 'surrounds':
+            where_clause += " and ST_DWithin($2, way, 0.0)"
+        elif options['check_geo'] == 'overlaps':
+            where_clause += " and ST_Overlaps($2, way)"
 
-    if check_geo == 'within':
-        where_clause += " and ST_DWithin(way, $2, 0.0)"
-    elif check_geo == 'surrounds':
-        where_clause += " and ST_DWithin($2, way, 0.0)"
-    elif check_geo == 'overlaps':
-        where_clause += " and ST_Overlaps($2, way)"
+        obs = []
+        for o in objects_bbox(
+            bbox,
+            other_selects,
+            {},
+            { # add_columns
+                '__distance': 'ST_Distance(ST_Transform($2, {unit.srs}), ST_Transform(__geo__, {unit.srs}))'
+            },
+            [ 'geometry' ],
+            [ geom ]
+        ):
+            if o['id'] != ob['id'] and o['__distance'] <= max_distance:
+                link_tags = {
+                    'distance': eval_metric([ str(o['__distance']) + 'u', 'px' ], ob)
+                }
+                obs.append((o, link_tags))
 
-    obs = []
-    for ob in objects(
-        bbox,
-        { parent_selector: where_clause },
-        { # add_columns
-            '__distance': 'ST_Distance(ST_Transform($2::geometry, {unit.srs}), ST_Transform(__geo__, {unit.srs}))'
-        },
-        [ 'geometry' ],
-        [ geom ]
-    ):
-        if ob['id'] != current['object']['id'] and ob['__distance'] <= max_distance:
-            ob['link_tags'] = {
-                'distance': eval_metric([ str(ob['__distance']) + 'u', 'px' ], current)
-            }
-            obs.append(ob)
-
-    obs = sorted(obs, key=lambda ob: ob['__distance'] )
-    return obs
+        obs = sorted(obs, key=lambda o: o[0]['__distance'] )
+        for o in obs:
+            yield((ob, o[0], o[1]))

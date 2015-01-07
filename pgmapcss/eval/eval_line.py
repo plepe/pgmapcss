@@ -15,7 +15,11 @@ def eval_line(param, current):
     else:
         plan = plpy.prepare('select ST_MakeLine($1) as r', ['geometry[]'])
 
-    res = plpy.execute(plan, [param])
+    try:
+      res = plpy.execute(plan, [param])
+    except Exception as err:
+        debug('Eval::line({}): Exception: {}'.format(param, err))
+        return ''
 
     return res[0]['r']
 

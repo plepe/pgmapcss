@@ -12,4 +12,4 @@ def eval_unique(param, current):
 
 # TESTS
 # IN ['foo;bar;foo']
-# OUT 'foo;bar'
+# OUT_SET 'foo;bar'
