@@ -72,7 +72,7 @@ class db(default):
             return None
 
         # value-eval() statements
-        if condition['value_type'] == 'eval':
+        if 'value_type' in condition and condition['value_type'] == 'eval':
             # treat other conditions as has_key
             ret = ( 'key', key )
 
