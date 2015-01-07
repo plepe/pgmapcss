@@ -164,7 +164,7 @@ class _stat(dict):
             values = {
                 v
                 for v in values
-                if v != None
+                if v != None and v != ''
             }
 
         if warn_unresolvable and True in values:
