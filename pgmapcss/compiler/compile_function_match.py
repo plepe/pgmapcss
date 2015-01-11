@@ -379,11 +379,11 @@ while src:
         objects_list = request_def[1]
 
         if request_type['type'] == 'objects_member_of':
-            request = objects_member_of(objects_list, request_type)
+            request = objects_member_of(objects_list, request_type['other_selects'], request_type['self_selects'], request_type['options'])
         elif request_type['type'] == 'objects_members':
-            request = objects_members(objects_list, request_type)
+            request = objects_members(objects_list, request_type['other_selects'], request_type['self_selects'], request_type['options'])
         elif request_type['type'] == 'objects_near':
-            request = objects_near(objects_list, request_type)
+            request = objects_near(objects_list, request_type['other_selects'], request_type['self_selects'], request_type['options'])
         else:
             plpy.warning('unknown request type {{}}', request_type['type'])
 
