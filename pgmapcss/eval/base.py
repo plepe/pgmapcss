@@ -17,7 +17,7 @@ def float_to_str(v, default=None):
     if r[-2:] == '.0':
         r = r[:-2]
     return r
-def debug(text):
+def debug(text, current=None):
     try:
         prefix = current['object']['id'] + ' | '
     except:

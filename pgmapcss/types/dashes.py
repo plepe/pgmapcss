@@ -4,7 +4,7 @@ import re
 
 class dashes(default):
     def compile_check(self, value):
-        return 'eval_to_dashes([' + value + '])'
+        return 'eval_to_dashes([' + value + '], current)'
 
     def __parse(self, param):
         if param == 'none':
