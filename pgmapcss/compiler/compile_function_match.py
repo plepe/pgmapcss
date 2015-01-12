@@ -393,8 +393,16 @@ while src:
         for request_object, src_object, link_tags in request:
             if src_object['id'] in pending_objects:
                 src_object = pending_objects[src_object['id']]
+            elif src_object['id'] in src:
+                # this object was already returned by this request -> make sure
+                # we use the same object again
+                src_object = src[src_object['id']]
             elif src_object['id'] not in done_objects:
                 src[src_object['id']] = src_object
+            else:
+                # object has already be done before -> don't add to
+                # pending_objects
+                pass
 
             request_object['state'][2].append(( src_object, link_tags))
 
