@@ -7,11 +7,11 @@ class config_eval_mul(config_base):
         ret = [ config_metric.mutable([p], stat) for p in param_values ]
         return min(ret)
 
-def eval_mul(params):
+def eval_mul(params, current):
     ret = 1
 
     for p in params:
-        v = eval_metric([p])
+        v = eval_metric([p], current)
 
         if v == '':
             return ''

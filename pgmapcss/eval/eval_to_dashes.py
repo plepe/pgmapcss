@@ -1,7 +1,7 @@
 class config_eval_to_dashes(config_base):
     pass
 
-def eval_to_dashes(params):
+def eval_to_dashes(params, current):
     if len(params) == 0 or params[0] == '':
         return 'none'
 

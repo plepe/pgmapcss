@@ -1,13 +1,13 @@
 class config_eval_line_locate_azimuth(config_base):
     mutable = 2
 
-def eval_line_locate_azimuth(param):
+def eval_line_locate_azimuth(param, current):
     if len(param) < 2:
         return ''
 
     l = float(eval_line_length([param[0]]))
 
-    f = eval_metric([param[1], 'px'])
+    f = eval_metric([param[1], 'px'], current)
     if f == '':
         # seems to be a geometry
         f = float(eval_line_locate_point([ param[0], param[1] ]))
@@ -21,7 +21,7 @@ def eval_line_locate_azimuth(param):
 
     dist = 1.0
     if len(param) > 2:
-        dist = eval_metric([param[2], 'px'])
+        dist = eval_metric([param[2], 'px'], current)
         if dist == '':
             dist = 1.0
         else:

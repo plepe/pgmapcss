@@ -12,7 +12,7 @@ class config_eval_identical(config_base):
         else:
             return config_base.possible_values(self, param_values, prop, stat)
 
-def eval_identical(param):
+def eval_identical(param, current):
     # empty parameter list -> all equal
     if len(param) == 0:
         return 'true'

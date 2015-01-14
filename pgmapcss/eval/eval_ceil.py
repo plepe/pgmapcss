@@ -1,7 +1,7 @@
 class config_eval_ceil(config_base):
     mutable = 3
 
-def eval_ceil(param):
+def eval_ceil(param, current):
     import math
     if len(param) == 0:
         return ''

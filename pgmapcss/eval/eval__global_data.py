@@ -24,7 +24,7 @@ class config_eval__global_data(config_base):
 
         return (str(v), 1)
 
-def eval__global_data(param):
+def eval__global_data(param, current):
     v = global_data
 
     for k in param:

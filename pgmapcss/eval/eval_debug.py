@@ -5,13 +5,13 @@ class config_eval_debug(config_base):
     def possible_values(self, param_values, prop, stat):
         return (param_values[0], 0)
 
-def eval_debug(param):
+def eval_debug(param, current):
     prefix = ''
 
     if len(param) == 1:
-        debug(param[0])
+        debug(param[0], current)
     else:
-        debug(param)
+        debug(param, current)
 
     return param[0]
 

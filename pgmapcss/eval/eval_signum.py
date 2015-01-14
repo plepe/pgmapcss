@@ -1,7 +1,7 @@
 class config_eval_signum(config_base):
     mutable = 3
 
-def eval_signum(param):
+def eval_signum(param, current):
     if len(param) == 0:
         return ''
 

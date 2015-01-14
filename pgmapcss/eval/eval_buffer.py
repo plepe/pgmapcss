@@ -1,11 +1,11 @@
 class config_eval_buffer(config_base):
     mutable = 2
 
-def eval_buffer(param):
+def eval_buffer(param, current):
     if len(param) < 2:
         return ''
 
-    radius = eval_metric([param[1], 'u'])
+    radius = eval_metric([param[1], 'u'], current)
 
     if radius == '':
         return ''

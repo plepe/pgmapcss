@@ -1,7 +1,7 @@
 class config_eval_reverse(config_base):
     mutable = 3
 
-def eval_reverse(param):
+def eval_reverse(param, current):
     if len(param) == 0:
         return ''
 

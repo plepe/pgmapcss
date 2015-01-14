@@ -1,7 +1,7 @@
 class config_eval_replace(config_base):
     mutable = 3
 
-def eval_replace(param):
+def eval_replace(param, current):
     if len(param) == 0:
         return ''
 

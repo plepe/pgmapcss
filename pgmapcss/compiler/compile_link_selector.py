@@ -10,16 +10,16 @@ def compile_link_selector(statement, stat):
     self_selects = compile_selectors_db([statement], None, stat)
 
     if statement['selector']['link']['type'] in ('>', ''):
-        return "objects_member_of([object], " +\
-            repr(other_selects) + ", " +\
-            repr(self_selects) + ", " +\
-            repr({}) + ")"
+        return "{ 'type': 'objects_member_of', " +\
+                "'other_selects': " + repr(other_selects) + ", " +\
+                "'self_selects': " + repr(self_selects) + ", " +\
+                "'options': {} }"
 
     elif statement['selector']['link']['type'] == '<':
-        return "objects_members([object], " +\
-            repr(other_selects) + ", " +\
-            repr(self_selects) + ", " +\
-            repr({}) + ")"
+        return "{ 'type': 'objects_members', " +\
+                "'other_selects': " + repr(other_selects) + ", " +\
+                "'self_selects': " + repr(self_selects) + ", " +\
+                "'options': {} }"
 
     elif statement['selector']['link']['type'] == 'near':
         distance = { 'value': '100' }
@@ -34,23 +34,23 @@ def compile_link_selector(statement, stat):
                     'id': statement['id']
                 }, stat)
         else:
-            distance = distance['value']
+            distance = repr(distance['value'])
 
-        return "objects_near([object], " +\
-            repr(other_selects) + ", " +\
-            repr(self_selects) + ", " +\
-            repr({
-                'distance': distance
-            }) + ")"
+        return "{ 'type': 'objects_near', " +\
+               "'other_selects': " + repr(other_selects) + ", " +\
+               "'self_selects': " + repr(self_selects) + ", " +\
+               "'options': { " +\
+               "'distance': " + distance +\
+               "}}"
 
-    elif statement['selector']['link']['type'] in ('within', 'surrounds', 'overlaps'):
-        return "objects_near([object], " +\
-            repr(other_selects) + ", " +\
-            repr(self_selects) + ", " +\
-            repr({
-                'distance': 0,
-                'check_geo': statement['selector']['link']['type'],
-            }) + ")"
+    elif statement['link_selector']['type'] in ('within', 'surrounds', 'overlaps'):
+        return "{ 'type': 'objects_near', " +\
+               "'other_selects': " + repr(other_selects) + ", " +\
+               "'self_selects': " + repr(self_selects) + ", " +\
+               "'options': { " +\
+               "'distance': 0," +\
+               "'check_geo': " + repr(statement['link_selector']['type']) +\
+               " }}"
 
     else:
         raise Exception('Unknown link selector "{type}"'.format(**selector['selector']['link']))

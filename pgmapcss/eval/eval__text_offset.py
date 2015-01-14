@@ -61,7 +61,7 @@ class config_eval__text_offset(config_base):
 
         return (ret, 0)
 
-def eval__text_offset(param):
+def eval__text_offset(param, current):
     prop = current['properties'][current['pseudo_element']]
     if 'text-offset' in prop and prop['text-offset'] is not None:
         return prop['text-offset']

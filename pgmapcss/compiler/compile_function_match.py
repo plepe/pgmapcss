@@ -12,16 +12,16 @@ from pgmapcss.misc import strip_includes
 def compile_function_match(stat):
     scale_denominators = sorted(stat.all_scale_denominators(), reverse=True)
 
-    check_functions = compile_build_result(stat)
+    object_checks = compile_build_result(stat)
     max_scale = None
     for min_scale in scale_denominators:
-        check_functions += compile_function_check([
+        object_checks += compile_function_check([
             v
             for v in stat['statements']
             if v['selector']['min_scale'] <= min_scale and
                 (v['selector']['max_scale'] == None or v['selector']['max_scale'] >= (max_scale or 10E+10))
         ], min_scale, max_scale, stat)
-        check_functions += '\n'
+        object_checks += '\n'
         max_scale = min_scale
 
     check_chooser  = "if render_context['scale_denominator'] is None:\n"
@@ -58,7 +58,7 @@ def compile_function_match(stat):
       'scale_denominators': repr(scale_denominators),
       'db_selects': compile_db_selects(stat['id'], stat),
       'db_query': db.query_functions(stat),
-      'function_check': check_functions,
+      'function_check': object_checks,
       'check_chooser': check_chooser,
       'eval_functions': \
 resource_string(pgmapcss.eval.__name__, 'base.py').decode('utf-8') +\
@@ -83,9 +83,7 @@ import copy
         ret += 'time_start = datetime.datetime.now() # profiling\n'
 
     ret += '''\
-global current
 global render_context
-current = None
 
 if not 'lang' in parameters:
     parameters['lang'] = {default_lang}
@@ -163,18 +161,93 @@ def dict_merge(dicts):
 
     return ret
 
+# Sources which still need to be processed. If a source is squeezed in (e.g.
+# due to a relationship), the previous source will be pushed to the src_stack.
+src_stack = [ ]
+# Objects which have a request (e.g. from a relationship).
+request_objects = {{ }}
+# Objects which are partly processed, but might still be needed at the current
+# state for handling relationships.
+pending_objects = {{ }}
+# Minimal index of a pending object. Decides whether a request for a
+# relationship will be handled right now or later (-> added to request_objects)
+pending_min_index = 999999999999999
+# List of objects which are already finished
+done_objects = {{ }}
+
 while src:
-    for object in src:
-        shown = False
-        counter['total'] += 1
+    while True:
+'''.format(**replacement)
 
-        orig_geo_src = object['geo']
-        orig_geo_out = convert_srs(object['geo'])
+    if stat['config'].get('debug.loop', False):
+        ret += '''
+        try:
+            plpy.warning(object['id'] + ' ' + start_state + ' => ' + object['state'][0] + ' ' + str(object['state'][1]))
+            del start_state
+        except:
+            pass
+'''.format(**replacement)
 
-        for result in check(object):
+    ret += '''
+        # get the next object from the current source.
+        if type(src) == list:
+            try:
+                object = src.pop(0)
+            except IndexError:
+                break
+        else:
+            try:
+                object = next(src)
+            except StopIteration:
+                break
+
+        # check if the object is already a pending_object and the object is new
+        # (no 'state') -> skip
+        if object['id'] in pending_objects and not 'state' in object and not object['id'] in done_objects:
+            break
+
+        # for each object the check() function will be called. it is a
+        # generator function which we either use via next() or send(). As we
+        # might need it for longer, we save the reference to the function in
+        # object['object_check']
+        if 'object_check' in object:
+            object_check = object['object_check']
+
+        else:
+            object['state'] = ( 'start', 0 )
+            shown = False
+            counter['total'] += 1
+            object_check = check(object)
+            object['object_check'] = object_check
+'''.format(**replacement)
+
+    if stat['config'].get('debug.loop', False):
+        ret += '''
+        start_state = object['state'][0] + ' ' + str(object['state'][1])
+'''.format(**replacement)
+
+    ret += '''
+        # get the next return value from the check() function, this can be
+        # either a result or a notification about relationship: 'pending',
+        # 'request', 'combine'
+        while object_check:
+            try:
+                if len(object['state']) > 2:
+                    result = object_check.send(object['state'][2])
+                else:
+                    result = next(object_check)
+            except StopIteration:
+                object['state'] = ( 'finish', 999999999999999 )
+                if object['id'] in pending_objects:
+                    del pending_objects[object['id']]
+                    done_objects[object['id']] = True
+                break
+
             if type(result) != tuple or len(result) == 0:
                 plpy.warning('unknown check result: ', result)
             elif result[0] == 'result':
+                # TODO: return current statement id
+                object['state'] = ( 'processing', 0 )
                 result = result[1]
 
                 # create a list of all style elements where the current
@@ -214,7 +287,7 @@ while src:
                     'types': result['types'],
                     'tags': pghstore.dumps(result['tags']),
                     'pseudo_element': result['pseudo_element'],
-                    'geo': orig_geo_out if result['geo'] == orig_geo_src else convert_srs(result['geo']),
+                    'geo': convert_srs(result['geo']),
                     'properties': pghstore.dumps(result['properties']),
                     'style_elements': [ se[0] for se in style_elements ],
                     'style_elements_index': [ se[1] for se in style_elements ],
@@ -225,13 +298,13 @@ while src:
 
     elif stat['mode'] == 'standalone':
         ret += '''
-                object['geo'] = orig_geo_out
+                object['geo'] = convert_srs(object['geo'])
                 yield {{
                     'id': result['id'],
                     'types': result['types'],
                     'tags': result['tags'],
                     'pseudo_element': result['pseudo_element'],
-                    'geo': orig_geo_out if result['geo'] == orig_geo_src else convert_srs(result['geo']),
+                    'geo': convert_srs(result['geo']),
                     'properties': result['properties'],
                     'style_elements': [ se[0] for se in style_elements ],
                     'style_elements_index': [ se[1] for se in style_elements ],
@@ -242,7 +315,36 @@ while src:
         '''.format(**replacement)
 
     ret += '''
+            # 'request' -> function needs other objects, e.g. from
+            # parent->child relation
+            elif result[0] == 'request':
+                object['state'] = result
+                object_check = None
+
+                # remember, that the current object has a request
+                request_id = repr(result[2])
+                if not request_id in request_objects:
+                    request_objects[request_id] = [ result[2], [] ]
+
+                request_objects[request_id][1].append(object)
+
+                # also add to pending_objects, so that relations will find this
+                # object
+                pending_objects[object['id']] = object
+
+            # the current object might used as parent for a relationship. add
+            # to pending_objects and cancel processing.
+            elif result[0] == 'pending':
+                object['state'] = result
+
+                pending_objects[object['id']] = object
+                object_check = None
+                if result[1] < pending_min_index:
+                    pending_min_index = result[1]
+
             elif result[0] == 'combine':
+                object['state'] = ( 'processing', )
+
                 shown = True
                 if result[1] not in combined_objects:
                     combined_objects[result[1]] = {{}}
@@ -258,14 +360,65 @@ while src:
 
     if stat['config'].get('debug.counter', False) == 'verbose':
         ret += '''
-        else:
+        elif object['state'][0] == 'finish':
             plpy.warning('not rendered: ' + object['id'] + ' ' + repr(object['tags']))
 '''.format(**replacement)
 
     ret += '''
+
     src = None
 
-    if len(combined_objects):
+    # the current src is empty, lets see, what there is still to be done
+    # 1st: check if there are any requests we can finish / continue
+    if not src and len(request_objects):
+        src = {{}}
+        done = []
+
+        request_id, request_def = request_objects.popitem()
+        request_type = request_def[0]
+        objects_list = request_def[1]
+
+        if request_type['type'] == 'objects_member_of':
+            request = objects_member_of(objects_list, request_type['other_selects'], request_type['self_selects'], request_type['options'])
+        elif request_type['type'] == 'objects_members':
+            request = objects_members(objects_list, request_type['other_selects'], request_type['self_selects'], request_type['options'])
+        elif request_type['type'] == 'objects_near':
+            request = objects_near(objects_list, request_type['other_selects'], request_type['self_selects'], request_type['options'])
+        else:
+            plpy.warning('unknown request type {{}}', request_type['type'])
+
+        for o in objects_list:
+            o['state'] = ( 'pending', o['state'][1], [] )
+
+        for request_object, src_object, link_tags in request:
+            if src_object['id'] in pending_objects:
+                src_object = pending_objects[src_object['id']]
+            elif src_object['id'] in src:
+                # this object was already returned by this request -> make sure
+                # we use the same object again
+                src_object = src[src_object['id']]
+            elif src_object['id'] not in done_objects:
+                src[src_object['id']] = src_object
+            else:
+                # object has already be done before -> don't add to
+                # pending_objects
+                pass
+
+            request_object['state'][2].append(( src_object, link_tags))
+
+        src = list(src.values())
+        if len(src) == 0:
+            src = None
+
+    # 2nd: check if there's still a src in the src_stack
+    if not src:
+        try:
+            src = src_stack.pop()
+        except IndexError:
+            src = None
+
+    # 3rd: maybe object were combined to new objects
+    if not src and len(combined_objects):
         src = []
         for combine_type, items in combined_objects.items():
             for combine_id, obs in items.items():
@@ -276,8 +429,30 @@ while src:
                     'geo': ST_Collect([ ob['geo'] for ob in obs ])
                 }})
 
-        combined_objects = []
-    '''.format(**replacement)
+        combined_objects = {{ }}
+
+    # 4th: check if there are still pending_objects, process them next
+    # pending_min_index always points to the next pending objects -> if it is
+    # 999999999999999, there are no pending_objects any more
+    if not src:
+        src = [ ]
+        pending_min_index = 999999999999999
+
+        for pending_id, pending in pending_objects.items():
+            if pending['state'][0] == 'pending' and pending['state'][1] < pending_min_index:
+                pending_min_index = pending['state'][1]
+
+        for pending_id, pending in pending_objects.items():
+            if pending['state'][0] == 'pending' and pending['state'][1] == pending_min_index:
+                src.append(pending)
+
+        pending_min_index = 999999999999999
+
+        if len(src) == 0:
+            src = None
+
+    # final: no sources left
+'''.format(**replacement)
 
     if stat['config'].get('debug.profiler', False):
         ret += '''

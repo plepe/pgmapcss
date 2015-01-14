@@ -13,6 +13,21 @@ def resolve_set_statements(statement, done, stat):
         return ret
     done.append(statement['id'])
 
+    parent_selectors = None
+    if 'parent' in statement['selector']:
+        parent_statement = copy.deepcopy(statement)
+        parent_statement['selector'] = parent_statement['selector']['parent']
+        parent_selectors = resolve_set_statements(parent_statement, [], stat)
+
+        new_ret = []
+        for lr in ret:
+            for p in parent_selectors:
+                r = copy.deepcopy(lr)
+                r['parent'] = copy.deepcopy(p)
+                new_ret.append(r)
+
+        ret = new_ret
+
     # iterate over all conditions in the statement
     for condition in statement['selector']['conditions']:
         last_ret = ret

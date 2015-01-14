@@ -1,7 +1,7 @@
 class config_eval_red(config_base):
     mutable = 3
 
-def eval_red(param):
+def eval_red(param, current):
     if len(param) == 0:
         return ''
 

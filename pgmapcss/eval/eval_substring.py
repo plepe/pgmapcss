@@ -1,7 +1,7 @@
 class config_eval_substring(config_base):
     mutable = 3
 
-def eval_substring(param):
+def eval_substring(param, current):
     if len(param) == 0:
         return ''
 

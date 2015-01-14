@@ -1,7 +1,7 @@
 class config_eval_atan(config_base):
     mutable = 3
 
-def eval_atan(param):
+def eval_atan(param, current):
     if len(param) == 0:
         return ''
 

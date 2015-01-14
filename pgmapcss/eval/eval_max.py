@@ -1,7 +1,7 @@
 class config_eval_max(config_base):
     mutable = 3
 
-def eval_max(param):
+def eval_max(param, current):
     if len(param) == 0:
         return ''
     if len(param) == 1:

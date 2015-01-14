@@ -7,14 +7,14 @@ class config_eval_div(config_base):
         ret = [ config_metric.mutable([p], stat) for p in param_values ]
         return min(ret)
 
-def eval_div(param):
+def eval_div(param, current):
   ret = None
 
   for p in param:
       if p == '' or p == None:
           f = ''
       else:
-          f = eval_metric([p])
+          f = eval_metric([p], current)
 
       f = float(f) if f != '' else 0.0
 

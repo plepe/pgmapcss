@@ -1,7 +1,7 @@
 class config_eval_area(config_base):
     mutable = 2
 
-def eval_area(param):
+def eval_area(param, current):
     if len(param) == 0:
         return ''
 
@@ -12,7 +12,7 @@ def eval_area(param):
         debug('Eval::area({}): Exception: {}'.format(param, err))
         return ''
 
-    zoom = eval_metric(['1u'])
+    zoom = eval_metric(['1u'], current)
 
     if zoom == '':
         return ''

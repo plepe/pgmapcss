@@ -1,14 +1,14 @@
 class config_eval_translate(config_base):
     mutable = 2
 
-def eval_translate(param):
+def eval_translate(param, current):
     if len(param) == 0:
         return ''
     if len(param) < 3:
         return param[0]
 
-    x = to_float(eval_metric([param[1], 'u']))
-    y = to_float(eval_metric([param[2], 'u']))
+    x = to_float(eval_metric([param[1], 'u'], current))
+    y = to_float(eval_metric([param[2], 'u'], current))
 
     try:
         plan = plpy.prepare('select ST_Transform(ST_Translate(ST_Transform($1, {unit.srs}), $2, $3), {db.srs}) as r', ['geometry', 'float', 'float'])

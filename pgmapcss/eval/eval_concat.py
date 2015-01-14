@@ -3,7 +3,7 @@ class config_eval_concat(config_base):
     op = '.'
     mutable = 3
 
-def eval_concat(param):
+def eval_concat(param, current):
     ret = ''
     for p in param:
         ret += p or ''

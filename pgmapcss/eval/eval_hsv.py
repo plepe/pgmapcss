@@ -3,7 +3,7 @@ class config_eval_hsv(config_base):
     mutable = 3
     alias = ( 'hsv_color' )
 
-def eval_hsv(param):
+def eval_hsv(param, current):
     if len(param) < 3:
         return ''
 

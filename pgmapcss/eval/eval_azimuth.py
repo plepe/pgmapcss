@@ -1,7 +1,7 @@
 class config_eval_azimuth(config_base):
     mutable = 2
 
-def eval_azimuth(param):
+def eval_azimuth(param, current):
     if len(param) < 2:
         return ''
 

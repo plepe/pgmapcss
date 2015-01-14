@@ -1,11 +1,11 @@
 class config_eval_get(config_base):
     mutable = 3
 
-def eval_get(param):
+def eval_get(param, current):
   if len(param) < 2:
       return ''
 
-  i = eval_int([param[1]])
+  i = eval_int([param[1]], current)
 
   if i == '':
       return ''

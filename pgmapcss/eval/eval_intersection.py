@@ -1,7 +1,7 @@
 class config_eval_intersection(config_base):
     mutable = 3
 
-def eval_intersection(param):
+def eval_intersection(param, current):
     if len(param) < 2:
         return ''
 

@@ -1,7 +1,7 @@
 class config_eval_tanh(config_base):
     mutable = 3
 
-def eval_tanh(param):
+def eval_tanh(param, current):
     if len(param) == 0:
         return ''
 

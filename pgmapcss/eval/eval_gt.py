@@ -16,15 +16,15 @@ class config_eval_gt(config_base):
         else:
             return config_base.possible_values(self, param_values, prop, stat)
 
-def eval_gt(param):
+def eval_gt(param, current):
     if len(param) < 2:
         return ''
 
-    a = eval_metric(param[0:1])
+    a = eval_metric(param[0:1], current)
     a = float(a) if a != '' else 0.0
 
     for p in param[1:]:
-        b = eval_metric([p])
+        b = eval_metric([p], current)
         b = float(b) if b != '' else 0.0
 
         if not a > b:

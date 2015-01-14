@@ -1,4 +1,4 @@
-def eval_tag(param):
+def eval_tag(param, current):
     for p in param:
         if p in current['tags']:
             v = current['tags'][p]

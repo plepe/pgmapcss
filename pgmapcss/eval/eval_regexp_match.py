@@ -1,7 +1,7 @@
 class config_eval_regexp_match(config_base):
     mutable = 3
 
-def eval_regexp_match(param):
+def eval_regexp_match(param, current):
     if len(param) < 2:
         return ''
 

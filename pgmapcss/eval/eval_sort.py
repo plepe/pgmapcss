@@ -1,7 +1,7 @@
 class config_eval_sort(config_base):
     mutable = 3
 
-def eval_sort(param):
+def eval_sort(param, current):
     if len(param) == 0:
         return ''
 

@@ -1,7 +1,7 @@
 class config_eval_line_locate_point(config_base):
     mutable = 2
 
-def eval_line_locate_point(param):
+def eval_line_locate_point(param, current):
     if len(param) < 2:
         return ''
 
@@ -15,7 +15,7 @@ def eval_line_locate_point(param):
         debug('Eval::line_locate_point({}): Exception: {}'.format(param, err))
         return ''
 
-    return eval_metric([ repr(res[0]['r']) + 'u' ])
+    return eval_metric([ repr(res[0]['r']) + 'u' ], current)
 
 # IN ['010200002031BF0D0002000000EC51B8DE163A3A410AD7A36078B45641295C8F826E393A4152B81E8573B45641', '010100002031BF0D00EC51B8DE163A3A410AD7A36078B45641']
 # OUT '0'

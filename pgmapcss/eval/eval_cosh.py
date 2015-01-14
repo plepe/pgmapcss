@@ -1,7 +1,7 @@
 class config_eval_cosh(config_base):
     mutable = 3
 
-def eval_cosh(param):
+def eval_cosh(param, current):
     if len(param) == 0:
         return ''
 

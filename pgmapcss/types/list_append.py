@@ -6,7 +6,7 @@ class list_append(default):
         default.__init__(self, key, stat)
         register_includes({
             'list_append': '''
-def list_append(key, value):
+def list_append(key, value, current):
     if not key in current['properties'][current['pseudo_element']]:
         return value
     else:
@@ -15,7 +15,7 @@ def list_append(key, value):
         })
 
     def compile_check(self, value):
-        return "list_append(" + repr(self.key) + ", " + value +")"
+        return "list_append(" + repr(self.key) + ", " + value +", current)"
 
     def compile(self, prop):
-        return "list_append(" + repr(self.key) + ", " + repr(prop['value']) + ")"
+        return "list_append(" + repr(self.key) + ", " + repr(prop['value']) + ", current)"

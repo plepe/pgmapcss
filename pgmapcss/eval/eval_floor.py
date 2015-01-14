@@ -1,7 +1,7 @@
 class config_eval_floor(config_base):
     mutable = 3
 
-def eval_floor(param):
+def eval_floor(param, current):
     import math
     if len(param) == 0:
         return ''

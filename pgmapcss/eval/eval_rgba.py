@@ -1,7 +1,7 @@
 class config_eval_rgba(config_base):
     mutable = 3
 
-def eval_rgba(param):
+def eval_rgba(param, current):
     if len(param) < 4:
         return ''
 

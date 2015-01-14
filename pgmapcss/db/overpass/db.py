@@ -268,6 +268,9 @@ class db(default):
             m1 = self.convert_to_regexp(d1[0])
             m2 = self.convert_to_regexp(d2[0])
 
+            if m1 is None or m2 is None:
+                return
+
             if m1[0] == m2[0]:
                 return [
                         c
@@ -329,9 +332,26 @@ class db(default):
 
         return ret
 
+    def convert_condition_parent(self, condition):
+        if type(condition) == list:
+            t = []
+            for c1 in condition:
+                t.append(self.convert_condition_parent(c1))
+
+            return t
+
+        t = tuple()
+        for i, c in enumerate(condition):
+            if i == 0:
+                c = 'parent_' + c
+            t += ( c ,)
+
+        return t
+
     def compile_selector(self, selector, no_object_type=False):
         filter = {}
-        filter['object_type'] = selector['type']
+        if 'type' in selector and selector['type'] is not None:
+            filter['object_type'] = selector['type']
 
         conditions = [
             self.compile_condition(c, filter)
@@ -343,16 +363,18 @@ class db(default):
             parent_conditions = self.compile_selector(selector['parent'])[0]
 
             conditions.append(( 'parent', selector['parent']['type'], selector['link']['type'] ))
-            for condition in parent_conditions:
-                if condition is None:
-                    continue
-                t = tuple()
-                for i, c in enumerate(condition):
-                    if i == 0:
-                        c = 'parent_' + c
-                    t += ( c ,)
 
-                conditions.append(t)
+            for condition in parent_conditions:
+                if condition is not None:
+                    condition = self.convert_condition_parent(condition)
+                    if type(condition) == list:
+                        conditions = [[[
+                            conditions + r2
+                            for r1 in condition
+                            for r2 in r1
+                        ]]]
+                    else:
+                        conditions.append(condition)
 
         ret = [ [] ]
 

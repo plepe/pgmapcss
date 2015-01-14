@@ -1,7 +1,7 @@
 class config_eval_line_part(config_base):
     mutable = 2
 
-def eval_line_part(param):
+def eval_line_part(param, current):
     if len(param) == 0:
         return ''
 
@@ -11,7 +11,7 @@ def eval_line_part(param):
     length = float(eval_line_length([param[0]]))
 
     # start position
-    pos0 = eval_metric([ param[1], 'px' ])
+    pos0 = eval_metric([ param[1], 'px' ], current)
     if pos0 == '':
         pos0 = 0.0
     else:
@@ -28,7 +28,7 @@ def eval_line_part(param):
 
     # end position
     if len(param) >= 3:
-        pos1 = eval_metric([ param[2], 'px' ])
+        pos1 = eval_metric([ param[2], 'px' ], current)
         if pos1 == '':
             pos1 = length
         else:

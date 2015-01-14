@@ -1,7 +1,7 @@
 class config_eval_parameter(config_base):
     mutable = 2
 
-def eval_parameter(param):
+def eval_parameter(param, current):
     if len(param) == 0:
         return ''
 

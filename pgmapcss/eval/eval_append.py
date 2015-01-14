@@ -1,7 +1,7 @@
 class config_eval_append(config_base):
     mutable = 3
 
-def eval_append(param):
+def eval_append(param, current):
     if len(param) == 0:
         return ''
 

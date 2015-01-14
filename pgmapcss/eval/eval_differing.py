@@ -17,7 +17,7 @@ class config_eval_differing(config_base):
         else:
             return config_base.possible_values(self, param_values, prop, stat)
 
-def eval_differing(param):
+def eval_differing(param, current):
     # empty parameter list -> all equal
     if len(param) == 0:
         return 'false'
@@ -27,7 +27,7 @@ def eval_differing(param):
         return 'false'
 
     # convert all values to numbers
-    values = [ eval_metric([v]) for v in param ]
+    values = [ eval_metric([v], current) for v in param ]
 
     if not '' in values and len(values) != len(set(values)):
         return 'false'

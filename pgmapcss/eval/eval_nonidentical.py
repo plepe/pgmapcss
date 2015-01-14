@@ -12,7 +12,7 @@ class config_eval_nonidentical(config_base):
         else:
             return config_base.possible_values(self, param_values, prop, stat)
 
-def eval_nonidentical(param):
+def eval_nonidentical(param, current):
     # empty parameter list -> all equal
     if len(param) == 0:
         return 'false'

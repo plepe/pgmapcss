@@ -133,7 +133,7 @@ class Functions:
         import pgmapcss.db as db
         config = self.eval_functions[func]
 
-        statement = config.compiler([ repr(p) for p in param ], '', stat)
+        statement = config.compiler([ repr(p) for p in param ], ', None', stat)
         return self.eval(statement)
 
     def get_tests(self, src):

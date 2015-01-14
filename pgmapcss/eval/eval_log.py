@@ -1,7 +1,7 @@
 class config_eval_log(config_base):
     mutable = 3
 
-def eval_log(param):
+def eval_log(param, current):
     if len(param) == 0:
         return ''
 

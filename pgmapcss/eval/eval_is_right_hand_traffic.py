@@ -1,7 +1,7 @@
 class config_eval_is_right_hand_traffic(config_base):
     mutable = 1
 
-def eval_is_right_hand_traffic(param):
+def eval_is_right_hand_traffic(param, current):
     force = False
     if len(param) > 1:
         force = param[1] == 'force'

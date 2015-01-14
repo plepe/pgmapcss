@@ -1,7 +1,7 @@
 class config_eval_split(config_base):
     mutable = 3
 
-def eval_split(param):
+def eval_split(param, current):
     if len(param) < 2:
         return ''
 

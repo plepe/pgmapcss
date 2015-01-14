@@ -1,7 +1,7 @@
 class config_eval_line_interpolate_line(config_base):
     mutable = 2
 
-def eval_line_interpolate_point(param):
+def eval_line_interpolate_point(param, current):
     if len(param) == 0 or not param[0]:
         return ''
 
@@ -10,8 +10,8 @@ def eval_line_interpolate_point(param):
         l = None
 
     else:
-        l = eval_line_length([param[0]])
-        f = eval_metric([param[1], 'px'])
+        l = eval_line_length([param[0]], current)
+        f = eval_metric([param[1], 'px'], current)
         if f == '':
             return ''
         f = float(f) / float(l)

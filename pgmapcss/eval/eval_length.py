@@ -1,7 +1,7 @@
 class config_eval_length(config_base):
     mutable = 3
 
-def eval_length(param):
+def eval_length(param, current):
     if len(param) == 0:
         return ''
 

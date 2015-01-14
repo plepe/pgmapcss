@@ -456,7 +456,9 @@ def objects_bbox(_bbox, db_selects, options):
 def objects_by_id(id_list, options):
     q = ''
     multipolygons = []
-    for i in id_list:
+    for o in objects:
+        i = o['id']
+
         if i[0:1] == 'n':
             q += 'node({});out meta geom;'.format(i[1:])
         elif i[0:1] == 'w':
@@ -624,9 +626,12 @@ def objects_members(objects, other_selects, self_selects, options):
                     yield((ob, t, link_tags))
 
 def objects_near(objects, other_selects, self_selects, options):
+    if not len(objects):
+        return
+
     cache_id = 'objects_near' + '|' + repr(other_selects) + '|' + repr(self_selects) + '|' + repr(options)
 
-    max_distance = to_float(eval_metric([ options['distance'], 'u' ]))
+    max_distance = to_float(eval_metric([ options['distance'], 'u' ], objects[0]))
     if max_distance is None:
         return
 
@@ -667,7 +672,7 @@ def objects_near(objects, other_selects, self_selects, options):
 
                 if o['id'] != ob['id'] and t['dist'] <= max_distance:
                     link_tags = {
-                        'distance': eval_metric([ str(t['dist']) + 'u', 'px' ])
+                        'distance': eval_metric([ str(t['dist']) + 'u', 'px' ], ob)
                     }
 
                     yield (ob, o, link_tags)

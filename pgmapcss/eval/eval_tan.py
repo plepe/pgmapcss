@@ -1,7 +1,7 @@
 class config_eval_tan(config_base):
     mutable = 3
 
-def eval_tan(param):
+def eval_tan(param, current):
     if len(param) == 0:
         return ''
 

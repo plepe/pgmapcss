@@ -463,7 +463,7 @@ def objects_near(objects, other_selects, self_selects, options):
     for ob in objects:
         geom = ob['geo']
 
-        max_distance = to_float(eval_metric([ options['distance'], 'u' ]))
+        max_distance = to_float(eval_metric([ options['distance'], 'u' ], ob))
         if max_distance is None:
             return
         elif max_distance == 0:
@@ -495,7 +495,7 @@ def objects_near(objects, other_selects, self_selects, options):
         ):
             if o['id'] != ob['id'] and o['__distance'] <= max_distance:
                 link_tags = {
-                    'distance': eval_metric([ str(o['__distance']) + 'u', 'px' ])
+                    'distance': eval_metric([ str(o['__distance']) + 'u', 'px' ], ob)
                 }
                 obs.append((o, link_tags))
 

@@ -1,7 +1,7 @@
 class config_eval_green(config_base):
     mutable = 3
 
-def eval_green(param):
+def eval_green(param, current):
     if len(param) == 0:
         return ''
 
