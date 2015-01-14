@@ -3,17 +3,17 @@ from .compile_selector_part import compile_selector_part
 import copy
 from collections import Counter
 
-def compile_function_check(statements, min_scale, max_scale, stat):
+def compile_function_check(statements, min_scale, max_scale, stat, types=None, not_types=set(), function_name_suffix=None):
     replacement = {
       'style_id': stat['id'],
       'min_scale': min_scale,
       'max_scale': max_scale,
-      'min_scale_esc': str(min_scale).replace('.', '_'),
+      'function_name_suffix': function_name_suffix or str(min_scale).replace('.', '_'),
       'pseudo_elements': repr(stat['pseudo_elements'])
     }
 
     ret = '''
-def check_{min_scale_esc}(object):
+def check_{function_name_suffix}(object):
 # initialize variables
     current = {{
         'object': object,
@@ -35,6 +35,11 @@ def check_{min_scale_esc}(object):
 
     compiled_statements = []
     for i in statements:
+        if types is not None and not i['selector']['type'] in types:
+            continue
+        if types is None and i['selector']['type'] in not_types:
+            continue
+
         # create a copy of the statement and modify min/max scale
         i = copy.deepcopy(i)
         i['selector']['min_scale'] = min_scale
