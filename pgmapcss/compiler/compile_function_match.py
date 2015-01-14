@@ -31,7 +31,9 @@ def compile_function_match(stat):
         check_chooser += "elif render_context['scale_denominator'] >= %i:\n" % i
         check_chooser += "    check = check_%s\n" % str(i).replace('.', '_')
 
-    stat['global_data'] = {}
+    stat['global_data'] = {
+        'variables': {}
+    }
     # get global data from type
     for prop in stat.properties():
         prop_type = pgmapcss.types.get(prop, stat)

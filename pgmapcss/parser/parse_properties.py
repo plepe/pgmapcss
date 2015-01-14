@@ -32,6 +32,10 @@ def parse_properties(properties, to_parse):
             current['assignment_type'] = 'C'
             current['key'] = to_parse.match_group(1)
 
+        elif to_parse.match('\s*@([a-zA-Z0-9_]+)\s*:'):
+            current['assignment_type'] = 'V'
+            current['key'] = to_parse.match_group(1)
+
         elif to_parse.match('\s*\}'):
             return
 

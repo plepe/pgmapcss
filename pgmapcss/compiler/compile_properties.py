@@ -46,4 +46,10 @@ def compile_properties(statement, stat, indent=''):
 }))
 '''
 
+        elif prop['assignment_type'] == 'V':
+            c = compile_value(prop, stat)
+
+            ret += indent + "global_data['variables'][" +\
+                repr(prop['key']) + '] = ' + c + '\n'
+
     return ret
