@@ -68,6 +68,23 @@ def parse_file(stat, filename=None, base_style=None, content=None, defaults=[]):
             media = None
             continue
 
+        global_properties = []
+        parse_properties(global_properties, f, global_context=True, accept_assignment_types={'V'})
+        if len(global_properties):
+            statement = {
+                'id': stat['max_prop_id'],
+                'properties': global_properties,
+                'selector': {
+                    'type': 'global',
+                    'pseudo_element': 'default',
+                    'min_scale': 0,
+                    'max_scale': None,
+                    'conditions': [],
+                }
+            }
+            stat['max_prop_id'] = stat['max_prop_id'] + 1
+            stat['statements'].append(statement)
+
         selectors = []
         parse_selectors(selectors, f)
 
