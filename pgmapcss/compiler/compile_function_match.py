@@ -24,6 +24,9 @@ def compile_function_match(stat):
         object_checks += '\n'
         max_scale = min_scale
 
+    object_checks += compile_function_check(stat['statements'], 0, None, stat, types={'global'}, function_name_suffix='global')
+    object_checks += '\n'
+
     check_chooser  = "if render_context['scale_denominator'] is None:\n"
     check_chooser += "    check = check_0\n"
 
@@ -177,6 +180,12 @@ pending_min_index = 999999999999999
 # List of objects which are already finished
 done_objects = {{ }}
 
+src_stack.append(src)
+global_object = {{ 'id': '@global@', 'tags': {{ }}, 'types': ['global'], 'state': ('start', 0), 'geo': None }}
+global_object['object_check'] = check_global(global_object)
+src = [ global_object ]
+
+shown = False
 while src:
     while True:
 '''.format(**replacement)
