@@ -10,13 +10,13 @@ def and_join(lst):
 
     return ' and '.join(lst)
 
-def list_eval_functions_prop(prop, stat):
+def list_eval_functions_prop(prop, stat, types={'f', 'o'}):
     ret = set()
 
     for p in prop:
         if type(p) == list:
-            ret = ret.union(list_eval_functions_prop(p, stat))
-        elif p[0:2] in ( 'f:', 'o:' ):
+            ret = ret.union(list_eval_functions_prop(p, stat, types))
+        elif p[0:1] in types and p[1:2] == ':':
             ret.add(p)
 
     return ret
@@ -29,6 +29,22 @@ def list_eval_functions(statement, stat):
             ret = ret.union(list_eval_functions_prop(prop['value'], stat))
 
     return ret
+
+def uses_variables(statement, stat):
+    variables = set()
+
+    for prop in statement['properties']:
+        if prop['assignment_type'] == 'V':
+            variables.add(prop['key'])
+
+        if 'value_type' in prop and prop['value_type'] == 'eval':
+            l = list_eval_functions_prop(prop['value'], stat, {'V'})
+            variables = variables.union({ x[2:] for x in l })
+
+    if len(variables) == 0:
+        return False
+
+    return variables
 
 # returns
 # {
@@ -53,6 +69,9 @@ def compile_statement(statement, stat, indent=''):
                 c['key'] if 'key' in c else None
                 for c in object_selector['conditions']
             ]) + '\n'
+
+    if uses_variables(statement, stat):
+        ret['body'] += indent + 'yield ("pending", ' + str(statement['id']) + ')\n'
 
     if 'link' in statement['selector']:
         ret['body'] += indent + '# link selector -> get list of objects, but return with "request", so that statements of parent objects up to the current statement can be processed. Remember link tags, add them later-on.\n'
