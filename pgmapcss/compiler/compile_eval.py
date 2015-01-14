@@ -26,6 +26,8 @@ def compile_eval(value, prop, stat):
     if type(value) == str:
         if value[0:2] == 'v:':
             return repr(value[2:])
+        elif value[0:2] == 'V:':
+            return "global_data['variables'][" + repr(value[2:]) + "] if " + repr(value[2:]) + " in global_data['variables'] else None"
         elif value[0:2] == 'f:':
             func = value[2:]
             if not func in eval_functions:

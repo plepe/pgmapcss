@@ -72,6 +72,11 @@ def parse_eval(to_parse, math_level=0, current_op=None, rek=0, end_chars=set()):
                 current = to_parse.match_group(0)
                 mode = 10
 
+            # a variable
+            elif to_parse.match('@([a-zA-Z0-9_]+)'):
+                current_result.append('V:' + to_parse.match_group(1))
+                mode = 20
+
             # opening bracket
             elif to_parse.match('\('):
                 result = parse_eval(to_parse, rek=rek+1)
