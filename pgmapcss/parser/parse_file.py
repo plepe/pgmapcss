@@ -9,6 +9,24 @@ import copy
 from pkg_resources import *
 import pgmapcss.defaults
 
+def parse_global_properties(f, stat):
+    global_properties = []
+    parse_properties(global_properties, f, global_context=True, accept_assignment_types={'V'})
+    if len(global_properties):
+        statement = {
+            'id': stat['max_prop_id'],
+            'properties': global_properties,
+            'selector': {
+                'type': 'global',
+                'pseudo_element': 'default',
+                'min_scale': 0,
+                'max_scale': None,
+                'conditions': [],
+            }
+        }
+        stat['max_prop_id'] = stat['max_prop_id'] + 1
+        stat['statements'].append(statement)
+
 def parse_file(stat, filename=None, base_style=None, content=None, defaults=[]):
     if not 'max_prop_id' in stat:
         stat['max_prop_id'] = 0
@@ -46,6 +64,8 @@ def parse_file(stat, filename=None, base_style=None, content=None, defaults=[]):
     f.set_content(strip_comments(f))
 
 # read statements until there's only whitespace left
+    parse_global_properties(f, stat)
+
     while True:
         if media and f.match('\s*}'):
             media = None
@@ -68,23 +88,6 @@ def parse_file(stat, filename=None, base_style=None, content=None, defaults=[]):
             media = None
             continue
 
-        global_properties = []
-        parse_properties(global_properties, f, global_context=True, accept_assignment_types={'V'})
-        if len(global_properties):
-            statement = {
-                'id': stat['max_prop_id'],
-                'properties': global_properties,
-                'selector': {
-                    'type': 'global',
-                    'pseudo_element': 'default',
-                    'min_scale': 0,
-                    'max_scale': None,
-                    'conditions': [],
-                }
-            }
-            stat['max_prop_id'] = stat['max_prop_id'] + 1
-            stat['statements'].append(statement)
-
         selectors = []
         parse_selectors(selectors, f)
 
@@ -105,3 +108,5 @@ def parse_file(stat, filename=None, base_style=None, content=None, defaults=[]):
                 prop['statement'] = statement
                 prop['id'] = stat['max_prop_id']
                 stat['max_prop_id'] = stat['max_prop_id'] + 1
+
+        parse_global_properties(f, stat)
