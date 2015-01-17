@@ -24,7 +24,14 @@ def parse_global_properties(f, stat):
                 'conditions': [],
             }
         }
+
         stat['max_prop_id'] = stat['max_prop_id'] + 1
+
+        for prop in statement['properties']:
+            prop['statement'] = statement
+            prop['id'] = stat['max_prop_id']
+            stat['max_prop_id'] = stat['max_prop_id'] + 1
+
         stat['statements'].append(statement)
 
 def parse_file(stat, filename=None, base_style=None, content=None, defaults=[]):
