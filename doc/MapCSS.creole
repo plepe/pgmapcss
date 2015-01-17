@@ -133,6 +133,8 @@ This makes sure that the highway's name matches the streetname of the address no
 === Pseudo classes ===
 After the condition selector(s), separated by ':'. Several pseudo classes may be specified. They can also be negated by prepending by '!', e.g. '!:closed'. Optional.
 
+Some pseudo classes accept a parameter. This parameter may be the result of an eval expression, e.g. {{{:lang(list("en", "fr"))}}}.
+
 Unsupported pseudo classes are evaluated as false.
 
 The following pseudo classes are supported:
