@@ -115,6 +115,9 @@ def main():
         'args': args,
         'lang': lang,
         'parameters': parameters,
+        'variables': {},
+        # a dict with the variable names as keys and a list of property ids
+        # when there's an assignment to this variable
     })
 
     if args.config:

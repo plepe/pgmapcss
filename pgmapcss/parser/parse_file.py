@@ -32,7 +32,13 @@ def parse_global_properties(f, stat):
             prop['id'] = stat['max_prop_id']
             stat['max_prop_id'] = stat['max_prop_id'] + 1
 
+            if prop['assignment_type'] == 'V':
+                if not prop['key'] in stat['variables']:
+                    stat['variables'][prop['key']] = []
+                stat['variables'][prop['key']].append(prop['id'])
+
         stat['statements'].append(statement)
+
 
 def parse_file(stat, filename=None, base_style=None, content=None, defaults=[]):
     if not 'max_prop_id' in stat:
@@ -115,5 +121,10 @@ def parse_file(stat, filename=None, base_style=None, content=None, defaults=[]):
                 prop['statement'] = statement
                 prop['id'] = stat['max_prop_id']
                 stat['max_prop_id'] = stat['max_prop_id'] + 1
+
+                if prop['assignment_type'] == 'V':
+                    if not prop['key'] in stat['variables']:
+                        stat['variables'][prop['key']] = []
+                    stat['variables'][prop['key']].append(prop['id'])
 
         parse_global_properties(f, stat)
