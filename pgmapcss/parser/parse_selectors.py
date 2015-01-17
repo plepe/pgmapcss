@@ -63,7 +63,7 @@ def parse_selector_part(to_parse, object_class_selector='\*|[a-z_]+'):
                 current['conditions'].append(result)
 
 # parse pseudo classes
-        if to_parse.match('(!?):([a-zA-Z0-9_]+)'):
+        if to_parse.match('(!?):([a-zA-Z0-9_\-]+)'):
             condition = {
                 'op': 'pseudo_class',
                 'key': to_parse.match_group(2)
