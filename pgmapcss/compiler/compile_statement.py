@@ -53,6 +53,13 @@ def selector_check_variables(selector, stat):
 
     return ret
 
+def compile_statement_pending(statement, stat, indent=''):
+    ret = ''
+
+    ret += indent + 'yield ("pending", ' + str(statement['id']) + ')\n'
+
+    return ret
+
 # returns
 # {
 #   'check': Check as list, e.g. ['highway=foo', '...'],
@@ -70,7 +77,7 @@ def compile_statement(statement, stat, indent=''):
 
     # check if the selector uses variables
     if not pending and selector_check_variables(object_selector, stat):
-        ret['pre-check'] += indent + 'yield ("pending", ' + str(statement['id']) + ')\n'
+        ret['pre-check'] += compile_statement_pending(statement, stat, indent=indent)
         pending = True
 
     ret['check'] += compile_selector_part(object_selector, stat)
@@ -84,7 +91,7 @@ def compile_statement(statement, stat, indent=''):
             ]) + '\n'
 
     if not pending and uses_variables(statement, stat):
-        ret['body'] += indent + 'yield ("pending", ' + str(statement['id']) + ')\n'
+        ret['body'] += compile_statement_pending(statement, stat, indent=indent)
         pending = True
 
     if 'link' in statement['selector']:
