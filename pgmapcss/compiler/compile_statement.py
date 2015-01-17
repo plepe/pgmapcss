@@ -55,8 +55,34 @@ def selector_check_variables(selector, stat):
 
 def compile_statement_pending(statement, stat, indent=''):
     ret = ''
+    variables = set()
 
-    ret += indent + 'yield ("pending", ' + str(statement['id']) + ')\n'
+    variables = variables.union(selector_check_variables(statement['selector'], stat))
+    variables = variables.union(uses_variables(statement, stat))
+
+    last_assign = {
+        k: [
+            p
+            for p in stat['variables'][k]
+            if p <= statement['id']
+        ]
+        for k in variables
+    }
+
+    last_assign = {
+        k: v[-1]
+        for k, v in last_assign.items()
+        if len(v)
+    }
+
+    if len(last_assign):
+        ret += indent + 'if ' + ' or '.join([
+            "global_data['variables-status'][" + repr(k) + "]['done'] < " + str(v)
+            for k, v in last_assign.items()
+        ]) + ':\n'
+        indent += '    '
+
+        ret += indent + 'yield ("pending", ' + str(statement['id']) + ')\n'
 
     return ret
 

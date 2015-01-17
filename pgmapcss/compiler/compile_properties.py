@@ -52,4 +52,12 @@ def compile_properties(statement, stat, indent=''):
             ret += indent + "global_data['variables'][" +\
                 repr(prop['key']) + '] = ' + c + '\n'
 
+            # when type is global, there's only a single object, therefore we
+            # can always assume that after the assignment all assignments are
+            # finished
+            ret += indent + "global_data['variables-status'][" +\
+                repr(prop['key']) + "]['" +\
+                ('done' if statement['selector']['type'] == 'global' else 'pending') +\
+                "'] = " + str(prop['id']) + '\n'
+
     return ret

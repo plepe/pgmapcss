@@ -35,7 +35,11 @@ def compile_function_match(stat):
         check_chooser += "    check = check_%s\n" % str(i).replace('.', '_')
 
     stat['global_data'] = {
-        'variables': {}
+        'variables': {},
+        'variables-status': {
+            k: { 'done': 0 }
+            for k in stat['variables']
+        },
     }
     # get global data from type
     for prop in stat.properties():
@@ -441,6 +445,14 @@ while src:
                 }})
 
         combined_objects = {{ }}
+
+    # before 4th: all current sources are done, we can assume all variable
+    # assignments are finished up to this point.
+    for k, v in global_data['variables-status'].items():
+        if 'pending' in v:
+            if v['done'] < v['pending']:
+                v['done'] = v['pending']
+            del v['pending']
 
     # 4th: check if there are still pending_objects, process them next
     # pending_min_index always points to the next pending objects -> if it is
