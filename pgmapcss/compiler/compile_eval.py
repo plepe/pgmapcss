@@ -9,6 +9,42 @@ def valid_func_name(func):
     else:
         raise Exception('Illegal eval function name: ' + func)
 
+def eval_uses_types(value, types, stat):
+    ret = set()
+
+    for v in value:
+        if type(v) == list:
+            ret = ret.union(eval_uses_types(v, types, stat))
+        elif v[0:1] in types and v[1:2] == ':':
+            ret.add(v)
+
+    return ret
+
+def eval_uses_variables(value, stat):
+    variables = set()
+
+    l = eval_uses_types(value, {'V'}, stat)
+    variables = variables.union({ x[2:] for x in l })
+
+    return variables
+
+def eval_uses_functions(value, stat):
+    eval_functions = pgmapcss.eval.functions().list()
+    ret = set()
+
+    for func in eval_uses_types(value, {'f', 'o'}, stat):
+        if func[0:2] == 'o:':
+            func = [ k for k, v in eval_functions.items() if func[2:] in v.op and not v.unary ][0]
+        elif func[0:2] == 'f:':
+            func = func[2:]
+            if not func in eval_functions:
+                if func in pgmapcss.eval.functions().aliases:
+                    func = pgmapcss.eval.functions().aliases[func]
+
+        ret.add(func)
+
+    return ret
+
 def compile_eval(value, prop, stat):
     global eval_param
 

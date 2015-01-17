@@ -3,6 +3,7 @@ from .compile_link_selector import compile_link_selector
 from .compile_properties import compile_properties
 from .compile_conditions import compile_conditions
 from .compile_media_query import compile_media_query
+from .compile_eval import *
 
 def and_join(lst):
     if len(lst) == 0:
@@ -10,23 +11,12 @@ def and_join(lst):
 
     return ' and '.join(lst)
 
-def list_eval_functions_prop(prop, stat, types={'f', 'o'}):
-    ret = set()
-
-    for p in prop:
-        if type(p) == list:
-            ret = ret.union(list_eval_functions_prop(p, stat, types))
-        elif p[0:1] in types and p[1:2] == ':':
-            ret.add(p)
-
-    return ret
-
 def list_eval_functions(statement, stat):
     ret = set()
 
     for prop in statement['properties']:
         if prop['value_type'] == 'eval':
-            ret = ret.union(list_eval_functions_prop(prop['value'], stat))
+            ret = ret.union(eval_uses_functions(prop['value'], stat))
 
     return ret
 
@@ -38,8 +28,8 @@ def uses_variables(statement, stat):
             variables.add(prop['key'])
 
         if 'value_type' in prop and prop['value_type'] == 'eval':
-            l = list_eval_functions_prop(prop['value'], stat, {'V'})
-            variables = variables.union({ x[2:] for x in l })
+            l = eval_uses_variables(prop['value'], stat)
+            variables = variables.union(l)
 
     if len(variables) == 0:
         return False
