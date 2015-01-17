@@ -83,6 +83,9 @@ def check_{function_name_suffix}(object):
             else:
                 combinable = False
 
+        ret += '\n'.join(indent + x for x in i['pre-check'].splitlines())
+        ret += '\n'
+
         for c in checks:
             if not c in current_checks:
                 current_checks += [ c ]

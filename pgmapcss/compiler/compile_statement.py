@@ -36,19 +36,42 @@ def uses_variables(statement, stat):
 
     return variables
 
+def selector_check_variables(selector, stat):
+    ret = set()
+
+    for condition in selector['conditions']:
+        if condition['op'] == 'eval':
+            ret = ret.union(eval_uses_variables(condition['key'], stat))
+
+        elif condition['value_type'] == 'eval':
+            ret = ret.union(eval_uses_variables(condition['value'], stat))
+
+    if 'parent' in selector:
+        ret = ret.union(selector_check_variables(selector['parent'], stat))
+        ret = ret.union(selector_check_variables(selector['link'], stat))
+
+
+    return ret
+
 # returns
 # {
 #   'check': Check as list, e.g. ['highway=foo', '...'],
 #   'body': tags['foo'] = 'bar'
 # }
 def compile_statement(statement, stat, indent=''):
-    ret = { 'check': [], 'body': '' }
+    ret = { 'check': [], 'body': '', 'pre-check': '' }
     object_selector = statement['selector']
+    pending = False
 
     if 'media' in statement:
         v = compile_media_query(statement['media'], stat)
         if v:
             ret['check'].append(v)
+
+    # check if the selector uses variables
+    if not pending and selector_check_variables(object_selector, stat):
+        ret['pre-check'] += indent + 'yield ("pending", ' + str(statement['id']) + ')\n'
+        pending = True
 
     ret['check'] += compile_selector_part(object_selector, stat)
 
@@ -60,8 +83,9 @@ def compile_statement(statement, stat, indent=''):
                 for c in object_selector['conditions']
             ]) + '\n'
 
-    if uses_variables(statement, stat):
+    if not pending and uses_variables(statement, stat):
         ret['body'] += indent + 'yield ("pending", ' + str(statement['id']) + ')\n'
+        pending = True
 
     if 'link' in statement['selector']:
         ret['body'] += indent + '# link selector -> get list of objects, but return with "request", so that statements of parent objects up to the current statement can be processed. Remember link tags, add them later-on.\n'
