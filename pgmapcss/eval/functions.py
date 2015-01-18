@@ -182,7 +182,7 @@ class Functions:
         config = self.eval_functions[func]
 
         code = '[ ' + ', '.join([
-            config.compiler([ repr(p) for p in t ], '', {})
+            config.compiler([ repr(p) for p in t ], ', current', {})
             for t in tests['param_in']
         ]) + ' ]'
 
@@ -207,7 +207,7 @@ include_text()
 
         if len(tests['param_in']):
             for i, param_in in enumerate(tests['param_in']):
-                ret += 'yield ' + config.compiler([ repr(p) for p in param_in ], '', {}) + '\n'
+                ret += 'yield ' + config.compiler([ repr(p) for p in param_in ], ', current', {}) + '\n'
 
             ret += "$body$ language 'plpython3u' immutable;"
             conn = db.connection()
