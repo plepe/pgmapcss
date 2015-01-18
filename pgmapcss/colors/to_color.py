@@ -22,6 +22,8 @@ def to_color(value):
         from .color_names import color_names
     except ValueError:
         global color_names
+    except SystemError:
+        global color_names
 
     if value in color_names:
         return color_names[value]

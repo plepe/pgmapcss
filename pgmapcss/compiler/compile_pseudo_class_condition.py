@@ -1,6 +1,9 @@
 from .compile_eval import compile_eval
 
 def compile_pseudo_class_condition(condition, stat):
+    if condition['key'] in ('order-natural-asc', 'order-natural-desc', 'order-alphabetical-asc', 'order-alphabetical-desc', 'order-numerical-asc', 'order-numerical-desc'):
+        return ['True']
+
     if condition['key'] not in ('active', 'hover', 'closed', 'connection', 'unconnected', 'tagged', 'righthandtraffic', 'lefthandtraffic', 'lang'):
         print('unknown/unsupported pseudo class: {key}'.format(**condition))
         return ['False']
@@ -35,4 +38,7 @@ def compile_pseudo_class_condition(condition, stat):
             print('pseudo class :lang() requires a parameter -> ignoring'.format(**condition))
             return ['False']
 
-        return ["parameters['lang'] == " + repr(condition['value'])]
+        if condition['value_type'] == 'eval':
+            return ["parameters['lang'] in " + compile_eval(condition['value'], condition, stat) + ".split(';')"]
+        else:
+            return ["parameters['lang'] in " + repr(condition['value'].split(';'))]

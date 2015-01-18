@@ -1,5 +1,6 @@
 from .parse_condition import parse_condition
 from .parse_string import parse_string
+from .parse_eval import parse_eval
 from .ParseError import *
 import re
 
@@ -63,7 +64,7 @@ def parse_selector_part(to_parse, object_class_selector='\*|[a-z_]+'):
                 current['conditions'].append(result)
 
 # parse pseudo classes
-        if to_parse.match('(!?):([a-zA-Z0-9_]+)'):
+        if to_parse.match('(!?):([a-zA-Z0-9_\-]+)'):
             condition = {
                 'op': 'pseudo_class',
                 'key': to_parse.match_group(2)
@@ -74,12 +75,16 @@ def parse_selector_part(to_parse, object_class_selector='\*|[a-z_]+'):
 
 # ... additionally check if there is a parameter to the pseudo class
             if to_parse.match('\('):
-                m = parse_string(to_parse)
+                m = parse_eval(to_parse)
                 if m:
-                    condition['value'] = m
+                    if type(m) == str and m[0:2] == 'v:':
+                        condition['value'] = m[2:]
+                        condition['value_type'] = 'value'
+                    else:
+                        condition['value'] = m
+                        condition['value_type'] = 'eval'
+
                     to_parse.match('\)')
-                elif to_parse.match('([^\)]*)\)'):
-                    condition['value'] = to_parse.match_group(1)
                 else:
                     raise ParseError(to_parse, 'Can\'t parse parameter to pseudo class')
 

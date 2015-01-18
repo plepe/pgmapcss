@@ -10,7 +10,7 @@ Alternatively there's a standalone mode, where the MapCSS style is compiled into
 
 Since version 0.10 you don't even need a local database import (a local database is needed nonetheless), as the new default data source is Overpass API. Alternatively, osm2pgsql and osmosis pgsnapshot are supported. See [doc/database.md](doc/database.md) for details.
 
-Stable version: [0.10.0](https://github.com/plepe/pgmapcss) ([CHANGELOG](https://github.com/plepe/pgmapcss/blob/master/CHANGELOG.creole)), development version: [0.11-dev](https://github.com/plepe/pgmapcss/tree/branch-0.11), see [open issues](https://github.com/plepe/pgmapcss/milestones/Version%200.11)
+Stable version: [0.10.1](https://github.com/plepe/pgmapcss) ([CHANGELOG](https://github.com/plepe/pgmapcss/blob/master/CHANGELOG.creole)), development version: [0.11-dev](https://github.com/plepe/pgmapcss/tree/branch-0.11), see [open issues](https://github.com/plepe/pgmapcss/milestones/Version%200.11)
 
 Features
 --------

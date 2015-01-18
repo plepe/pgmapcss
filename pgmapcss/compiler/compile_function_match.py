@@ -183,6 +183,8 @@ pending_objects = {{ }}
 pending_min_index = 999999999999999
 # List of objects which are already finished
 done_objects = {{ }}
+# List of objects which should be ordered
+order_objects = {{ }}
 
 src_stack.append(src)
 global_object = {{ 'id': '@global@', 'tags': {{ }}, 'types': ['global'], 'state': ('start', 0), 'geo': None }}
@@ -366,6 +368,26 @@ while src:
                 if result[2] not in combined_objects[result[1]]:
                     combined_objects[result[1]][result[2]] = []
                 combined_objects[result[1]][result[2]].append(result[3])
+
+            elif result[0][0:6] == 'order-':
+                object['state'] = result
+
+                # the current object should be ordered. add to list of objects
+                # to be ordered (and initialize list if empty)
+                if not result[1] in order_objects:
+                    order_objects[result[1]] = {{
+                        'order': result[0],
+                        'objects': [],
+                    }}
+
+                order_objects[result[1]]['objects'].append((object, result[2]))
+
+                # also remember object in pending_objects
+                pending_objects[object['id']] = object
+                object_check = None
+                if result[1] < pending_min_index:
+                    pending_min_index = result[1]
+
             else:
                 plpy.warning('unknown check result: ', result)
 
@@ -446,7 +468,33 @@ while src:
 
         combined_objects = {{ }}
 
-    # before 4th: all current sources are done, we can assume all variable
+    # 4th: order objects
+    if len(order_objects):
+        min_index = sorted(order_objects.keys())[0]
+        order_type = order_objects[min_index]['order'].split('-')[1]
+        order_reverse = order_objects[min_index]['order'].split('-')[2] == 'desc'
+
+        if order_type == 'natural':
+            order_key = lambda key: [
+                int(c) if c.isdigit() else c
+                for c in re.split('([0-9]+)', key[1])
+            ]
+        elif order_type == 'alphabetical':
+            order_key = lambda key: key[1]
+        elif order_type == 'numerical':
+            order_key = lambda key: to_int(key[1]) or 0
+
+        plpy.warning(order_type, order_reverse)
+
+        src = sorted(order_objects[min_index]['objects'], reverse=order_reverse, key=order_key)
+        src = [
+            v[0]
+            for v in src
+        ]
+
+        del order_objects[min_index]
+
+    # before 5th: all current sources are done, we can assume all variable
     # assignments are finished up to this point.
     for k, v in global_data['variables-status'].items():
         if 'pending' in v:
@@ -454,7 +502,7 @@ while src:
                 v['done'] = v['pending']
             del v['pending']
 
-    # 4th: check if there are still pending_objects, process them next
+    # 5th: check if there are still pending_objects, process them next
     # pending_min_index always points to the next pending objects -> if it is
     # 999999999999999, there are no pending_objects any more
     if not src:
