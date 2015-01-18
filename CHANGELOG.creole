@@ -1,3 +1,9 @@
+0.10.1 release 2014-01-18
+* Some fixes concerning the DB/Overpass backend
+* Compatibility Python 3.4
+* Update Maki icons
+* some minor bugfixes, see Git log for details
+
 0.10.0 release 2014-01-04
 * New database backend 'overpass', which is also the new default database backend, including multipolygon support, relationship queries, ...
 * DB/osm2pgsql can optimize some queries with relationships. (e.g. relation[type=route] member)

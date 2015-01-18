@@ -32,6 +32,7 @@ class image_png(default):
             return prop['value']
 
         if os.path.exists(prop['value']):
+            from wand.image import Image
             img = Image(filename=prop['value'])
             self.data[prop['value']] = img.size
             if not prop['key'] in self.stat['global_data']:
