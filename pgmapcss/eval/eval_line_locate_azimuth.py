@@ -5,12 +5,12 @@ def eval_line_locate_azimuth(param, current):
     if len(param) < 2:
         return ''
 
-    l = float(eval_line_length([param[0]]))
+    l = float(eval_line_length([param[0]], current))
 
     f = eval_metric([param[1], 'px'], current)
     if f == '':
         # seems to be a geometry
-        f = float(eval_line_locate_point([ param[0], param[1] ]))
+        f = float(eval_line_locate_point([ param[0], param[1] ], current))
     else:
         f = float(f)
 

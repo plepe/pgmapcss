@@ -8,7 +8,7 @@ def eval_line_part(param, current):
     if len(param) == 1:
         return param[0]
 
-    length = float(eval_line_length([param[0]]))
+    length = float(eval_line_length([param[0]], current))
 
     # start position
     pos0 = eval_metric([ param[1], 'px' ], current)
