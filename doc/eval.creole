@@ -167,6 +167,7 @@ Mapnik < 3.0 can't read dynamic color values. Therefore pgmapcss has to know all
 | is_right_hand_traffic | [geometry, ["force"]] | boolean | checks if the geometry (default: the geometry of the current object) is in a region with right hand traffic. returns 'true', 'false' or 'partly' (if it crosses boundaries of left/right hand traffic). If the current viewport is in an area with only left-/right hand traffic, this function will only be evaluated once (unless "force" is passed as 2nd parameter).
 | intersects | geometry, geometry | boolean | check if the both geometries intersect (see [[http://postgis.net/docs/manual-2.0/ST_Intersects.html|Postgis: ST_Intersects]]) |
 | within | geometry, geometry | boolean | check if the the 1st geometry is completely inside the 2nd geometry (see [[http://postgis.net/docs/manual-2.0/ST_Within.html|Postgis: ST_Within]]) |
+| collect | geometry, geometry | geometry | Merge two geometries into one. Additionally to [[http://postgis.net/docs/manual-2.0/ST_Collect.html|ST_Collect]], the result is also [[http://postgis.net/docs/manual-2.0/ST_CollectionHomogenize.html|homogenized]]. |
 
 == Operator Functions ==
 * Functions usually used via their operator(s).
