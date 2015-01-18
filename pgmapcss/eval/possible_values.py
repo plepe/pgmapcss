@@ -23,7 +23,8 @@ def possible_values(value, prop, stat):
             return ( { value[2:] }, 3 )
         elif value[0:2] == 'V:':
             # TODO: check possible values of this variable
-            return ( { True }, 0 )
+            v = stat.property_values('@' + value[2:], max_prop_id=prop['id'] - 1)
+            return ( v, 3 )
         elif value[0:2] == 'f:':
             func = value[2:]
             if not func in eval_functions:

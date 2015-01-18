@@ -72,6 +72,13 @@ class _stat(dict):
         # Don't need 'eval_true' and 'warn_unresolvable' in cache_id, will be handled specially
         cache_id = prop + '-' + repr(pseudo_element) + '-' + repr(include_illegal_values) + '-' + repr(value_type) + '-' + repr(max_prop_id) + '-' + repr(include_none) + '-' + repr(object_type) + '-' + repr(postprocess)
 
+        if prop[0:1] == '@':
+            prop_name = prop[1:]
+            prop_assignment_type = 'V'
+        else:
+            prop_name = prop
+            prop_assignment_type = 'P'
+
         # Check if values are already calculated in cache
         if cache_id in self.property_values_cache:
             values = self.property_values_cache[cache_id]
@@ -98,7 +105,7 @@ class _stat(dict):
             for p in v['properties']
             if object_type is None or v['selector']['type'] == object_type
             if pseudo_element == None or v['selector']['pseudo_element'] in ('*', pseudo_element)
-            if p['assignment_type'] == 'P' and p['key'] == prop
+            if p['assignment_type'] == prop_assignment_type and p['key'] == prop_name
             if value_type == None or value_type == p['value_type']
             if p['value_type'] != 'eval'
             if max_prop_id is None or p['id'] <= max_prop_id
@@ -114,7 +121,7 @@ class _stat(dict):
                 for v in self['statements']
                 for p in v['properties']
                 if pseudo_element == None or v['selector']['pseudo_element'] in ('*', pseudo_element)
-                if p['assignment_type'] == 'P' and p['key'] == prop
+                if p['assignment_type'] == prop_assignment_type and p['key'] == prop_name
                 if p['value_type'] == 'eval'
                 if max_prop_id is None or p['id'] <= max_prop_id
                 for v1 in pgmapcss.eval.possible_values(p['value'], p, self)[0]
