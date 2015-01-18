@@ -20,7 +20,7 @@ def to_color(value):
 
     try:
         from .color_names import color_names
-    except ValueError:
+    except SystemError:
         global color_names
 
     if value in color_names:
