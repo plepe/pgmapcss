@@ -133,6 +133,8 @@ This makes sure that the highway's name matches the streetname of the address no
 === Pseudo classes ===
 After the condition selector(s), separated by ':'. Several pseudo classes may be specified. They can also be negated by prepending by '!', e.g. '!:closed'. Optional.
 
+Some pseudo classes accept a parameter. This parameter may be the result of an eval expression, e.g. {{{:lang(list("en", "fr"))}}}.
+
 Unsupported pseudo classes are evaluated as false.
 
 The following pseudo classes are supported:
@@ -146,6 +148,9 @@ The following pseudo classes are supported:
 | :righthandtraffic | true if there is right-hand traffic at the current location
 | :lefthandtraffic | true if there is left-hand traffic at the current locatiown
 | :lang(fr) | true when the active language equals the one in brackets (e.g. french in this example). Combined languages codes (like "fr-ca") are not supported.
+| :order-numerical-asc(tag/expr), :order-numerical-desc(tag/expr) | Execute the following rule for all matching map features in order of the given tag or the value of the expression (useful in combination with global variables). Example: `node[natural=peak]:order-numerical-desc(ele)` which will order by the tag "ele", which typically contains the elevation of the peak. An example with an expression: `node[place=city]:order-numerical-asc(any(tag('population'), 10000))`, which will use the tag population of all places, but will use the value 10000 if the tag is not set.
+| :order-alphabetical-asc(tag/expr), :order-alphabetical-desc(tag/expr) | Like :order-numerical-asc(), but will apply an alphabetical sort order.
+| :order-natural-asc(tag/expr), :order-natural-desc(tag/expr) | Like :order-numerical-asc(), but will apply a natural sort order.
 
 === Pseudo elements ===
 After the pseudo class(es), separated by '::'. Optional.

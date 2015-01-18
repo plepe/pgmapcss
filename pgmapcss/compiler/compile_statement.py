@@ -3,6 +3,8 @@ from .compile_link_selector import compile_link_selector
 from .compile_properties import compile_properties
 from .compile_conditions import compile_conditions
 from .compile_media_query import compile_media_query
+from .compile_pseudo_class_actions import compile_pseudo_class_actions
+from .compile_eval import *
 
 def and_join(lst):
     if len(lst) == 0:
@@ -53,6 +55,8 @@ def compile_statement(statement, stat, indent=''):
                 c['key'] if 'key' in c else None
                 for c in object_selector['conditions']
             ]) + '\n'
+
+    ret['body'] += compile_pseudo_class_actions(object_selector, statement, stat, indent=indent)
 
     if 'link' in statement['selector']:
         ret['body'] += indent + '# link selector -> get list of objects, but return with "request", so that statements of parent objects up to the current statement can be processed. Remember link tags, add them later-on.\n'
