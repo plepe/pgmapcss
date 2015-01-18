@@ -5,6 +5,7 @@ for i in \
   motorway_junction.mapcss \
   places_population.mapcss \
   highest_peaks.mapcss \
+  highest_peaks_var.mapcss \
   housenumbers.mapcss \
   combined_roads.mapcss \
   tramway_network.mapcss \

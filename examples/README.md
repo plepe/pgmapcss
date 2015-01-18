@@ -156,6 +156,54 @@ node[natural=peak][!near_ele] {
 }
 ```
 
+Highest Peaks (using global variables)
+======================================
+This is an optimized version of the "Highest Peak" above. In this example, not the relationship between nearby peaks is used, instead all peaks in the bounding box are sorted by elevation descending and the geometry of the peaks are collected in a global variable. If the buffer around the "current" peak intersects any peaks in the global variable, it is not the highest in the area.
+
+This is much more performant as the original approach, where the nearest peaks for each peak had to be queried and compared. The main difference in the output is, that peaks outside the bounding box are not incorporated.
+
+These features (order by value, global variables, collecting geometries) were introduced in version 0.11.
+
+![highest_peaks_var](highest_peaks_var.png)
+```css
+/* Initialize variable '@geo_highest_peaks', which will be a geometry
+ * containing all nodes of highest peaks. */
+@geo_highest_peaks: ;
+
+node[natural=peak] {
+  text: eval(concat(tag(name), ' (', tag(ele), ')'));
+  icon-image: triangle;
+  icon-width: 12;
+  text-offset: 8;
+  point-text-layer: 3;
+  icon-layer: 2;
+  z-index: 4;
+}
+
+/* We process all peaks ordered by elevation descending. If the peak (including
+ * a buffer of 128px) does not intersect any points in the @geo_highest_peaks,
+ * it must be the highest peak in the region */
+node[natural=peak]:order-numerical-desc(ele) {
+  /* check if the current peak is the highest peak in region */
+  set .is_highest = !intersects(@geo_highest_peaks, buffer(prop('geo'), 128px));
+  /* if it is, add the geometry of the current peak to @geo_highest_peaks, otherwise leave @geo_highest_peaks untouched */
+  @geo_highest_peaks: cond(tag('.is_highest'), collect(@geo_highest_peaks, prop('geo')), @geo_highest_peaks);
+}
+
+/* If .is_highest is true, emphasize */
+node[natural=peak][.is_highest?] {
+  font-size: 14;
+  text-color: red;
+  z-index: 3;
+  icon-image: triangle;
+  icon-width: 18;
+  icon-color: red;
+  text-offset: 10;
+  point-text-layer: 1;
+  icon-layer: 0;
+}
+```
+
 Housenumbers
 ============
 Professional maps usually have the housenumbers rotated to be parallel to the associated street. The following mapcss file achieves this, by using an invisible line where the housenumber is printed on. The right image shows a "debug" view, where the construction of the "invisible" (here blue) line is shown. You can remove all statements marked with "DEBUG" from the mapcss file.
