@@ -43,7 +43,7 @@ def selector_check_variables(selector, stat):
         if condition['op'] == 'eval':
             ret = ret.union(eval_uses_variables(condition['key'], stat))
 
-        elif condition['value_type'] == 'eval':
+        elif 'value_type' in condition and condition['value_type'] == 'eval':
             ret = ret.union(eval_uses_variables(condition['value'], stat))
 
     if 'parent' in selector:
