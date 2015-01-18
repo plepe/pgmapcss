@@ -39,6 +39,6 @@ def compile_pseudo_class_condition(condition, stat):
             return ['False']
 
         if condition['value_type'] == 'eval':
-            return ["parameters['lang'] == " + compile_eval(condition['value'], condition, stat)]
+            return ["parameters['lang'] in " + compile_eval(condition['value'], condition, stat) + ".split(';')"]
         else:
-            return ["parameters['lang'] == " + repr(condition['value'])]
+            return ["parameters['lang'] in " + repr(condition['value'].split(';'))]
