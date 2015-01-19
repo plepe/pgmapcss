@@ -26,10 +26,11 @@ class pixels(default):
 
 
     def compile_postprocess(self):
+        code, eval_options = compile_eval([ 'o:+', [ 'f:prop', 'v:' + self.key, 'v:default' ], [ 'f:prop', 'v:' + self.key ]], { 'key': self.key }, self.stat)
         return "if " + repr(self.key) + " in current['properties'][pseudo_element] and current['properties'][pseudo_element][" + repr(self.key) + "] is not None and len(current['properties'][pseudo_element][" + repr(self.key) + "]) > 0 and current['properties'][pseudo_element][" + repr(self.key) + "][0] == '+':\n" +\
                "    if pseudo_element != 'default':\n" +\
                "        current['properties'][pseudo_element][" + repr(self.key) + "] = " +\
-               compile_eval([ 'o:+', [ 'f:prop', 'v:' + self.key, 'v:default' ], [ 'f:prop', 'v:' + self.key ]], { 'key': self.key }, self.stat) + "\n" +\
+               code + "\n" +\
                "    else:\n" +\
                "        current['properties'][pseudo_element][" + repr(self.key) + "] = " +\
                "current['properties'][pseudo_element][" + repr(self.key) + "][1:]"
@@ -77,7 +78,9 @@ class pixels(default):
         if v[1] == 'px':
             return repr(v[0])
 
-        return prefix + self.compile_check(compile_eval([ 'f:metric', 'v:' + v[0] + v[1] ], prop, self.stat))
+        code, eval_options = compile_eval([ 'f:metric', 'v:' + v[0] + v[1] ], prop, self.stat)
+
+        return prefix + self.compile_check(code)
 
     def stat_value(self, prop):
         v = self._parse(prop['value'])

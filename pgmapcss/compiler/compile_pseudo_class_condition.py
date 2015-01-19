@@ -16,7 +16,8 @@ def compile_pseudo_class_condition(condition, stat):
         return ['False']
 
     elif condition['key'] == 'closed':
-        return [compile_eval('f:is_closed', condition, stat) + " == 'true'"]
+        code, eval_options = compile_eval('f:is_closed', condition, stat)
+        return [code + " == 'true'"]
 
     elif condition['key'] == 'connection':
         return ["len(list(objects_member_of(current['object']['id'], 'way', None))) > 1"]
@@ -28,10 +29,12 @@ def compile_pseudo_class_condition(condition, stat):
         return ["len({ k: v for k, v in current['tags'].items() if not re.match('(source.*|note|comment|converted_by|created_by|watch.*|fixme|FIXME|description|attribution)$', k) }) != 0"]
 
     elif condition['key'] == 'righthandtraffic':
-        return [compile_eval('f:is_right_hand_traffic', condition, stat) + " != 'false'"]
+        code, eval_options = compile_eval('f:is_right_hand_traffic', condition, stat)
+        return [code + " != 'false'"]
 
     elif condition['key'] == 'lefthandtraffic':
-        return [compile_eval('f:is_left_hand_raffic', condition, stat) + " != 'false'"]
+        code, eval_options = compile_eval('f:is_left_hand_raffic', condition, stat)
+        return [code + " != 'false'"]
 
     elif condition['key'] == 'lang':
         if not 'value' in condition:
@@ -39,6 +42,7 @@ def compile_pseudo_class_condition(condition, stat):
             return ['False']
 
         if condition['value_type'] == 'eval':
-            return ["parameters['lang'] in " + compile_eval(condition['value'], condition, stat) + ".split(';')"]
+            code, eval_options = compile_eval(condition['value'], condition, stat)
+            return ["parameters['lang'] in " + code + ".split(';')"]
         else:
             return ["parameters['lang'] in " + repr(condition['value'].split(';'))]

@@ -7,7 +7,8 @@ def compile_pseudo_class_action(condition, statement, stat, indent=''):
     if condition['key'] in ('order-natural-asc', 'order-natural-desc', 'order-alphabetical-asc', 'order-alphabetical-desc', 'order-numerical-asc', 'order-numerical-desc'):
         ret = indent + "yield (" + repr(condition['key']) + ", " + repr(statement['id']) + ", "
         if condition['value_type'] == 'eval':
-            ret += compile_eval(condition['value'], condition, stat)
+            code, eval_options = compile_eval(condition['value'], condition, stat)
+            ret += code
         else:
             ret += "current['tags'][" + repr(condition['value']) + "] if " + repr(condition['value']) + " in current['tags'] else None"
 

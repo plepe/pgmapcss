@@ -11,10 +11,11 @@ def compile_value(prop, stat):
         prop_type = pgmapcss.types.default(None, stat);
 
     if prop['value_type'] == 'eval':
-        return prop_type.compile_check(compile_eval(prop['value'], prop, stat))
+        code, eval_options = compile_eval(prop['value'], prop, stat)
+        return prop_type.compile_check(code), eval_options
 
     elif prop['value'] == None:
-        return 'None'
+        return 'None', {}
 
     else:
-        return prop_type.compile(prop)
+        return prop_type.compile(prop), {}

@@ -97,8 +97,9 @@ def print_postprocess(prop, stat, indent=''):
     # postprocess requested properties (see @postprocess)
     if prop in stat['defines']['postprocess']:
         v = stat['defines']['postprocess'][prop]
+        code, eval_options = compile_eval(v['value'], v, stat)
         ret += indent + "current['properties'][pseudo_element][" + repr(prop) +\
-           "] = " + compile_eval(v['value'], v, stat) + '\n'
+           "] = " + code + '\n'
 
     # if property has been postprocessed (because it is ad depending property
     # in several main properties), don't process again

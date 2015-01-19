@@ -65,6 +65,10 @@ class config_base:
 #          (e.g. zoom() => { 1, 2, 3, ..., 18 }
 #   True .. it's not possible to predict the result of this function (e.g. random())
 # the second element is the mutability, see above
+# an optional third element (dict) contains additional information, e.g. requirements:
+# {
+#   'requirements': { 'geo', 'meta' }
+# }
     def possible_values(self, param_values, prop, stat):
         m = self.mutable
 

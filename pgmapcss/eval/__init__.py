@@ -1,5 +1,6 @@
 from .config import load
 from .possible_values import possible_values
+from .merge_options import merge_options
 
 eval_functions = None
 
