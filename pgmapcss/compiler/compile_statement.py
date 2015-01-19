@@ -4,7 +4,6 @@ from .compile_properties import compile_properties
 from .compile_conditions import compile_conditions
 from .compile_media_query import compile_media_query
 from .compile_pseudo_class_actions import compile_pseudo_class_actions
-from .compile_eval import *
 
 def and_join(lst):
     if len(lst) == 0:

@@ -1,5 +1,4 @@
 from .default import default
-from ..compiler.compile_eval import compile_eval
 import re
 
 class angle(default):
