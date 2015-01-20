@@ -30,6 +30,10 @@ class config_base:
     op = None
     unary = False
     aliases = None
+    eval_options = dict()
+# eval options contains additional information, e.g. requirements
+# if the possible_values or possible_values_all functions are overridden, these
+# function need to return eval_options as third value
     mutable = 0
 # 'mutable' says whether a function returns different output for the same set
 # of input parameters:
@@ -73,12 +77,12 @@ class config_base:
         m = self.mutable
 
         if True in param_values:
-            return ( True, 0 )
+            return ( True, 0, self.eval_options )
 
         if callable(m):
             m = self.mutable(param_values, stat)
 
         if m == 3:
-            return ( self(param_values, stat), m )
+            return ( self(param_values, stat), m, self.eval_options )
 
-        return ( True, m )
+        return ( True, m, self.eval_options )
