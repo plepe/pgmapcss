@@ -1,5 +1,8 @@
 class config_eval_is_right_hand_traffic(config_base):
     mutable = 1
+    eval_options = {
+        'requirements': { 'geo' }
+    }
 
 def eval_is_right_hand_traffic(param, current):
     force = False

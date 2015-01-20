@@ -1,5 +1,17 @@
-class config_is_closed(config_base):
-    mutable = 1
+class config_eval_is_closed(config_base):
+    def possible_values(self, param_values, prop, stat):
+        result = config_base.possible_values(self, param_values, prop, stat)
+        eval_options = {}
+        if len(result) > 2:
+            eval_options = result[2]
+
+        if len(param_values) == 0:
+            if 'requirements' in eval_options:
+                eval_options['requirements'].add('geo')
+            else:
+                eval_options['requirements'] = { 'geo' }
+
+        return result[0], result[1], eval_options
 
 def eval_is_closed(param, current):
     if len(param) > 0:
