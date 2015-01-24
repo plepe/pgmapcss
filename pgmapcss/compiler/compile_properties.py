@@ -1,24 +1,24 @@
 import pgmapcss.db as db
 from .compile_eval import compile_eval
 from .compile_value import compile_value
+from .compile_requirements import compile_requirements
 from .CompileError import CompileError
 
 def compile_properties(statement, stat, indent=''):
     ret = ''
-    eval_options = {}
 
     for prop in statement['properties']:
         if prop['assignment_type'] == 'P':
-            code, eval_options = compile_value(prop, stat)
+            res = compile_value(prop, stat)
 
-            if code == None:
+            if res == None:
                 raise CompileError('Illegal value for property "%s" found: "%s"' % ( prop['key'], prop['value'] ))
 
             ret += indent + "current['properties'][" + statement['current_pseudo_element'] + ']' +\
-                '[' + repr(prop['key']) + '] = ' + code + '\n'
+                '[' + repr(prop['key']) + '] = ' + res['code'] + '\n'
 
         elif prop['assignment_type'] == 'T':
-            code, eval_options = compile_value(prop, stat)
+            res = compile_value(prop, stat)
             ret += indent
 
             # JOSM classes ("set foo" => set ".foo" too)
@@ -28,7 +28,7 @@ def compile_properties(statement, stat, indent=''):
                     '[' + repr('.' + prop['key']) + '] = '
 
             ret += "current['tags']" +\
-                '[' + repr(prop['key']) + '] = ' + code + '\n'
+                '[' + repr(prop['key']) + '] = ' + res['code'] + '\n'
 
         elif prop['assignment_type'] == 'U':
             # JOSM classes ("set foo" => set ".foo" too)
@@ -39,13 +39,16 @@ def compile_properties(statement, stat, indent=''):
             ret += indent + "current['tags'].pop(" + repr(prop['key']) + ', None)\n'
 
         elif prop['assignment_type'] == 'C':
-            code, eval_options = compile_value(prop, stat)
+            res = compile_value(prop, stat)
             ret += indent + '''yield(( 'combine', ''' + repr(prop['key']) + \
-            ', ' + code + ''', {
+            ', ' + res['code'] + ''', {
     'id': object['id'],
     'tags': current['tags'],
     'geo': current['properties'][''' + statement['current_pseudo_element'] + ''']['geo'] if 'geo' in current['properties'][''' + statement['current_pseudo_element'] + '''] else current['object']['geo']
 }))
 '''
+
+        if 'options' in res:
+            ret = compile_requirements(res['options'], prop, stat, indent) + ret
 
     return ret

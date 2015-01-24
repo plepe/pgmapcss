@@ -26,14 +26,15 @@ class pixels(default):
 
 
     def compile_postprocess(self):
-        code, eval_options = compile_eval([ 'o:+', [ 'f:prop', 'v:' + self.key, 'v:default' ], [ 'f:prop', 'v:' + self.key ]], { 'key': self.key }, self.stat)
-        return "if " + repr(self.key) + " in current['properties'][pseudo_element] and current['properties'][pseudo_element][" + repr(self.key) + "] is not None and len(current['properties'][pseudo_element][" + repr(self.key) + "]) > 0 and current['properties'][pseudo_element][" + repr(self.key) + "][0] == '+':\n" +\
+        result = compile_eval([ 'o:+', [ 'f:prop', 'v:' + self.key, 'v:default' ], [ 'f:prop', 'v:' + self.key ]], { 'key': self.key }, self.stat)
+        result['code'] = "if " + repr(self.key) + " in current['properties'][pseudo_element] and current['properties'][pseudo_element][" + repr(self.key) + "] is not None and len(current['properties'][pseudo_element][" + repr(self.key) + "]) > 0 and current['properties'][pseudo_element][" + repr(self.key) + "][0] == '+':\n" +\
                "    if pseudo_element != 'default':\n" +\
                "        current['properties'][pseudo_element][" + repr(self.key) + "] = " +\
-               code + "\n" +\
+               result['code'] + "\n" +\
                "    else:\n" +\
                "        current['properties'][pseudo_element][" + repr(self.key) + "] = " +\
                "current['properties'][pseudo_element][" + repr(self.key) + "][1:]"
+        return result['code']
 
     def stat_postprocess(self, values, pseudo_element=None):
         ret = set()
@@ -78,9 +79,9 @@ class pixels(default):
         if v[1] == 'px':
             return repr(v[0])
 
-        code, eval_options = compile_eval([ 'f:metric', 'v:' + v[0] + v[1] ], prop, self.stat)
+        result = compile_eval([ 'f:metric', 'v:' + v[0] + v[1] ], prop, self.stat)
 
-        return prefix + self.compile_check(code)
+        return prefix + self.compile_check(result['code'])
 
     def stat_value(self, prop):
         v = self._parse(prop['value'])

@@ -24,11 +24,17 @@ def compile_eval(value, prop, stat):
     if mutable == 3 and len(possible_values) == 1:
         possible_values = possible_values.pop()
         if type(possible_values) == str:
-            return repr(possible_values), eval_options
+            return {
+                'code': repr(possible_values),
+                'options': eval_options,
+            }
 
     if type(value) == str:
         if value[0:2] == 'v:':
-            return repr(value[2:]), eval_options
+            return {
+                'code': repr(value[2:]),
+                'options': eval_options,
+            }
 
         elif value[0:2] == 'f:':
             func = value[2:]
@@ -38,22 +44,29 @@ def compile_eval(value, prop, stat):
                 else:
                     raise Exception('Unknown eval function: ' + func)
 
-            return eval_functions[func].compiler([], eval_param, stat), eval_options
+            return {
+                'code': eval_functions[func].compiler([], eval_param, stat),
+                'options': eval_options,
+            }
 
         else:
             raise Exception('compiling eval: ' + repr(value))
 
     if len(value) == 0:
-        return '', eval_options
+        return {
+            'code': '',
+            'options': eval_options,
+        }
 
     if not value[0][0:2] in ('f:', 'o:', 'u:'):
-        ret, o = compile_eval(value[0], prop, stat)
-        return ret, pgmapcss.eval.merge_options(eval_options, o)
+        ret = compile_eval(value[0], prop, stat)
+        ret['options'] = pgmapcss.eval.merge_options(eval_options, ret['options'])
+        return ret
 
     results = [ compile_eval(i, prop, stat) for i in value[1:] ]
-    param = [ r[0] for r in results ]
+    param = [ r['code'] for r in results ]
     for r in results:
-        eval_options = pgmapcss.eval.merge_options(eval_options, r[1])
+        eval_options = pgmapcss.eval.merge_options(eval_options, r['options'])
 
     if value[0][0:2] == 'o:':
         func = [ k for k, v in eval_functions.items() if value[0][2:] in v.op and not v.unary ][0]
@@ -70,4 +83,7 @@ def compile_eval(value, prop, stat):
         else:
             raise Exception('Unknown eval function: ' + func)
 
-    return eval_functions[func].compiler(param, eval_param, stat), eval_options
+    return {
+        'code': eval_functions[func].compiler(param, eval_param, stat),
+        'options': eval_options,
+    }

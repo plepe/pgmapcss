@@ -4,6 +4,7 @@ from .compile_properties import compile_properties
 from .compile_conditions import compile_conditions
 from .compile_media_query import compile_media_query
 from .compile_pseudo_class_actions import compile_pseudo_class_actions
+import pgmapcss.eval.merge_options
 
 def and_join(lst):
     if len(lst) == 0:
@@ -37,7 +38,7 @@ def list_eval_functions(statement, stat):
 #   'body': tags['foo'] = 'bar'
 # }
 def compile_statement(statement, stat, indent=''):
-    ret = { 'check': [], 'body': '' }
+    ret = { 'check': [], 'body': '', 'id': statement['id'] }
     object_selector = statement['selector']
 
     if 'media' in statement:
@@ -45,7 +46,8 @@ def compile_statement(statement, stat, indent=''):
         if v:
             ret['check'].append(v)
 
-    ret['check'] += compile_selector_part(object_selector, stat)
+    res = compile_selector_part(object_selector, stat)
+    ret['check'] += res
 
     # for tr() function -> replace {0.tag} and similar
     # TODO: include only in body, when tr() is being used
@@ -66,10 +68,12 @@ def compile_statement(statement, stat, indent=''):
         ret['body'] += indent + "current['parent_object'] = parent_object\n"
         ret['body'] += indent + "current['link_object'] = { 'tags': link_tags }\n"
         ret['body'] += indent + "current['link_object']['tags']['index'] = str(parent_index)\n"
+        res_parent = compile_conditions(statement['selector']['parent']['conditions'], stat, "current['parent_object']['tags']")
+        res_link = compile_conditions(statement['selector']['link']['conditions'], stat, "current['link_object']['tags']")
         ret['body'] += indent + 'if (' +\
-          and_join(compile_conditions(statement['selector']['parent']['conditions'], stat, "current['parent_object']['tags']")) +\
+          and_join(res_parent['code']) +\
           ') and (' +\
-          and_join(compile_conditions(statement['selector']['link']['conditions'], stat, "current['link_object']['tags']")) + '):\n'
+          and_join(res_link['code']) + '):\n'
 
         indent += '    '
         ret['body'] += indent + 'current[\'parent_object\'] = parent_object\n'

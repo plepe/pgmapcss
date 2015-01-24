@@ -406,31 +406,36 @@ while src:
             request = objects_members(objects_list, request_type['other_selects'], request_type['self_selects'], request_type['options'])
         elif request_type['type'] == 'objects_near':
             request = objects_near(objects_list, request_type['other_selects'], request_type['self_selects'], request_type['options'])
+        elif request_type['type'] == 'objects_by_id':
+            request = objects_by_id(objects_list, request_type['options'])
         else:
             plpy.warning('unknown request type {{}}', request_type['type'])
 
         for o in objects_list:
             o['state'] = ( 'pending', o['state'][1], [] )
 
-        for request_object, src_object, link_tags in request:
-            if src_object['id'] in pending_objects:
-                src_object = pending_objects[src_object['id']]
-            elif src_object['id'] in src:
-                # this object was already returned by this request -> make sure
-                # we use the same object again
-                src_object = src[src_object['id']]
-            elif src_object['id'] not in done_objects:
-                src[src_object['id']] = src_object
-            else:
-                # object has already be done before -> don't add to
-                # pending_objects
-                pass
+        if request_type['type'] == 'objects_by_id':
+            src = request
+        else:
+            for request_object, src_object, link_tags in request:
+                if src_object['id'] in pending_objects:
+                    src_object = pending_objects[src_object['id']]
+                elif src_object['id'] in src:
+                    # this object was already returned by this request -> make sure
+                    # we use the same object again
+                    src_object = src[src_object['id']]
+                elif src_object['id'] not in done_objects:
+                    src[src_object['id']] = src_object
+                else:
+                    # object has already be done before -> don't add to
+                    # pending_objects
+                    pass
 
-            request_object['state'][2].append(( src_object, link_tags))
+                request_object['state'][2].append(( src_object, link_tags))
 
-        src = list(src.values())
-        if len(src) == 0:
-            src = None
+            src = list(src.values())
+            if len(src) == 0:
+                src = None
 
     # 2nd: check if there's still a src in the src_stack
     if not src:

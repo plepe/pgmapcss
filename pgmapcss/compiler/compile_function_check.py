@@ -2,6 +2,7 @@ from .compile_statement import compile_statement
 from .compile_selector_part import compile_selector_part
 import copy
 from collections import Counter
+from .compile_requirements import compile_requirements
 
 def compile_function_check(statements, min_scale, max_scale, stat):
     replacement = {
@@ -43,22 +44,23 @@ def check_{min_scale_esc}(object):
         # if the statement has a parent selector, check if the current object
         # might be a parent. if yes, return with state "pending"
         if 'parent_selector' in i:
-            r = {
-                'check': compile_selector_part(i['parent_selector'], stat),
-                'body': "yield (('pending', " + str(i['id']) + "))\n"
-            }
-            compiled_statements.append(r)
+            result = compile_selector_part(i['parent_selector'], stat)
+            result['body'] = "yield ('pending', " + str(i['id']) + ")\n"
+            result['check'] = result['code']
+            del result['code']
+            print('parent_selector', result)
+            compiled_statements.append(result)
 
         compiled_statements.append(compile_statement(i, stat))
 
     check_count = dict(Counter([
-        check
+        check['code']
         for c in compiled_statements
         for check in c['check']
     ]))
 
     def sort_check_count(c):
-        return check_count[c]
+        return check_count[c['code']]
 
     indent = '    '
     current_checks = []
@@ -81,7 +83,9 @@ def check_{min_scale_esc}(object):
         for c in checks:
             if not c in current_checks:
                 current_checks += [ c ]
-                ret += indent + 'if ' + c + ":\n"
+                if 'options' in c:
+                    ret += compile_requirements(c['options'], { 'id': i['id'] }, stat, indent=indent)
+                ret += indent + 'if ' + c['code'] + ":\n"
                 indent += '    '
 
         ret += '\n'.join(indent + x for x in i['body'].splitlines())

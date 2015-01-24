@@ -7,10 +7,11 @@ def compile_condition(condition, stat, var="current['tags']"):
     ret = []
     final_value = None
     negate = False
-    eval_options = {}
+    result = {}
 
     if 'value_type' in condition and condition['value_type'] == 'eval':
-        final_value, eval_options = compile_eval(condition['value'], condition, stat)
+        result = compile_eval(condition['value'], condition, stat)
+        final_value = result['code']
 
     elif 'value' in condition:
         final_value = repr(condition['value'])
@@ -91,11 +92,12 @@ def compile_condition(condition, stat, var="current['tags']"):
 
     # eval(...)
     elif condition['op'] == 'eval':
-        code, eval_options = compile_eval(condition['key'], condition, stat)
-        ret.append(code + " not in ('', 'false', 'no', '0', None)")
+        # overwrite result, so that options will be returned
+        result = compile_eval(condition['key'], condition, stat)
+        ret.append(result['code'] + " not in ('', 'false', 'no', '0', None)")
 
     elif condition['op'] == 'pseudo_class':
-        ret += compile_pseudo_class_condition(condition, stat)
+        return compile_pseudo_class_condition(condition, stat)
 
     elif condition['op'] in ('key_regexp', 'key_regexp_case'):
         flags = ''
@@ -115,4 +117,5 @@ def compile_condition(condition, stat, var="current['tags']"):
     if negate:
         ret = ['not (' + ' and '.join(ret) + ')']
 
-    return ret;
+    result['code'] = ret
+    return result
