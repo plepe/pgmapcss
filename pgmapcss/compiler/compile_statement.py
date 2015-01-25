@@ -71,9 +71,9 @@ def compile_statement(statement, stat, indent=''):
         res_parent = compile_conditions(statement['selector']['parent']['conditions'], stat, "current['parent_object']['tags']")
         res_link = compile_conditions(statement['selector']['link']['conditions'], stat, "current['link_object']['tags']")
         ret['body'] += indent + 'if (' +\
-          and_join(res_parent['code']) +\
+          and_join([ r['code'] for r in res_parent ]) +\
           ') and (' +\
-          and_join(res_link['code']) + '):\n'
+          and_join([ r['code'] for r in res_link ]) + '):\n'
 
         indent += '    '
         ret['body'] += indent + 'current[\'parent_object\'] = parent_object\n'
