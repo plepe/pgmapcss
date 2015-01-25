@@ -539,7 +539,7 @@ def objects_member_of(objects, other_selects, self_selects, options):
                 for si, ss in other_selects.items()
             ]) + ');'
 
-            q += 'out meta qt geom;'
+            q += 'out body qt;'
 
             for r1, r2 in replacements.items():
                 q = q.replace(r1, r2)
@@ -594,8 +594,7 @@ def objects_members(objects, other_selects, self_selects, options):
                 ss['query'].replace('__TYPE__', ob_type)
                 for si, ss in self_selects.items()
             ]) + ');'
-            q += 'out meta qt geom;'
-            # TODO: out body qt; would be sufficient, but need to adapt assemble_object
+            q += 'out body qt;'
             for r1, r2 in replacements.items():
                 q = q.replace(r1, r2)
 
@@ -623,7 +622,7 @@ def objects_members(objects, other_selects, self_selects, options):
                 for si, ss in other_selects.items()
             ]) + ');'
 
-            q += 'out meta qt geom;'
+            q += 'out body qt;'
         # TODO: .a out body qt; would be sufficient, but need to adapt assemble_object
             for r1, r2 in replacements.items():
                 q = q.replace(r1, r2)
