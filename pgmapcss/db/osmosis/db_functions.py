@@ -178,16 +178,23 @@ where ({w}) and not id = ANY(Array[{done}]::bigint[])) t
 
 def objects_by_id(id_list, options):
     _id_list = [ int(i[1:]) for i in id_list if i[0] == 'n' ]
-    plan = plpy.prepare('select id, tags, geom from nodes where id=any($1)', ['bigint[]']);
+    plan = plpy.prepare('select *, (select name from users where id=user_id) as user from nodes where id=any($1)', ['bigint[]']);
     res = plpy.cursor(plan, [_id_list])
     for r in res:
-        yield {
+        t = {
             'id': 'n' + str(r['id']),
             'members': [],
             'tags': pghstore.loads(r['tags']),
             'geo': r['geom'],
             'types': ['node', 'point']
         }
+        t['tags']['osm:id'] = str(t['id'])
+        t['tags']['osm:version'] = str(r['version'])
+        t['tags']['osm:user_id'] = str(r['user_id'])
+        t['tags']['osm:user'] = r['user']
+        t['tags']['osm:timestamp'] = str(r['tstamp'])
+        t['tags']['osm:changeset'] = str(r['changeset_id'])
+        yield(t)
 
     _id_list = [ int(i[1:]) for i in id_list if i[0] == 'w' ]
     plan = plpy.prepare('select id, tags, version, user_id, (select name from users where id=user_id) as user, tstamp, changeset_id, linestring as linestring, array_agg(node_id) as member_ids from (select ways.*, node_id from ways left join way_nodes on ways.id=way_nodes.way_id where ways.id=any($1) order by way_nodes.sequence_id) t group by id, tags, version, user_id, tstamp, changeset_id, linestring', ['bigint[]']);
