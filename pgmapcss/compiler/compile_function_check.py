@@ -99,6 +99,16 @@ def check_{min_scale_esc}(object):
 
             ret = build_result(current, pseudo_element)
 
+            # if 'geo' has been modified, it can be read from properties, if
+            # not directly from object
+            if 'geo' in current['properties'][pseudo_element]:
+                # set geo as return value AND remove key from properties
+                ret['geo'] = current['properties'][pseudo_element].pop('geo');
+            else:
+                if not 'geo' in current['object']:
+                    yield 'request', 999999999999999, {{ 'type': 'objects_by_id', 'options': {{ 'requirements': {{'geo'}} }} }}
+                ret['geo'] = current['object']['geo']
+
             yield(( 'result', ret))
 '''.format(**replacement)
 

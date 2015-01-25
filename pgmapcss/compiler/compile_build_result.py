@@ -70,14 +70,6 @@ def build_result(current, pseudo_element):
         ret += print_postprocess(prop, stat, indent=indent)
 
     ret += indent + '''\
-# if 'geo' has been modified, it can be read from properties, if
-# not directly from object
-if 'geo' in current['properties'][pseudo_element]:
-    # set geo as return value AND remove key from properties
-    ret['geo'] = current['properties'][pseudo_element].pop('geo');
-else:
-    ret['geo'] = current['object']['geo']
-
 ret['properties'] = current['properties'][pseudo_element]
 
 return ret
