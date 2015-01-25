@@ -78,9 +78,13 @@ def objects_bbox(bbox, db_selects, options):
     pass
 
 # objects_by_id() yields the specified objects from the database
+# objects is either an array of IDs or a list of already existing objects.
+# if existing objects are passed, the object must be modified, not re-created.
+# also, existing values (especially tags) should not be overwritten, as these
+# might have been modified by code.
 # an id is a string with the object type identifier and the id, e.g. 'n1234'
 # options: a dict, with additional settings (currently: none)
-def objects_by_id(id_list, options):
+def objects_by_id(objects, options):
     pass
 
 # objects_member_of(). For each object in the `objects` list, return all parent

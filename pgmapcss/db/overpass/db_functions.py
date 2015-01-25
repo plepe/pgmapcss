@@ -192,10 +192,12 @@ def relation_geom(r):
 
     return res[0]['geom']
 
-def assemble_object(r, way_polygon=None):
-    t = {
-        'tags': r['tags'] if 'tags' in r else {},
-    }
+def assemble_object(r, t=None, way_polygon=None):
+    if t is None:
+        t = {}
+
+    t['tags'] = r['tags'] if 'tags' in r else {}
+
     if r['type'] == 'node':
         t['id'] = 'n' + str(r['id'])
         t['types'] = ['node', 'point']
@@ -453,7 +455,12 @@ def objects_bbox(_bbox, db_selects, options):
 
             yield(assemble_object(r))
 
-def objects_by_id(id_list, options):
+def objects_by_id(objects, options):
+    id_list = {
+        (i['id'] if type(i) == dict else i): (i if type(i) == dict else {})
+        for i in objects
+    }
+
     q = ''
     multipolygons = []
     for o in objects:
@@ -471,7 +478,8 @@ def objects_by_id(id_list, options):
     q = '[out:json];' + q
 
     for r in overpass_query(q):
-        yield(assemble_object(r))
+        id = r['type'][0] + str(r['id'])
+        yield(assemble_object(r, id_list[id]))
 
 def objects_member_of(objects, other_selects, self_selects, options):
     global member_of_cache

@@ -176,67 +176,76 @@ where ({w}) and not id = ANY(Array[{done}]::bigint[])) t
             r['tags']['osm:changeset'] = str(r['changeset_id'])
             yield(r)
 
-def objects_by_id(id_list, options):
+def objects_by_id(objects, options):
+    id_list = {
+        (i['id'] if type(i) == dict else i): (i if type(i) == dict else {})
+        for i in objects
+    }
+
     _id_list = [ int(i[1:]) for i in id_list if i[0] == 'n' ]
     plan = plpy.prepare('select id, tags, geom from nodes where id=any($1)', ['bigint[]']);
     res = plpy.cursor(plan, [_id_list])
     for r in res:
-        yield {
-            'id': 'n' + str(r['id']),
-            'members': [],
-            'tags': pghstore.loads(r['tags']),
-            'geo': r['geom'],
-            'types': ['node', 'point']
-        }
+        i = 'n' + str(r['id'])
+        t = id_list[i]
+
+        t['id'] = i
+        t['members'] = []
+        t['tags'] = pghstore.loads(r['tags'])
+        t['geo'] = r['geom']
+        t['types'] = ['node', 'point']
+        yield t
 
     _id_list = [ int(i[1:]) for i in id_list if i[0] == 'w' ]
     plan = plpy.prepare('select id, tags, version, user_id, (select name from users where id=user_id) as user, tstamp, changeset_id, linestring as linestring, array_agg(node_id) as member_ids from (select ways.*, node_id from ways left join way_nodes on ways.id=way_nodes.way_id where ways.id=any($1) order by way_nodes.sequence_id) t group by id, tags, version, user_id, tstamp, changeset_id, linestring', ['bigint[]']);
     res = plpy.cursor(plan, [_id_list])
     for r in res:
-        t = {
-            'id': 'w' + str(r['id']),
-            'members': [ {
+        i = 'w' + str(r['id'])
+        t = id_list[i]
+
+        t['id'] = i
+        t['members'] = [ {
                     'member_id': 'n' + str(m),
                     'sequence_id': str(i)
                 }
                 for i, m in enumerate(r['member_ids'])
-            ],
-            'tags': pghstore.loads(r['tags']),
-            'geo': r['linestring'],
-            'types': ['way', 'line', 'area']
-        }
+            ]
+        t['tags'] = pghstore.loads(r['tags'])
+        t['geo'] = r['linestring']
+        t['types'] = ['way', 'line', 'area']
         t['tags']['osm:id'] = str(t['id'])
         t['tags']['osm:version'] = str(r['version'])
         t['tags']['osm:user_id'] = str(r['user_id'])
         t['tags']['osm:user'] = r['user']
         t['tags']['osm:timestamp'] = str(r['tstamp'])
         t['tags']['osm:changeset'] = str(r['changeset_id'])
-        yield(t)
+        yield t
 
     _id_list = [ int(i[1:]) for i in id_list if i[0] == 'r' ]
     plan = plpy.prepare('select id, tags, version, user_id, (select name from users where id=user_id) as user, tstamp, changeset_id, array_agg(lower(member_type) || member_id) as member_ids, array_agg(member_role) as member_roles from (select relations.*, member_type, member_id, member_role from relations left join relation_members on relations.id=relation_members.relation_id where relations.id=any($1) order by relation_members.sequence_id) t group by id, tags, version, user_id, tstamp, changeset_id', ['bigint[]']);
     res = plpy.cursor(plan, [_id_list])
     for r in res:
-        t = {
-            'id': 'r' + str(r['id']),
-            'tags': pghstore.loads(r['tags']),
-            'members': [ {
+        i = 'r' + str(r['id'])
+        t = id_list[i]
+
+        t['id'] = i
+        t['tags'] = pghstore.loads(r['tags'])
+        t['members'] = [ {
                     'member_id': m[0],
                     'role': m[1],
                     'sequence_id': i
                 }
                 for i, m in enumerate(zip(r['member_ids'], r['member_roles']))
-            ],
-            'geo': None,
-            'types': ['relation']
-        }
+            ]
+        t['geo'] = None
+        t['types'] = ['relation']
         t['tags']['osm:id'] = str(t['id'])
         t['tags']['osm:version'] = str(r['version'])
         t['tags']['osm:user_id'] = str(r['user_id'])
         t['tags']['osm:user'] = r['user']
         t['tags']['osm:timestamp'] = str(r['tstamp'])
         t['tags']['osm:changeset'] = str(r['changeset_id'])
-        yield(t)
+        yield t
 
 def objects_member_of(objects, other_selects, self_selects, options):
     if 'relation' in other_selects:
