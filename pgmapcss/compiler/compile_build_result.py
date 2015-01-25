@@ -4,9 +4,18 @@ from .compile_eval import compile_eval
 def compile_build_result(stat):
     indent = '    '
 
+    result_properties = {
+        prop
+        for style_element, d in stat['defines']['style_element_property'].items()
+        for prop in d['value'].split(';')
+    }
+
     ret  = '''\
 def build_result(current, pseudo_element):
     has_postprocessed = set()
+
+    if len([ t for t in {result_properties} if t in current['properties'][pseudo_element] ]) == 0:
+        return None
 
     # Finally build return value(s)
     ret = {
@@ -16,7 +25,7 @@ def build_result(current, pseudo_element):
         'pseudo_element': pseudo_element
     }
 
-'''
+'''.replace('{result_properties}', repr(result_properties))
 
     # handle @values, @default_other for all properties
     done_prop = []
