@@ -454,19 +454,22 @@ def objects_bbox(_bbox, db_selects, options):
             yield(assemble_object(r))
 
 def objects_by_id(id_list, options):
+    if len(id_list) == 0:
+        return
+
     q = ''
     multipolygons = []
     for i in id_list:
         if i[0:1] == 'n':
-            q += 'node({});out meta geom;'.format(i[1:])
+            q += 'node({});'.format(i[1:])
         elif i[0:1] == 'w':
-            q += 'way({});out meta geom;'.format(i[1:])
+            q += 'way({});'.format(i[1:])
         elif i[0:1] == 'r':
-            q += 'relation({});out meta geom;'.format(i[1:])
+            q += 'relation({});'.format(i[1:])
 
     if q == '':
         return
-    q = '[out:json];' + q
+    q = '[out:json];(' + q + ');out meta geom qt;'
 
     for r in overpass_query(q):
         yield(assemble_object(r))
