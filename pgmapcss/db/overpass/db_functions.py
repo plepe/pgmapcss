@@ -196,7 +196,8 @@ def assemble_object(r, t=None, way_polygon=None):
     if t is None:
         t = {}
 
-    t['tags'] = r['tags'] if 'tags' in r else {}
+    if not 'tags' in t:
+        t['tags'] = r['tags'] if 'tags' in r else {}
 
     if r['type'] == 'node':
         t['id'] = 'n' + str(r['id'])
@@ -235,12 +236,14 @@ def assemble_object(r, t=None, way_polygon=None):
                 }
                 for i, m in enumerate(r['members'])
             ]
+
     t['tags']['osm:id'] = t['id']
-    t['tags']['osm:version'] = str(r['version']) if 'version' in r else ''
-    t['tags']['osm:user_id'] = str(r['uid']) if 'uid' in r else ''
-    t['tags']['osm:user'] = r['user'] if 'user' in r else ''
-    t['tags']['osm:timestamp'] = r['timestamp'] if 'timestamp' in r else ''
-    t['tags']['osm:changeset'] = str(r['changeset']) if 'changeset' in r else ''
+    if not 'osm:version' in t['tags'] and 'version' in r:
+        t['tags']['osm:version'] = str(r['version'])
+        t['tags']['osm:user_id'] = str(r['uid'])
+        t['tags']['osm:user'] = r['user']
+        t['tags']['osm:timestamp'] = r['timestamp']
+        t['tags']['osm:changeset'] = str(r['changeset'])
 
     return t
 

@@ -313,21 +313,22 @@ def objects_by_id(objects, options):
         t['members'] = []
         t['geo'] = r['way']
         t['types'] = ['node', 'point']
+        if not 'tags' in t:
 # START db.columns.node
-        t['tags'] = {
-            k: r[k]
-            for k in r
-            if k not in ['id', 'geo', 'types', 'tags', 'way', 'osm_id']
-            if r[k] is not None
-        }
+            t['tags'] = {
+                k: r[k]
+                for k in r
+                if k not in ['id', 'geo', 'types', 'tags', 'way', 'osm_id']
+                if r[k] is not None
+            }
 # START db.has-hstore
-        t['tags'] = dict(pghstore.loads(r['tags']).items() | t['tags'].items())
+            t['tags'] = dict(pghstore.loads(r['tags']).items() | t['tags'].items())
 # END db.has-hstore
 # END db.columns.node
 # START db.hstore-only
-        t['tags'] = pghstore.loads(r['tags'])
+            t['tags'] = pghstore.loads(r['tags'])
 # END db.hstore-only
-        t['tags']['osm:id'] = t['id']
+            t['tags']['osm:id'] = t['id']
         yield t
 
     _id_list = [ int(i[1:]) for i in id_list if i[0] == 'w' ]
@@ -346,21 +347,22 @@ def objects_by_id(objects, options):
             ]
         t['geo'] = r['way']
         t['types'] = ['way', r['_type']]
+        if not 'tags' in t:
 # START db.columns.way
-        t['tags'] = {
-            k: r[k]
-            for k in r
-            if k not in ['osm_id', 'geo', 'types', 'tags', 'nodes', '_type', 'way']
-            if r[k] is not None
-        }
+            t['tags'] = {
+                k: r[k]
+                for k in r
+                if k not in ['osm_id', 'geo', 'types', 'tags', 'nodes', '_type', 'way']
+                if r[k] is not None
+            }
 # START db.has-hstore
-        t['tags'] = dict(pghstore.loads(r['tags']).items() | t['tags'].items())
+            t['tags'] = dict(pghstore.loads(r['tags']).items() | t['tags'].items())
 # END db.has-hstore
 # END db.columns.way
 # START db.hstore-only
-        t['tags'] = pghstore.loads(r['tags'])
+            t['tags'] = pghstore.loads(r['tags'])
 # END db.hstore-only
-        t['tags']['osm:id'] = t['id']
+            t['tags']['osm:id'] = t['id']
         yield t
 
     _id_list = [ int(i[1:]) for i in id_list if i[0] == 'r' ]
@@ -371,11 +373,11 @@ def objects_by_id(objects, options):
         t = id_list[i]
 
         t['id'] = i
-        t['tags'] = flatarray_to_tags(r['tags']) if r['tags'] else {},
+        if not 'tags' in t:
+            t['tags'] = flatarray_to_tags(r['tags']) if r['tags'] else {},
         t['members'] = flatarray_to_members(r['members']),
         t['geo'] = r['way'],
         t['types'] = ['relation'] if r['way'] is None else ['relation', 'area']
-        t['tags']['osm:id'] = t['id']
         yield t
 
 def flatarray_to_tags(arr):

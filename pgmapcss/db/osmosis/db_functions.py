@@ -191,7 +191,8 @@ def objects_by_id(objects, options):
 
         t['id'] = i
         t['members'] = []
-        t['tags'] = pghstore.loads(r['tags'])
+        if not 'tags' in t:
+            t['tags'] = pghstore.loads(r['tags'])
         t['geo'] = r['geom']
         t['types'] = ['node', 'point']
         yield t
@@ -213,12 +214,14 @@ def objects_by_id(objects, options):
         t['tags'] = pghstore.loads(r['tags'])
         t['geo'] = r['linestring']
         t['types'] = ['way', 'line', 'area']
-        t['tags']['osm:id'] = str(t['id'])
-        t['tags']['osm:version'] = str(r['version'])
-        t['tags']['osm:user_id'] = str(r['user_id'])
-        t['tags']['osm:user'] = r['user']
-        t['tags']['osm:timestamp'] = str(r['tstamp'])
-        t['tags']['osm:changeset'] = str(r['changeset_id'])
+        if not 'tags' in t:
+            t['tags'] = pghstore.loads(r['tags'])
+            t['tags']['osm:id'] = str(t['id'])
+            t['tags']['osm:version'] = str(r['version'])
+            t['tags']['osm:user_id'] = str(r['user_id'])
+            t['tags']['osm:user'] = r['user']
+            t['tags']['osm:timestamp'] = str(r['tstamp'])
+            t['tags']['osm:changeset'] = str(r['changeset_id'])
         yield t
 
     _id_list = [ int(i[1:]) for i in id_list if i[0] == 'r' ]
@@ -229,7 +232,6 @@ def objects_by_id(objects, options):
         t = id_list[i]
 
         t['id'] = i
-        t['tags'] = pghstore.loads(r['tags'])
         t['members'] = [ {
                     'member_id': m[0],
                     'role': m[1],
@@ -239,12 +241,14 @@ def objects_by_id(objects, options):
             ]
         t['geo'] = None
         t['types'] = ['relation']
-        t['tags']['osm:id'] = str(t['id'])
-        t['tags']['osm:version'] = str(r['version'])
-        t['tags']['osm:user_id'] = str(r['user_id'])
-        t['tags']['osm:user'] = r['user']
-        t['tags']['osm:timestamp'] = str(r['tstamp'])
-        t['tags']['osm:changeset'] = str(r['changeset_id'])
+        if not 'tags' in t:
+            t['tags'] = pghstore.loads(r['tags'])
+            t['tags']['osm:id'] = str(t['id'])
+            t['tags']['osm:version'] = str(r['version'])
+            t['tags']['osm:user_id'] = str(r['user_id'])
+            t['tags']['osm:user'] = r['user']
+            t['tags']['osm:timestamp'] = str(r['tstamp'])
+            t['tags']['osm:changeset'] = str(r['changeset_id'])
         yield t
 
 def objects_member_of(objects, other_selects, self_selects, options):
