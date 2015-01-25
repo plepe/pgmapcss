@@ -82,6 +82,9 @@ def node_geom(lat, lon):
 def way_geom(r, is_polygon):
     global geom_plan
 
+    if not 'geometry' in r:
+        return None
+
     try:
         geom_plan
     except NameError:
@@ -184,9 +187,15 @@ def relation_geom(r):
 
     for m in r['members']:
         if m['type'] == 'node':
+            if not 'lat' in m:
+                return None
             l.append(node_geom(m['lat'], m['lon']))
         if m['type'] == 'way':
-            l.append(way_geom(m, None))
+            g = way_geom(m, None)
+            if g:
+                l.append(g)
+            else:
+                return None
 
     res = plpy.execute(geom_plan_collect, [ l ])
 
@@ -213,7 +222,9 @@ def assemble_object(r, t=None, way_polygon=None):
             t['types'].append('area')
         else:
             t['types'].append('line')
-        t['geo'] = way_geom(r, is_polygon)
+        g = way_geom(r, is_polygon)
+        if g:
+            t['geo'] = g
         t['members'] = [
                 {
                     'member_id': 'n' + str(m),
@@ -227,7 +238,9 @@ def assemble_object(r, t=None, way_polygon=None):
         if 'tags' in r and 'type' in r['tags'] and r['tags']['type'] in ('multipolygon', 'boundary'):
             t['geo'] = multipolygon_geom(r)
         else:
-            t['geo'] = relation_geom(r)
+            g = relation_geom(r)
+            if g:
+                t['geo'] = g
         t['members'] = [
                 {
                     'member_id': m['type'][0] + str(m['ref']),
@@ -270,7 +283,7 @@ def objects_bbox(_bbox, db_selects, options):
     else:
         replacements['__BBOX__'] = ''
 
-    qry += ';__QRY__;out meta geom;'
+    qry += ';__QRY__;out body geom qt;'
 
     # nodes
     w = []
@@ -447,7 +460,7 @@ def objects_bbox(_bbox, db_selects, options):
         q1 = ');('.join([ w1['query'] for w1 in w ]).replace('__TYPE__', 'relation(pivot.a)')
         q2 = ');('.join([ w1['query'] for w1 in w ]).replace('__TYPE__', 'way(pivot.a)')
 
-        q = ('[out:json];is_in({})->.a;(' + q1 + q2 + ');out meta geom;').format(res[0]['geom'])
+        q = ('[out:json];is_in({})->.a;(' + q1 + q2 + ');out body geom;').format(res[0]['geom'])
         for r1, r2 in replacements.items():
             q = q.replace(r1, r2)
 
