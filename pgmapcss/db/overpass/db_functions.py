@@ -220,9 +220,10 @@ def assemble_object(r, way_polygon=None):
             ]
     elif r['type'] == 'relation':
         t['id'] = 'r' + str(r['id'])
-        t['types'] = ['area', 'relation']
+        t['types'] = [ 'relation']
         if 'tags' in r and 'type' in r['tags'] and r['tags']['type'] in ('multipolygon', 'boundary'):
             t['geo'] = multipolygon_geom(r)
+            t['types'] += [ 'area', 'multipolygon' ]
         else:
             t['geo'] = relation_geom(r)
         t['members'] = [
@@ -291,7 +292,7 @@ def objects_bbox(_bbox, db_selects, options):
 
     # way areas and multipolygons based on outer tags
     w = []
-    for t in ('*', 'area'):
+    for t in ('*', 'area', 'multipolygon'):
         if t in db_selects:
             w.append(db_selects[t])
 
@@ -411,7 +412,7 @@ def objects_bbox(_bbox, db_selects, options):
     # relations
     w = []
     parent_query = ''
-    for t, type_condition in {'*': '', 'relation': '', 'area': "[type~'^multipolygon|boundary$']"}.items():
+    for t, type_condition in {'*': '', 'relation': '', 'area': "[type~'^multipolygon|boundary$']", 'multipolygon': "[type~'^multipolygon|boundary$']"}.items():
         if t in db_selects:
             w.append(db_selects[t]['query'].replace('__TYPE__', 'relation' + type_condition))
             if 'parent_query' in db_selects[t]:
@@ -429,9 +430,9 @@ def objects_bbox(_bbox, db_selects, options):
 
             yield(assemble_object(r))
 
-    # areas
+    # areas (objects surrounding the current bounding box)
     w = []
-    for t in ('*', 'area'):
+    for t in ('*', 'area', 'multipolygon'):
         if t in db_selects:
             w.append(db_selects[t])
 

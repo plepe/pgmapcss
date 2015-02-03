@@ -122,7 +122,7 @@ where {bbox} ( {w} ) offset 0) t
         qry = '''
 select * {add_columns} from (
 select (CASE WHEN has_outer_tags THEN 'm' ELSE 'r' END) || cast(id as text) as id, id as rid, version, user_id, (select name from users where id=user_id) as user, tstamp, changeset_id, has_outer_tags,
-       tags, geom as geo, Array['area'] as types
+       tags, geom as geo, Array['area', 'multipolygon'] as types
 from (select multipolygons.*, relations.version, relations.user_id, relations.tstamp, relations.changeset_id from multipolygons left join relations on multipolygons.id = relations.id) t
 where {bbox} ( {w} ) offset 0) t
 '''.format(bbox=bbox, w=' or '.join(w), add_columns=add_columns_qry.replace('__geo__', 'geo'))

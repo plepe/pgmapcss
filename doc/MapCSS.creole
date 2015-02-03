@@ -35,6 +35,7 @@ First part of a selector; required.
 | area | Matches polygons (polygons as from osm2pgsql, incl. relations with type multipolygon)
 | point | Currently an alias for 'node'
 | line | Matches lines (way or relation)
+| multipolygon | Matches multipolygons, which are relations with a tag type=multipolygon or type=boundary, and tags from either the relation or the outer member(s). See [[doc/database.md|doc/database.md]] for details. This is like area, but without simple polygons from closed ways.
 | canvas | The background
 
 The type of an object is retrieved from the 'types'-array in object-value (see [[API.md]]). You can add/remove types from your database query.
