@@ -408,13 +408,22 @@ while src:
             request = objects_near(objects_list, request_type['other_selects'], request_type['self_selects'], request_type['options'])
         elif request_type['type'] == 'objects_by_id':
             request = objects_by_id(objects_list, request_type['options'])
+        elif request_type['type'] == 'parent_objects_by_id':
+            request = objects_list
+            objects_list = {{
+                o2['id']: o2
+                for o1 in request
+                for o2 in o1['parents']
+            }}
+            objects_by_id(objects_list.values(), request_type['options'])
         else:
             plpy.warning('unknown request type {{}}', request_type['type'])
 
-        for o in objects_list:
-            o['state'] = ( 'pending', o['state'][1], [] )
+        if request_type['type'] != 'parent_objects_by_id':
+            for o in objects_list:
+                o['state'] = ( 'pending', o['state'][1], [] )
 
-        if request_type['type'] == 'objects_by_id':
+        if request_type['type'] in ('objects_by_id', 'parent_objects_by_id'):
             src = request
         else:
             for request_object, src_object, link_tags in request:
