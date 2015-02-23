@@ -21,7 +21,9 @@ def resolve_set_statements(statement, done, stat):
         # check if there are any statements which assign the current condition key
         filter = {
             'has_set_tag': condition['key'],
-            'max_id': statement['id']
+            'max_id': statement['id'],
+            'min_scale': statement['selector']['min_scale'],
+            'max_scale': statement['selector']['max_scale'] or 10E+10,
         }
         set_statements = stat.filter_statements(filter)
 
@@ -132,7 +134,7 @@ def check_is_sub_selector(selector, master_selector):
 
     return is_sub
 
-def compile_selectors_db(statements, selector_index, stat):
+def compile_selectors_db(statements, selector_index, stat, filter=None):
     selectors = {}
 
     for i in statements:
@@ -140,6 +142,11 @@ def compile_selectors_db(statements, selector_index, stat):
             _statement = stat['statements'][i]
         else:
             _statement = i
+
+        if filter:
+            _statement = copy.deepcopy(_statement)
+            _statement['selector']['min_scale'] = filter['min_scale']
+            _statement['selector']['max_scale'] = filter['max_scale']
 
         for selector in resolve_set_statements(_statement, [], stat):
             if selector_index is not None:
@@ -218,7 +225,7 @@ def compile_db_selects(id, stat):
         filter = { 'min_scale': min_scale, 'max_scale': max_scale or 10E+10}
         current_selectors = filter_selectors(filter, stat)
 
-        conditions = compile_selectors_db(current_selectors, None, stat)
+        conditions = compile_selectors_db(current_selectors, None, stat, filter)
 
         max_scale = min_scale
 
