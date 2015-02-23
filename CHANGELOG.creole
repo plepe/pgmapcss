@@ -1,3 +1,7 @@
+0.10.2 release 2014-02-23
+* Bugfixes
+* Update Maki icons
+
 0.10.1 release 2014-01-18
 * Some fixes concerning the DB/Overpass backend
 * Compatibility Python 3.4
