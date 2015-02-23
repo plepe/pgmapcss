@@ -118,3 +118,4 @@ List of icons available from the [Mapbox Maki](https://www.mapbox.com/maki/) pro
 | scooter | Scooter | ![Scooter](../pgmapcss/icons/maki/scooter-24.png)
 | gift | Gift | ![Gift](../pgmapcss/icons/maki/gift-24.png)
 | ice-cream | Ice cream | ![Ice cream](../pgmapcss/icons/maki/ice-cream-24.png)
+| dentist | Dentist | ![Dentist](../pgmapcss/icons/maki/dentist-24.png)
