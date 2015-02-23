@@ -201,6 +201,8 @@ def assemble_object(r, way_polygon=None):
         t['types'] = ['node', 'point']
         t['geo'] = node_geom(r['lat'], r['lon'])
     elif r['type'] == 'way':
+        if len(r['nodes']) < 2:
+            return None
         is_polygon = way_polygon in (True, None) and len(r['nodes']) > 3 and r['nodes'][0] == r['nodes'][-1]
         if way_polygon is True and not is_polygon:
             return None
