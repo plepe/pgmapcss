@@ -287,7 +287,9 @@ def objects_bbox(_bbox, db_selects, options):
             q = q.replace(r1, r2)
 
         for r in overpass_query(q):
-            yield(assemble_object(r))
+            t = assemble_object(r)
+            if t:
+                yield t
 
         #'http://overpass-turbo.eu/?Q=' + q).read()
 
@@ -358,14 +360,15 @@ def objects_bbox(_bbox, db_selects, options):
                         area_ways_done.append(outer['ref'])
 
                 t = assemble_object(r)
-                if len(mp_tags) == 0:
-                    t['id'] = 'm' + str(r['id'])
-                    t['types'] = ['multipolygon', 'area']
-                    t['tags'] = outer_tags
-                    t['tags']['osm:id'] = t['id']
-                    t['tags']['osm:has_outer_tags'] = 'yes'
+                if t:
+                    if len(mp_tags) == 0:
+                        t['id'] = 'm' + str(r['id'])
+                        t['types'] = ['multipolygon', 'area']
+                        t['tags'] = outer_tags
+                        t['tags']['osm:id'] = t['id']
+                        t['tags']['osm:has_outer_tags'] = 'yes'
 
-                yield(t)
+                    yield t
 
         _ways = None
         _rels = None
@@ -429,7 +432,9 @@ def objects_bbox(_bbox, db_selects, options):
                 continue
             rels_done.append(r['id'])
 
-            yield(assemble_object(r))
+            t = assemble_object(r)
+            if t:
+                yield t
 
     # areas
     w = []
@@ -453,7 +458,9 @@ def objects_bbox(_bbox, db_selects, options):
                (r['type'] == 'relation' and r['id'] in rels_done):
                 continue
 
-            yield(assemble_object(r))
+            t = assemble_object(r)
+            if t:
+                yield t
 
 def objects_by_id(id_list, options):
     if len(id_list) == 0:
@@ -474,7 +481,9 @@ def objects_by_id(id_list, options):
     q = '[out:json];(' + q + ');out meta geom qt;'
 
     for r in overpass_query(q):
-        yield(assemble_object(r))
+        t = assemble_object(r)
+        if t:
+            yield t
 
 def objects_member_of(objects, other_selects, self_selects, options):
     global member_of_cache
@@ -525,7 +534,8 @@ def objects_member_of(objects, other_selects, self_selects, options):
 
             for r in overpass_query(q):
                 t = assemble_object(r)
-                member_of_cache[member_of_cache_id].append(t)
+                if t:
+                    member_of_cache[member_of_cache_id].append(t)
 
         for t in member_of_cache[member_of_cache_id]:
             for m in t['members']:
@@ -580,8 +590,9 @@ def objects_members(objects, other_selects, self_selects, options):
 
             for r in overpass_query(q):
                 t = assemble_object(r)
-                t['type'] = r['type']
-                members_cache[members_cache_id]['self'][t['id']] = t
+                if t:
+                    t['type'] = r['type']
+                    members_cache[members_cache_id]['self'][t['id']] = t
 
             q = '[out:json][bbox:' + get_bbox() + '];'
 
@@ -609,7 +620,8 @@ def objects_members(objects, other_selects, self_selects, options):
 
             for r in overpass_query(q):
                 t = assemble_object(r)
-                members_cache[members_cache_id]['other'].append(t)
+                if t:
+                    members_cache[members_cache_id]['other'].append(t)
 
         if not ob['id'] in members_cache[members_cache_id]['self']:
             continue
