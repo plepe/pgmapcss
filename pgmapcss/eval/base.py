@@ -23,7 +23,7 @@ def debug(text):
     except:
         prefix = ''
 
-    plpy.warning(prefix + text)
+    plpy.warning(prefix + str(text))
 
 class config_base:
     math_level = None
