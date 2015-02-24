@@ -131,13 +131,17 @@ def multipolygon_geom(r):
           continue
 
         if m['role'] in ('outer', ''):
-            if len(m['geometry']) > 3 and m['geometry'][0] == m['geometry'][-1]:
+            if len(m['geometry']) < 2:
+                pass
+            elif len(m['geometry']) > 3 and m['geometry'][0] == m['geometry'][-1]:
                 polygons.append(linestring(m['geometry']))
             else:
                 lines.append(linestring(m['geometry']))
 
         elif m['role'] in ('inner'):
-            if len(m['geometry']) > 3 and m['geometry'][0] == m['geometry'][-1]:
+            if len(m['geometry']) < 2:
+                pass
+            elif len(m['geometry']) > 3 and m['geometry'][0] == m['geometry'][-1]:
                 inner_polygons.append(linestring(m['geometry']))
             else:
                 inner_lines.append(linestring(m['geometry']))
