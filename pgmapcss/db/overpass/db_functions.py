@@ -26,6 +26,18 @@ def overpass_query(query):
     while True:
         r = f.readline().decode('utf-8')
         if r == '':
+            if mode == 2:
+                f.close()
+
+                plpy.warning(block)
+
+                after_elements = json.loads(block)
+
+                if 'remark' in after_elements:
+                    raise Exception('Error in Overpass API: ' + str(after_elements['remark']))
+
+                return
+
             raise Exception('Connection closed early from Overpass API')
 
         if mode == 0:
@@ -49,8 +61,6 @@ def overpass_query(query):
                 block = ''
 
             elif re.match('\s*$', block) and re.match('.*\]', r):
-                f.close()
-
 # START debug.profiler
                 plpy.warning('%s\nquery took %.2fs for %d features' % (query, (datetime.datetime.now() - time_start).total_seconds(), len(ret)))
 # END debug.profiler
@@ -59,10 +69,14 @@ def overpass_query(query):
                     yield r
 # END db.serial_requests
 
-                return
+                mode = 2
+                block = '{'
 
             else:
                 block += r
+
+        elif mode == 2:
+            block += r
 
     if mode == 0:
         raise Exception('Could not parse Overpass API result')
