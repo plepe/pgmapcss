@@ -16,6 +16,9 @@ class db(default):
         if 'debug.profiler' in self.stat['config']:
             self.stat['config']['db.serial_requests'] = True
 
+        if not 'db.overpass-timeout' in self.stat['config']:
+            self.stat['config']['db.overpass-timeout'] = '180'
+
         self.parent_queries = []
 
     def tag_type(self, key, condition):

@@ -276,7 +276,7 @@ def objects_bbox(_bbox, db_selects, options):
     rels_done = []
     area_ways_done = []
 
-    qry = '[out:json]'
+    qry = '[out:json][timeout:{db.overpass-timeout}]'
     replacements = {}
 
     if _bbox:
@@ -467,7 +467,7 @@ def objects_bbox(_bbox, db_selects, options):
         q1 = ');('.join([ w1['query'] for w1 in w ]).replace('__TYPE__', 'relation(pivot.a)')
         q2 = ');('.join([ w1['query'] for w1 in w ]).replace('__TYPE__', 'way(pivot.a)')
 
-        q = ('[out:json];is_in({})->.a;(' + q1 + q2 + ');out meta geom;').format(res[0]['geom'])
+        q = ('[out:json][timeout:{db.overpass-timeout}];is_in({})->.a;(' + q1 + q2 + ');out meta geom;').format(res[0]['geom'])
         for r1, r2 in replacements.items():
             q = q.replace(r1, r2)
 
@@ -496,7 +496,7 @@ def objects_by_id(id_list, options):
 
     if q == '':
         return
-    q = '[out:json];(' + q + ');out meta geom qt;'
+    q = '[out:json][timeout:{db.overpass-timeout}];(' + q + ');out meta geom qt;'
 
     for r in overpass_query(q):
         t = assemble_object(r)
@@ -526,7 +526,7 @@ def objects_member_of(objects, other_selects, self_selects, options):
         if member_of_cache_id not in member_of_cache:
             member_of_cache[member_of_cache_id] = []
             replacements = { '__BBOX__': '(' + get_bbox() + ')' }
-            q = '[out:json][bbox:' + get_bbox() + '];'
+            q = '[out:json][timeout:{db.overpass-timeout}][bbox:' + get_bbox() + '];'
 
             for si, ss in self_selects.items():
                 if 'parent_query' in ss:
@@ -574,7 +574,7 @@ def objects_members(objects, other_selects, self_selects, options):
     except:
         members_cache = {}
 
-    q = '[out:json];'
+    q = '[out:json][timeout:{db.overpass-timeout}];'
 
     for ob in objects:
         if ob['id'][0] == 'n':
@@ -592,7 +592,7 @@ def objects_members(objects, other_selects, self_selects, options):
         if members_cache_id not in members_cache:
             members_cache[members_cache_id] = { 'self': {}, 'other': [] }
             replacements = { '__BBOX__': '(' + get_bbox() + ')' }
-            q = '[out:json][bbox:' + get_bbox() + '];'
+            q = '[out:json][timeout:{db.overpass-timeout}][bbox:' + get_bbox() + '];'
 
             for si, ss in self_selects.items():
                 if 'parent_query' in ss:
@@ -612,7 +612,7 @@ def objects_members(objects, other_selects, self_selects, options):
                     t['type'] = r['type']
                     members_cache[members_cache_id]['self'][t['id']] = t
 
-            q = '[out:json][bbox:' + get_bbox() + '];'
+            q = '[out:json][timeout:{db.overpass-timeout}][bbox:' + get_bbox() + '];'
 
             for si, ss in self_selects.items():
                 if 'parent_query' in ss:
