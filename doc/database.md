@@ -28,7 +28,7 @@ Behaviour can be influenced with the following config options:
 | db.overpass-url  | overpass only: Use this alternative Overpass API url. default: http://overpass-api.de/api | |
 | db.serial_requests | overpass only: Always finish parsing result data, before sending a parallel request (e.g. for handling relationships). Necessary on some APIs which disallow multiple requests at once. Impacts memory usage, as results need to be cached. | true/**false**
 | debug.profiler   | during execution, show some statistics about query/processing time and count of objects. | true/**false** |
-| db.overpass-timeout | overpass only: specify timeout in seconds for queries to the Overpass API. As a render job usually needs several queries, the total rendering time might be a multiple of this value. | 180
+| db.overpass-timeout | overpass only: specify timeout in seconds for queries to the Overpass API (make sure that the Overpass server accepts timeouts that long, e.g. by adding a "Timeout" parameter to Apache2). As a render job usually needs several queries, the total rendering time might be a multiple of this value. | 180
 
 Example usage:
 ```sh
