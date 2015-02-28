@@ -24,7 +24,12 @@ def overpass_query(query):
     block = ''
     mode = 0
     while True:
-        r = f.readline().decode('utf-8')
+        try:
+            r = f.readline().decode('utf-8')
+        except urllib.error.HTTPError as err:
+            plpy.warning('Overpass query failed:\n' + query)
+            raise
+
         if r == '':
             if mode == 2:
                 f.close()
