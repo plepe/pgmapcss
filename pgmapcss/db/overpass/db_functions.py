@@ -29,12 +29,10 @@ def overpass_query(query):
             if mode == 2:
                 f.close()
 
-                plpy.warning(block)
-
                 after_elements = json.loads(block)
 
                 if 'remark' in after_elements:
-                    raise Exception('Error in Overpass API: ' + str(after_elements['remark']))
+                    raise Exception('Error in Overpass API: ' + str(after_elements['remark']) + '\n' + 'Failed query was:\n' + query)
 
                 return
 
