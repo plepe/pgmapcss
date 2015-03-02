@@ -14,6 +14,7 @@ def overpass_query(query):
     url = '{db.overpass-url}/interpreter'
     data = urllib.parse.urlencode({ 'data': query })
     data = data.encode('utf-8')
+    count = 0
 
     try:
         f = urllib.request.urlopen(url, data)
@@ -27,7 +28,7 @@ def overpass_query(query):
         try:
             r = f.readline().decode('utf-8')
         except urllib.error.HTTPError as err:
-            plpy.warning('Overpass query failed:\n' + query)
+            plpy.warning('Overpass query failed (after {} features):\n'.format(count) + query)
             raise
 
         if r == '':
@@ -37,11 +38,11 @@ def overpass_query(query):
                 after_elements = json.loads(block)
 
                 if 'remark' in after_elements:
-                    raise Exception('Error in Overpass API: ' + str(after_elements['remark']) + '\n' + 'Failed query was:\n' + query)
+                    raise Exception('Error in Overpass API (after {} features): {}\nFailed query was:\n{}'.format(count, after_elements['remark'], query))
 
                 return
 
-            raise Exception('Connection closed early from Overpass API')
+            raise Exception('Connection closed early (after {} features) from Overpass API'.format(count))
 
         if mode == 0:
             if re.search('"elements":', r):
@@ -61,6 +62,7 @@ def overpass_query(query):
                 yield json.loads(block)
 # END db.serial_requests
 
+                count += 1
                 block = ''
 
             elif re.match('\s*$', block) and re.match('.*\]', r):
