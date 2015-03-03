@@ -1,8 +1,8 @@
-0.10.3 release upcoming
+0.10.3 release 2015-03-03
 * DB/Overpass improvements
 ** Ignore ways with less than two nodes
-** Catch timeout from Overpass API
-** set timeout for Overpass queries via {{{db.overpass-timeout}}}
+** Catch timeout from Overpass API (set timeout via config option {{{db.overpass-timeout}}})
+** improved error messages
 * some minor bugfixes
 
 0.10.2 release 2015-02-23
