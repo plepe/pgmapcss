@@ -37,6 +37,14 @@ def overpass_query(query):
 
                 after_elements = json.loads(block)
 
+# START debug.profiler
+                plpy.warning('%s\nquery took %.2fs for %d features' % (query, (datetime.datetime.now() - time_start).total_seconds(), len(ret)))
+# END debug.profiler
+# START db.serial_requests
+                for r in ret:
+                    yield r
+# END db.serial_requests
+
                 if 'remark' in after_elements:
                     raise Exception('Error in Overpass API (after {} features): {}\nFailed query was:\n{}'.format(count, after_elements['remark'], query))
 
@@ -66,14 +74,6 @@ def overpass_query(query):
                 block = ''
 
             elif re.match('\s*$', block) and re.match('.*\]', r):
-# START debug.profiler
-                plpy.warning('%s\nquery took %.2fs for %d features' % (query, (datetime.datetime.now() - time_start).total_seconds(), len(ret)))
-# END debug.profiler
-# START db.serial_requests
-                for r in ret:
-                    yield r
-# END db.serial_requests
-
                 mode = 2
                 block = '{'
 
