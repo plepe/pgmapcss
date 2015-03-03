@@ -46,7 +46,9 @@ def overpass_query(query):
 # END db.serial_requests
 
                 if 'remark' in after_elements:
-                    raise Exception('Error in Overpass API (after {} features): {}\nFailed query was:\n{}'.format(count, after_elements['remark'], query))
+                    # ignore timeout if it happens in "print"
+                    if not re.search("Query timed out in \"print\"", after_elements['remark']):
+                      raise Exception('Error in Overpass API (after {} features): {}\nFailed query was:\n{}'.format(count, after_elements['remark'], query))
 
                 return
 
