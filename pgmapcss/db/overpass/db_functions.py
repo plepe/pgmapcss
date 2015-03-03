@@ -101,6 +101,9 @@ def node_geom(lat, lon):
 def way_geom(r, is_polygon):
     global geom_plan
 
+    if len(r['geometry']) < 2:
+      return None
+
     try:
         geom_plan
     except NameError:
