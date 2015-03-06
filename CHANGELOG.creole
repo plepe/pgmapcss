@@ -1,3 +1,7 @@
+0.10.4 release upcoming
+* Bugfix :lefthandtraffic / :righthandtraffic (use correct SRIDs) -> need database re-initialization (-r init)
+* When converting SVGs to PNGs keep transparent background (e.g. for {{{image}}} resp. {{{repeat-image}}}); Mapnik 3.0 still does not support SVGs for LinePatterns (auto-convert SVG to PNG)
+
 0.10.3 release 2015-03-03
 * DB/Overpass improvements
 ** Ignore ways with less than two nodes
