@@ -16,12 +16,19 @@ class image_png(default):
             m = re.search("\.svg$", prop['value'])
             if m:
                 from wand.image import Image
+                from wand.color import Color
+                from wand.api import library
                 dest = self.stat['icons_dir'] + "/" + prop['value'].replace('/', '_') + ".png"
                 print("svg icon detected. converting '{0}' to '{1}'".format(prop['value'], dest))
 
-                with Image(filename=prop['value']) as img:
-                    img.format = 'png'
-                    img.save(filename=dest)
+                with Image() as img:
+                    with Color('transparent') as bg_color:
+                        library.MagickSetBackgroundColor(img.wand, bg_color.resource)
+                    img.read(blob=open(prop['value'], 'rb').read())
+                    dest_img = img.make_blob('png32')
+
+                    with open(dest, 'wb') as out:
+                        out.write(dest_img)
 
                 return repr(dest)
 
