@@ -27,8 +27,8 @@
 @type casing-dashes dashes;
 @type icon-rotation angle;
 @type symbol-rotation angle;
-@type image image;
-@type repeat-image image;
+@type image image_png;
+@type repeat-image image_png;
 @type repeat-image-offset pixels;
 @type left-casing-width pixels;
 @type left-casing-offset pixels;
