@@ -28,7 +28,7 @@ def compile_pseudo_class_condition(condition, stat):
         return [compile_eval('f:is_right_hand_traffic', condition, stat) + " != 'false'"]
 
     elif condition['key'] == 'lefthandtraffic':
-        return [compile_eval('f:is_left_hand_raffic', condition, stat) + " != 'false'"]
+        return [compile_eval('f:is_left_hand_traffic', condition, stat) + " != 'false'"]
 
     elif condition['key'] == 'lang':
         if not 'value' in condition:
