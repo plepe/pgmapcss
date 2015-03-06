@@ -13,10 +13,10 @@ class image_png(default):
 
         else:
             # Convert SVG to PNG
-            m = re.match("([^\/]*)\.svg", prop['value'])
+            m = re.search("\.svg$", prop['value'])
             if m:
                 from wand.image import Image
-                dest = self.stat['icons_dir'] + "/" + m.group(1) + ".png"
+                dest = self.stat['icons_dir'] + "/" + prop['value'].replace('/', '_') + ".png"
                 print("svg icon detected. converting '{0}' to '{1}'".format(prop['value'], dest))
 
                 with Image(filename=prop['value']) as img:

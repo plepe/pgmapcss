@@ -71,7 +71,7 @@ def db_init(conn, stat):
 
     # populate _pgmapcss_left_right_hand_traffic table
     f = resource_stream(pgmapcss.data.__name__, 'left-right-hand-traffic.wkt')
-    res = conn.prepare("insert into _pgmapcss_left_right_hand_traffic values (ST_Transform(ST_SetSRID($1::text, 4326), {}))".format(stat['config']['db.srs']))
+    res = conn.prepare("insert into _pgmapcss_left_right_hand_traffic values (ST_SetSRID($1::text, 4326))")
     while True:
         r = f.readline().decode('utf-8')
         if not r:
