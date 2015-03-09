@@ -22,71 +22,30 @@ def overpass_query(query):
         plpy.warning('Overpass query failed:\n' + query)
         raise
 
-    block = ''
-    mode = 0
-    while True:
-        try:
-            r = f.readline().decode('utf-8')
-        except urllib.error.HTTPError as err:
-            plpy.warning('Overpass query failed (after {} features):\n'.format(count) + query)
-            raise
+    try:
+        r = f.read().decode('utf-8')
+    except urllib.error.HTTPError as err:
+        plpy.warning('Overpass query failed (after {} features):\n'.format(count) + query)
+        raise
 
-        if r == '':
-            if mode == 2:
-                f.close()
+    # areas not initialized -> ignore
+    if re.search('osm3s_v[0-9\.]+_areas', r):
+        f.close()
+        return
 
-                after_elements = json.loads(block)
+    data = json.loads(r)
+
+    if 'remark' in data:
+        # ignore timeout if it happens in "print"
+        if not re.search("Query timed out in \"print\"", data['remark']):
+          raise Exception('Error in Overpass API (after {} features): {}\nFailed query was:\n{}'.format(count, data['remark'], query))
 
 # START debug.profiler
-                plpy.warning('%s\nquery took %.2fs for %d features' % (query, (datetime.datetime.now() - time_start).total_seconds(), len(ret)))
+    plpy.warning('%s\nquery took %.2fs for %d features' % (query, (datetime.datetime.now() - time_start).total_seconds(), len(data['elements'])))
 # END debug.profiler
-# START db.serial_requests
-                for r in ret:
-                    yield r
-# END db.serial_requests
 
-                if 'remark' in after_elements:
-                    # ignore timeout if it happens in "print"
-                    if not re.search("Query timed out in \"print\"", after_elements['remark']):
-                      raise Exception('Error in Overpass API (after {} features): {}\nFailed query was:\n{}'.format(count, after_elements['remark'], query))
-
-                return
-
-            raise Exception('Connection closed early (after {} features) from Overpass API'.format(count))
-
-        if mode == 0:
-            if re.search('"elements":', r):
-                mode = 1
-
-            # areas not initialized -> ignore
-            if re.search('osm3s_v[0-9\.]+_areas', r):
-                f.close()
-                return
-
-        elif mode == 1:
-            if re.match('}', r):
-                block += '}'
-# START db.serial_requests
-                ret.append(json.loads(block))
-# ELSE db.serial_requests
-                yield json.loads(block)
-# END db.serial_requests
-
-                count += 1
-                block = ''
-
-            elif re.match('\s*$', block) and re.match('.*\]', r):
-                mode = 2
-                block = '{'
-
-            else:
-                block += r
-
-        elif mode == 2:
-            block += r
-
-    if mode == 0:
-        raise Exception('Could not parse Overpass API result')
+    for e in data['elements']:
+        yield e
 
 def node_geom(lat, lon):
     global geom_plan
