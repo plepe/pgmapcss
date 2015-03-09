@@ -10,11 +10,7 @@ class icon(default):
         if prop['value'] is None:
             return prop['value']
 
-        if os.path.exists(prop['value']):
-            return repr(prop['value'])
-
-        else:
-            return repr("icon:" + prop['value'])
+        return repr(prop['value'])
 
     def stat_value(self, prop):
         # TODO: it would be better if icons would be checked in a step between parsing and compiling
