@@ -20,14 +20,14 @@ class _stat(dict):
             ])),
             reverse=True)
 
-    def properties(self, pseudo_element=None, max_prop_id=None, object_type=None):
+    def properties(self, pseudo_element=None, max_prop_id=None, object_type=None, assignment_type='P'):
         ret = set([
             p['key']
             for v in self['statements']
             if object_type is None or v['selector']['type'] == object_type
             if pseudo_element == None or v['selector']['pseudo_element'] in ('*', p)
             for p in v['properties']
-            if p['assignment_type'] == 'P'
+            if p['assignment_type'] == assignment_type
             if max_prop_id is None or p['id'] <= max_prop_id
         ])
 
@@ -53,7 +53,7 @@ class _stat(dict):
         return None
 
 
-    def property_values(self, prop, pseudo_element=None, include_illegal_values=False, value_type=None, eval_true=True, max_prop_id=None, include_none=False, object_type=None, postprocess=True, warn_unresolvable=False):
+    def property_values(self, prop, pseudo_element=None, include_illegal_values=False, value_type=None, eval_true=True, max_prop_id=None, include_none=False, object_type=None, postprocess=True, warn_unresolvable=False, assignment_type='P'):
         """Returns set of all values used on this property in any statement.
         Returns boolean 'True' if property is result of an unresolveable eval
         expression.
@@ -68,6 +68,7 @@ class _stat(dict):
         object_type: return values only for given object type (e.g. 'canvas')
         postprocess: include values derived from postprocessing
         warn_unresolvable: warn, if the property might be unresolvable
+        assignment_type: type of assignment, 'P' for property (default), 'T' for tag, ... (see parser/parse_properties.py for a full list)
         """
         # Don't need 'eval_true' and 'warn_unresolvable' in cache_id, will be handled specially
         cache_id = prop + '-' + repr(pseudo_element) + '-' + repr(include_illegal_values) + '-' + repr(value_type) + '-' + repr(max_prop_id) + '-' + repr(include_none) + '-' + repr(object_type) + '-' + repr(postprocess)
@@ -98,7 +99,7 @@ class _stat(dict):
             for p in v['properties']
             if object_type is None or v['selector']['type'] == object_type
             if pseudo_element == None or v['selector']['pseudo_element'] in ('*', pseudo_element)
-            if p['assignment_type'] == 'P' and p['key'] == prop
+            if p['assignment_type'] == assignment_type and p['key'] == prop
             if value_type == None or value_type == p['value_type']
             if p['value_type'] != 'eval'
             if max_prop_id is None or p['id'] <= max_prop_id
@@ -114,7 +115,7 @@ class _stat(dict):
                 for v in self['statements']
                 for p in v['properties']
                 if pseudo_element == None or v['selector']['pseudo_element'] in ('*', pseudo_element)
-                if p['assignment_type'] == 'P' and p['key'] == prop
+                if p['assignment_type'] == assignment_type and p['key'] == prop
                 if p['value_type'] == 'eval'
                 if max_prop_id is None or p['id'] <= max_prop_id
                 for v1 in pgmapcss.eval.possible_values(p['value'], p, self)[0]
@@ -133,7 +134,7 @@ class _stat(dict):
 
         if 'generated_properties' in self and prop in self['generated_properties']:
             gen = self['generated_properties'][prop]
-            combinations = self.properties_combinations(gen[0], pseudo_element, include_illegal_values, value_type, eval_true, max_prop_id, include_none, warn_unresolvable)
+            combinations = self.properties_combinations(gen[0], pseudo_element, include_illegal_values, value_type, eval_true, max_prop_id, include_none, warn_unresolvable, assignment_type)
             values = values.union({
                 gen[1](combination, self)
                 for combination in combinations
@@ -180,14 +181,14 @@ class _stat(dict):
 
         return values
 
-    def properties_combinations_pseudo_element(self, keys, pseudo_element, include_illegal_values=False, value_type=None, eval_true=True, max_prop_id=None, include_none=False, warn_unresolvable=False):
+    def properties_combinations_pseudo_element(self, keys, pseudo_element, include_illegal_values=False, value_type=None, eval_true=True, max_prop_id=None, include_none=False, warn_unresolvable=False, assignment_type='P'):
         combinations_list = [{}]
 
         for k in keys:
             new_combinations_list = []
 
             for combination in combinations_list:
-                for v in self.property_values(k, pseudo_element, include_illegal_values, value_type, eval_true, max_prop_id, include_none, warn_unresolvable=warn_unresolvable):
+                for v in self.property_values(k, pseudo_element, include_illegal_values, value_type, eval_true, max_prop_id, include_none, warn_unresolvable=warn_unresolvable, assignment_type=assignment_type):
                     c = combination.copy()
                     c[k] = v
                     new_combinations_list.append(c)
@@ -196,7 +197,7 @@ class _stat(dict):
 
         return combinations_list
 
-    def properties_combinations(self, keys, pseudo_elements=None, include_illegal_values=False, value_type=None, eval_true=True, max_prop_id=None, include_none=False, warn_unresolvable=False):
+    def properties_combinations(self, keys, pseudo_elements=None, include_illegal_values=False, value_type=None, eval_true=True, max_prop_id=None, include_none=False, warn_unresolvable=False, assignment_type='P'):
         combinations = []
         if type(pseudo_elements) == str:
             pseudo_elements = [ pseudo_elements ]
@@ -204,7 +205,7 @@ class _stat(dict):
             pseudo_elements = self['pseudo_elements']
 
         for pseudo_element in pseudo_elements:
-            combinations += self.properties_combinations_pseudo_element(keys, pseudo_element, include_illegal_values, value_type, eval_true, max_prop_id, include_none, warn_unresolvable)
+            combinations += self.properties_combinations_pseudo_element(keys, pseudo_element, include_illegal_values, value_type, eval_true, max_prop_id, include_none, warn_unresolvable, assignment_type)
 
         ret = []
         for combination in combinations:
