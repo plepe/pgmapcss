@@ -19,6 +19,9 @@ class db(default):
         if not 'db.overpass-timeout' in self.stat['config']:
             self.stat['config']['db.overpass-timeout'] = '180'
 
+        if not 'db.overpass-memory' in self.stat['config']:
+            self.stat['config']['db.overpass-memory'] = '536870912'
+
         self.parent_queries = []
 
     def tag_type(self, key, condition):

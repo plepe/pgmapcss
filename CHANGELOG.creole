@@ -1,4 +1,5 @@
 0.10.4 release upcoming
+* DB/Overpass: set max allowed memory by config option {{{db.overpass-memory}}}
 * Bugfix :lefthandtraffic / :righthandtraffic (use correct SRIDs) -> need database re-initialization (-r init)
 * When converting SVGs to PNGs keep transparent background (e.g. for {{{image}}} resp. {{{repeat-image}}}); Mapnik 3.0 still does not support SVGs for LinePatterns (auto-convert SVG to PNG)
 
