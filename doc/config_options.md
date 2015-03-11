@@ -30,6 +30,6 @@ Advances options:
 | db.has-hstore    | osm2pgsql only: Additional tags can be read from the 'tags' column (of type hstore). Usually autodetected. Needed when using offline mode. | |
 | db.multipolygons | osmosis only: Specify whether the multipolygons table is present and should be used. Usually autodected. Needed when using offline mode (default: false) | true/false
 | db.hstore_key_index| osm2pgsql/osmosis: Assume that there's a btree index on the specified keys (,-separated) and therefore add a tag-exists condition into the SQL query. E.g.: db.hstore_key_index=sport,amenity . | |
-| db.serial_requests | overpass only: Always finish parsing result data, before sending a parallel request (e.g. for handling relationships). Necessary on some APIs which disallow multiple requests at once. Impacts memory usage, as results need to be cached. | true/**false**
 | db.overpass-timeout | overpass only: specify timeout in seconds for queries to the Overpass API (make sure that the Overpass server accepts timeouts that long, e.g. by adding a "Timeout" parameter to Apache2). As a render job usually needs several queries, the total rendering time might be a multiple of this value. | 180
 | db.overpass-memory | overpass only: Sets the 'maxsize' parameter for an overpass query, which indicates the maximum allowed memory for the query in bytes RAM on the server. | 536870912 (512 MB)
+| db.overpass-profiler | overpass only: prints all queries, their duration (incl. parsing json) and the count of returned features. | true/**false**

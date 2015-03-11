@@ -13,9 +13,6 @@ class db(default):
         if not 'db.overpass-url' in self.stat['config']:
             self.stat['config']['db.overpass-url'] = 'http://overpass-api.de/api'
 
-        if 'debug.profiler' in self.stat['config']:
-            self.stat['config']['db.serial_requests'] = True
-
         if not 'db.overpass-timeout' in self.stat['config']:
             self.stat['config']['db.overpass-timeout'] = '180'
 
