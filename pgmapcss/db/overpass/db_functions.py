@@ -5,9 +5,9 @@ def overpass_query(query):
     import urllib.parse
     import json
 
-# START debug.overpass-profiler
+# START db.overpass-profiler
     time_start = datetime.datetime.now()
-# END debug.overpass-profiler
+# END db.overpass-profiler
     url = '{db.overpass-url}/interpreter'
     data = urllib.parse.urlencode({ 'data': query })
     data = data.encode('utf-8')
@@ -37,9 +37,9 @@ def overpass_query(query):
         if not re.search("Query timed out in \"print\"", data['remark']):
           raise Exception('Error in Overpass API (after {} features): {}\nFailed query was:\n{}'.format(count, data['remark'], query))
 
-# START debug.overpass-profiler
+# START db.overpass-profiler
     plpy.warning('%s\nquery took %.2fs for %d features' % (query, (datetime.datetime.now() - time_start).total_seconds(), len(data['elements'])))
-# END debug.overpass-profiler
+# END db.overpass-profiler
 
     for e in data['elements']:
         yield e
