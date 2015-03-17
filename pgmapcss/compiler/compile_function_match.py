@@ -96,6 +96,8 @@ if type(bbox) == list and len(bbox) == 4:
     plan = plpy.prepare('select ST_SetSRID(ST_MakeBox2D(ST_Point($1, $2), ST_Point($3, $4)), $5) as bounds', ['float', 'float', 'float', 'float', 'int'])
     res = plpy.execute(plan, [float(b) for b in bbox] + [ parameters['in.srs'] if 'in.srs' in parameters else parameters['srs'] ])
     _bbox = res[0]['bounds']
+elif type(bbox) == set:
+    _bbox = None
 else:
     _bbox = bbox
 
@@ -127,14 +129,16 @@ for style_element in all_style_elements:
 
 '''.format(**replacement)
 
-    func = "objects_bbox(render_context.get('bbox'), db_selects, {})"
+    ret += "if type(bbox) == set:\n"
+    ret += "    src = objects_by_id(bbox, {})\n"
+    ret += "else:\n"
+    ret += "    src = objects_bbox(render_context.get('bbox'), db_selects, {})\n"
+
     if stat['config'].get('debug.profiler', False):
         ret += "time_qry_start = datetime.datetime.now() # profiling\n"
-        ret += "src = list(" + func + ")\n"
+        ret += "src = list(src)\n"
         ret += "time_qry_stop = datetime.datetime.now() # profiling\n"
         ret += "plpy.warning('querying db objects took %.2fs' % (time_qry_stop - time_qry_start).total_seconds())\n"
-    else:
-        ret += "src = " + func + "\n"
 
     ret += '''\
 
