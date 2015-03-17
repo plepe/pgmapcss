@@ -52,6 +52,9 @@ optional arguments:
                         Process the map from the specified bounding box as
                         min_lon,min_lat,max_lon,max_lat in WGS-84. (default:
                         whole database)
+  -o ID [ID ...], --id ID [ID ...]
+                        Instead of processing all objects in the specified
+                        bounding box, process only the given object(s).
   -s SCALE, --scale SCALE
                         Process map at a specified scale denominator. If
                         z<zoom> syntax (e.g. "z15") is used, the zoom levels
@@ -73,6 +76,7 @@ scale         | Process map at a specified scale denominator.
 zoom          | zoom level of standard tile based map (projection 900913)
 x, y          | x/y tiles as with images (jpg/png), requires parameter z or zoom
 z             | zoom level in combination with x/y tiles. If a different tilesize (e.g. 512 or 1024) is used, the zoom level will be adapted automatically. With tilesize 256, zoom and z are equal.
+id            | Instead of processing all objects in the specified bounding box, process only the given object(s). For multiple objects, pass the parameter multiple times.
 tilesize      | the tilesize when using x/y tiles (default: 256)
 lang          | Use the given language code (e.g. "en" or "de") for language dependend instructions. Default: the first value of the HTTP Accept-Language header.
 srs           | ID of projection of output coordinates (default: 4326).
