@@ -19,7 +19,8 @@ def compile_function_match(stat):
             v
             for v in stat['statements']
             if v['selector']['min_scale'] <= min_scale and
-                (v['selector']['max_scale'] == None or v['selector']['max_scale'] >= (max_scale or 10E+10))
+                (v['selector']['max_scale'] == None or v['selector']['max_scale'] >= (max_scale or 10E+10)) and
+                v['selector']['type'] not in ('meta', 'canvas')
         ], min_scale, max_scale, stat)
         check_functions += '\n'
         max_scale = min_scale
