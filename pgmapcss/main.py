@@ -233,6 +233,7 @@ def main():
 
     pgmapcss.icons.process_icons(style_id, args, stat, conn)
     pgmapcss.symbols.process_symbols(style_id, args, stat, conn)
+    pgmapcss.get_meta(style_id, args, stat, conn)
 
     debug.close()
 
