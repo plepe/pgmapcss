@@ -19,30 +19,73 @@ def overpass_query(query):
         plpy.warning('Overpass query failed:\n' + query)
         raise
 
-    try:
-        r = f.read().decode('utf-8')
-    except urllib.error.HTTPError as err:
-        plpy.warning('Overpass query failed (after {} features):\n'.format(count) + query)
-        raise
+    r = None
+    result_without_elements = ''
+
+    while r != '  "elements": [\n':
+        try:
+            r = f.readline().decode('utf-8')
+            result_without_elements += r
+        except urllib.error.HTTPError as err:
+            plpy.warning('Overpass query failed while reading headers:\n'.format(count) + query)
+            raise
 
     # areas not initialized -> ignore
-    if re.search('osm3s_v[0-9\.]+_areas', r):
+    if re.search('osm3s_v[0-9\.]+_areas', result_without_elements):
         f.close()
         return
 
-    data = json.loads(r)
+    elements_todo = ''
 
+    still_reading = True
+    count = 0
+    to_parse = ''
+    while not elements_todo is None:
+        try:
+            r = f.read({db.overpass-blocksize})
+
+            # make sure that result is valid UTF-8
+            # thanks to http://rosettacode.org/wiki/Read_a_file_character_by_character/UTF8#Python
+            while True:
+                try:
+                    r = r.decode('utf-8')
+                except UnicodeDecodeError:
+                    r += f.read(1)
+                else:
+                    break
+
+            elements_todo += r
+        except urllib.error.HTTPError as err:
+            plpy.warning('Overpass query failed (after {} features):\n'.format(count) + query)
+            raise
+
+        end_last = elements_todo.rfind('\n},')
+        if end_last == -1:
+            end_last = elements_todo.rfind('\n}\n\n  ]\n}')
+            if end_last != -1:
+                to_parse = elements_todo[0 : end_last] + '\n}'
+                result_without_elements += elements_todo[end_last + 2 :]
+                elements_todo = None
+        else:
+            to_parse = elements_todo[0 : end_last] + '\n}'
+            elements_todo = elements_todo[end_last + 3 :]
+
+        data = json.loads('[' + to_parse + ']')
+        to_parse = ''
+        count += len(data)
+
+        for e in data:
+            yield e
+
+    data = json.loads(result_without_elements)
     if 'remark' in data:
         # ignore timeout if it happens in "print"
         if not re.search("Query timed out in \"print\"", data['remark']):
           raise Exception('Error in Overpass API (after {} features): {}\nFailed query was:\n{}'.format(count, data['remark'], query))
 
 # START db.overpass-profiler
-    plpy.warning('%s\nquery took %.2fs for %d features' % (query, (datetime.datetime.now() - time_start).total_seconds(), len(data['elements'])))
+    plpy.warning('%s\nquery took %.2fs for %d features' % (query, (datetime.datetime.now() - time_start).total_seconds(), count))
 # END db.overpass-profiler
-
-    for e in data['elements']:
-        yield e
 
 def node_geom(lat, lon):
     global geom_plan
