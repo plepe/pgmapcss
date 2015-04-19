@@ -12,6 +12,7 @@ def overpass_query(query):
     data = urllib.parse.urlencode({ 'data': query })
     data = data.encode('utf-8')
     count = 0
+    count_blocks = 0
 
     try:
         f = urllib.request.urlopen(url, data)
@@ -26,6 +27,7 @@ def overpass_query(query):
     block_remains = ''
 
     while not done:
+        count_blocks += 1
         try:
             r = f.read({db.overpass-blocksize})
 
@@ -96,7 +98,7 @@ def overpass_query(query):
     f.close()
 
 # START db.overpass-profiler
-    plpy.warning('%s\nquery took %.2fs for %d features' % (query, (datetime.datetime.now() - time_start).total_seconds(), count))
+    plpy.warning('%s\nquery took %.2fs for %d features (%d blocks)' % (query, (datetime.datetime.now() - time_start).total_seconds(), count, count_blocks))
 # END db.overpass-profiler
 
 def node_geom(lat, lon):
