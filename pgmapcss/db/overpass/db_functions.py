@@ -9,12 +9,12 @@ def overpass_query(query):
     time_start = datetime.datetime.now()
     time_duration = datetime.timedelta(0)
     download_size = 0
+    count = 0
+    count_blocks = 0
 # END db.overpass-profiler
     url = '{db.overpass-url}/interpreter'
     data = urllib.parse.urlencode({ 'data': query })
     data = data.encode('utf-8')
-    count = 0
-    count_blocks = 0
 
     try:
         f = urllib.request.urlopen(url, data)
@@ -29,7 +29,9 @@ def overpass_query(query):
     block_remains = ''
 
     while not done:
+# START db.overpass-profiler
         count_blocks += 1
+# END db.overpass-profiler
         try:
             r = f.read({db.overpass-blocksize})
 # START db.overpass-profiler
@@ -97,7 +99,9 @@ def overpass_query(query):
 
         # found a result
         if result:
+# START db.overpass-profiler
             count += len(result['elements'])
+# END db.overpass-profiler
             for e in result['elements']:
                 yield e
             result['elements'] = []
