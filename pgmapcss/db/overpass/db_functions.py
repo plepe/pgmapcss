@@ -8,6 +8,7 @@ def overpass_query(query):
 # START db.overpass-profiler
     time_start = datetime.datetime.now()
     time_duration = datetime.timedelta(0)
+    download_size = 0
 # END db.overpass-profiler
     url = '{db.overpass-url}/interpreter'
     data = urllib.parse.urlencode({ 'data': query })
@@ -31,6 +32,9 @@ def overpass_query(query):
         count_blocks += 1
         try:
             r = f.read({db.overpass-blocksize})
+# START db.overpass-profiler
+            download_size += len(r)
+# END db.overpass-profiler
 
             # make sure that result is valid UTF-8
             # thanks to http://rosettacode.org/wiki/Read_a_file_character_by_character/UTF8#Python
@@ -39,6 +43,9 @@ def overpass_query(query):
                     r = r.decode('utf-8')
                 except UnicodeDecodeError:
                     r += f.read(1)
+# START db.overpass-profiler
+                    download_size += 1
+# END db.overpass-profiler
                 else:
                     break
         except urllib.error.HTTPError as err:
@@ -107,7 +114,7 @@ def overpass_query(query):
     f.close()
 
 # START db.overpass-profiler
-    plpy.warning('%s\nquery took %.2fs for %d features (%d blocks)' % (query, time_duration.total_seconds(), count, count_blocks))
+    plpy.warning('%s\nquery took %.2fs for %d features (%.1f MB, %d blocks)' % (query, time_duration.total_seconds(), count, download_size / 1024.0 / 1024, count_blocks))
 # END db.overpass-profiler
 
 def node_geom(lat, lon):
