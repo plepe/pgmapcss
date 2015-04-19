@@ -7,6 +7,7 @@ def overpass_query(query):
 
 # START db.overpass-profiler
     time_start = datetime.datetime.now()
+    time_duration = datetime.timedelta(0)
 # END db.overpass-profiler
     url = '{db.overpass-url}/interpreter'
     data = urllib.parse.urlencode({ 'data': query })
@@ -83,12 +84,20 @@ def overpass_query(query):
             except ValueError:
                 pass
 
+# START db.overpass-profiler
+        time_duration += (datetime.datetime.now() - time_start)
+# END db.overpass-profiler
+
         # found a result
         if result:
             count += len(result['elements'])
             for e in result['elements']:
                 yield e
             result['elements'] = []
+
+# START db.overpass-profiler
+        time_start = datetime.datetime.now()
+# END db.overpass-profiler
 
     if 'remark' in result:
         # ignore timeout if it happens in "print"
@@ -98,7 +107,7 @@ def overpass_query(query):
     f.close()
 
 # START db.overpass-profiler
-    plpy.warning('%s\nquery took %.2fs for %d features (%d blocks)' % (query, (datetime.datetime.now() - time_start).total_seconds(), count, count_blocks))
+    plpy.warning('%s\nquery took %.2fs for %d features (%d blocks)' % (query, time_duration.total_seconds(), count, count_blocks))
 # END db.overpass-profiler
 
 def node_geom(lat, lon):
