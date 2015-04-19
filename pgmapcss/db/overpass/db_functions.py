@@ -19,28 +19,13 @@ def overpass_query(query):
         plpy.warning('Overpass query failed:\n' + query)
         raise
 
-    r = None
-    result_without_elements = ''
+    first = True
+    done = False
+    to_parse = None
+    result = None
+    block_remains = ''
 
-    while r != '  "elements": [\n':
-        try:
-            r = f.readline().decode('utf-8')
-            result_without_elements += r
-        except urllib.error.HTTPError as err:
-            plpy.warning('Overpass query failed while reading headers:\n'.format(count) + query)
-            raise
-
-    # areas not initialized -> ignore
-    if re.search('osm3s_v[0-9\.]+_areas', result_without_elements):
-        f.close()
-        return
-
-    elements_todo = ''
-
-    still_reading = True
-    count = 0
-    to_parse = ''
-    while not elements_todo is None:
+    while not done:
         try:
             r = f.read({db.overpass-blocksize})
 
@@ -53,35 +38,62 @@ def overpass_query(query):
                     r += f.read(1)
                 else:
                     break
-
-            elements_todo += r
         except urllib.error.HTTPError as err:
             plpy.warning('Overpass query failed (after {} features):\n'.format(count) + query)
             raise
 
-        end_last = elements_todo.rfind('\n},')
-        if end_last == -1:
-            end_last = elements_todo.rfind('\n}\n\n  ]\n}')
-            if end_last != -1:
-                to_parse = elements_todo[0 : end_last] + '\n}'
-                result_without_elements += elements_todo[end_last + 2 :]
-                elements_todo = None
+        # EOF detected
+        if not r:
+            done = True
+
+        # areas not initialized -> ignore
+        if first and re.search('osm3s_v[0-9\.]+_areas', r):
+            f.close()
+            return
+
+        if first:
+            # maybe we could read whole result in blocksize
+            first = False
+            try:
+                result = json.loads(r)
+            except ValueError:
+                pass
+            else:
+                done = True
+
+        # try to read complete elements from block, remember surroundings for
+        # later (block_remains)
+        if done:
+            to_parse = block_remains
         else:
-            to_parse = elements_todo[0 : end_last] + '\n}'
-            elements_todo = elements_todo[end_last + 3 :]
+            block_remains += r
+            end_last = block_remains.rfind('\n},')
+            if end_last != -1:
+                start = block_remains.find('"elements": [')
+                to_parse = block_remains[0 : end_last] + '}]\n}'
+                block_remains = block_remains[0 : start + 13] + block_remains[end_last + 3 :]
 
-        data = json.loads('[' + to_parse + ']')
-        to_parse = ''
-        count += len(data)
+        # try to load JSON - if not complete, try after next reading
+        if to_parse:
+            try:
+                result = json.loads(to_parse)
+                to_parse = None
+            except ValueError:
+                pass
 
-        for e in data:
-            yield e
+        # found a result
+        if result:
+            count += len(result['elements'])
+            for e in result['elements']:
+                yield e
+            result['elements'] = []
 
-    data = json.loads(result_without_elements)
-    if 'remark' in data:
+    if 'remark' in result:
         # ignore timeout if it happens in "print"
         if not re.search("Query timed out in \"print\"", data['remark']):
           raise Exception('Error in Overpass API (after {} features): {}\nFailed query was:\n{}'.format(count, data['remark'], query))
+
+    f.close()
 
 # START db.overpass-profiler
     plpy.warning('%s\nquery took %.2fs for %d features' % (query, (datetime.datetime.now() - time_start).total_seconds(), count))
