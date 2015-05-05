@@ -60,6 +60,9 @@ if __name__ == '__main__':
             ]
             parameters['in.srs'] = 4326
 
+        if params.getvalue("id"):
+            bounds = set(params.getlist("id"))
+
         if params.getvalue("scale"):
             scale_denom = float(params.getvalue("scale"))
 
@@ -104,6 +107,9 @@ if __name__ == '__main__':
             help='Process the map from the specified bounding box as min_lon,min_lat,max_lon,max_lat in WGS-84. (default: whole database)'
         )
 
+        parser.add_argument('-o', '--id', dest='id', nargs='+',
+            help='Instead of processing all objects in the specified bounding box, process only the given object(s).')
+
         parser.add_argument('-s', '--scale', dest='scale',
             default='2000',
             help='Process map at a specified scale denominator. If z<zoom> syntax (e.g. "z15") is used, the zoom levels of projection 900913 are used.'
@@ -129,6 +135,10 @@ if __name__ == '__main__':
             if len(bounds) != 4:
                 print("Error parsing bounds, expecting four numbers.")
                 sys.exit(1)
+
+        elif args.id:
+            bounds = set(args.id)
+
         else:
             bounds = None
 
