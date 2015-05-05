@@ -75,6 +75,9 @@ parser.add_argument('--lang', dest='lang',
     help='Use the given language code (e.g. "en" or "de") for language dependend instruction (e.g. function lang(), text:auto, ...). Default: language from current locale $LANG (or "en").'
 )
 
+parser.add_argument('--icons-parent-dir', dest='icons_parent_dir',
+    help='Use specified parent directory (which must already exist) to create icons. There, a directory <style_id>.icons will be created. (default: current working directory)')
+
 def main():
     print('pgmapcss version %s' % pgmapcss.version.VERSION)
     args = parser.parse_args()
@@ -111,11 +114,15 @@ def main():
             # default: english
             lang = 'en'
 
+    icons_dir = style_id + '.icons'
+    if args.icons_parent_dir:
+        icons_dir = args.icons_parent_dir + '/' + icons_dir
+
     stat = pgmapcss.compiler.stat._stat({
         'id': style_id,
         'config': {},
         'base_style': args.base_style,
-        'icons_dir': style_id + '.icons',
+        'icons_dir': icons_dir,
         'global_data': None,
         'mode': args.mode,
         'args': args,

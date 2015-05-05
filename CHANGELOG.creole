@@ -6,6 +6,7 @@
 * Mode standalone: by default not the whole database is queried - use '--bounds all'. CGI mode never queries the whole database.
 * @depend_property: main property may have default (@default_value, @default_other)
 * specify mapcss file by "-f file.mapcss"
+* specify icons parent directory by --icons-parent-dir
 * @import: evaluate relative paths to the file instead the working directory
 
 0.10.5 release 2015-05-05
