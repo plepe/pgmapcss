@@ -30,6 +30,7 @@ Behaviour can be influenced with the following config options:
 | db.overpass-timeout | specify timeout in seconds for queries to the Overpass API (make sure that the Overpass server accepts timeouts that long, e.g. by adding a "Timeout" parameter to Apache2). As a render job usually needs several queries, the total rendering time might be a multiple of this value. | 180
 | db.overpass-memory | Sets the 'maxsize' parameter for an overpass query, which indicates the maximum allowed memory for the query in bytes RAM on the server. | 536870912 (512 MB)
 | db.overpass-profiler | overpass only: prints all queries, their duration (incl. parsing json) and the count of returned features. | true/**false**
+| db.overpass-blocksize | overpass only: When reading from Overpass API read in blocks of specified size. Reduces memory impact. | 67108864 (64 MB)
 
 Example usage:
 ```sh
