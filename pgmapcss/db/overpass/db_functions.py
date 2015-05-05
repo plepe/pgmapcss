@@ -7,11 +7,14 @@ def overpass_query(query):
 
 # START db.overpass-profiler
     time_start = datetime.datetime.now()
+    time_duration = datetime.timedelta(0)
+    download_size = 0
+    count = 0
+    count_blocks = 0
 # END db.overpass-profiler
     url = '{db.overpass-url}/interpreter'
     data = urllib.parse.urlencode({ 'data': query })
     data = data.encode('utf-8')
-    count = 0
 
     try:
         f = urllib.request.urlopen(url, data)
@@ -19,30 +22,104 @@ def overpass_query(query):
         plpy.warning('Overpass query failed:\n' + query)
         raise
 
-    try:
-        r = f.read().decode('utf-8')
-    except urllib.error.HTTPError as err:
-        plpy.warning('Overpass query failed (after {} features):\n'.format(count) + query)
-        raise
+    first = True
+    done = False
+    to_parse = None
+    result = None
+    block_remains = ''
 
-    # areas not initialized -> ignore
-    if re.search('osm3s_v[0-9\.]+_areas', r):
-        f.close()
-        return
+    while not done:
+# START db.overpass-profiler
+        count_blocks += 1
+# END db.overpass-profiler
+        try:
+            r = f.read({db.overpass-blocksize})
+# START db.overpass-profiler
+            download_size += len(r)
+# END db.overpass-profiler
 
-    data = json.loads(r)
+            # make sure that result is valid UTF-8
+            # thanks to http://rosettacode.org/wiki/Read_a_file_character_by_character/UTF8#Python
+            while True:
+                try:
+                    r = r.decode('utf-8')
+                except UnicodeDecodeError:
+                    r += f.read(1)
+# START db.overpass-profiler
+                    download_size += 1
+# END db.overpass-profiler
+                else:
+                    break
+        except urllib.error.HTTPError as err:
+            plpy.warning('Overpass query failed (after {} features):\n'.format(count) + query)
+            raise
 
-    if 'remark' in data:
+        # EOF detected
+        if not r:
+            done = True
+
+        # areas not initialized -> ignore
+        if first and re.search('osm3s_v[0-9\.]+_areas', r):
+            f.close()
+            return
+
+        if first:
+            # maybe we could read whole result in blocksize
+            first = False
+            try:
+                result = json.loads(r)
+            except ValueError:
+                pass
+            else:
+                done = True
+
+        # try to read complete elements from block, remember surroundings for
+        # later (block_remains)
+        if done:
+            to_parse = block_remains
+        else:
+            block_remains += r
+            end_last = block_remains.rfind('\n},')
+            if end_last != -1:
+                start = block_remains.find('"elements": [')
+                to_parse = block_remains[0 : end_last] + '}]\n}'
+                block_remains = block_remains[0 : start + 13] + block_remains[end_last + 3 :]
+
+        # try to load JSON - if not complete, try after next reading
+        if to_parse:
+            try:
+                result = json.loads(to_parse)
+                to_parse = None
+            except ValueError:
+                pass
+
+# START db.overpass-profiler
+        time_duration += (datetime.datetime.now() - time_start)
+# END db.overpass-profiler
+
+        # found a result
+        if result:
+# START db.overpass-profiler
+            count += len(result['elements'])
+# END db.overpass-profiler
+            for e in result['elements']:
+                yield e
+            result['elements'] = []
+
+# START db.overpass-profiler
+        time_start = datetime.datetime.now()
+# END db.overpass-profiler
+
+    if 'remark' in result:
         # ignore timeout if it happens in "print"
         if not re.search("Query timed out in \"print\"", data['remark']):
           raise Exception('Error in Overpass API (after {} features): {}\nFailed query was:\n{}'.format(count, data['remark'], query))
 
-# START db.overpass-profiler
-    plpy.warning('%s\nquery took %.2fs for %d features' % (query, (datetime.datetime.now() - time_start).total_seconds(), len(data['elements'])))
-# END db.overpass-profiler
+    f.close()
 
-    for e in data['elements']:
-        yield e
+# START db.overpass-profiler
+    plpy.warning('%s\nquery took %.2fs for %d features (%.1f MB, %d blocks)' % (query, time_duration.total_seconds(), count, download_size / 1024.0 / 1024, count_blocks))
+# END db.overpass-profiler
 
 def node_geom(lat, lon):
     global geom_plan

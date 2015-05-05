@@ -54,8 +54,8 @@
 @postprocess text eval(text_transform(prop("text"), prop("text-transform")));
 @postprocess final-casing-width eval(prop("width") + prop("casing-width") * 2);
 @postprocess final-icon-image eval(cond(
-  prop('icon-image') && substring(prop('icon-image'), 0, 5) == 'icon:',
-    style_id() . '.icons/' . substring(prop('icon-image'), 5) . '-' . prop('icon-color') . '-' . prop('icon-width'). '.svg',
+  prop('icon-image') && (!regexp_test('\\.', prop('icon-image'))),
+    style_id() . '.icons/' . prop('icon-image') . '-' . prop('icon-color') . '-' . prop('icon-width'). '.svg',
     prop('icon-image')
   ));
 @postprocess final-symbol-image eval(
