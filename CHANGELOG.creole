@@ -6,6 +6,7 @@
 * Mode standalone: by default not the whole database is queried - use '--bounds all'. CGI mode never queries the whole database.
 * @depend_property: main property may have default (@default_value, @default_other)
 * specify mapcss file by "-f file.mapcss"
+* @import: evaluate relative paths to the file instead the working directory
 
 0.10.5 release 2015-05-05
 * DB/Overpass: download from API in blocks, to avoid huge memory consumption. specify {{{db.overpass-blocksize}}} (default: 64MB).

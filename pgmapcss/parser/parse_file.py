@@ -55,7 +55,12 @@ def parse_file(stat, filename=None, base_style=None, content=None, defaults=[]):
             if not r:
                 break;
             elif r and r[0] == 'import':
-                parse_file(stat, r[1])
+                if(os.path.dirname(filename)):
+                    import_file = os.path.dirname(filename) + '/' + r[1]
+                else:
+                    import_file = r[1]
+
+                parse_file(stat, import_file)
             elif r and r[0] == 'media':
                 media = r[1]
 
