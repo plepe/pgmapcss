@@ -21,6 +21,9 @@ parser.add_argument('style_id', type=str, help='''\
   file will be called style_id.mapnik.
 ''')
 
+parser.add_argument('-f', '--file', dest='file',
+    help='Use specified mapcss file as input (default: <style_id>.mapcss)')
+
 parser.add_argument('-d', '--database', dest='database',
     default=getpass.getuser(),
     help='Name of database (default: username)')
@@ -83,6 +86,9 @@ def main():
         style_id = m.group(1)
 
     file_name = style_id + '.mapcss'
+
+    if args.file:
+        file_name = args.file
 
     parameters = { }
     if args.parameters is not None:

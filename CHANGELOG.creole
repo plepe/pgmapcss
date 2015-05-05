@@ -5,6 +5,7 @@
 * Mode standalone: include meta info in output. "--meta only" (resp. &meta=only in CGI) will only show meta info.
 * Mode standalone: by default not the whole database is queried - use '--bounds all'. CGI mode never queries the whole database.
 * @depend_property: main property may have default (@default_value, @default_other)
+* specify mapcss file by "-f file.mapcss"
 
 0.10.5 release 2015-05-05
 * DB/Overpass: download from API in blocks, to avoid huge memory consumption. specify {{{db.overpass-blocksize}}} (default: 64MB).
