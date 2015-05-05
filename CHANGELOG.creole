@@ -1,5 +1,7 @@
-0.10.5 release upcoming
+0.10.5 release 2015-05-05
 * DB/Overpass: download from API in blocks, to avoid huge memory consumption. specify {{{db.overpass-blocksize}}} (default: 64MB).
+* Icon handling from 0.10.4 also for ol4pgm
+* Update Maki icons
 
 0.10.4 release 2015-03-11
 * DB/Overpass: set max allowed memory by config option {{{db.overpass-memory}}}
