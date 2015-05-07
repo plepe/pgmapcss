@@ -114,6 +114,7 @@ render_context = {{ 'bbox': res[0]['bounds'], 'scale_denominator': scale_denomin
     ret += '''\
 {db_query}
 {eval_functions}
+load_translation('{style_id}')
 {function_check}
 db_selects = None
 {db_selects}

@@ -13,6 +13,9 @@ def eval_tr(param):
 
     ret = param[0]
 
+    if ret in translation_strings and translation_strings[ret] != '':
+        ret = translation_strings[ret]
+
     for i, v in enumerate(param):
         for j, w in enumerate(current['condition-keys']):
             if w is not None:
