@@ -13,8 +13,22 @@ def eval_tr(param):
 
     ret = param[0]
 
-    if ret in translation_strings and translation_strings[ret] != '':
+    # we tried before, but did not find in pgmapcss_translations
+    if ret in translation_strings and translation_strings[ret] == None:
+        pass
+
+    elif ret in translation_strings and translation_strings[ret] != '':
         ret = translation_strings[ret]
+
+    else:
+        plan = plpy.prepare('select value from pgmapcss_translations where lang=$1 and key=$2', ['text', 'text'])
+        res = plpy.execute(plan, [ parameters['lang'], ret ])
+
+        if len(res):
+            translation_strings[ret] = res[0]['value']
+            ret = res[0]['value']
+        else:
+            translation_strings[ret] = None
 
     for i, v in enumerate(param):
         for j, w in enumerate(current['condition-keys']):
