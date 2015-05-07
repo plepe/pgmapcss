@@ -11,6 +11,7 @@ import argparse
 import getpass
 import pgmapcss.db
 import pgmapcss.eval
+import pgmapcss.translation
 import os
 
 parser = argparse.ArgumentParser(description='Compiles a MapCSS style description into PostgreSQL functions and builds an accompanying Mapnik stylesheet.')
@@ -254,4 +255,7 @@ def main():
         mapcss.parentNode.removeChild(mapcss)
         open(style_id + '.mapnik', 'w').write(tree.toxml())
 
+    pgmapcss.translation.create_template(stat)
+
+    # debug ouput
     print('Debug output wrote to ' + style_id + '.output')

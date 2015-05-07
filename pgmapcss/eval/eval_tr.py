@@ -1,5 +1,11 @@
 class config_eval_tr(config_base):
     mutable = 0
+    def possible_values_all(self, param_values, prop, stat):
+        if not 'translation_strings' in stat:
+            stat['translation_strings'] = set()
+        stat['translation_strings'] |= param_values[0]
+        return ( { True }, 0 )
+
 
 def eval_tr(param):
     if len(param) == 0:
