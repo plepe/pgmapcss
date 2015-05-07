@@ -36,3 +36,11 @@ create index _pgmapcss_PGCache_id on _pgmapcss_PGCache(id);
 create index _pgmapcss_PGCache_geo on _pgmapcss_PGCache using gist(geo);
 
 drop function if exists __eval_test__();
+
+drop table if exists pgmapcss_translations cascade;
+create table pgmapcss_translations (
+  lang          text,
+  key           text,
+  value         text,
+  primary key(lang, key)
+);

@@ -1,4 +1,5 @@
 import re
+import json
 import postgresql
 import pgmapcss.data
 from pkg_resources import *
@@ -79,6 +80,14 @@ def db_init(conn, stat):
         if r[0] != '#':
             res(r)
     f.close()
+
+    # populate pgmapcss_translations
+    f = resource_string(pgmapcss.translation.__name__, 'tag-translations.json')
+    f = json.loads(f.decode('utf-8'))
+    res = conn.prepare("insert into pgmapcss_translations values ($1::text, $2::text, $3::text)")
+    for lang, d in f.items():
+        for key, value in d.items():
+            res(lang, key, value)
 
     db_version_create()
     db_update(conn)
