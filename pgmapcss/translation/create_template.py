@@ -11,11 +11,15 @@ def create_template(stat):
     except OSError:
         pass
 
-    translation_strings = {
-        k: ''
-        for k in stat['translation_strings']
-    }
+    translation_strings = {}
+    if 'translation_update' in stat['config'] and stat['config']['translation_update']:
+        try:
+            translation_strings = open(stat['config']['translation_dir'] + '/template.json', 'r').read()
+            translation_strings = json.loads(translation_strings)
+        except IOError:
+            pass
+
+    for k in stat['translation_strings']:
+        translation_strings[k] = ''
 
     open(stat['config']['translation_dir'] + '/template.json', 'w').write(json.dumps(translation_strings, sort_keys=True, indent=2))
-
-

@@ -20,6 +20,7 @@ The following config options are supported:
 | debug.explain_queries | Print queries, their plans and count of executions to stderr (standalone mode only). | true/**false** |
 | debug.overpass_queries | overpass only: Print a debug message for each query posted to the Overpass API | true/**false** |
 | translation_dir | which directory to use for translation strings | <style_id>.translation/
+| translation_update | when set to true, the template.json in translation_dir is not re-created, but extend by additional strings | true/**false**
 
 Advances options:
 
