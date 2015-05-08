@@ -1,13 +1,13 @@
-def load_translation(id, abs_path):
+def load_translation(translation_dir, abs_path):
     import json
     global translation_strings
     translation_strings = {}
 
     try:
-        data = open(id + '.translation/' + parameters['lang'] + '.json', 'r').read()
+        data = open(translation_dir + '/' + parameters['lang'] + '.json', 'r').read()
     except IOError:
         try:
-            data = open(abs_path + '/' + id + '.translation/' + parameters['lang'] + '.json', 'r').read()
+            data = open(abs_path + '/' + translation_dir + '/' + parameters['lang'] + '.json', 'r').read()
         except IOError:
             return
 

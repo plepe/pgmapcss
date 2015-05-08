@@ -1,4 +1,5 @@
 from .create_template import create_template
+from .init import init
 from ..includes import register_includes
 from pkg_resources import *
 

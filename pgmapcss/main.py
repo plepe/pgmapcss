@@ -167,6 +167,8 @@ def main():
             else:
                 print('* Current DB version: {version}'.format(**db_version))
 
+    pgmapcss.translation.init(stat)
+
     if args.eval_tests is not False:
         if len(args.eval_tests):
             pgmapcss.eval.functions(stat).test_all(args.eval_tests)

@@ -7,7 +7,7 @@ def create_template(stat):
 
     # generate translation files
     try:
-        os.mkdir(stat['id'] + '.translation')
+        os.mkdir(stat['config']['translation_dir'])
     except OSError:
         pass
 
@@ -16,6 +16,6 @@ def create_template(stat):
         for k in stat['translation_strings']
     }
 
-    open(stat['id'] + '.translation/template.json', 'w').write(json.dumps(translation_strings, sort_keys=True, indent=2))
+    open(stat['config']['translation_dir'] + '/template.json', 'w').write(json.dumps(translation_strings, sort_keys=True, indent=2))
 
 

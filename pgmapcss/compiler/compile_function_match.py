@@ -57,6 +57,7 @@ def compile_function_match(stat):
       'all_style_elements': repr({ k
           for k, v in stat['defines']['style_element_property'].items()
       }),
+      'translation_dir': repr(stat['config']['translation_dir']),
       'scale_denominators': repr(scale_denominators),
       'db_selects': compile_db_selects(stat['id'], stat),
       'db_query': db.query_functions(stat),
@@ -116,7 +117,7 @@ render_context = {{ 'bbox': res[0]['bounds'], 'scale_denominator': scale_denomin
     ret += '''\
 {db_query}
 {eval_functions}
-load_translation('{style_id}', {abs_path})
+load_translation({translation_dir}, {abs_path})
 {function_check}
 db_selects = None
 {db_selects}
