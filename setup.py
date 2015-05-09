@@ -18,6 +18,7 @@ setup(
         'pgmapcss.symbols': [ '*.svg' ],
         'pgmapcss.data': [ '*.wkt' ],
         'pgmapcss.defaults': [ '*.mapcss' ],
+        'pgmapcss.translation': [ '*.json' ],
     },
     scripts = [ 'bin/pgmapcss' ],
     install_requires = [
