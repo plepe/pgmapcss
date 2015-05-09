@@ -2,17 +2,22 @@ from .compile_statement import compile_statement
 import copy
 from collections import Counter
 
-def compile_function_check(statements, min_scale, max_scale, stat):
+def compile_function_check(statements, min_scale, max_scale, stat, func_name=None, build_result='build_result'):
     replacement = {
-      'style_id': stat['id'],
-      'min_scale': min_scale,
-      'max_scale': max_scale,
-      'min_scale_esc': str(min_scale).replace('.', '_'),
-      'pseudo_elements': repr(stat['pseudo_elements'])
+        'style_id': stat['id'],
+        'min_scale': min_scale,
+        'max_scale': max_scale,
+        'pseudo_elements': repr(stat['pseudo_elements']),
+        'build_result': build_result,
     }
 
+    if func_name is not None:
+        replacement['func_name'] = func_name
+    else:
+        replacement['func_name'] = 'check_' + str(min_scale).replace('.', '_')
+
     ret = '''
-def check_{min_scale_esc}(object):
+def {func_name}(object):
 # initialize variables
     global current
     current = {{
@@ -37,8 +42,10 @@ def check_{min_scale_esc}(object):
     for i in statements:
         # create a copy of the statement and modify min/max scale
         i = copy.deepcopy(i)
-        i['selector']['min_scale'] = min_scale
-        i['selector']['max_scale'] = max_scale
+        if min_scale is not None:
+            i['selector']['min_scale'] = min_scale
+        if max_scale is not None:
+            i['selector']['max_scale'] = max_scale
 
         compiled_statements.append(compile_statement(i, stat))
 
@@ -84,7 +91,7 @@ def check_{min_scale_esc}(object):
         if current['has_pseudo_element'][pseudo_element]:
             current['pseudo_element'] = pseudo_element # for eval functions
 
-            ret = build_result(current, pseudo_element)
+            ret = {build_result}(current, pseudo_element)
 
             yield(( 'result', ret))
 '''.format(**replacement)
