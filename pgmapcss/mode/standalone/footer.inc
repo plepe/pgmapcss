@@ -205,13 +205,31 @@ if __name__ == '__main__':
     results = []
     last_object = None
 
+    object = {{
+        'id': '',
+        'tags': {{}},
+        'types': [ 'meta' ],
+        'geo': None,
+    }}
+
+    meta = {{}}
+    for result in check_meta(object):
+        if result[0] == 'result':
+            meta = result[1]
+    meta['id'] = '{style_id}'
+
     for result in pgmapcss_{style_id}(bounds, scale_denom, parameters):
         if result['object'] == last_object:
             results.append(result)
 
         else:
             if len(results) == 0:
-                print('{{ "type": "FeatureCollection",')
+                print('{{')
+                if meta is not None:
+                    print('  "meta": ', end='')
+                    print(json.dumps(meta, indent=2).replace('\n', '\n  '), end='')
+                    print(',')
+                print('  "type": "FeatureCollection",')
                 print('"crs": {{ "type": "name", "properties": {{ "name": "EPSG:' + str(parameters['srs']) + '" }} }},')
                 print('"features": [')
             else:

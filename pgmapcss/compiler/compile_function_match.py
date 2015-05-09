@@ -315,6 +315,18 @@ plpy.warning('Resource Usage: ' + str(resource.getrusage(resource.RUSAGE_SELF)) 
     footer = strip_includes(resource_stream(pgmapcss.mode.__name__, stat['mode'] + '/footer.inc'), stat)
     footer = footer.format(**replacement)
 
-    ret = header + indent + ret.replace('\n', '\n' + indent) + '\n' + footer
+    ret = header + indent + ret.replace('\n', '\n' + indent)
+
+    if stat['mode'] == 'standalone':
+        ret += '\n'
+        ret += 'def build_result_meta(current, pseudo_element):\n'
+        ret += "    return current['properties'][pseudo_element]\n\n"
+        ret += compile_function_check([
+            v
+            for v in stat['statements']
+            if v['selector']['type'] in ('meta', )
+        ], None, None, stat, func_name='check_meta', build_result='build_result_meta')
+
+    ret += '\n' + footer
 
     return ret
