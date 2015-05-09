@@ -1,3 +1,6 @@
+meta {
+  title: "Test";
+}
 canvas {
   fill-color: #f2efd9;
   buffer: 128;

@@ -66,6 +66,8 @@ optional arguments:
                         language dependend instruction (e.g. function lang(),
                         text:auto, ...). Default: language from current locale
                         $LANG (or "en").
+  --meta META           Whether meta information should be included (true,
+                        false, only)
 ```
 
 #### CGI script
@@ -81,12 +83,18 @@ tilesize      | the tilesize when using x/y tiles (default: 256)
 lang          | Use the given language code (e.g. "en" or "de") for language dependend instructions. Default: the first value of the HTTP Accept-Language header.
 srs           | ID of projection of output coordinates (default: 4326).
 in.srs        | Per default the coordinates of the bounding box are assumed to be in 'srs'. Use this to override this value.
+meta          | Whether meta information should be included (true, only)
 OTHER         | all other parameters will be available via the parameters() function.
 
 #### GeoJSON output
 Some example output (shortened). As you can see, the "results" part of "properties" may contain several items, for each pseudo element.
 ```json
-{ "type": "FeatureCollection",
+{
+  "meta": {
+    "id": "test",
+    "title": "Test"
+  },
+  "type": "FeatureCollection",
   "crs": { "type": "name", "properties": { "name": "EPSG:4326" } },
   "features": [
     {

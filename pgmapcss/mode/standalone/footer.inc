@@ -134,7 +134,7 @@ if __name__ == '__main__':
 
         parser.add_argument('--meta', dest='meta',
             default='true',
-            help='Whether meta information should be included (true, only)'
+            help='Whether meta information should be included (true, false, only)'
         )
 
         args = parser.parse_args()
