@@ -12,6 +12,7 @@ if __name__ == '__main__':
     import re
     import json
     import os
+    include_meta = 'false'
 
     if 'GATEWAY_INTERFACE' in os.environ:
         import cgi
@@ -77,6 +78,9 @@ if __name__ == '__main__':
         if params.getvalue('srs'):
             parameters['srs'] = int(params.getvalue('srs'))
 
+        if 'meta' in parameters:
+            include_meta = parameters['meta']
+
         # print HTML headers
         print("content-type: text/javascript, charset-utf8")
         print()
@@ -128,6 +132,11 @@ if __name__ == '__main__':
             help='Use the specified spatial reference system for returned geometries (default: 4326).'
         )
 
+        parser.add_argument('--meta', dest='meta',
+            default='true',
+            help='Whether meta information should be included (true, only)'
+        )
+
         args = parser.parse_args()
 
         if args.bounds:
@@ -149,6 +158,8 @@ if __name__ == '__main__':
         else:
             print("Error parsing scale.")
             sys.exit(1)
+
+        include_meta = args.meta
 
         parameters = {{ }}
         if args.parameters is not None:
@@ -205,45 +216,50 @@ if __name__ == '__main__':
     results = []
     last_object = None
 
-    object = {{
-        'id': '',
-        'tags': {{}},
-        'types': [ 'meta' ],
-        'geo': None,
-    }}
+    if include_meta in ('true', 'only'):
+        object = {{
+            'id': '',
+            'tags': {{}},
+            'types': [ 'meta' ],
+            'geo': None,
+        }}
 
-    meta = {{}}
-    for result in check_meta(object):
-        if result[0] == 'result':
-            meta = result[1]
-    meta['id'] = '{style_id}'
+        meta = {{}}
+        for result in check_meta(object):
+            if result[0] == 'result':
+                meta = result[1]
+        meta['id'] = '{style_id}'
 
-    for result in pgmapcss_{style_id}(bounds, scale_denom, parameters):
-        if result['object'] == last_object:
-            results.append(result)
+    if include_meta == 'only':
+        print(json.dumps({{ 'meta': meta }}, indent=2))
 
-        else:
-            if len(results) == 0:
-                print('{{')
-                if meta is not None:
-                    print('  "meta": ', end='')
-                    print(json.dumps(meta, indent=2).replace('\n', '\n  '), end='')
-                    print(',')
-                print('  "type": "FeatureCollection",')
-                print('"crs": {{ "type": "name", "properties": {{ "name": "EPSG:' + str(parameters['srs']) + '" }} }},')
-                print('"features": [')
-            else:
-                print(format_result(results))
-                print(",")
-
-            results = [result]
-            last_object = result['object']
-
-    if len(results) == 0:
-        print('{{ "type": "FeatureCollection", "features": []}}')
     else:
-        print(format_result(results))
-        print("]}}\n")
+        for result in pgmapcss_{style_id}(bounds, scale_denom, parameters):
+            if result['object'] == last_object:
+                results.append(result)
+
+            else:
+                if len(results) == 0:
+                    print('{{')
+                    if include_meta == 'true':
+                        print('  "meta": ', end='')
+                        print(json.dumps(meta, indent=2).replace('\n', '\n  '), end='')
+                        print(',')
+                    print('  "type": "FeatureCollection",')
+                    print('"crs": {{ "type": "name", "properties": {{ "name": "EPSG:' + str(parameters['srs']) + '" }} }},')
+                    print('"features": [')
+                else:
+                    print(format_result(results))
+                    print(",")
+
+                results = [result]
+                last_object = result['object']
+
+        if len(results) == 0:
+            print('{{ "type": "FeatureCollection", "features": []}}')
+        else:
+            print(format_result(results))
+            print("]}}\n")
 
     plpy.execute(plpy.prepare('truncate _pgmapcss_PGCache', []), [])
     plpy.execute(plpy.prepare('commit', []), [])
