@@ -217,17 +217,9 @@ if __name__ == '__main__':
     last_object = None
 
     if include_meta in ('true', 'only'):
-        object = {{
-            'id': '',
-            'tags': {{}},
-            'types': [ 'meta' ],
-            'geo': None,
-        }}
-
         meta = {{}}
-        for result in check_meta(object):
-            if result[0] == 'result':
-                meta = result[1]
+        for result in pgmapcss_{style_id}('meta', scale_denom, parameters):
+            meta = result
         meta['id'] = '{style_id}'
 
     if include_meta == 'only':

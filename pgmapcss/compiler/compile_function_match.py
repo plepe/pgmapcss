@@ -25,6 +25,16 @@ def compile_function_match(stat):
         check_functions += '\n'
         max_scale = min_scale
 
+    if stat['mode'] == 'standalone':
+        check_functions += 'def build_result_meta(current, pseudo_element):\n'
+        check_functions += "    return current['properties'][pseudo_element]\n\n"
+        check_functions += compile_function_check([
+            v
+            for v in stat['statements']
+            if v['selector']['type'] in ('meta', )
+        ], None, None, stat, func_name='check_meta', build_result='build_result_meta')
+        check_functions += '\n'
+
     check_chooser  = "if render_context['scale_denominator'] is None:\n"
     check_chooser += "    check = check_0\n"
 
@@ -93,7 +103,9 @@ if not 'lang' in parameters:
 if not 'srs' in parameters:
     parameters['srs' ] = {srs}
 
-if type(bbox) == list and len(bbox) == 4:
+if bbox == 'meta':
+    _bbox = None
+elif type(bbox) == list and len(bbox) == 4:
     plan = plpy.prepare('select ST_SetSRID(ST_MakeBox2D(ST_Point($1, $2), ST_Point($3, $4)), $5) as bounds', ['float', 'float', 'float', 'float', 'int'])
     res = plpy.execute(plan, [float(b) for b in bbox] + [ parameters['in.srs'] if 'in.srs' in parameters else parameters['srs'] ])
     _bbox = res[0]['bounds']
@@ -119,6 +131,18 @@ render_context = {{ 'bbox': res[0]['bounds'], 'scale_denominator': scale_denomin
 db_selects = None
 {db_selects}
 counter = {{ 'rendered': 0, 'total': 0 }}
+
+if bbox == 'meta':
+    object = {{
+        'id': '',
+        'types': [ 'meta' ],
+        'tags': {{}},
+        'geo': None
+    }}
+    for r in check_meta(object):
+        if r[0] == 'result':
+            yield r[1]
+    return
 
 {check_chooser}
 combined_objects = {{}}
@@ -316,16 +340,6 @@ plpy.warning('Resource Usage: ' + str(resource.getrusage(resource.RUSAGE_SELF)) 
     footer = footer.format(**replacement)
 
     ret = header + indent + ret.replace('\n', '\n' + indent)
-
-    if stat['mode'] == 'standalone':
-        ret += '\n'
-        ret += 'def build_result_meta(current, pseudo_element):\n'
-        ret += "    return current['properties'][pseudo_element]\n\n"
-        ret += compile_function_check([
-            v
-            for v in stat['statements']
-            if v['selector']['type'] in ('meta', )
-        ], None, None, stat, func_name='check_meta', build_result='build_result_meta')
 
     ret += '\n' + footer
 
