@@ -77,6 +77,10 @@ if __name__ == '__main__':
         if params.getvalue('srs'):
             parameters['srs'] = int(params.getvalue('srs'))
 
+        if bounds is None:
+            print("No bounding box defined.")
+            sys.exit(1)
+
         # print HTML headers
         print("content-type: text/javascript, charset-utf8")
         print()
@@ -104,7 +108,7 @@ if __name__ == '__main__':
             help='Host for database (default: as set at compile time)')
 
         parser.add_argument('-b', '--bounds', dest='bounds',
-            help='Process the map from the specified bounding box as min_lon,min_lat,max_lon,max_lat in WGS-84. (default: whole database)'
+            help='Process the map from the specified bounding box as min_lon,min_lat,max_lon,max_lat in WGS-84. If you pass \'all\', the whole database will be queried.'
         )
 
         parser.add_argument('-o', '--id', dest='id', nargs='+',
@@ -131,16 +135,20 @@ if __name__ == '__main__':
         args = parser.parse_args()
 
         if args.bounds:
-            bounds = args.bounds.split(',')
-            if len(bounds) != 4:
-                print("Error parsing bounds, expecting four numbers.")
-                sys.exit(1)
+            if args.bounds == 'all':
+                bounds = None
+            else:
+                bounds = args.bounds.split(',')
+                if len(bounds) != 4:
+                    print("Error parsing argument 'bounds', expecting four numbers or 'all'.")
+                    sys.exit(1)
 
         elif args.id:
             bounds = set(args.id)
 
         else:
-            bounds = None
+            print("Argument 'bounds' not defined, expecting four numbers or 'all'")
+            sys.exit(1)
 
         if args.scale[0] == 'z':
             scale_denom = 559082264.028 / (2 ** int(args.scale[1:]))

@@ -1,5 +1,6 @@
 0.11 release upcoming
 * Mode standalone: specify ID or list of IDs instead of a bounding box
+* Mode standalone: by default not the whole database is queried - use '--bounds all'. CGI mode does never queries the whole database.
 
 0.10.5 release 2015-05-05
 * DB/Overpass: download from API in blocks, to avoid huge memory consumption. specify {{{db.overpass-blocksize}}} (default: 64MB).
