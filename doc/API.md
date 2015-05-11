@@ -63,6 +63,8 @@ optional arguments:
                         language dependend instruction (e.g. function lang(),
                         text:auto, ...). Default: language from current locale
                         $LANG (or "en").
+  --srs SRS             Use the specified spatial reference system for
+                        returned geometries (default: 4326).
 ```
 
 #### CGI script
