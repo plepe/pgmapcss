@@ -37,7 +37,7 @@ for file in glob.glob('openstreetmap-tag-translations/*/*.json'):
 
     data[lang].update(this_data_new)
 
-final_data = json.dumps(data, indent=2, ensure_ascii=False)
+final_data = json.dumps(data, sort_keys=True, indent=4, ensure_ascii=False)
 open('pgmapcss/translation/tag-translations.json', 'w').write(final_data)
 subprocess.call(["git", "add", "pgmapcss/translation/tag-translations.json"])
 subprocess.call(["git", "status", "pgmapcss/translation/tag-translations.json"])

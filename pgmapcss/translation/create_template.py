@@ -22,4 +22,4 @@ def create_template(stat):
     for k in stat['translation_strings']:
         translation_strings[k] = ''
 
-    open(stat['config']['translation_dir'] + '/template.json', 'w').write(json.dumps(translation_strings, sort_keys=True, indent=2))
+    open(stat['config']['translation_dir'] + '/template.json', 'w').write(json.dumps(translation_strings, sort_keys=True, indent=4, ensure_ascii=False))
