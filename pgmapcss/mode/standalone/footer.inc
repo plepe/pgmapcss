@@ -199,7 +199,7 @@ if __name__ == '__main__':
             'properties': properties_list,
         }}
 
-        return json.dumps(feature, indent=2)
+        return json.dumps(feature, indent=4, ensure_ascii=False)
 
 
     results = []
