@@ -3,9 +3,10 @@
     for k, v in plpy.explain_queries.items():
         sys.stderr.write('* {{}}\n'.format(k))
         sys.stderr.write('- Executed {{count}} time(s)\n'.format(**v))
-        sys.stderr.write('- Explain:\n')
-        for e in v['explain']:
-            sys.stderr.write('    ' + e[0] + '\n')
+        if 'explain' in v:
+            sys.stderr.write('- Explain:\n')
+            for e in v['explain']:
+                sys.stderr.write('    ' + e[0] + '\n')
 # END debug.explain_queries
 
 if __name__ == '__main__':

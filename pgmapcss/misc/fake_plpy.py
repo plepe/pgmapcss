@@ -39,9 +39,10 @@ class fake_plpy:
     def record_explain_queries(self, plan, param):
         if not plan.query in self.explain_queries:
             self.explain_queries[plan.query] = {{ 'count': 0 }}
-            explain = self.conn.prepare('explain ' + plan.query)
-            sys.stderr.write(plan.query)
-            self.explain_queries[plan.query]['explain'] = explain(*param)
+            if not re.match('(begin|rollback|commit|truncate)(\s.*|)$', plan.query):
+                explain = self.conn.prepare('explain ' + plan.query)
+                sys.stderr.write(plan.query)
+                self.explain_queries[plan.query]['explain'] = explain(*param)
 
         self.explain_queries[plan.query]['count'] += 1
 # END debug.explain_queries
