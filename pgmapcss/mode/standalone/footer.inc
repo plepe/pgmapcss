@@ -78,7 +78,7 @@ if __name__ == '__main__':
             parameters['srs'] = int(params.getvalue('srs'))
 
         # print HTML headers
-        print("content-type: text/javascript, charset-utf8")
+        print("content-type: application/javascript; charset-utf8")
         print()
 
     else:
