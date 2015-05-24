@@ -77,6 +77,17 @@ if __name__ == '__main__':
         if params.getvalue('srs'):
             parameters['srs'] = int(params.getvalue('srs'))
 
+        if 'meta' in parameters:
+            include_meta = parameters['meta']
+
+        if bounds is None and include_meta != 'only':
+            print("No bounding box defined.")
+            sys.exit(1)
+
+        # re-open stdout to use utf-8 encoding
+        import codecs
+        sys.stdout = codecs.getwriter("utf-8")(sys.stdout.detach())
+
         # print HTML headers
         print("content-type: application/javascript; charset-utf8")
         print()
