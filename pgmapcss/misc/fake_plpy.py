@@ -35,8 +35,8 @@ class fake_plpy:
 
         return plan
 
-    def execute(self, plan, param=[]):
 # START debug.explain_queries
+    def record_explain_queries(self, plan, param):
         if not plan.query in self.explain_queries:
             self.explain_queries[plan.query] = {{ 'count': 0 }}
             explain = self.conn.prepare('explain ' + plan.query)
@@ -44,6 +44,11 @@ class fake_plpy:
             self.explain_queries[plan.query]['explain'] = explain(*param)
 
         self.explain_queries[plan.query]['count'] += 1
+# END debug.explain_queries
+
+    def execute(self, plan, param=[]):
+# START debug.explain_queries
+        self.record_explain_queries(plan, param)
 # END debug.explain_queries
         ret = []
         for r in plan(*param):
@@ -56,13 +61,7 @@ class fake_plpy:
 
     def cursor(self, plan, param=[]):
 # START debug.explain_queries
-        if not plan.query in self.explain_queries:
-            self.explain_queries[plan.query] = {{ 'count': 0 }}
-            explain = self.conn.prepare('explain ' + plan.query)
-            sys.stderr.write(plan.query)
-            self.explain_queries[plan.query]['explain'] = explain(*param)
-
-        self.explain_queries[plan.query]['count'] += 1
+        self.record_explain_queries(plan, param)
 # END debug.explain_queries
         for r in plan(*param):
             yield dict(r)
