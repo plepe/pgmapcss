@@ -145,7 +145,7 @@ The following pseudo classes are supported:
 | :tagged | what is considered tagged, i.e. an object that with a tag key other than the following: source*, source_ref, note, comment, converted_by, created_by, watch*, fixme, FIXME, description, attribution (in this list, * is a glob). Note: osm2pgsql does not even import those object into the database.
 | :righthandtraffic | true if there is right-hand traffic at the current location
 | :lefthandtraffic | true if there is left-hand traffic at the current locatiown
-| :lang(fr) | true when the active language equals the one in brackets (e.g. french in this example). Combined languages codes (like "fr-ca") are not supported.
+| :lang(fr) | true when the active language equals the one in brackets (e.g. french in this example). Combined languages codes (like "fr-ca") are not supported. See [[localization.md]] for details.
 
 === Pseudo elements ===
 After the pseudo class(es), separated by '::'. Optional.
