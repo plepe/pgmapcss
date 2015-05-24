@@ -41,7 +41,6 @@ class fake_plpy:
             self.explain_queries[plan.query] = {{ 'count': 0 }}
             if not re.match('(begin|rollback|commit|truncate)(\s.*|)$', plan.query):
                 explain = self.conn.prepare('explain ' + plan.query)
-                sys.stderr.write(plan.query)
                 self.explain_queries[plan.query]['explain'] = explain(*param)
 
         self.explain_queries[plan.query]['count'] += 1
