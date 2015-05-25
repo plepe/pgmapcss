@@ -55,7 +55,15 @@ def parse_file(stat, filename=None, base_style=None, content=None, defaults=[]):
             if not r:
                 break;
             elif r and r[0] == 'import':
-                parse_file(stat, r[1])
+                if os.path.exists(r[1]):
+                    parse_file(stat, r[1])
+
+                elif filename and \
+                  os.path.exists(os.path.dirname(filename) + '/' + r[1]):
+                    parse_file(stat, os.path.dirname(filename) + '/' + r[1])
+                else:
+                    parse_file(stat, content=pgmapcss.renderer.get_base_style(r[1]))
+
             elif r and r[0] == 'media':
                 media = r[1]
 
