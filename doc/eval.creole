@@ -89,6 +89,7 @@ If you read a number, unit conversion takes place. The following units are suppo
 | exp | v number | number | Return e raised to the power of v | no standard
 | min | number, [number, [number, ...]] | number | Returns lowest of the input values. | MapCSS 0.2
 | max | number, [number, [number, ...]] | number | Returns highest of the input values. | MapCSS 0.2
+| sum | number, [number, [number, ...]] | number | Returns sum of all input values. | MapCSS 0.2
 | metric | value | number | Converts the input to pixels (or ""). E.g. number('3m') => '1.5' when the scale is '2 meters in 1 pixel'. | MapCSS 0.2
 | metric | value, [string] | number | Converts the input to a number (or "") of the specified unit (parameter 2, default 'px'). E.g. number('2px') => '2' or number('100px', 'm') => '238.86' (at zoom level 16). | no standard
 | zmetric | value | number | Currently not supported, returns '' |
