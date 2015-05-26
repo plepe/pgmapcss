@@ -1,5 +1,4 @@
 @type text tag_value;
-@type width int;
 @type icon-image icon;
 @type color color;
 @type casing-color color;
