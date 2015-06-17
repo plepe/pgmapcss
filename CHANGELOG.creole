@@ -10,6 +10,8 @@
 * @import: evaluate relative paths to the file instead the working directory
 * Localization: function tr() translates strings. See [[doc/localization.md]] for details.
 * Include tag translations for many OSM Tags, based on [[https://github.com/plepe/openstreetmap-tag-translations]]
+* @import can also import base styles from pgmapcss distribution
+* -t/--template accepts relative or absolute file names
 
 0.10.5 release 2015-05-05
 * DB/Overpass: download from API in blocks, to avoid huge memory consumption. specify {{{db.overpass-blocksize}}} (default: 64MB).

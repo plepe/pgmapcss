@@ -47,7 +47,7 @@ parser.add_argument('-H', '--host', dest='host',
 
 parser.add_argument('-t', '--template', dest='base_style',
     required=True,
-    help='mapcss/renderer base style for the correct renderer and renderer version, e.g. "mapnik-2.0"')
+    help='mapcss/renderer base style for the correct renderer and renderer version, e.g. "mapnik-2.0". You can reference a file by relative/absolute path too.')
 
 parser.add_argument('--eval-tests', dest='eval_tests',
     default=False, nargs='*',

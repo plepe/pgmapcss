@@ -13,7 +13,9 @@ def parse_file(stat, filename=None, base_style=None, content=None, defaults=[]):
     if not 'max_prop_id' in stat:
         stat['max_prop_id'] = 0
 
-    if base_style:
+    if base_style and os.path.exists(base_style):
+        parse_file(stat, base_style)
+    elif base_style:
         parse_file(stat, content=pgmapcss.renderer.get_base_style(base_style))
 
     if defaults:
@@ -60,7 +62,11 @@ def parse_file(stat, filename=None, base_style=None, content=None, defaults=[]):
                 else:
                     import_file = r[1]
 
-                parse_file(stat, import_file)
+                if os.path.exists(import_file):
+                    parse_file(stat, import_file)
+
+                else:
+                    parse_file(stat, content=pgmapcss.renderer.get_base_style(r[1]))
             elif r and r[0] == 'media':
                 media = r[1]
 
