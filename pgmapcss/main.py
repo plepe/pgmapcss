@@ -21,6 +21,9 @@ parser.add_argument('style_id', type=str, help='''\
   file will be called style_id.mapnik.
 ''')
 
+parser.add_argument('-f', '--file', dest='file',
+    help='Use specified mapcss file as input (default: <style_id>.mapcss)')
+
 parser.add_argument('-d', '--database', dest='database',
     default=getpass.getuser(),
     help='Name of database (default: username)')
@@ -72,6 +75,9 @@ parser.add_argument('--lang', dest='lang',
     help='Use the given language code (e.g. "en" or "de") for language dependend instruction (e.g. function lang(), text:auto, ...). Default: language from current locale $LANG (or "en").'
 )
 
+parser.add_argument('--icons-parent-dir', dest='icons_parent_dir',
+    help='Use specified parent directory (which must already exist) to create icons. There, a directory <style_id>.icons will be created. (default: current working directory)')
+
 def main():
     print('pgmapcss version %s' % pgmapcss.version.VERSION)
     args = parser.parse_args()
@@ -83,6 +89,9 @@ def main():
         style_id = m.group(1)
 
     file_name = style_id + '.mapcss'
+
+    if args.file:
+        file_name = args.file
 
     parameters = { }
     if args.parameters is not None:
@@ -105,11 +114,15 @@ def main():
             # default: english
             lang = 'en'
 
+    icons_dir = style_id + '.icons'
+    if args.icons_parent_dir:
+        icons_dir = args.icons_parent_dir + '/' + icons_dir
+
     stat = pgmapcss.compiler.stat._stat({
         'id': style_id,
         'config': {},
         'base_style': args.base_style,
-        'icons_dir': style_id + '.icons',
+        'icons_dir': icons_dir,
         'global_data': None,
         'mode': args.mode,
         'args': args,
