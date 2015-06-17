@@ -1,3 +1,4 @@
+import os
 from pkg_resources import *
 import pgmapcss.db as db
 from .compile_db_selects import compile_db_selects
@@ -56,6 +57,7 @@ def compile_function_match(stat):
       'host': stat['args'].host,
       'password': stat['args'].password,
       'database': stat['args'].database,
+      'abs_path': repr(os.getcwd()),
       'default_lang': repr(stat['lang']),
       'user': stat['args'].user,
       'srs': stat['config']['srs'],
@@ -66,6 +68,7 @@ def compile_function_match(stat):
       'all_style_elements': repr({ k
           for k, v in stat['defines']['style_element_property'].items()
       }),
+      'translation_dir': repr(stat['config']['translation_dir']),
       'scale_denominators': repr(scale_denominators),
       'db_selects': compile_db_selects(stat['id'], stat),
       'db_query': db.query_functions(stat),
@@ -127,6 +130,7 @@ render_context = {{ 'bbox': res[0]['bounds'], 'scale_denominator': scale_denomin
     ret += '''\
 {db_query}
 {eval_functions}
+load_translation({translation_dir}, {abs_path})
 {function_check}
 db_selects = None
 {db_selects}

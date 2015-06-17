@@ -41,7 +41,7 @@ If you read a number, unit conversion takes place. The following units are suppo
 | prop | key, [string] | value | current value of the computed property on pseudo element param2 (default: current pseudo element). Examples: prop(width), prop(width, casing) | MapCSS 0.2 (no standard: pseudo element)
 | is_prop_set | key:string, [pseudo_element:string] | boolean | returns true if the property key has been set on the pseudo element pseudo_element | JOSM
 | tag | key, [key, [key, ...]] | value | value of the tag key (e.g. tag("name") ). If several keys are passed, the first set tag is returned, e.g. tag("name:en", "int_name", "name"). | MapCSS 0.2 (only one key)
-| localized_tag | key, [language] | value | Returns either a localized version of the tag with the key (e.g. 'name:en' => "Vienna") or the tag with the key (e.g. 'name' => "Wien"). See below at lang() for the default language. | MapCSS 0.2
+| localized_tag | key, [language] | value | Returns either a localized version of the tag with the key (e.g. 'name:en' => "Vienna") or the tag with the key (e.g. 'name' => "Wien"). See [[localization.md]] how the current language is assessed. | MapCSS 0.2
 | has_tag_key | key:string | boolean | returns true if the object has a tag with the given key | JOSM
 | parent_id | | text | Return the id of the current parent object. | no standard
 | parent_tag | key, [key, [key, ...]] | value | value of the tag key (e.g. parent_tag("name") ) of the parent element in the link selector. If several keys are passed, the first set tag is returned, e.g. parent_tag("name:en", "int_name", "name"). | no standard
@@ -63,7 +63,7 @@ If you read a number, unit conversion takes place. The following units are suppo
 | scale_denominator | | number | Returns current scale denominator, e.g. '17061.8366708' (at zoom level 15) | no standard
 | viewport | | geometry | Returns the bounding box of the current viewport | no standard
 | parameter | key | string | Return the chosen parameter (e.g. from the -p/--parameter argument in standalone mode) or //none//.
-| lang | | string | The currently active language. This is either the language from the active locale in standalone mode or the active locale when the style was compiled.
+| lang | | string | The currently active language. This is either the language from the active locale in standalone mode or the active locale when the style was compiled. See [[localization.md]] for details.
 
 == String Functions ==
 |= Function |= Parameters |= Return value |= Description | Compatibility
@@ -186,4 +186,4 @@ Mapnik < 3.0 can't read dynamic color values. Therefore pgmapcss has to know all
 | JOSM_pref | key:string, default:value | value | used in JOSM for advanced preferences. Does nothing, but return the default value
 | JOSM_search | | boolean | always returns false
 | _global_data | [key, [key, [...]]] | value | access a value from global_data
-| tr | str:string, arg0:value, arg1:value | JOSM-compatibility function: In JOSM this function translates English strings to the current language. In pgmapcss this is not supported (yet), but it replaces occurences of "{}" by the arguments. You can also specify the nth argument by using "{n}". Additionally all occurances of {m.key}, {m.value} and {m.tag}, where m is the mth condition of the current selector, will be replaced by the key, the value or the full tag (key=value) in _all_ arguments. Example: tr("Test: {1}{}{0}", "bar", "foo") => "Test: foobarbar"), *[power=transformer][!transformer] { tr("{0} without {1}", "{0.tag}", "{1.key}"); } => "power=cable without voltage".
+| tr | str:string, arg0..n:value | Translates strings. See doc/localization.md for details.

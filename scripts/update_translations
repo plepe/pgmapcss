@@ -1,0 +1,43 @@
+#!/usr/bin/env python3
+import os
+import json
+import subprocess
+import glob
+import re
+
+if os.path.exists('openstreetmap-tag-translations'):
+    os.chdir('openstreetmap-tag-translations')
+    subprocess.call(["git", "pull"])
+    os.chdir('..')
+else:
+    subprocess.call(["git", "clone", "https://github.com/plepe/openstreetmap-tag-translations.git"])
+
+data = {}
+for file in glob.glob('openstreetmap-tag-translations/*/*.json'):
+    m = re.match('openstreetmap-tag-translations/(.*)/(.*).json', file)
+    lang = m.group(2)
+
+    if lang == 'template':
+        continue
+
+    if not lang in data:
+        data[lang] = {}
+
+    this_data = json.loads(open(file, 'r').read())
+
+    # sanitize data
+    this_data_new = {}
+    for k, v in this_data.items():
+        if type(v) == dict:
+            if 'message' in v:
+                this_data_new[k] = v['message']
+        elif type(v) == str:
+            if v != '':
+                this_data_new[k] = v
+
+    data[lang].update(this_data_new)
+
+final_data = json.dumps(data, sort_keys=True, indent=4, ensure_ascii=False)
+open('pgmapcss/translation/tag-translations.json', 'w').write(final_data)
+subprocess.call(["git", "add", "pgmapcss/translation/tag-translations.json"])
+subprocess.call(["git", "status", "pgmapcss/translation/tag-translations.json"])
