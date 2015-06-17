@@ -1,5 +1,7 @@
 0.11 release upcoming
 * Mode standalone: specify ID or list of IDs instead of a bounding box
+* Localization: function tr() translates strings. See [[doc/localization.md]] for details.
+* Include tag translations for many OSM Tags, based on [[https://github.com/plepe/openstreetmap-tag-translations]]
 
 0.10.5 release 2015-05-05
 * DB/Overpass: download from API in blocks, to avoid huge memory consumption. specify {{{db.overpass-blocksize}}} (default: 64MB).
