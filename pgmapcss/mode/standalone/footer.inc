@@ -12,6 +12,7 @@ if __name__ == '__main__':
     import re
     import json
     import os
+    include_meta = 'false'
 
     if 'GATEWAY_INTERFACE' in os.environ:
         import cgi
@@ -139,6 +140,11 @@ if __name__ == '__main__':
             help='Use the specified spatial reference system for returned geometries (default: 4326).'
         )
 
+        parser.add_argument('--meta', dest='meta',
+            default='true',
+            help='Whether meta information should be included (true, false, only)'
+        )
+
         args = parser.parse_args()
 
         if args.bounds:
@@ -160,6 +166,8 @@ if __name__ == '__main__':
         else:
             print("Error parsing scale.")
             sys.exit(1)
+
+        include_meta = args.meta
 
         parameters = {{ }}
         if args.parameters is not None:
@@ -216,27 +224,42 @@ if __name__ == '__main__':
     results = []
     last_object = None
 
-    for result in pgmapcss_{style_id}(bounds, scale_denom, parameters):
-        if result['object'] == last_object:
-            results.append(result)
+    if include_meta in ('true', 'only'):
+        meta = {{}}
+        for result in pgmapcss_{style_id}('meta', scale_denom, parameters):
+            meta = result
+        meta['id'] = '{style_id}'
 
-        else:
-            if len(results) == 0:
-                print('{{ "type": "FeatureCollection",')
-                print('"crs": {{ "type": "name", "properties": {{ "name": "EPSG:' + str(parameters['srs']) + '" }} }},')
-                print('"features": [')
-            else:
-                print(format_result(results))
-                print(",")
+    if include_meta == 'only':
+        print(json.dumps({{ 'meta': meta }}, indent=2))
 
-            results = [result]
-            last_object = result['object']
-
-    if len(results) == 0:
-        print('{{ "type": "FeatureCollection", "features": []}}')
     else:
-        print(format_result(results))
-        print("]}}\n")
+        for result in pgmapcss_{style_id}(bounds, scale_denom, parameters):
+            if result['object'] == last_object:
+                results.append(result)
+
+            else:
+                if len(results) == 0:
+                    print('{{')
+                    if include_meta == 'true':
+                        print('  "meta": ', end='')
+                        print(json.dumps(meta, indent=2).replace('\n', '\n  '), end='')
+                        print(',')
+                    print('  "type": "FeatureCollection",')
+                    print('"crs": {{ "type": "name", "properties": {{ "name": "EPSG:' + str(parameters['srs']) + '" }} }},')
+                    print('"features": [')
+                else:
+                    print(format_result(results))
+                    print(",")
+
+                results = [result]
+                last_object = result['object']
+
+        if len(results) == 0:
+            print('{{ "type": "FeatureCollection", "features": []}}')
+        else:
+            print(format_result(results))
+            print("]}}\n")
 
     plpy.execute(plpy.prepare('truncate _pgmapcss_PGCache', []), [])
     plpy.execute(plpy.prepare('commit', []), [])
