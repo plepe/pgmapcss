@@ -37,7 +37,7 @@ When compiling in 'standalone' mode, a file {style_id}.py will be created, which
 usage: {style_id}.py [-h] [-b BOUNDS] [-s SCALE]
                        [-P PARAMETERS [PARAMETERS ...]] [--lang LANG]
 
-Executes the compiled map style and prints resulting objects.
+Executes the compiled map style and prints resulting objects. Either '--bounds' or '--id' are required.
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -50,8 +50,8 @@ optional arguments:
   -H HOST, --host HOST  Host for database (default: as set at compile time)
   -b BOUNDS, --bounds BOUNDS
                         Process the map from the specified bounding box as
-                        min_lon,min_lat,max_lon,max_lat in WGS-84. (default:
-                        whole database)
+                        min_lon,min_lat,max_lon,max_lat in WGS-84. If you pass
+                        'all', the whole database will be queried.
   -o ID [ID ...], --id ID [ID ...]
                         Instead of processing all objects in the specified
                         bounding box, process only the given object(s).
@@ -71,9 +71,11 @@ optional arguments:
 ```
 
 #### CGI script
+Either 'bbox'; 'id'; 'x', 'y' and ('z', 'zoom' or 'scale') are required.
+
 Parameter key | Description
 --------------|-------------
-bbox          | Process the map from the specified bounding box as min_lon,min_lat,max_lon,max_lat in WGS-84. (default: whole database)
+bbox          | Process the map from the specified bounding box as min_lon,min_lat,max_lon,max_lat in WGS-84.
 scale         | Process map at a specified scale denominator.
 zoom          | zoom level of standard tile based map (projection 900913)
 x, y          | x/y tiles as with images (jpg/png), requires parameter z or zoom
