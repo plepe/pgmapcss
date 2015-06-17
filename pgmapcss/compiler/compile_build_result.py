@@ -31,6 +31,19 @@ def build_result(current, pseudo_element):
         return stat['defines']['depend_property'][k]['pos']
     main_prop_order.sort(key=main_prop_order_key)
 
+    def main_prop_check_default(main_prop):
+        if main_prop in stat['defines']['default_value']:
+            return True
+
+        if main_prop in stat['defines']['default_other']:
+            prop = stat['defines']['default_other'][main_prop]['value']
+            if prop in stat.properties():
+                return True
+            else:
+                return main_prop_check_default(prop)
+
+        return False
+
     stat['may_have_postprocessed'] = set()
     # start with props from @depend_property
     for main_prop in main_prop_order:
@@ -38,6 +51,8 @@ def build_result(current, pseudo_element):
         include_main_prop = False
         if main_prop in stat.properties():
             include_main_prop = True
+        else:
+            include_main_prop = main_prop_check_default(main_prop)
 
         props = props['value'].split(';')
         r = ''
@@ -62,7 +77,10 @@ def build_result(current, pseudo_element):
             r += print_postprocess(main_prop, stat, indent=indent + '    ')
 
         if include_main_prop and r != '':
-            ret += indent + 'if ' + repr(main_prop) + " in current['properties'][pseudo_element]:\n"
+            ret += indent + 'if ' + repr(main_prop) + " in current['properties'][pseudo_element]"
+            if main_prop in stat['defines']['default_other']:
+                ret += " or " + repr(stat['defines']['default_other'][main_prop]['value']) + " in current['properties'][pseudo_element]"
+            ret += ":\n"
             ret += r
 
     for prop in [ prop for prop in stat.properties() if not prop in done_prop ]:

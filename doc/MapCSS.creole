@@ -478,6 +478,8 @@ E.g.
 
 For @default_other, @values: don't process depending values if main property is not set.
 
+The main_property may default to a specific value (see @default_value) or the value of another property (see @default_other).
+
 == Style-Elements depending on property ==
 {{{
 @style_element_property line "width;color";
