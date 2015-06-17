@@ -4,6 +4,19 @@ import copy
 # combinations from set statements. also, conditions with a key prefixed by '.'
 # are removed.
 def resolve_set_statements(statement, done, stat):
+    # if as type a wildcard was given ('*'), run resolve_set_statements with
+    # all possible types
+    if statement['selector']['type'] is True:
+        ret = []
+
+        for r in [ 'node', 'way', 'relation', 'multipolygon' ]:
+            s = copy.deepcopy(statement)
+            s['selector']['type'] = r
+            ret += resolve_set_statements(s, done, stat)
+            done.remove(s['id'])
+
+        return ret
+
     # initialize return selector(s) with empty conditions
     ret = copy.deepcopy(statement['selector'])
     ret['conditions'] = []

@@ -244,14 +244,14 @@ where osm_id>0 and {bbox} ( {w} )
 
 # planet_osm_polygon - relations
     w = []
-    for t in ('*', 'area', 'relation'):
+    for t in ('*', 'area', 'relation', 'multipolygon'):
         if t in db_selects:
             w.append(db_selects[t])
 
     if len(w):
         qry = '''
 select 'r' || cast(-osm_id as text) as id,
-       way as geo, Array['area', 'relation'] as types
+       way as geo, Array['area', 'relation', 'multipolygon'] as types
 # START db.has-hstore
        , tags
 # END db.has-hstore
@@ -365,7 +365,7 @@ def objects_by_id(id_list, options):
             'tags': flatarray_to_tags(r['tags']) if r['tags'] else {},
             'members': flatarray_to_members(r['members']),
             'geo': r['way'],
-            'types': ['relation'] if r['way'] is None else ['relation', 'area']
+            'types': ['relation'] if r['way'] is None else ['relation', 'area', 'multipolygon']
         }
         t['tags']['osm:id'] = t['id']
         yield t
