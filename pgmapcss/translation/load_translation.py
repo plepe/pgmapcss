@@ -4,10 +4,10 @@ def load_translation(translation_dir, abs_path):
     translation_strings = {}
 
     try:
-        data = open(translation_dir + '/' + parameters['lang'] + '.json', 'r').read()
+        data = open(translation_dir + '/' + parameters['lang'] + '.json', 'r', encoding='utf-8').read()
     except IOError:
         try:
-            data = open(abs_path + '/' + translation_dir + '/' + parameters['lang'] + '.json', 'r').read()
+            data = open(abs_path + '/' + translation_dir + '/' + parameters['lang'] + '.json', 'r', encoding='utf-8').read()
         except IOError:
             return
 
