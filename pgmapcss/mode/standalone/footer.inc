@@ -160,7 +160,7 @@ if __name__ == '__main__':
         elif args.id:
             bounds = set(args.id)
 
-        else:
+        elif args.meta != 'only':
             print("Argument 'bounds' not defined, expecting four numbers or 'all'")
             sys.exit(1)
 
