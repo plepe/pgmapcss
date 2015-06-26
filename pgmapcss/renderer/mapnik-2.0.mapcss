@@ -62,7 +62,7 @@
 @postprocess final-icon-image eval(cond(
   prop('icon-image') && (!regexp_test('\\.', prop('icon-image'))),
     style_id() . '.icons/' . prop('icon-image') . '-' . prop('icon-color') . '-' . prop('icon-width'). '.svg',
-    prop('icon-image')
+    style_id() . '.icons/' . prop('icon-image')
   ));
 @postprocess final-symbol-image eval(
 style_id() . '.icons/symbol-' . prop('symbol-shape') .'-'. prop('symbol-size') .'-'. prop('symbol-stroke-width') .'-'. prop('symbol-stroke-color') .'-'. prop('symbol-stroke-opacity') .'-'. prop('symbol-fill-color') .'-'. prop('symbol-fill-opacity') .'.svg');
