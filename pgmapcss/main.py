@@ -124,6 +124,8 @@ def main():
         'config': {},
         'base_style': args.base_style,
         'icons_dir': icons_dir,
+        'file_name': file_name,
+        'dir_name': os.path.dirname(file_name),
         'global_data': None,
         'mode': args.mode,
         'args': args,

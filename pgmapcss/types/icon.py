@@ -19,9 +19,9 @@ class icon(default):
                 # assume maki icon
                 # TODO: check if icon is part of Maki
                 pass
-            elif os.path.exists(prop['value']):
+            elif os.path.exists(self.stat['dir_name'] + '/' + prop['value']):
                 from wand.image import Image
-                img = Image(filename=prop['value'])
+                img = Image(filename=self.stat['dir_name'] + '/' + prop['value'])
                 self.data[prop['value']] = img.size
             else:
                 print('Warning: icon {value} not found - can\'t determine size.'.format(**prop))

@@ -2,8 +2,10 @@ import os
 from pkg_resources import *
 
 def build_icon(x, stat):
-    if os.path.exists(x['icon-image']):
-        return x['icon-image']
+    if os.path.exists(stat['dir_name'] + '/' + x['icon-image']):
+        os.copy(stat['dir_name'] + '/' + x['icon-image'], stat['icons_dir'] + '/' + x['icon-image'])
+
+        return stat['icons_dir'] + '/' + x['icon-image']
 
     if True in x.values():
         return True
