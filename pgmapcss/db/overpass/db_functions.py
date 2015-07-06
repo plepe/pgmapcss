@@ -23,7 +23,10 @@ def overpass_run(intro):
     index = 0
     collect = []
 
-    query, closure_collect, closure_process, cl_param = query_cache[index]
+    _query_cache = query_cache
+    query_cache = []
+
+    query, closure_collect, closure_process, cl_param = _query_cache[index]
     for r in overpass_query(total_query):
         if r['type'] == 'node' and not 'lat' in r:
             if closure_process:
@@ -33,15 +36,13 @@ def overpass_run(intro):
                 collect = []
 
             index += 1
-            query, closure_collect, closure_process, cl_param = query_cache[index]
+            query, closure_collect, closure_process, cl_param = _query_cache[index]
         else:
             t = closure_collect(r, cl_param)
             if closure_process:
                 collect.append(t)
             else:
                 yield t
-
-    query_cache = []
 
 def overpass_query(query):
     import urllib.request
