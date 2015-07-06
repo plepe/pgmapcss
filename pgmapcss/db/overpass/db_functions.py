@@ -9,19 +9,34 @@ def overpass_send_query(query, closure_collect, closure_process=None, cl_param=N
 
 def overpass_run(intro):
     global query_cache
+    closure_process = None
+
+    # use "node;out 1 ids;" as separator statement between requests
+    total_query = intro + '\nnode;out 1 ids\n'.join([
+        query
+        for query, closure_collect, closure_process, cl_param in query_cache
+    ])
+
+    index = 0
     collect = []
 
-    for query, closure_collect, closure_process, cl_param in query_cache:
-        for r in overpass_query(intro + query):
+    query, closure_collect, closure_process, cl_param = query_cache[index]
+    for r in overpass_query(total_query):
+        if r['type'] == 'node' and not 'lat' in r:
+            if closure_process:
+                for t in closure_process(collect, cl_param):
+                    yield t
+
+                collect = []
+
+            index += 1
+            query, closure_collect, closure_process, cl_param = query_cache[index]
+        else:
             t = closure_collect(r, cl_param)
             if closure_process:
                 collect.append(t)
             else:
                 yield t
-
-    if closure_process:
-        for t in closure_process(collect, cl_param):
-            yield t
 
     query_cache = []
 
