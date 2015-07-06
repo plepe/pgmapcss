@@ -68,6 +68,8 @@ optional arguments:
                         $LANG (or "en").
   --meta META           Whether meta information should be included (true,
                         false, only)
+  --srs SRS             Use the specified spatial reference system for
+                        returned geometries (default: 4326).
 ```
 
 #### CGI script

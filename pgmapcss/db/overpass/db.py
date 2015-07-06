@@ -264,6 +264,12 @@ class db(default):
                         for c in c1
                         if c != d1[0]
                     ] + [ ( 'key', d1[0][1] ) ]
+            if d1[0][0] == 'parent_key' or d2[0][0] == 'parent_key':
+                return [
+                        c
+                        for c in c1
+                        if c != d1[0]
+                    ] + [ ( 'parent_key', d1[0][1] ) ]
 
     def check_merge_regexp(self, c1, c2):
         # c1 and c2 only differ in one condition and it has the same key

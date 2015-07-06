@@ -1,4 +1,45 @@
 #[out:json][bbox:{{bbox}}];(way[name=Marschnergasse];way[name=Erdbrustgasse]);out geom meta;
+global query_cache
+query_cache = []
+
+def overpass_send_query(query, closure_collect, closure_process=None, cl_param=None):
+    global query_cache
+
+    query_cache.append(( query, closure_collect, closure_process, cl_param ))
+
+def overpass_run(intro):
+    global query_cache
+    closure_process = None
+
+    # use "node;out 1 ids;" as separator statement between requests
+    total_query = intro + '\nnode;out 1 ids\n'.join([
+        query
+        for query, closure_collect, closure_process, cl_param in query_cache
+    ])
+
+    index = 0
+    collect = []
+
+    _query_cache = query_cache
+    query_cache = []
+
+    query, closure_collect, closure_process, cl_param = _query_cache[index]
+    for r in overpass_query(total_query):
+        if r['type'] == 'node' and not 'lat' in r:
+            if closure_process:
+                for t in closure_process(collect, cl_param):
+                    yield t
+
+                collect = []
+
+            index += 1
+            query, closure_collect, closure_process, cl_param = _query_cache[index]
+        else:
+            t = closure_collect(r, cl_param)
+            if closure_process:
+                collect.append(t)
+            else:
+                yield t
 
 def overpass_query(query):
     import urllib.request
@@ -316,15 +357,18 @@ def get_bbox(_bbox=None):
 
 def objects_bbox(_bbox, db_selects, options):
     non_relevant_tags = {'type', 'source', 'source:ref', 'source_ref', 'note', 'comment', 'created_by', 'converted_by', 'fixme', 'FIXME', 'description', 'attribution', 'osm:id', 'osm:version', 'osm:user_id', 'osm:user', 'osm:timestamp', 'osm:changeset'}
-    ways_done = []
-    rels_done = []
-    area_ways_done = []
+    done = {
+        'ways': [],
+        'rels': [],
+        'area_ways': []
+    }
 
-    qry = '[out:json][timeout:{db.overpass-timeout}][maxsize:{db.overpass-memory}]'
+    qry = ''
+    qry_intro = ''
     replacements = {}
 
     if _bbox:
-        qry += '[bbox:' + get_bbox(_bbox) + ']'
+        qry_intro += '[bbox:' + get_bbox(_bbox) + ']'
         replacements['__BBOX__'] = '(' + get_bbox(_bbox) + ')'
     else:
         replacements['__BBOX__'] = ''
@@ -348,10 +392,7 @@ def objects_bbox(_bbox, db_selects, options):
         for r1, r2 in replacements.items():
             q = q.replace(r1, r2)
 
-        for r in overpass_query(q):
-            t = assemble_object(r)
-            if t:
-                yield t
+        overpass_send_query(q, assemble_object)
 
         #'http://overpass-turbo.eu/?Q=' + q).read()
 
@@ -382,58 +423,65 @@ def objects_bbox(_bbox, db_selects, options):
         _ways = {}
         _rels = {}
 
-        for r in overpass_query(q):
+        def cl_mp_collect(r, cl_param):
             if r['type'] == 'way':
-                _ways[r['id']] = r
+                cl_param[0][r['id']] = r
             elif r['type'] == 'relation':
-                _rels[r['id']] = r
+                cl_param[1][r['id']] = r
 
-        for rid, r in _rels.items():
-            mp_tags = {
-                    vk: vv
-                    for vk, vv in r['tags'].items()
-                    if vk not in non_relevant_tags
-                }
-            is_valid_mp = True
-            outer_tags = None
+        def cl_mp_process(items, cl_param):
+            _ways = cl_param[0]
+            _rels = cl_param[1]
+            done = cl_param[2]
 
-            for outer in r['members']:
-                if outer['role'] in ('', 'outer'):
-                    if not outer['ref'] in _ways:
-                        continue
+            for rid, r in _rels.items():
+                mp_tags = {
+                        vk: vv
+                        for vk, vv in r['tags'].items()
+                        if vk not in non_relevant_tags
+                    }
+                is_valid_mp = True
+                outer_tags = None
 
-                    outer_way = _ways[outer['ref']]
-                    tags = {
-                            vk: vv
-                            for vk, vv in outer_way['tags'].items()
-                            if vk not in non_relevant_tags
-                        } if 'tags' in outer_way else {}
-
-                    if outer_tags is None:
-                        outer_tags = tags
-                    elif outer_tags != tags:
-                        is_valid_mp = True
-
-            if (len(mp_tags) == 0 or mp_tags == outer_tags) and \
-                is_valid_mp and outer_tags is not None:
-                rels_done.append(rid)
                 for outer in r['members']:
                     if outer['role'] in ('', 'outer'):
-                        area_ways_done.append(outer['ref'])
+                        if not outer['ref'] in _ways:
+                            continue
 
-                t = assemble_object(r)
-                if t:
-                    if len(mp_tags) == 0:
-                        t['id'] = 'm' + str(r['id'])
-                        t['types'] = ['multipolygon', 'area']
-                        t['tags'] = outer_tags
-                        t['tags']['osm:id'] = t['id']
-                        t['tags']['osm:has_outer_tags'] = 'yes'
+                        outer_way = _ways[outer['ref']]
+                        tags = {
+                                vk: vv
+                                for vk, vv in outer_way['tags'].items()
+                                if vk not in non_relevant_tags
+                            } if 'tags' in outer_way else {}
 
-                    yield t
+                        if outer_tags is None:
+                            outer_tags = tags
+                        elif outer_tags != tags:
+                            is_valid_mp = True
 
-        _ways = None
-        _rels = None
+                if (len(mp_tags) == 0 or mp_tags == outer_tags) and \
+                    is_valid_mp and outer_tags is not None:
+                    done['rels'].append(rid)
+                    for outer in r['members']:
+                        if outer['role'] in ('', 'outer'):
+                            done['area_ways'].append(outer['ref'])
+
+                    t = assemble_object(r)
+                    if t:
+                        if len(mp_tags) == 0:
+                            t['id'] = 'm' + str(r['id'])
+                            t['types'] = ['multipolygon', 'area']
+                            t['tags'] = outer_tags
+                            t['tags']['osm:id'] = t['id']
+                            t['tags']['osm:has_outer_tags'] = 'yes'
+
+                        yield t
+
+            _ways = None
+            _rels = None
+
+        overpass_send_query(q, cl_mp_collect, cl_mp_process, ( _ways, _rels, done ))
 
     # ways - will be run 3 times, first for areas, then lines and finally for not specified ways
     for types in [
@@ -457,23 +505,25 @@ def objects_bbox(_bbox, db_selects, options):
             for r1, r2 in replacements.items():
                 q = q.replace(r1, r2)
 
-            for r in overpass_query(q):
-                if r['id'] in ways_done:
-                    continue
+            def cl_ways(r, done):
+                if r['id'] in done['ways']:
+                    return
 
                 # check, if way was part of multipolygon (with tags from outer
                 # ways) -> may not be area
                 way_polygon = types['way_polygon']
-                if r['id'] in area_ways_done:
+                if r['id'] in done['area_ways']:
                     if types['way_polygon'] == True:
-                        continue
+                        return
                     else:
                         way_polygon = False
 
                 t = assemble_object(r, way_polygon=way_polygon)
                 if t:
-                    ways_done.append(r['id'])
-                    yield t
+                    done['ways'].append(r['id'])
+                    return t
+
+            overpass_send_query(q, cl_ways, None, done)
 
     # relations
     w = []
@@ -489,14 +539,14 @@ def objects_bbox(_bbox, db_selects, options):
         for r1, r2 in replacements.items():
             q = q.replace(r1, r2)
 
-        for r in overpass_query(q):
-            if r['id'] in rels_done:
-                continue
-            rels_done.append(r['id'])
+        def cl_rels(r, done):
+            if r['id'] in done['rels']:
+                return
+            done['rels'].append(r['id'])
 
-            t = assemble_object(r)
-            if t:
-                yield t
+            return assemble_object(r)
+
+        overpass_send_query(q, cl_rels, None, done)
 
     # areas (objects surrounding the current bounding box)
     w = []
@@ -511,18 +561,22 @@ def objects_bbox(_bbox, db_selects, options):
         q1 = ');('.join([ w1['query'] for w1 in w ]).replace('__TYPE__', 'relation(pivot.a)')
         q2 = ');('.join([ w1['query'] for w1 in w ]).replace('__TYPE__', 'way(pivot.a)')
 
-        q = ('[out:json][timeout:{db.overpass-timeout}][maxsize:{db.overpass-memory}];is_in({})->.a;(' + q1 + q2 + ');out meta geom;').format(res[0]['geom'])
+        q = (';is_in({})->.a;(' + q1 + q2 + ');out meta geom;').format(res[0]['geom'])
         for r1, r2 in replacements.items():
             q = q.replace(r1, r2)
 
-        for r in overpass_query(q):
-            if (r['type'] == 'way' and r['id'] in ways_done) or\
-               (r['type'] == 'relation' and r['id'] in rels_done):
-                continue
+        def cl_ways_rels(r, done):
+            if (r['type'] == 'way' and r['id'] in done['ways']) or\
+               (r['type'] == 'relation' and r['id'] in done['rels']):
+                return
 
-            t = assemble_object(r)
-            if t:
-                yield t
+            return assemble_object(r)
+
+        overpass_send_query(q, cl_ways_rels, None, done)
+
+    for r in overpass_run('[out:json][timeout:{db.overpass-timeout}][maxsize:{db.overpass-memory}]' + qry_intro):
+        if r:
+            yield r
 
 def objects_by_id(id_list, options):
     if len(id_list) == 0:
