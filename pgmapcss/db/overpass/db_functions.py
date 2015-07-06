@@ -315,9 +315,11 @@ def get_bbox(_bbox=None):
 
 def objects_bbox(_bbox, db_selects, options):
     non_relevant_tags = {'type', 'source', 'source:ref', 'source_ref', 'note', 'comment', 'created_by', 'converted_by', 'fixme', 'FIXME', 'description', 'attribution', 'osm:id', 'osm:version', 'osm:user_id', 'osm:user', 'osm:timestamp', 'osm:changeset'}
-    ways_done = []
-    rels_done = []
-    area_ways_done = []
+    done = {
+        'ways': [],
+        'rels': [],
+        'area_ways': []
+    }
 
     qry = '[out:json][timeout:{db.overpass-timeout}][maxsize:{db.overpass-memory}]'
     replacements = {}
@@ -415,10 +417,10 @@ def objects_bbox(_bbox, db_selects, options):
 
             if (len(mp_tags) == 0 or mp_tags == outer_tags) and \
                 is_valid_mp and outer_tags is not None:
-                rels_done.append(rid)
+                done['rels'].append(rid)
                 for outer in r['members']:
                     if outer['role'] in ('', 'outer'):
-                        area_ways_done.append(outer['ref'])
+                        done['area_ways'].append(outer['ref'])
 
                 t = assemble_object(r)
                 if t:
@@ -457,13 +459,13 @@ def objects_bbox(_bbox, db_selects, options):
                 q = q.replace(r1, r2)
 
             for r in overpass_query(q):
-                if r['id'] in ways_done:
+                if r['id'] in done['ways']:
                     continue
 
                 # check, if way was part of multipolygon (with tags from outer
                 # ways) -> may not be area
                 way_polygon = types['way_polygon']
-                if r['id'] in area_ways_done:
+                if r['id'] in done['area_ways']:
                     if types['way_polygon'] == True:
                         continue
                     else:
@@ -471,7 +473,7 @@ def objects_bbox(_bbox, db_selects, options):
 
                 t = assemble_object(r, way_polygon=way_polygon)
                 if t:
-                    ways_done.append(r['id'])
+                    done['ways'].append(r['id'])
                     yield t
 
     # relations
@@ -489,9 +491,9 @@ def objects_bbox(_bbox, db_selects, options):
             q = q.replace(r1, r2)
 
         for r in overpass_query(q):
-            if r['id'] in rels_done:
+            if r['id'] in done['rels']:
                 continue
-            rels_done.append(r['id'])
+            done['rels'].append(r['id'])
 
             t = assemble_object(r)
             if t:
@@ -515,8 +517,8 @@ def objects_bbox(_bbox, db_selects, options):
             q = q.replace(r1, r2)
 
         for r in overpass_query(q):
-            if (r['type'] == 'way' and r['id'] in ways_done) or\
-               (r['type'] == 'relation' and r['id'] in rels_done):
+            if (r['type'] == 'way' and r['id'] in done['ways']) or\
+               (r['type'] == 'relation' and r['id'] in done['rels']):
                 continue
 
             t = assemble_object(r)
