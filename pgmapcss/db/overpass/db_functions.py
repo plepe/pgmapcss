@@ -7,16 +7,17 @@ def overpass_send_query(query, closure_collect, closure_process=None, cl_param=N
 
     query_cache.append(( query, closure_collect, closure_process, cl_param ))
 
-def overpass_run():
+def overpass_run(intro):
     global query_cache
     collect = []
 
     for query, closure_collect, closure_process, cl_param in query_cache:
-        for r in overpass_query(query):
+        for r in overpass_query(intro + query):
+            t = closure_collect(r, cl_param)
             if closure_process:
-                collect.append(closure_collect(r, cl_param))
+                collect.append(t)
             else:
-                yield closure_collect(r, cl_param)
+                yield t
 
     if closure_process:
         for t in closure_process(collect, cl_param):
@@ -345,11 +346,12 @@ def objects_bbox(_bbox, db_selects, options):
         'area_ways': []
     }
 
-    qry = '[out:json][timeout:{db.overpass-timeout}][maxsize:{db.overpass-memory}]'
+    qry = ''
+    qry_intro = ''
     replacements = {}
 
     if _bbox:
-        qry += '[bbox:' + get_bbox(_bbox) + ']'
+        qry_intro += '[bbox:' + get_bbox(_bbox) + ']'
         replacements['__BBOX__'] = '(' + get_bbox(_bbox) + ')'
     else:
         replacements['__BBOX__'] = ''
@@ -542,7 +544,7 @@ def objects_bbox(_bbox, db_selects, options):
         q1 = ');('.join([ w1['query'] for w1 in w ]).replace('__TYPE__', 'relation(pivot.a)')
         q2 = ');('.join([ w1['query'] for w1 in w ]).replace('__TYPE__', 'way(pivot.a)')
 
-        q = ('[out:json][timeout:{db.overpass-timeout}][maxsize:{db.overpass-memory}];is_in({})->.a;(' + q1 + q2 + ');out meta geom;').format(res[0]['geom'])
+        q = (';is_in({})->.a;(' + q1 + q2 + ');out meta geom;').format(res[0]['geom'])
         for r1, r2 in replacements.items():
             q = q.replace(r1, r2)
 
@@ -555,7 +557,7 @@ def objects_bbox(_bbox, db_selects, options):
 
         overpass_send_query(q, cl_ways_rels, None, done)
 
-    for r in overpass_run():
+    for r in overpass_run('[out:json][timeout:{db.overpass-timeout}][maxsize:{db.overpass-memory}]' + qry_intro):
         if r:
             yield r
 
