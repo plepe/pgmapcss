@@ -9,7 +9,7 @@ def resolve_set_statements(statement, done, stat):
     if statement['selector']['type'] is True:
         ret = []
 
-        for r in [ 'node', 'way', 'relation', 'multipolygon' ]:
+        for r in [ 'node', 'point', 'way', 'relation', 'multipolygon', 'area', 'line' ]:
             s = copy.deepcopy(statement)
             s['selector']['type'] = r
             ret += resolve_set_statements(s, done, stat)
