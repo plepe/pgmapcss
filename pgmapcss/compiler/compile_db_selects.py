@@ -33,6 +33,7 @@ def resolve_set_statements(statement, done, stat):
 
         # check if there are any statements which assign the current condition key
         filter = {
+            'object_type': statement['selector']['type'],
             'has_set_tag': condition['key'],
             'max_id': statement['id'],
             'min_scale': statement['selector']['min_scale'],
