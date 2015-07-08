@@ -9,7 +9,7 @@ def resolve_set_statements(statement, done, stat):
     if statement['selector']['type'] is True:
         ret = []
 
-        for r in [ 'node', 'way', 'relation', 'multipolygon' ]:
+        for r in [ 'node', 'point', 'way', 'relation', 'multipolygon', 'area', 'line' ]:
             s = copy.deepcopy(statement)
             s['selector']['type'] = r
             ret += resolve_set_statements(s, done, stat)
@@ -33,6 +33,7 @@ def resolve_set_statements(statement, done, stat):
 
         # check if there are any statements which assign the current condition key
         filter = {
+            'object_type': statement['selector']['type'],
             'has_set_tag': condition['key'],
             'max_id': statement['id'],
             'min_scale': statement['selector']['min_scale'],
