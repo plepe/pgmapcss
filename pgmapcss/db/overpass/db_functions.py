@@ -156,8 +156,8 @@ def overpass_query(query):
 
     if 'remark' in result:
         # ignore timeout if it happens in "print"
-        if not re.search("Query timed out in \"print\"", data['remark']):
-          raise Exception('Error in Overpass API (after {} features): {}\nFailed query was:\n{}'.format(count, data['remark'], query))
+        if not re.search("Query timed out in \"print\"", result['remark']):
+          raise Exception('Error in Overpass API (after {} features): {}\nFailed query was:\n{}'.format(count, result['remark'], query))
 
     f.close()
 
